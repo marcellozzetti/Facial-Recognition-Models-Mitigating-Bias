@@ -459,7 +459,7 @@ precisions = []
 log_losses = []
 
 for epoch in range(num_epochs):
-    #adjust_learning_rate(optimizer, epoch)
+    adjust_learning_rate(optimizer, epoch)
 
     model.train()
 
@@ -507,6 +507,14 @@ for epoch in range(num_epochs):
             all_preds.extend(preds)
             all_probs.extend(probs)
 
+    scheduler.step(epoch_loss)
+
+    # Early stopping
+    early_stopping(logloss)
+    if early_stopping.early_stop:
+        print("Early stopping")
+        break
+
     # Numpy conversion 
     #all_labels = npy.array(all_labels)
     #all_preds = npy.array(all_preds)
@@ -532,14 +540,6 @@ for epoch in range(num_epochs):
     print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(train_loader):.4f}, '
           f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
-    scheduler.step(epoch_loss)
-
-    # Early stopping
-    early_stopping(logloss)
-    if early_stopping.early_stop:
-        print("Early stopping")
-        break
-    
     # Resources optimization
     del images, labels, outputs, loss
     gc.collect()
