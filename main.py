@@ -418,7 +418,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
 
 def softmax(x):
-    exp_x = np.exp(x - np.max(x))  # Subtrair o máximo para estabilidade numérica
+    exp_x = npy.exp(x - npy.max(x))  # Subtrair o máximo para estabilidade numérica
     return exp_x / exp_x.sum(axis=1, keepdims=True)
 
 print("Step 10 (CNN model): End")
@@ -476,8 +476,8 @@ for epoch in range(num_epochs):
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
 
-            #probs = F.softmax(outputs, dim=1).cpu().numpy()
-            probs = F.softmax(outputs, dim=1)
+            probs = F.softmax(outputs, dim=1).cpu().numpy()
+            #probs = F.softmax(outputs, dim=1)
 
             print("Verificando probs: ", probs)
 
