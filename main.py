@@ -383,7 +383,10 @@ def collate_fn(batch):
         return torch.empty(0), torch.empty(0)
     return torch.utils.data.dataloader.default_collate(batch)
 
-class_counts = torch.bincount(torch.tensor(csv_train_lab_pd['race'].values))
+label_encoder = LabelEncoder()
+label_encoder.fit(csv_train_lab_pd['race'])
+
+class_counts = len(label_encoder.classes_)
 class_weights = 1.0 / class_counts.float()
 sample_weights = class_weights[torch.tensor(csv_train_lab_pd['race'].values)]
 
@@ -393,9 +396,6 @@ train_loader = DataLoader(train_dataset, batch_size=4, sampler=sampler, collate_
 # Create DataLoaders using a filter function: collate_fn
 #train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
-
-label_encoder = LabelEncoder()
-label_encoder.fit(csv_train_lab_pd['race'])
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
