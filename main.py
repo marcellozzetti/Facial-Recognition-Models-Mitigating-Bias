@@ -14,7 +14,7 @@ import plotly.graph_objs as go
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset, random_split, WeightedRandomSampler
 
 from sklearn.metrics import accuracy_score, precision_score, log_loss
 from sklearn.utils import resample
@@ -383,8 +383,15 @@ def collate_fn(batch):
         return torch.empty(0), torch.empty(0)
     return torch.utils.data.dataloader.default_collate(batch)
 
+class_counts = torch.bincount(torch.tensor(csv_train_lab_pd['race'].values))
+class_weights = 1.0 / class_counts.float()
+sample_weights = class_weights[torch.tensor(csv_train_lab_pd['race'].values)]
+
+sampler = WeightedRandomSampler(sample_weights, len(sample_weights))
+train_loader = DataLoader(train_dataset, batch_size=4, sampler=sampler, collate_fn=collate_fn)
+
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
+#train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
 
 label_encoder = LabelEncoder()
@@ -416,7 +423,7 @@ def adjust_learning_rate(optimizer, epoch):
 model = LResNet50E_IR().to(device)
 #criterion = ArcFaceLoss()
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
 scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, verbose=True)
 
 def softmax(x):
@@ -429,7 +436,7 @@ print("Step 10 (CNN model): End")
 
 print("Step 11 (Training execution): Start")
 
-num_epochs = 20
+num_epochs = 10
 
 # General Metrics
 train_losses = []
@@ -450,6 +457,9 @@ for epoch in range(num_epochs):
 
         outputs = model(images)
         loss = criterion(outputs, labels_tensor)
+
+        print("Outputs train:", outputs)
+        print("Labels train:", labels_tensor)
 
         optimizer.zero_grad()
         loss.backward()
@@ -476,6 +486,9 @@ for epoch in range(num_epochs):
             outputs = model(images)
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
+
+            print("Outputs val:", outputs)
+            print("Labels val:", labels_tensor)
 
             probs = F.softmax(outputs, dim=1).cpu().numpy()
             preds = torch.max(outputs, 1)[1].cpu().numpy()
