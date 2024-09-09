@@ -402,8 +402,8 @@ def collate_fn(batch):
     return torch.utils.data.dataloader.default_collate(batch)
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, collate_fn=collate_fn)
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_train_lab_pd['race'])
@@ -438,7 +438,7 @@ optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0
 scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, verbose=True)
 
 # Implementar early stopping
-early_stopping = EarlyStopping(patience=5)
+#early_stopping = EarlyStopping(patience=5)
 
 def softmax(x):
     exp_x = npy.exp(x - npy.max(x))  # Subtrair o máximo para estabilidade numérica
@@ -450,7 +450,7 @@ print("Step 10 (CNN model): End")
 
 print("Step 11 (Training execution): Start")
 
-num_epochs = 20
+num_epochs = 50
 
 # General Metrics
 train_losses = []
@@ -522,6 +522,8 @@ for epoch in range(num_epochs):
     all_probs = softmax(all_probs)
     logloss = log_loss(all_labels, all_probs)
 
+    scheduler.step(epoch_loss)
+
     # Armazenando as métricas
     train_losses.append(epoch_loss / len(val_loader))
     accuracies.append(accuracy)
@@ -532,8 +534,6 @@ for epoch in range(num_epochs):
     print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(train_loader):.4f}, '
           f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
-    scheduler.step(epoch_loss)
-
     # Resources optimization
     del images, labels, outputs, loss
     gc.collect()
@@ -542,14 +542,14 @@ for epoch in range(num_epochs):
     # Early stopping
     #early_stopping(logloss)
     #if early_stopping.early_stop:
-        #print("Early stopping")
-        #break
+    #    print("Early stopping")
+    #    break
 
 torch.save(model.state_dict(), model_fairface_file)
 print('Finished Training and Model Saved')
 
 # Ploting general metrics
-epochs_range = range(1, epoch + 1)
+epochs_range = range(1, num_epochs + 1)
 
 plt.figure(figsize=(12, 8))
 
