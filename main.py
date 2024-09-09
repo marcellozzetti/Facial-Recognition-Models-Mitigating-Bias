@@ -477,9 +477,6 @@ for epoch in range(num_epochs):
             epoch_loss += loss.item()
 
             probs = F.softmax(outputs, dim=1).cpu().numpy()
-            #probs = F.softmax(outputs, dim=1)
-
-            print("Verificando probs: ", probs)
 
             preds = torch.max(outputs, 1)[1].cpu().numpy()
 
