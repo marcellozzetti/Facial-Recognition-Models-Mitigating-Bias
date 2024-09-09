@@ -401,21 +401,25 @@ label_encoder.fit(csv_train_lab_pd['race'])
 class LResNet50E_IR(nn.Module):
     def __init__(self, num_classes=len(label_encoder.classes_)):
         super(LResNet50E_IR, self).__init__()
-        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+        self.backbone = models.resnet50(pretrained=True)
+        self.backbone.fc = nn.Sequential(
+            nn.Linear(self.backbone.fc.in_features, 512),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(512, num_classes)
+        )
 
     def forward(self, x):
         return self.backbone(x)
 
 # Adjustments learning Rate
 def adjust_learning_rate(optimizer, epoch):
-    lr = 0.1
-    if epoch >= 24:
-        lr /= 10
-    if epoch >= 30:
-        lr /= 10
-    if epoch >= 36:
-        lr /= 10
+    if epoch < 10:
+        lr = 0.01
+    elif epoch < 15:
+        lr = 0.001
+    else:
+        lr = 0.0001
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
