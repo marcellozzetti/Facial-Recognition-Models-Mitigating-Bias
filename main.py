@@ -549,7 +549,7 @@ torch.save(model.state_dict(), model_fairface_file)
 print('Finished Training and Model Saved')
 
 # Ploting general metrics
-epochs_range = range(1, num_epochs + 1)
+epochs_range = range(1, epoch + 1)
 
 plt.figure(figsize=(12, 8))
 
