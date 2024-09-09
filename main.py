@@ -23,6 +23,7 @@ from sklearn.preprocessing import LabelEncoder
 import torchvision.transforms as transforms
 import torchvision.models as models
 from torchvision.models import ResNet50_Weights
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 import torch.nn.functional as F
 
 import matplotlib.patches as patches
@@ -360,6 +361,25 @@ class FaceDataset(Dataset):
             print(f"Error processing image {img_name}: {e}")
             return None, None
 
+class EarlyStopping:
+    def __init__(self, patience=5, verbose=False):
+        self.patience = patience
+        self.verbose = verbose
+        self.counter = 0
+        self.best_loss = None
+        self.early_stop = False
+
+    def __call__(self, val_loss):
+        if self.best_loss is None:
+            self.best_loss = val_loss
+        elif val_loss > self.best_loss:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+        else:
+            self.best_loss = val_loss
+            self.counter = 0
+
 # Transformations and normalization
 transform = transforms.Compose([
     transforms.ToTensor(),
@@ -385,7 +405,6 @@ def collate_fn(batch):
 train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
 
-label_encoder = LabelEncoder()
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_train_lab_pd['race'])
 
@@ -416,6 +435,10 @@ model = LResNet50E_IR().to(device)
 #criterion = ArcFaceLoss()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, verbose=True)
+
+# Implementar early stopping
+early_stopping = EarlyStopping(patience=5)
 
 def softmax(x):
     exp_x = npy.exp(x - npy.max(x))  # Subtrair o máximo para estabilidade numérica
@@ -427,7 +450,7 @@ print("Step 10 (CNN model): End")
 
 print("Step 11 (Training execution): Start")
 
-num_epochs = 10
+num_epochs = 20
 
 # General Metrics
 train_losses = []
@@ -436,7 +459,7 @@ precisions = []
 log_losses = []
 
 for epoch in range(num_epochs):
-    adjust_learning_rate(optimizer, epoch)
+    #adjust_learning_rate(optimizer, epoch)
 
     model.train()
 
@@ -484,12 +507,10 @@ for epoch in range(num_epochs):
             all_preds.extend(preds)
             all_probs.extend(probs)
 
-    # Numpy conversion
-    
+    # Numpy conversion 
     #all_labels = npy.array(all_labels)
     #all_preds = npy.array(all_preds)
     #all_probs = npy.array(all_probs)
-
     all_labels = [label.item() for label in all_labels]
 
     print("all_labels", all_labels)
@@ -511,6 +532,14 @@ for epoch in range(num_epochs):
     print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(train_loader):.4f}, '
           f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
+    scheduler.step(epoch_loss)
+
+    # Early stopping
+    early_stopping(logloss)
+    if early_stopping.early_stop:
+        print("Early stopping")
+        break
+    
     # Resources optimization
     del images, labels, outputs, loss
     gc.collect()
