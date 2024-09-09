@@ -489,6 +489,8 @@ for epoch in range(num_epochs):
     #all_preds = npy.array(all_preds)
     #all_probs = npy.array(all_probs)
 
+    all_labels = [label.cpu().numpy() for label in all_labels]
+
     print("all_labels", all_labels)
     print("all_preds", all_preds)
 
