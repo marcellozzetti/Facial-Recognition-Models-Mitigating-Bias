@@ -481,15 +481,13 @@ for epoch in range(num_epochs):
             all_probs.extend(probs)
 
     # Numpy conversion
-    # Create a tensor on GPU
-    gpu_tensor = torch.randn(2, 3, device='cuda')
-
-    # Move it to CPU and convert to NumPy
-    cpu_tensor = gpu_tensor.cpu().numpy()
+    all_labels = all_labels.cpu().numpy()
+    all_preds = all_preds.cpu().numpy()
+    all_probs = all_probs.cpu().numpy()
     
-    all_labels = npy.array(all_labels)
-    all_preds = npy.array(all_preds)
-    all_probs = npy.array(all_probs)
+    #all_labels = npy.array(all_labels)
+    #all_preds = npy.array(all_preds)
+    #all_probs = npy.array(all_probs)
 
     print("all_labels", all_labels)
     print("all_preds", all_preds)
