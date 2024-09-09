@@ -509,12 +509,6 @@ for epoch in range(num_epochs):
 
     scheduler.step(epoch_loss)
 
-    # Early stopping
-    early_stopping(logloss)
-    if early_stopping.early_stop:
-        print("Early stopping")
-        break
-
     # Numpy conversion 
     #all_labels = npy.array(all_labels)
     #all_preds = npy.array(all_preds)
@@ -544,6 +538,12 @@ for epoch in range(num_epochs):
     del images, labels, outputs, loss
     gc.collect()
     torch.cuda.empty_cache()
+
+    # Early stopping
+    early_stopping(logloss)
+    if early_stopping.early_stop:
+        print("Early stopping")
+        break
 
 torch.save(model.state_dict(), model_fairface_file)
 print('Finished Training and Model Saved')
