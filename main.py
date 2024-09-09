@@ -540,10 +540,10 @@ for epoch in range(num_epochs):
     torch.cuda.empty_cache()
 
     # Early stopping
-    early_stopping(logloss)
-    if early_stopping.early_stop:
-        print("Early stopping")
-        break
+    #early_stopping(logloss)
+    #if early_stopping.early_stop:
+        #print("Early stopping")
+        #break
 
 torch.save(model.state_dict(), model_fairface_file)
 print('Finished Training and Model Saved')
