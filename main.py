@@ -417,6 +417,10 @@ model = LResNet50E_IR().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
 
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))  # Subtrair o máximo para estabilidade numérica
+    return exp_x / exp_x.sum(axis=1, keepdims=True)
+
 print("Step 10 (CNN model): End")
 
 #11. Treinar e extrair as métricas
@@ -472,9 +476,11 @@ for epoch in range(num_epochs):
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
 
-            probs = F.softmax(outputs, dim=1).cpu().numpy()
+            #probs = F.softmax(outputs, dim=1).cpu().numpy()
+            probs = F.softmax(outputs, dim=1)
 
-            preds = torch.max(outputs, 1)[1].cpu().numpy()
+            #preds = torch.max(outputs, 1)[1].cpu().numpy()
+            preds = torch.max(outputs, 1)[1]
 
             all_labels.extend(labels_tensor)
             all_preds.extend(preds)
@@ -498,6 +504,8 @@ for epoch in range(num_epochs):
 
     accuracy = accuracy_score(all_labels, all_preds)
     precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+
+    all_probs = softmax(all_probs)
     logloss = log_loss(all_labels, all_probs)
 
     # Armazenando as métricas
