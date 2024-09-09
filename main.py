@@ -402,8 +402,8 @@ def collate_fn(batch):
     return torch.utils.data.dataloader.default_collate(batch)
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_train_lab_pd['race'])
@@ -450,7 +450,7 @@ print("Step 10 (CNN model): End")
 
 print("Step 11 (Training execution): Start")
 
-num_epochs = 50
+num_epochs = 40
 
 # General Metrics
 train_losses = []
@@ -462,7 +462,6 @@ for epoch in range(num_epochs):
     adjust_learning_rate(optimizer, epoch)
 
     model.train()
-
     start_time = time.time()
 
     for images, labels in train_loader:
