@@ -479,23 +479,21 @@ for epoch in range(num_epochs):
             #probs = F.softmax(outputs, dim=1).cpu().numpy()
             probs = F.softmax(outputs, dim=1)
 
-            #preds = torch.max(outputs, 1)[1].cpu().numpy()
-            preds = torch.max(outputs, 1)[1]
+
+            print("Verificando preds: ", torch.max(outputs, 1))
+
+            preds = torch.max(outputs, 1)[1].cpu().numpy()
+            #preds = torch.max(outputs, 1)[1]
 
             all_labels.extend(labels_tensor)
             all_preds.extend(preds)
             all_probs.extend(probs)
 
     # Numpy conversion
-    #all_labels = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_labels]
-    #all_preds = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_preds]
-    #all_probs = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_probs]
     
     #all_labels = npy.array(all_labels)
     #all_preds = npy.array(all_preds)
     #all_probs = npy.array(all_probs)
-
-    #all_labels = [label.cpu().numpy() for label in all_labels]
 
     all_labels = [label.item() for label in all_labels]
 
