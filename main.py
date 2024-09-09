@@ -507,8 +507,6 @@ for epoch in range(num_epochs):
             all_preds.extend(preds)
             all_probs.extend(probs)
 
-    #scheduler.step(epoch_loss)
-
     # Numpy conversion 
     #all_labels = npy.array(all_labels)
     #all_preds = npy.array(all_preds)
@@ -533,6 +531,8 @@ for epoch in range(num_epochs):
     # Metrics for validation step
     print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(train_loader):.4f}, '
           f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
+
+    scheduler.step(epoch_loss)
 
     # Resources optimization
     del images, labels, outputs, loss
