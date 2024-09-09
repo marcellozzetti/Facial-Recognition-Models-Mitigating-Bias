@@ -481,10 +481,9 @@ for epoch in range(num_epochs):
             all_probs.extend(probs)
 
     # Numpy conversion
-    #all_labels = all_labels.cpu().numpy()
-    all_labels = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_labels]
-    all_preds = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_preds]
-    all_probs = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_probs]
+    #all_labels = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_labels]
+    #all_preds = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_preds]
+    #all_probs = [label.cpu().numpy() if isinstance(label, torch.Tensor) else label for label in all_probs]
     
     #all_labels = npy.array(all_labels)
     #all_preds = npy.array(all_preds)
