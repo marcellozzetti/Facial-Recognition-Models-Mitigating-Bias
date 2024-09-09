@@ -363,7 +363,7 @@ class FaceDataset(Dataset):
 
 # Transformations and normalization
 transform = transforms.Compose([
-    transforms.ToPILImage(),
+    transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
@@ -515,12 +515,6 @@ for epoch in range(num_epochs):
     del images, labels, outputs, loss
     gc.collect()
     torch.cuda.empty_cache()
-
-    # Early stopping
-    #early_stopping(logloss)
-    #if early_stopping.early_stop:
-    #    print("Early stopping")
-    #    break
 
 torch.save(model.state_dict(), model_fairface_file)
 print('Finished Training and Model Saved')
