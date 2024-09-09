@@ -361,27 +361,9 @@ class FaceDataset(Dataset):
             print(f"Error processing image {img_name}: {e}")
             return None, None
 
-class EarlyStopping:
-    def __init__(self, patience=5, verbose=False):
-        self.patience = patience
-        self.verbose = verbose
-        self.counter = 0
-        self.best_loss = None
-        self.early_stop = False
-
-    def __call__(self, val_loss):
-        if self.best_loss is None:
-            self.best_loss = val_loss
-        elif val_loss > self.best_loss:
-            self.counter += 1
-            if self.counter >= self.patience:
-                self.early_stop = True
-        else:
-            self.best_loss = val_loss
-            self.counter = 0
-
 # Transformations and normalization
 transform = transforms.Compose([
+    transforms.ToPILImage(),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
@@ -437,11 +419,8 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=0.0005)
 scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, verbose=True)
 
-# Implementar early stopping
-#early_stopping = EarlyStopping(patience=5)
-
 def softmax(x):
-    exp_x = npy.exp(x - npy.max(x))  # Subtrair o máximo para estabilidade numérica
+    exp_x = npy.exp(x - npy.max(x))
     return exp_x / exp_x.sum(axis=1, keepdims=True)
 
 print("Step 10 (CNN model): End")
@@ -499,7 +478,6 @@ for epoch in range(num_epochs):
             epoch_loss += loss.item()
 
             probs = F.softmax(outputs, dim=1).cpu().numpy()
-
             preds = torch.max(outputs, 1)[1].cpu().numpy()
 
             all_labels.extend(labels_tensor)
@@ -546,6 +524,11 @@ for epoch in range(num_epochs):
 
 torch.save(model.state_dict(), model_fairface_file)
 print('Finished Training and Model Saved')
+
+print("train_losses", train_losses)
+print("accuracies", accuracies)
+print("precisions", precisions)
+print("log_losses", log_losses)
 
 # Ploting general metrics
 epochs_range = range(1, num_epochs + 1)
