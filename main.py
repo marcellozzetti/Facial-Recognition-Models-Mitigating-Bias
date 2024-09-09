@@ -507,7 +507,7 @@ for epoch in range(num_epochs):
             all_preds.extend(preds)
             all_probs.extend(probs)
 
-    scheduler.step(epoch_loss)
+    #scheduler.step(epoch_loss)
 
     # Numpy conversion 
     #all_labels = npy.array(all_labels)
