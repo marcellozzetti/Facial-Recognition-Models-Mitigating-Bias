@@ -314,10 +314,11 @@ print("Step 9 (Images Adjustments): Start")
 img_names = csv_train_lab_pd['file']
 
 # Call the function to perform the adjustments
-for img_name in img_names:
-    img_path = os.path.join(img_base_dir, img_name)
-    img = cv2.imread(img_path)
-    detect_and_adjust_faces(img, img_name, img_processed_dir, False)
+if False:
+    for img_name in img_names:
+        img_path = os.path.join(img_base_dir, img_name)
+        img = cv2.imread(img_path)
+        detect_and_adjust_faces(img, img_name, img_processed_dir, False)
 
 print("Step 9 (Images Adjustments): End")
 
