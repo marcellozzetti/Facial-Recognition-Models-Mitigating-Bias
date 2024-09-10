@@ -394,9 +394,9 @@ label_encoder.fit(csv_train_lab_pd['race'])
 #train_loader = DataLoader(train_dataset, batch_size=4, sampler=sampler, collate_fn=collate_fn)
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=2, pin_memory=False, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
-val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, num_workers=2, pin_memory=False, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
@@ -493,10 +493,10 @@ for epoch in range(num_epochs):
             probs = F.softmax(outputs, dim=1).cpu().numpy()
             preds = torch.max(outputs, 1)[1].cpu().numpy()
 
-            print("Outputs val:", outputs)
-            print("Labels val:", labels_tensor)
-            print("probs val:", probs)
-            print("preds val:", preds)
+            #print("Outputs val:", outputs)
+            #print("Labels val:", labels_tensor)
+            #print("probs val:", probs)
+            #print("preds val:", preds)
 
             all_labels.extend(labels_tensor)
             all_preds.extend(preds)
