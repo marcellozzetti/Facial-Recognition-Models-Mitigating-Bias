@@ -314,7 +314,7 @@ print("Step 9 (Images Adjustments): Start")
 img_names = csv_train_lab_pd['file']
 
 # Call the function to perform the adjustments
-if True:
+if False:
     for img_name in img_names:
         img_path = os.path.join(img_base_dir, img_name)
         img = cv2.imread(img_path)
@@ -347,10 +347,11 @@ class FaceDataset(Dataset):
                 raise FileNotFoundError(f"Image {img_name} not found")
 
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            results = detector.detect_faces(img)
 
-            if len(results) == 0:
-                raise ValueError("No face detected")
+            #results = detector.detect_faces(img)
+ f
+            #if len(results) == 0:
+            #    raise ValueError("No face detected")
 
             if self.transform:
                 img = Image.fromarray(img)
