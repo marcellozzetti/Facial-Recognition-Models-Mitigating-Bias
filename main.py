@@ -16,7 +16,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset, random_split, WeightedRandomSampler
 
-from torch.cuda.amp import GradScaler, autocast
+from torch.amp import GradScaler, autocast
 
 from sklearn.metrics import accuracy_score, precision_score, log_loss
 from sklearn.utils import resample
