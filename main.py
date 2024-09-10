@@ -395,9 +395,9 @@ label_encoder.fit(csv_train_lab_pd['race'])
 #train_loader = DataLoader(train_dataset, batch_size=4, sampler=sampler, collate_fn=collate_fn)
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=12, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
-val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=12, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
@@ -461,42 +461,22 @@ for epoch in range(num_epochs):
     adjust_learning_rate(optimizer, epoch)
 
     model.train()
-    optimizer.zero_grad()
     start_time = time.time()
-
-    for step, (images, labels) in enumerate(train_loader):
+    
+    for images, labels in train_loader:
         images = images.to(device)
+
         labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
 
-        outputs = model(images)
-        loss = criterion(outputs, labels_tensor)
-        loss.backward()  # Acumula os gradientes
-
-        # Atualiza os pesos a cada `accumulation_steps`
-        if (step + 1) % accumulation_steps == 0:
-            optimizer.step()
-            optimizer.zero_grad()  # Zera os gradientes após a atualização
-
-    # Atualiza os pesos se o número total de batches não for múltiplo de `accumulation_steps`
-    if (step + 1) % accumulation_steps != 0:
-        optimizer.step()
         optimizer.zero_grad()
-    
-    
-    #for images, labels in train_loader:
-        #images = images.to(device)
 
-        #labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-
-        #optimizer.zero_grad()
-
-        #with torch.amp.autocast('cuda'):
-        #    outputs = model(images)
-        #    loss = criterion(outputs, labels_tensor)
+        with torch.amp.autocast('cuda'):
+            outputs = model(images)
+            loss = criterion(outputs, labels_tensor)
     
-        #scaler.scale(loss).backward()
-        #scaler.step(optimizer)
-        #scaler.update()
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
 
         #scheduler.step()
 
