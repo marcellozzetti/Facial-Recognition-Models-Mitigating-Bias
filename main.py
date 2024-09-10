@@ -471,8 +471,8 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
 
         with autocast():
-            outputs = model(inputs)
-            loss = criterion(outputs, targets)
+            outputs = model(images)
+            loss = criterion(outputs, labels_tensor)
     
         scaler.scale(loss).backward()
         scaler.step(optimizer)
