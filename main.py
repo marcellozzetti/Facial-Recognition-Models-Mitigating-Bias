@@ -16,6 +16,8 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset, random_split, WeightedRandomSampler
 
+from torch.cuda.amp import GradScaler, autocast
+
 from sklearn.metrics import accuracy_score, precision_score, log_loss
 from sklearn.utils import resample
 from sklearn.preprocessing import LabelEncoder
@@ -450,6 +452,8 @@ accuracies = []
 precisions = []
 log_losses = []
 
+scaler = GradScaler()
+
 for epoch in range(num_epochs):
     adjust_learning_rate(optimizer, epoch)
 
@@ -461,12 +465,21 @@ for epoch in range(num_epochs):
 
         labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
 
-        outputs = model(images)
-        loss = criterion(outputs, labels_tensor)
+        #outputs = model(images)
+        #loss = criterion(outputs, labels_tensor)
  
         optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+
+        with autocast():
+            outputs = model(inputs)
+            loss = criterion(outputs, targets)
+    
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+
+        #loss.backward()
+        #optimizer.step()
 
     overhead = time.time() - start_time
 
