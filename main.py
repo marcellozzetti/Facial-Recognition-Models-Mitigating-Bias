@@ -402,11 +402,15 @@ class LResNet50E_IR(nn.Module):
     def __init__(self, num_classes=len(label_encoder.classes_)):
         super(LResNet50E_IR, self).__init__()
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+        self.dropout = nn.Dropout(p=0.5)  # Adding dropout to reduce overfitting
+        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+        self.backbone.fc = self.fc
 
     def forward(self, x):
-        return self.backbone(x)
-
+        x = self.backbone(x)
+        x = self.dropout(x)
+        return x
+    
 # Adjustments learning Rate
 def adjust_learning_rate(optimizer, epoch):
     if epoch < 10:
