@@ -349,7 +349,7 @@ class FaceDataset(Dataset):
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             #results = detector.detect_faces(img)
- f
+
             #if len(results) == 0:
             #    raise ValueError("No face detected")
 
