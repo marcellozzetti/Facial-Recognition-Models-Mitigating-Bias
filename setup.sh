@@ -2,6 +2,8 @@
 # Update SO
 sudo apt update -y
 
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+
 #Install GitHub Client
 sudo apt install gh
 
