@@ -396,7 +396,7 @@ label_encoder.fit(csv_train_lab_pd['race'])
 #train_loader = DataLoader(train_dataset, batch_size=4, sampler=sampler, collate_fn=collate_fn)
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=6, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
 val_loader = DataLoader(val_dataset, batch_size=6, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
