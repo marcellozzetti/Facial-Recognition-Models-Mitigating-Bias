@@ -430,11 +430,11 @@ model = nn.DataParallel(model)  # Paraleliza o modelo entre várias GPUs
 
 #criterion = ArcFaceLoss()
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
+#optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
 
-#scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=3, verbose=True)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
-
 
 def softmax(x):
     exp_x = npy.exp(x - npy.max(x))
@@ -455,33 +455,50 @@ precisions = []
 log_losses = []
 
 scaler = GradScaler()
+accumulation_steps = 4
 
 for epoch in range(num_epochs):
     adjust_learning_rate(optimizer, epoch)
 
     model.train()
+    optimizer.zero_grad()
     start_time = time.time()
 
-    for images, labels in train_loader:
+    for step, (images, labels) in enumerate(train_loader):
         images = images.to(device)
-
         labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
 
-        #outputs = model(images)
-        #loss = criterion(outputs, labels_tensor)
- 
+        outputs = model(images)
+        loss = criterion(outputs, labels_tensor)
+        loss.backward()  # Acumula os gradientes
+
+        # Atualiza os pesos a cada `accumulation_steps`
+        if (step + 1) % accumulation_steps == 0:
+            optimizer.step()
+            optimizer.zero_grad()  # Zera os gradientes após a atualização
+
+    # Atualiza os pesos se o número total de batches não for múltiplo de `accumulation_steps`
+    if (step + 1) % accumulation_steps != 0:
+        optimizer.step()
         optimizer.zero_grad()
-
-        with torch.amp.autocast('cuda'):
-            outputs = model(images)
-            loss = criterion(outputs, labels_tensor)
     
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
+    
+    #for images, labels in train_loader:
+        #images = images.to(device)
 
-        #loss.backward()
-        #optimizer.step()
+        #labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+
+        #optimizer.zero_grad()
+
+        #with torch.amp.autocast('cuda'):
+        #    outputs = model(images)
+        #    loss = criterion(outputs, labels_tensor)
+    
+        #scaler.scale(loss).backward()
+        #scaler.step(optimizer)
+        #scaler.update()
+
+        #scheduler.step()
 
     overhead = time.time() - start_time
 
