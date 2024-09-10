@@ -464,9 +464,6 @@ for epoch in range(num_epochs):
         outputs = model(images)
         loss = criterion(outputs, labels_tensor)
 
-        #print("Outputs train:", outputs)
-        #print("Labels train:", labels_tensor)
-
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
