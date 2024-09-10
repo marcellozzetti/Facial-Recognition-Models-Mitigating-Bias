@@ -399,19 +399,62 @@ train_loader = DataLoader(train_dataset, batch_size=12, shuffle=True, num_worker
 
 val_loader = DataLoader(val_dataset, batch_size=12, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
+class ArcMarginProduct(nn.Module):
+    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
+        super(ArcMarginProduct, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.s = s
+        self.m = m
+        self.easy_margin = easy_margin
+        self.ls_eps = ls_eps
+        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
+        nn.init.xavier_uniform_(self.weight)
+
+    def forward(self, input, label):
+        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
+        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
+        phi = cosine - self.m
+        if self.easy_margin:
+            phi = torch.where(cosine > 0, phi, cosine)
+        else:
+            phi = torch.where(cosine > (1.0 - self.m), phi, cosine)
+        one_hot = torch.zeros(cosine.size(), device=input.device)
+        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
+        if self.ls_eps > 0:
+            phi = phi - self.ls_eps
+        output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
+        output = output * self.s
+        return output
+
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
     def __init__(self, num_classes=len(label_encoder.classes_)):
         super(LResNet50E_IR, self).__init__()
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.5)  # Adding dropout to reduce overfitting
-        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
-        self.backbone.fc = self.fc
+        self.dropout = nn.Dropout(p=0.5)
+        self.arc_margin_product = ArcMarginProduct(self.backbone.fc.in_features, num_classes)
+        self.backbone.fc = nn.Identity()  # Remove the final layer of ResNet50
 
-    def forward(self, x):
+    def forward(self, x, labels=None):
         x = self.backbone(x)
         x = self.dropout(x)
+        if labels is not None:
+            x = self.arc_margin_product(x, labels)
         return x
+
+#class LResNet50E_IR(nn.Module):
+#    def __init__(self, num_classes=len(label_encoder.classes_)):
+#        super(LResNet50E_IR, self).__init__()
+#        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+#        self.dropout = nn.Dropout(p=0.5)  # Adding dropout to reduce overfitting
+#        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+#        self.backbone.fc = self.fc
+
+#    def forward(self, x):
+#        x = self.backbone(x)
+#        x = self.dropout(x)
+#        return x
     
 # Adjustments learning Rate
 def adjust_learning_rate(optimizer, epoch):
@@ -432,7 +475,7 @@ model = nn.DataParallel(model)  # Paraleliza o modelo entre várias GPUs
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
 
-scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 
 def softmax(x):
     exp_x = npy.exp(x - npy.max(x))
