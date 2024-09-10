@@ -470,7 +470,7 @@ for epoch in range(num_epochs):
  
         optimizer.zero_grad()
 
-        with autocast():
+        with torch.amp.autocast(device):
             outputs = model(images)
             loss = criterion(outputs, labels_tensor)
     
