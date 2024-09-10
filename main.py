@@ -394,8 +394,8 @@ label_encoder.fit(csv_train_lab_pd['race'])
 #train_loader = DataLoader(train_dataset, batch_size=4, sampler=sampler, collate_fn=collate_fn)
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=6, shuffle=True, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=6, shuffle=False, collate_fn=collate_fn)
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
@@ -420,6 +420,7 @@ def adjust_learning_rate(optimizer, epoch):
 
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR().to(device)
+model = nn.DataParallel(model)  # Paraleliza o modelo entre várias GPUs
 #criterion = ArcFaceLoss()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
@@ -457,8 +458,8 @@ for epoch in range(num_epochs):
         outputs = model(images)
         loss = criterion(outputs, labels_tensor)
 
-        print("Outputs train:", outputs)
-        print("Labels train:", labels_tensor)
+        #print("Outputs train:", outputs)
+        #print("Labels train:", labels_tensor)
 
         optimizer.zero_grad()
         loss.backward()
@@ -486,11 +487,13 @@ for epoch in range(num_epochs):
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
 
-            print("Outputs val:", outputs)
-            print("Labels val:", labels_tensor)
-
             probs = F.softmax(outputs, dim=1).cpu().numpy()
             preds = torch.max(outputs, 1)[1].cpu().numpy()
+
+            print("Outputs val:", outputs)
+            print("Labels val:", labels_tensor)
+            print("probs val:", probs)
+            print("preds val:", preds)
 
             all_labels.extend(labels_tensor)
             all_preds.extend(preds)
