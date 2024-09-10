@@ -362,7 +362,7 @@ class FaceDataset(Dataset):
             return img, label
 
         except (FileNotFoundError, ValueError) as e:
-            print(f"Error processing image {img_name}: {e}")
+            print(f"Error processing image {img_name}")
             return None, None
 
 # Transformations and normalization
@@ -521,8 +521,8 @@ for epoch in range(num_epochs):
     #all_probs = npy.array(all_probs)
     all_labels = [label.item() for label in all_labels]
 
-    print("all_labels", all_labels)
-    print("all_preds", all_preds)
+    #print("all_labels", all_labels)
+    #print("all_preds", all_preds)
 
     accuracy = accuracy_score(all_labels, all_preds)
     precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
