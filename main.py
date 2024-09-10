@@ -394,9 +394,9 @@ label_encoder.fit(csv_train_lab_pd['race'])
 #train_loader = DataLoader(train_dataset, batch_size=4, sampler=sampler, collate_fn=collate_fn)
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
-val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
@@ -442,7 +442,7 @@ print("Step 10 (CNN model): End")
 
 print("Step 11 (Training execution): Start")
 
-num_epochs = 20
+num_epochs = 50
 
 # General Metrics
 train_losses = []
