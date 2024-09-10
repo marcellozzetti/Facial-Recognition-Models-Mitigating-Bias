@@ -442,7 +442,7 @@ print("Step 10 (CNN model): End")
 
 print("Step 11 (Training execution): Start")
 
-num_epochs = 5
+num_epochs = 20
 
 # General Metrics
 train_losses = []
