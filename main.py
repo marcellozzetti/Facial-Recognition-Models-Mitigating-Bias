@@ -314,7 +314,7 @@ print("Step 9 (Images Adjustments): Start")
 img_names = csv_train_lab_pd['file']
 
 # Call the function to perform the adjustments
-if False:
+if True:
     for img_name in img_names:
         img_path = os.path.join(img_base_dir, img_name)
         img = cv2.imread(img_path)
