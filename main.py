@@ -394,8 +394,9 @@ label_encoder.fit(csv_train_lab_pd['race'])
 #train_loader = DataLoader(train_dataset, batch_size=4, sampler=sampler, collate_fn=collate_fn)
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True, num_workers=8, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+
+val_loader = DataLoader(val_dataset, batch_size=8, shuffle=False, num_workers=8, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
@@ -425,6 +426,7 @@ def adjust_learning_rate(optimizer, epoch):
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR().to(device)
 model = nn.DataParallel(model)  # Paraleliza o modelo entre várias GPUs
+
 #criterion = ArcFaceLoss()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
