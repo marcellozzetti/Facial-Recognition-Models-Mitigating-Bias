@@ -429,18 +429,16 @@ class ArcMarginProduct(nn.Module):
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
-    def __init__(self, num_classes=len(label_encoder.classes_)):
+    def __init__(self, num_classes=7):  # Certifique-se de que `num_classes` está correto
         super(LResNet50E_IR, self).__init__()
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
         self.dropout = nn.Dropout(p=0.5)
-        self.arc_margin_product = ArcMarginProduct(self.backbone.fc.in_features, num_classes)
-        self.backbone.fc = nn.Identity()  # Remove the final layer of ResNet50
+        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+        self.backbone.fc = self.fc
 
-    def forward(self, x, labels=None):
+    def forward(self, x):
         x = self.backbone(x)
         x = self.dropout(x)
-        if labels is not None:
-            x = self.arc_margin_product(x, labels)
         return x
 
 #class LResNet50E_IR(nn.Module):
