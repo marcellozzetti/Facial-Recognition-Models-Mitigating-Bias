@@ -9,7 +9,7 @@ sudo apt install gh
 
 gh auth login
 
-#Token: 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
+#Token: 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
 
 #Add main directory
 mkdir projects

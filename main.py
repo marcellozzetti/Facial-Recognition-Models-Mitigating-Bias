@@ -55,7 +55,7 @@ print("Step 2 (Global Variables): Start")
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # Main paths
-base_dir = '/home/ubuntu/projects'
+base_dir = '/cloudfiles/code/Users/marcello.ozzetti'
 
 img_base_dir = base_dir + '/fairface/dataset/'
 img_processed_dir = base_dir + '/fairface/dataset/output/processed_images/'
