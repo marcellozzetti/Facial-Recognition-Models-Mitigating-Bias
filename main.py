@@ -112,9 +112,9 @@ label_encoder = LabelEncoder()
 label_encoder.fit(pre_processing_images.csv_train_lab_pd['race'])
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
-val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
 
 class ArcMarginProduct(nn.Module):
     def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
