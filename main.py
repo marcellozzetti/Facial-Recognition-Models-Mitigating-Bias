@@ -111,7 +111,7 @@ def collate_fn(batch):
     return torch.utils.data.dataloader.default_collate(batch)
 
 label_encoder = LabelEncoder()
-label_encoder.fit(csv_train_lab_pd['race'])
+label_encoder.fit(pre_processing_images.csv_train_lab_pd['race'])
 
 # Create DataLoaders using a filter function: collate_fn
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
@@ -185,13 +185,12 @@ def adjust_learning_rate(optimizer, epoch):
         param_group['lr'] = lr
 
 # Initialize model, criterion, and optimizer
-model = LResNet50E_IR().to(device)
+model = LResNet50E_IR().to(pre_processing_images.device)
 model = nn.DataParallel(model)  # Paraleliza o modelo entre várias GPUs
 
 #criterion = ArcFaceLoss()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
-
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 
 def softmax(x):
@@ -222,9 +221,9 @@ for epoch in range(num_epochs):
     start_time = time.time()
     
     for images, labels in train_loader:
-        images = images.to(device)
+        images = images.to(pre_processing_images.device)
 
-        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(pre_processing_images.device)
 
         optimizer.zero_grad()
 
@@ -252,9 +251,9 @@ for epoch in range(num_epochs):
 
     with torch.no_grad():
         for images, labels in val_loader:
-            images = images.to(device)
+            images = images.to(pre_processing_images.device)
 
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(pre_processing_images.device)
 
             outputs = model(images)
             loss = criterion(outputs, labels_tensor)
@@ -304,7 +303,7 @@ for epoch in range(num_epochs):
     gc.collect()
     torch.cuda.empty_cache()
 
-torch.save(model.state_dict(), model_fairface_file)
+torch.save(model.state_dict(), pre_processing_images.model_fairface_file)
 print('Finished Training and Model Saved')
 
 print("train_losses", train_losses)
