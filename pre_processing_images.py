@@ -290,7 +290,7 @@ if perform_adjustments:
 df_filtered = csv_concatenated_pd[~csv_concatenated_pd['file'].isin(failed_images)]
 
 # Saving the updated DataFrame
-df_filtered.to_csv(csv_concat_dataset_filtered_file, index=False)
+#df_filtered.to_csv(csv_concat_dataset_filtered_file, index=False)
 
 print(f"Removed {len(failed_images)} images that failed processing.") 
 
