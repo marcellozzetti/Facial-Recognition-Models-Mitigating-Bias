@@ -10,7 +10,7 @@ base_dir = '/home/azureuser/cloudfiles/code/Users/marcello.ozzetti'
 img_base_dir = base_dir + '/fairface/dataset/'
 
 #7. Descompactar o dataset de imagens
-print("Step 7 (Imagens Download): Start")
+print("Step 6 (Imagens Download): Start")
 
 # Checking if exists
 os.makedirs(img_base_dir, exist_ok=True)
@@ -18,9 +18,9 @@ os.makedirs(img_base_dir, exist_ok=True)
 # Download the ZIP file
 response = requests.get(zip_dataset_file)
 
-print("Step 7 (Imagens Download): Dataset Downloaded")
+print("Step 6 (Imagens Download): Dataset Downloaded")
 
 with zipfile.ZipFile(io.BytesIO(response.content)) as zip_ref:
     zip_ref.extractall(img_base_dir)
 
-print("Step 7 (Imagens Download): End")
+print("Step 6 (Imagens Download): End")

@@ -263,7 +263,7 @@ def detect_and_adjust_faces(img, img_name, save_dir=None, draw_bounding=False):
 print("Step 5 (Imagens Functions): End")
 
 #6. Executar os ajustes das imagens do dataset
-print("Step 6 (Images Adjustments): Start")
+print("Step 7 (Images Adjustments): Start")
 
 # Load dataset
 csv_concatenated_pd = pd.read_csv(csv_concat_dataset_file)
@@ -291,10 +291,10 @@ df_filtered.to_csv(csv_concat_dataset_filtered_file, index=False)
 
 print(f"Removed {len(failed_images)} images that failed processing.") 
 
-print("Step 6 (Images Adjustments): End")
+print("Step 7 (Images Adjustments): End")
 
 #7. Rebalancear o dataset
-print("Step 7 (Rebalance Dataset): Start")
+print("Step 8 (Rebalance Dataset): Start")
 
 # Load dataset
 csv_concatenated_pd = pd.read_csv(csv_concat_dataset_filtered_file)
@@ -343,4 +343,4 @@ fig.update_layout(title='Analytical Class Dashboard',
 
 fig.show()
 
-print("Step 7 (Rebalance Dataset): End")
+print("Step 8 (Rebalance Dataset): End")
