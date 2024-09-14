@@ -94,20 +94,7 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 
-# Load dataset
-csv_concatenated_pd = pd.read_csv(pre_processing_images.csv_balanced_concat_dataset_file)
-csv_concatenated_pd = csv_concatenated_pd.sort_values(by='file')
-
-dataset_considered = (
-    csv_concatenated_pd.head(pre_processing_images.max_samples)
-    if pre_processing_images.max_samples > 0
-    else csv_concatenated_pd
-)
-
-print(dataset_considered.describe())
-
-dataset = FaceDataset(dataset_considered, pre_processing_images.img_processed_dir, transform=transform)
-#dataset = FaceDataset(pre_processing_images.csv_train_lab_pd, pre_processing_images.img_processed_dir, transform=transform)
+dataset = FaceDataset(pre_processing_images.csv_train_lab_pd, pre_processing_images.img_processed_dir, transform=transform)
 
 # Split dataset into training and validation sets
 train_size = int(0.8 * len(dataset))
@@ -122,8 +109,7 @@ def collate_fn(batch):
     return torch.utils.data.dataloader.default_collate(batch)
 
 label_encoder = LabelEncoder()
-label_encoder.fit(dataset_considered['race'])
-print("label_encoder ",label_encoder)
+label_encoder.fit(pre_processing_images.csv_train_lab_pd['race'])
 
 # Create DataLoaders using a filter function: collate_fn
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
