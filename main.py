@@ -96,11 +96,9 @@ transform = transforms.Compose([
 
 # Load dataset
 csv_concatenated_pd = pd.read_csv(pre_processing_images.csv_balanced_concat_dataset_file)
-indices = npy.arange(len(csv_concatenated_pd))
-limited_indices = indices[:pre_processing_images.max_samples]  # Pegue os primeiros max_samples índices
-# Crie o dataset considerado baseado no flag
+
 dataset_considered = (
-    Subset(csv_concatenated_pd, limited_indices)
+    csv_concatenated_pd.head(5000)
     if pre_processing_images.max_samples > 0
     else csv_concatenated_pd
 )
