@@ -2,6 +2,8 @@
 # Update SO
 sudo apt update -y
 
+ssh -i fairface-training-gpu_key.pem azureuser@172.212.201.132
+
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
 #Install GitHub Client
