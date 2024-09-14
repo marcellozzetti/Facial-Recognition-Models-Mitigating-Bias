@@ -14,7 +14,7 @@ import plotly.graph_objs as go
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset, random_split, WeightedRandomSampler
+from torch.utils.data import DataLoader, Dataset, Subset, random_split, WeightedRandomSampler
 
 from torch.amp import GradScaler, autocast
 
@@ -76,7 +76,6 @@ class FaceDataset(Dataset):
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
             #results = detector.detect_faces(img)
-
             #if len(results) == 0:
             #    raise ValueError("No face detected")
 
@@ -95,8 +94,19 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 
-# Load the dataset
-dataset = FaceDataset(pre_processing_images.csv_train_lab_pd, pre_processing_images.img_processed_dir, transform=transform)
+# Load dataset
+csv_concatenated_pd = pd.read_csv(pre_processing_images.csv_balanced_concat_dataset_file)
+indices = npy.arange(len(csv_concatenated_pd))
+limited_indices = indices[:pre_processing_images.max_samples]  # Pegue os primeiros max_samples índices
+# Crie o dataset considerado baseado no flag
+dataset_considered = (
+    Subset(csv_concatenated_pd, limited_indices)
+    if pre_processing_images.max_samples > 0
+    else csv_concatenated_pd
+)
+
+dataset = FaceDataset(dataset_considered, pre_processing_images.img_processed_dir, transform=transform)
+#dataset = FaceDataset(pre_processing_images.csv_train_lab_pd, pre_processing_images.img_processed_dir, transform=transform)
 
 # Split dataset into training and validation sets
 train_size = int(0.8 * len(dataset))
