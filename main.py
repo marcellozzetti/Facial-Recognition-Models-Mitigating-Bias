@@ -209,7 +209,7 @@ accuracies = []
 precisions = []
 log_losses = []
 
-scaler = GradScaler()
+scaler = GradScaler() if pre_processing_images.device == 'cuda' else None
 accumulation_steps = 4
 
 for epoch in range(num_epochs):
@@ -225,15 +225,18 @@ for epoch in range(num_epochs):
 
         optimizer.zero_grad()
 
-        with torch.amp.autocast('cuda'):
+        with autocast() if pre_processing_images.device == 'cuda' else torch.no_grad():
             outputs = model(images)
             loss = criterion(outputs, labels_tensor)
-    
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
 
-        #scheduler.step()
+        # Usar scaler somente para GPU
+        if scaler:
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            loss.backward()
+            optimizer.step()
 
     overhead = time.time() - start_time
 
@@ -299,7 +302,8 @@ for epoch in range(num_epochs):
     # Resources optimization
     del images, labels, outputs, loss
     gc.collect()
-    torch.cuda.empty_cache()
+    if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
+        torch.cuda.empty_cache()
 
 torch.save(model.state_dict(), pre_processing_images.model_fairface_file)
 print('Finished Training and Model Saved')
