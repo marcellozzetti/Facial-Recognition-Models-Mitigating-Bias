@@ -107,8 +107,9 @@ dataset_considered = (
 
 # Dataset size
 print("Dataset size:")
-print(f"Rows: {dataset_considered.shape[0]}")
-print(f"Columns: {dataset_considered.shape[1]}")
+sample_data, _ = dataset_considered[0]
+print(f"Rows: {sample_data.shape[0]}")
+print(f"Columns: {sample_data.shape[1]}")
 
 # Statistical overview
 print("\nStatistical Overview:")
