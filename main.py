@@ -96,6 +96,7 @@ transform = transforms.Compose([
 
 # Load dataset
 csv_concatenated_pd = pd.read_csv(pre_processing_images.csv_balanced_concat_dataset_file)
+csv_concatenated_pd = csv_concatenated_pd.sort_values(by='file')
 
 dataset_considered = (
     csv_concatenated_pd.head(pre_processing_images.max_samples)
