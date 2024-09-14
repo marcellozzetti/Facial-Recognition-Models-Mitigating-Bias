@@ -282,10 +282,10 @@ if perform_adjustments:
         img = cv2.imread(img_path)
         if not detect_and_adjust_faces(img, img_name, img_processed_dir, False):
             print("Failed imagem included: ", img_path)
-            failed_images.append(img_path)
+            failed_images.append(img_name)
 
 # Remover as imagens que falharam do DataFrame
-df_filtered = csv_concatenated_pd[~csv_concatenated_pd['image_path'].isin(failed_images)]
+df_filtered = csv_concatenated_pd[~csv_concatenated_pd['file'].isin(failed_images)]
 
 # Saving the updated DataFrame
 df_filtered.to_csv(csv_concat_dataset_filtered_file, index=False)
