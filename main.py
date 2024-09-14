@@ -105,14 +105,6 @@ dataset_considered = (
     else csv_concatenated_pd
 )
 
-# Dataset size
-print("Dataset size:")
-sample_data, _ = dataset_considered[0]
-print(f"Rows: {sample_data.shape[0]}")
-print(f"Columns: {sample_data.shape[1]}")
-
-# Statistical overview
-print("\nStatistical Overview:")
 print(dataset_considered.describe())
 
 dataset = FaceDataset(dataset_considered, pre_processing_images.img_processed_dir, transform=transform)
