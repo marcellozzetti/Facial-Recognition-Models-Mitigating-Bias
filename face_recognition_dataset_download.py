@@ -18,6 +18,8 @@ os.makedirs(img_base_dir, exist_ok=True)
 # Download the ZIP file
 response = requests.get(zip_dataset_file)
 
+print("Step 7 (Imagens Download): Dataset Downloaded")
+
 with zipfile.ZipFile(io.BytesIO(response.content)) as zip_ref:
     zip_ref.extractall(img_base_dir)
 
