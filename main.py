@@ -98,7 +98,7 @@ transform = transforms.Compose([
 csv_concatenated_pd = pd.read_csv(pre_processing_images.csv_balanced_concat_dataset_file)
 
 dataset_considered = (
-    csv_concatenated_pd.head(5000)
+    csv_concatenated_pd.head(pre_processing_images.max_samples)
     if pre_processing_images.max_samples > 0
     else csv_concatenated_pd
 )
@@ -121,7 +121,8 @@ def collate_fn(batch):
     return torch.utils.data.dataloader.default_collate(batch)
 
 label_encoder = LabelEncoder()
-label_encoder.fit(pre_processing_images.csv_train_lab_pd['race'])
+label_encoder.fit(dataset_considered['race'])
+print("label_encoder ",label_encoder)
 
 # Create DataLoaders using a filter function: collate_fn
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
