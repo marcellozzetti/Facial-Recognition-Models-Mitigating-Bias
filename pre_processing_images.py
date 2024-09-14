@@ -60,6 +60,7 @@ base_dir = '/home/azureuser/cloudfiles/code/Users/marcello.ozzetti'
 img_base_dir = base_dir + '/fairface/dataset/'
 img_processed_dir = base_dir + '/fairface/dataset/output/processed_images/'
 csv_concat_dataset_file = base_dir + '/fairface/dataset/fairface_concat_dataset.csv'
+csv_concat_dataset_filtered_file = base_dir + '/fairface/dataset/fairface_concat_filtered_dataset.csv'
 csv_balanced_concat_dataset_file = base_dir + '/fairface/dataset/fairface_balanced_concat_dataset.csv'
 model_fairface_file = base_dir + '/fairface/dataset/output/fairface_model.pth'
 
@@ -84,12 +85,12 @@ print("Step 2 (Global Variables): End")
 print("Step 3 (Join Dataset): Start")
 
 # Concat two dataframes
-csv_concatenated = pd.concat([csv_train_pd, csv_val_pd])
+csv_concatenated_pd = pd.concat([csv_train_pd, csv_val_pd])
 
 # Checking if exists
 os.makedirs(img_base_dir, exist_ok=True)
 
-csv_concatenated.to_csv(csv_concat_dataset_file, index=False)
+csv_concatenated_pd.to_csv(csv_concat_dataset_file, index=False)
 
 print("Step 3 (Join Dataset): End")
 
@@ -97,32 +98,32 @@ print("Step 3 (Join Dataset): End")
 print("Step 4 (Import dataSet): Start")
 
 # Load dataset
-df = pd.read_csv(csv_concat_dataset_file)
+csv_concatenated_pd = pd.read_csv(csv_concat_dataset_file)
 
 # Dataset size
 print("Dataset size:")
-print(f"Rows: {df.shape[0]}")
-print(f"Columns: {df.shape[1]}")
+print(f"Rows: {csv_concatenated_pd.shape[0]}")
+print(f"Columns: {csv_concatenated_pd.shape[1]}")
 
 # Statistical overview
 print("\nStatistical Overview:")
-print(df.describe())
+print(csv_concatenated_pd.describe())
 
 # Checking null values
 print("\nChecking null values:")
-print(df.isnull().sum())
+print(csv_concatenated_pd.isnull().sum())
 
 # Using plotly to create interactive dashboards
 class_columns = ['age', 'gender', 'race']
 
 for column in class_columns:
     print(f"\nColumn Class Distribuition '{column}':")
-    class_distribution = df[column].value_counts()
+    class_distribution = csv_concatenated_pd[column].value_counts()
     print(class_distribution)
 
     # Ploting class distribution using seaborn
     plt.figure(figsize=(10, 6))
-    sns.countplot(data=df, x=column)
+    sns.countplot(data=csv_concatenated_pd, x=column)
     plt.title(f'Column Class Distribuition: {column}')
     plt.show()
 
@@ -130,7 +131,7 @@ fig = go.Figure()
 
 # Graphs for each different class
 for column in class_columns:
-    fig.add_trace(go.Histogram(x=df[column], name=f'Histogram {column}'))
+    fig.add_trace(go.Histogram(x=csv_concatenated_pd[column], name=f'Histogram {column}'))
 
 # Dashboard layout
 fig.update_layout(title='Analytical Class Dashboard',
@@ -142,57 +143,8 @@ fig.show()
 
 print("Step 4 (Import dataSet): End")
 
-#5. Rebalancear o dataset
-print("Step 5 (Rebalance Dataset): Start")
-
-# Main class to be balanced
-class_column = 'race'
-
-# Count samples per class
-class_counts = df[class_column].value_counts()
-print("Sample count per class before balancing:")
-print(class_counts)
-
-# Identify the minority class
-minority_class = class_counts.idxmin()
-min_count = class_counts.min()
-
-# Create a new empty DataFrame to store balanced samples
-balanced_df = pd.DataFrame()
-
-# Perform undersampling of majority classes
-for class_ in class_counts.index:
-    class_df = df[df[class_column] == class_]
-    if len(class_df) > min_count:
-        # Perform undersampling of the class
-        class_df = resample(class_df, replace=False, n_samples=min_count, random_state=42)
-    balanced_df = pd.concat([balanced_df, class_df])
-
-# Check the new counts
-balanced_class_counts = balanced_df[class_column].value_counts()
-print("\nSample count per class after balancing:")
-print(balanced_class_counts)
-
-# Save the new dataset
-balanced_df.to_csv(csv_balanced_concat_dataset_file, index=False)
-
-# Ploting
-fig = go.Figure()
-for column in class_columns:
-    fig.add_trace(go.Histogram(x=balanced_df[column], name=f'Histogram {column}'))
-
-# New dashboard layout
-fig.update_layout(title='Analytical Class Dashboard',
-                  xaxis_title='Classes',
-                  yaxis_title='Contagem',
-                  barmode='overlay')
-
-fig.show()
-
-print("Step 5 (Rebalance Dataset): End")
-
-#6. Definição das funções de tratamento de imagens e faces
-print("Step 6 (Imagens Functions): Start")
+#5. Definição das funções de tratamento de imagens e faces
+print("Step 5 (Imagens Functions): Start")
 
 # This function crop the given face in img based on given coordinates
 def cropping_procedure(img, x, y, width, height):
@@ -291,7 +243,7 @@ def detect_and_adjust_faces(img, img_name, save_dir=None, draw_bounding=False):
     if draw_bounding:
       draw_bounding_procedure(threated_face)
 
-    # Redimensionar a face e verificar se a imagem não está vazia
+    # Resize the face and check if the image is not empty
     try:
         threated_face = cv2.resize(threated_face, (224, 224), interpolation=cv2.INTER_AREA)
     except cv2.error as e:
@@ -308,20 +260,88 @@ def detect_and_adjust_faces(img, img_name, save_dir=None, draw_bounding=False):
 
     return True
 
-print("Step 6 (Imagens Functions): End")
+print("Step 5 (Imagens Functions): End")
 
-#9. Executar os ajustes e das imagens do dataset
-print("Step 9 (Images Adjustments): Start")
+#6. Executar os ajustes das imagens do dataset
+print("Step 6 (Images Adjustments): Start")
+
+# Load dataset
+csv_concatenated_pd = pd.read_csv(csv_concat_dataset_file)
 
 # Getting the file name
-balanced_df = pd.read_csv(csv_balanced_concat_dataset_file)
-img_names = balanced_df['file']
+#img_names = csv_concatenated_pd['file']
+img_names = csv_train_lab_pd['file']
+
+# Failed imagens to be removed
+failed_images = []
 
 # Call the function to perform the adjustments
 if perform_adjustments:
     for img_name in img_names:
         img_path = os.path.join(img_base_dir, img_name)
         img = cv2.imread(img_path)
-        detect_and_adjust_faces(img, img_name, img_processed_dir, False)
+        if not detect_and_adjust_faces(img, img_name, img_processed_dir, False):
+            print("Failed imagem included: ", img_path)
+            failed_images.append(img_path)
 
-print("Step 9 (Images Adjustments): End")
+# Remover as imagens que falharam do DataFrame
+df_filtered = csv_concatenated_pd[~csv_concatenated_pd['image_path'].isin(failed_images)]
+
+# Saving the updated DataFrame
+df_filtered.to_csv(csv_concat_dataset_filtered_file, index=False)
+
+print(f"Removed {len(failed_images)} images that failed processing.") 
+
+print("Step 6 (Images Adjustments): End")
+
+#7. Rebalancear o dataset
+print("Step 7 (Rebalance Dataset): Start")
+
+# Load dataset
+csv_concatenated_pd = pd.read_csv(csv_concat_dataset_file)
+
+# Main class to be balanced
+class_column = 'race'
+
+# Count samples per class
+class_counts = csv_concatenated_pd[class_column].value_counts()
+print("Sample count per class before balancing:")
+print(class_counts)
+
+# Identify the minority class
+minority_class = class_counts.idxmin()
+min_count = class_counts.min()
+
+# Create a new empty DataFrame to store balanced samples
+balanced_df = pd.DataFrame()
+
+# Perform undersampling of majority classes
+for class_ in class_counts.index:
+    class_df = csv_concatenated_pd[csv_concatenated_pd[class_column] == class_]
+    if len(class_df) > min_count:
+        # Perform undersampling of the class
+        class_df = resample(class_df, replace=False, n_samples=min_count, random_state=42)
+    balanced_df = pd.concat([balanced_df, class_df])
+
+# Check the new counts
+balanced_class_counts = balanced_df[class_column].value_counts()
+print("\nSample count per class after balancing:")
+print(balanced_class_counts)
+
+# Save the new dataset
+balanced_df.to_csv(csv_balanced_concat_dataset_file, index=False)
+
+# Ploting
+fig = go.Figure()
+for column in class_columns:
+    fig.add_trace(go.Histogram(x=balanced_df[column], name=f'Histogram {column}'))
+
+# New dashboard layout
+fig.update_layout(title='Analytical Class Dashboard',
+                  xaxis_title='Classes',
+                  yaxis_title='Contagem',
+                  barmode='overlay')
+
+fig.show()
+
+print("Step 7 (Rebalance Dataset): End")
