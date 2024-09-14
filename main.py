@@ -225,17 +225,23 @@ for epoch in range(num_epochs):
 
         optimizer.zero_grad()
 
-        with autocast() if pre_processing_images.device == 'cuda' else torch.no_grad():
+        # Usar autocast apenas para GPU, sem no_grad durante o treinamento
+        if pre_processing_images.device == 'cuda':
+            with torch.amp.autocast():
+                outputs = model(images)
+                loss = criterion(outputs, labels_tensor)
+        else:
+            # Sem autocast para CPU
             outputs = model(images)
             loss = criterion(outputs, labels_tensor)
 
-        # Usar scaler somente para GPU
-        if scaler:
+        # Escalamento de gradientes para GPU ou backward padrão para CPU
+        if scaler and pre_processing_images.device == 'cuda':
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
         else:
-            loss.backward()
+            loss.backward()  # Certifique-se que os gradientes estão sendo calculados
             optimizer.step()
 
     overhead = time.time() - start_time
