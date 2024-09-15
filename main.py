@@ -189,6 +189,8 @@ model = nn.DataParallel(model)  # Paraleliza o modelo entre várias GPUs
 #criterion = ArcFaceLoss()
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
+#optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-4)
+
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 
 def softmax(x):
