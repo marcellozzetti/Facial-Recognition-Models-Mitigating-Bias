@@ -79,9 +79,9 @@ class FaceDataset(Dataset):
             #if len(results) == 0:
             #    raise ValueError("No face detected")
 
-            if self.transform:
-                img = Image.fromarray(img)
-                img = self.transform(img)
+            #if self.transform:
+            #    img = Image.fromarray(img)
+            #    img = self.transform(img)
 
             return img, label
 
