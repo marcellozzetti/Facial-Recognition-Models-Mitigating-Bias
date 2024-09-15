@@ -43,5 +43,3 @@ pip3 install tensorflow
 
 pip3 install tensorflow-gpu
 
-
-https://ml.azure.com/fileexplorerAzNB?wsid=/subscriptions/c0522196-e734-4fc8-8ccb-d1c6a73ff363/resourceGroups/marcello.ozzetti-rg/providers/Microsoft.MachineLearningServices/workspaces/FairFace-Training&tid=ac78bd89-c96e-4aa5-9c11-111c7f465624&activeFilePath=Terminals/FairfaceTraining/2
