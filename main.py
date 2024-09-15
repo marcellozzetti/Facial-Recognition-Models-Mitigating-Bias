@@ -79,9 +79,9 @@ class FaceDataset(Dataset):
             #if len(results) == 0:
             #    raise ValueError("No face detected")
 
-            #if self.transform:
-            #    img = Image.fromarray(img)
-            #    img = self.transform(img)
+            if self.transform:
+                img = Image.fromarray(img)
+                img = self.transform(img)
 
             return img, label
 
@@ -93,7 +93,7 @@ transform = transforms.Compose([
     #transforms.ToTensor(),
     #transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 
-    transforms.ToPILImage(),
+    #transforms.ToPILImage(),
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
