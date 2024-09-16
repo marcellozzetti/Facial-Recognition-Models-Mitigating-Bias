@@ -61,7 +61,7 @@ img_base_dir = base_dir + '/fairface/dataset/'
 img_processed_dir = base_dir + '/fairface/dataset/output/processed_images/'
 csv_concat_dataset_file = base_dir + '/fairface/dataset/fairface_concat_dataset.csv'
 csv_concat_dataset_filtered_file = base_dir + '/fairface/dataset/fairface_concat_filtered_dataset.csv'
-csv_balanced_concat_dataset_file = base_dir + '/fairface/dataset/fairface_balanced_concat_dataset.csv'
+csv_balanced_concat_dataset_file = base_dir + '/Facial-Recognition-Models-Mitigating-Bias/dataset/fairface_balanced_concat_dataset.csv'
 model_fairface_file = base_dir + '/fairface/dataset/output/fairface_model.pth'
 
 # From GitHUB
