@@ -91,12 +91,13 @@ class FaceDataset(Dataset):
 # Transformations and normalization
 transform = transforms.Compose([
     #transforms.ToTensor(),
-    #transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
     #transforms.ToPILImage(),
     #transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 csv_pd = pd.read_csv(pre_processing_images.csv_balanced_concat_dataset_file)
@@ -156,7 +157,7 @@ class LResNet50E_IR(nn.Module):
     def __init__(self, num_classes=len(label_encoder.classes_)):
         super(LResNet50E_IR, self).__init__()
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.5)
+        self.dropout = nn.Dropout(p=0.3)
         self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
         self.backbone.fc = self.fc
 
