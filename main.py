@@ -181,11 +181,11 @@ class LResNet50E_IR(nn.Module):
 # Adjustments learning Rate
 def adjust_learning_rate(optimizer, epoch):
     if epoch < 10:
-        lr = 0.01
+        lr = 0.1
     elif epoch < 15:
-        lr = 0.001
+        lr = 0.01
     else:
-        lr = 0.0001
+        lr = 0.001
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
