@@ -231,7 +231,6 @@ for epoch in range(num_epochs):
             probs = F.softmax(outputs, dim=1).cpu().numpy()
             preds = torch.max(outputs, 1)[1].cpu().numpy()
 
-            #all_labels.extend(labels_tensor)
             all_labels.extend(labels_tensor.cpu().numpy())
             all_preds.extend(preds)
             all_probs.extend(probs)
