@@ -34,7 +34,7 @@ from mtcnn.mtcnn import MTCNN
 import pre_processing_images
 
 # Constants
-BATCH_SIZE = 256
+BATCH_SIZE = 128
 NUM_EPOCHS = 10
 LEARNING_RATES = [0.01, 0.001, 0.0001]
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
@@ -44,6 +44,7 @@ cuda_available = torch.cuda.is_available()
 device = torch.device("cuda" if cuda_available else "cpu")
 
 if torch.cuda.is_available() and device == torch.device("cuda"):
+        gc.collect()
         torch.cuda.empty_cache()
 
 print("Step 1 (Imports): End")
