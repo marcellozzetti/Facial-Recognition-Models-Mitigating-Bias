@@ -36,7 +36,7 @@ import pre_processing_images
 # Constants
 BATCH_SIZE = 128
 NUM_EPOCHS = 10
-LEARNING_RATES = [0.001, 0.0001, 0.00001]
+LEARNING_RATES = [0.01, 0.001, 0.0001]
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
