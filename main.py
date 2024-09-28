@@ -42,12 +42,9 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 # Check if Cuda is available
 cuda_available = torch.cuda.is_available()
 device = torch.device("cuda" if cuda_available else "cpu")
-print("device MAIN: ", device)
 
-print("Teste: ", device == torch.device("cuda"))
-
-if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
-        print("cleaned")
+if torch.cuda.is_available() and device == torch.device("cuda"):
+        print("cleaned CUDA")
         torch.cuda.empty_cache()
 
 print("Step 1 (Imports): End")
@@ -186,7 +183,7 @@ accuracies = []
 precisions = []
 log_losses = []
 
-scaler = GradScaler() if pre_processing_images.device == 'cuda' else None
+scaler = GradScaler() if device == torch.device("cuda") else None
 accumulation_steps = 4
 
 for epoch in range(num_epochs):
@@ -199,7 +196,7 @@ for epoch in range(num_epochs):
         labels_tensor = torch.tensor(label_encoder.transform(labels)).to(pre_processing_images.device)
         optimizer.zero_grad()
 
-        if pre_processing_images.device == 'cuda':
+        if device == torch.device("cuda"):
             with torch.amp.autocast():
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
@@ -207,7 +204,7 @@ for epoch in range(num_epochs):
             outputs = model(images)
             loss = criterion(outputs, labels_tensor)
 
-        if scaler and pre_processing_images.device == 'cuda':
+        if scaler and device == torch.device("cuda"):
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
@@ -257,7 +254,7 @@ for epoch in range(num_epochs):
 
     del images, labels, outputs, loss
     gc.collect()
-    if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
+    if torch.cuda.is_available() and device == torch.device("cuda"):
         torch.cuda.empty_cache()
 
 torch.save(model.state_dict(), pre_processing_images.model_fairface_file)
