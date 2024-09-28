@@ -91,6 +91,34 @@ val_size = int(0.1 * len(dataset))
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
+class ArcMarginProduct(nn.Module):
+    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
+        super(ArcMarginProduct, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.s = s  # scale factor
+        self.m = m  # margin
+        self.easy_margin = easy_margin
+        self.ls_eps = ls_eps  # label smoothing
+        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
+        nn.init.xavier_uniform_(self.weight)
+
+    def forward(self, input, label):
+        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
+        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
+        phi = cosine - self.m
+        if self.easy_margin:
+            phi = torch.where(cosine > 0, phi, cosine)
+        else:
+            phi = torch.where(cosine > (1.0 - self.m), phi, cosine)
+        one_hot = torch.zeros(cosine.size(), device=input.device)
+        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
+        if self.ls_eps > 0:
+            phi = phi - self.ls_eps
+        output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
+        output = output * self.s
+        return output
+
 def collate_fn(batch):
     batch = [item for item in batch if item[0] is not None and item[1] is not None]
     if len(batch) == 0:
@@ -106,9 +134,9 @@ val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_w
 
 # Modelo ResNet50 para o ArcFace
 class ResNet50ArcFace(nn.Module):
-    def __init__(self, num_classes, feature_dim=512, pretrained=True):
+    def __init__(self, num_classes, feature_dim=512, weights=ResNet50_Weights.DEFAULT):
         super(ResNet50ArcFace, self).__init__()
-        self.backbone = models.resnet50(pretrained=pretrained)
+        self.backbone = models.resnet50(weights=weights)
         self.backbone.fc = nn.Linear(self.backbone.fc.in_features, feature_dim)
         self.arc_margin_product = ArcMarginProduct(in_features=feature_dim, out_features=num_classes)
 
