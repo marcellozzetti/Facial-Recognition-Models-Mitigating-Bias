@@ -34,10 +34,10 @@ from mtcnn.mtcnn import MTCNN
 import pre_processing_images
 
 # Constants
-BATCH_SIZE = 256
+BATCH_SIZE = 128
 NUM_EPOCHS = 10
 LEARNING_RATES = [0.001, 0.0001, 0.00001]
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:256"
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
         torch.cuda.empty_cache()
