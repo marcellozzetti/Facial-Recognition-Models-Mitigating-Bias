@@ -40,6 +40,7 @@ LEARNING_RATES = [0.01, 0.001, 0.0001]
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
+        print("cleaned")
         torch.cuda.empty_cache()
 
 print("Step 1 (Imports): End")
