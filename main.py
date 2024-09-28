@@ -34,8 +34,8 @@ from mtcnn.mtcnn import MTCNN
 import pre_processing_images
 
 # Constants
-BATCH_SIZE = 128
-NUM_EPOCHS = 50
+BATCH_SIZE = 256
+NUM_EPOCHS = 10
 LEARNING_RATES = [0.001, 0.0001, 0.00001]
 
 print("Step 1 (Imports): End")
