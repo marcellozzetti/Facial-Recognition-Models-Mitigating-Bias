@@ -147,9 +147,9 @@ class ResNet50ArcFace(nn.Module):
         return features
 
 class ResNet50Simple(nn.Module):
-    def __init__(self, num_classes, pretrained=True):
+    def __init__(self, num_classes, weights=ResNet50_Weights.DEFAULT):
         super(ResNet50Simple, self).__init__()
-        self.backbone = models.resnet50(pretrained=pretrained)
+        self.backbone = models.resnet50(weights=weights)
         self.backbone.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
 
     def forward(self, x):
