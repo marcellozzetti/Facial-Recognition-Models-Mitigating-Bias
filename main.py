@@ -87,7 +87,6 @@ class FaceDataset(Dataset):
 transform = transforms.Compose([
     transforms.RandomHorizontalFlip(),  # Flip horizontal aleatório
     transforms.RandomRotation(10),      # Rotação aleatória de até 10 graus
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),  # Ajuste de cor
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalização
 ])
@@ -147,7 +146,7 @@ class LResNet50E_IR(nn.Module):
     def __init__(self, num_classes=len(label_encoder.classes_)):
         super(LResNet50E_IR, self).__init__()
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.5)
+        self.dropout = nn.Dropout(p=0.2)
         self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
         self.backbone.fc = self.fc
 
