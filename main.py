@@ -254,7 +254,7 @@ for epoch in range(num_epochs):
     if torch.cuda.is_available() and device == torch.device("cuda"):
         torch.cuda.empty_cache()
 
-torch.save(model.state_dict(), pre_processing_images.model_fairface_file)
+torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
 
 # Plotting general metrics
