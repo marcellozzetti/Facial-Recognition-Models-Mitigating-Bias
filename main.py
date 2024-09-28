@@ -34,7 +34,7 @@ from mtcnn.mtcnn import MTCNN
 import pre_processing_images
 
 # Constants
-BATCH_SIZE = 256
+BATCH_SIZE = 128
 NUM_EPOCHS = 10
 LEARNING_RATES = [0.001, 0.0001, 0.00001]
 
@@ -93,8 +93,10 @@ label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 
 # Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=8, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=8, pin_memory=True, prefetch_factor=2, collate_fn=collate_fn)
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True, collate_fn=collate_fn)
+val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
+
+#prefetch_factor=2
 
 class ArcMarginProduct(nn.Module):
     def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
