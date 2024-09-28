@@ -44,7 +44,7 @@ cuda_available = torch.cuda.is_available()
 device = torch.device("cuda" if cuda_available else "cpu")
 print("device MAIN: ", device)
 
-print("Teste: ", device == 'cuda')
+print("Teste: ", device == torch.device("cuda"))
 
 if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
         print("cleaned")
