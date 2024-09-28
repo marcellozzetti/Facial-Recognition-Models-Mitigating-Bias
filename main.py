@@ -79,9 +79,17 @@ class FaceDataset(Dataset):
             return None, None
 
 # Transformations and normalization
+#transform = transforms.Compose([
+#    transforms.ToTensor(),
+#    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+#])
+
 transform = transforms.Compose([
+    transforms.RandomHorizontalFlip(),  # Flip horizontal aleatório
+    transforms.RandomRotation(10),      # Rotação aleatória de até 10 graus
+    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),  # Ajuste de cor
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalização
 ])
 
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
@@ -148,16 +156,6 @@ class LResNet50E_IR(nn.Module):
         x = self.dropout(x)
         return x
 
-def adjust_learning_rate(optimizer, epoch):
-    if epoch < 10:
-        lr = LEARNING_RATES[0]
-    elif epoch < 15:
-        lr = LEARNING_RATES[1]
-    else:
-        lr = LEARNING_RATES[2]
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
-
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR().to(device)
 model = nn.DataParallel(model)
@@ -185,7 +183,6 @@ log_losses = []
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 for epoch in range(num_epochs):
-    #adjust_learning_rate(optimizer, epoch)
     model.train()
     start_time = time.time()
     
