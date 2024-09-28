@@ -44,7 +44,6 @@ cuda_available = torch.cuda.is_available()
 device = torch.device("cuda" if cuda_available else "cpu")
 
 if torch.cuda.is_available() and device == torch.device("cuda"):
-        print("cleaned CUDA")
         torch.cuda.empty_cache()
 
 print("Step 1 (Imports): End")
@@ -160,7 +159,7 @@ def adjust_learning_rate(optimizer, epoch):
         param_group['lr'] = lr
 
 # Initialize model, criterion, and optimizer
-model = LResNet50E_IR().to(pre_processing_images.device)
+model = LResNet50E_IR().to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
@@ -183,7 +182,7 @@ accuracies = []
 precisions = []
 log_losses = []
 
-scaler = GradScaler() if device == torch.device("cuda") else None
+scaler =  torch.cuda.amp.GradScaler() if device == torch.device("cuda") else None
 accumulation_steps = 4
 
 for epoch in range(num_epochs):
@@ -192,8 +191,8 @@ for epoch in range(num_epochs):
     start_time = time.time()
     
     for images, labels in train_loader:
-        images = images.to(pre_processing_images.device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(pre_processing_images.device)
+        images = images.to(device)
+        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
         optimizer.zero_grad()
 
         if device == torch.device("cuda"):
@@ -223,8 +222,8 @@ for epoch in range(num_epochs):
 
     with torch.no_grad():
         for images, labels in val_loader:
-            images = images.to(pre_processing_images.device)
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(pre_processing_images.device)
+            images = images.to(device)
+            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
             outputs = model(images)
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
