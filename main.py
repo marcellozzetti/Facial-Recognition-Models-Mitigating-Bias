@@ -181,7 +181,6 @@ precisions = []
 log_losses = []
 
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
-accumulation_steps = 4
 
 for epoch in range(num_epochs):
     adjust_learning_rate(optimizer, epoch)
