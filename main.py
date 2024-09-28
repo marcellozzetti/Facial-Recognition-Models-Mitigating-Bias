@@ -85,7 +85,7 @@ transform = transforms.Compose([
 ])
 
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_BASE_DIR, transform=transform)
+dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
 
 # Split dataset into training and validation sets
 train_size = int(0.8 * len(dataset))
