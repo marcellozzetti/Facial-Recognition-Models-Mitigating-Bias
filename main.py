@@ -290,7 +290,9 @@ plt.title('Log Loss over Epochs')
 plt.legend()
 
 plt.tight_layout()
+plt.savefig('output/training_metrics.png')
 plt.show()
+plt.close()
 
 print("Step 11 (Training execution): End")
 
