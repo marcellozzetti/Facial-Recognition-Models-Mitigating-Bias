@@ -182,7 +182,7 @@ accuracies = []
 precisions = []
 log_losses = []
 
-scaler =  torch.cuda.amp.GradScaler() if device == torch.device("cuda") else None
+scaler =  torch.amp.GradScaler(device) if device == torch.device("cuda") else None
 accumulation_steps = 4
 
 for epoch in range(num_epochs):
@@ -196,7 +196,7 @@ for epoch in range(num_epochs):
         optimizer.zero_grad()
 
         if device == torch.device("cuda"):
-            with torch.amp.autocast():
+            with torch.amp.autocast(device):
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
         else:
