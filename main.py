@@ -1,4 +1,4 @@
-print("Step 1 (Imports): Starting")
+print("Step 1 (Imports): Start")
 
 import os
 import time
@@ -88,8 +88,9 @@ dataset = FaceDataset(csv_pd, pre_processing_images.IMG_BASE_DIR, transform=tran
 
 # Split dataset into training and validation sets
 train_size = int(0.8 * len(dataset))
-val_size = len(dataset) - train_size
-train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+val_size = int(0.1 * len(dataset))
+test_size = len(dataset) - train_size - val_size
+train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
 def collate_fn(batch):
     batch = [item for item in batch if item[0] is not None and item[1] is not None]
@@ -162,7 +163,7 @@ model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3, factor=0.1, verbose=True)
 
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
@@ -183,7 +184,7 @@ log_losses = []
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 for epoch in range(num_epochs):
-    adjust_learning_rate(optimizer, epoch)
+    #adjust_learning_rate(optimizer, epoch)
     model.train()
     start_time = time.time()
     
@@ -292,3 +293,27 @@ plt.tight_layout()
 plt.show()
 
 print("Step 11 (Training execution): End")
+
+print("Step 12 (Testing): Start")
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
+
+model.eval()
+all_test_preds = []
+all_test_labels = []
+
+with torch.no_grad():
+    for images, labels in test_loader:
+        images = images.to(device)
+        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+        outputs = model(images)
+        preds = torch.max(outputs, 1)[1].cpu().numpy()
+
+        all_test_labels.extend(labels_tensor.cpu().numpy())
+        all_test_preds.extend(preds)
+
+test_accuracy = accuracy_score(all_test_labels, all_test_preds)
+print(f'Test Accuracy: {test_accuracy:.4f}')
+
+print("Step 12 (Testing): End")
+
+
