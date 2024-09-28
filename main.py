@@ -220,7 +220,7 @@ for epoch in range(num_epochs):
         for images, labels in val_loader:
             images = images.to(device)
             labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            outputs = model(images, labels_tensor)
+            outputs = model(images)
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
 
