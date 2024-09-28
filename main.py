@@ -191,10 +191,10 @@ for epoch in range(num_epochs):
 
         if device == torch.device("cuda"):
             with torch.amp.autocast("cuda"):
-                outputs = model(images)
+                outputs = model(images, labels_tensor)
                 loss = criterion(outputs, labels_tensor)
         else:
-            outputs = model(images)
+            outputs = model(images, labels_tensor)
             loss = criterion(outputs, labels_tensor)
 
         if scaler and device == torch.device("cuda"):
@@ -220,14 +220,15 @@ for epoch in range(num_epochs):
         for images, labels in val_loader:
             images = images.to(device)
             labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            outputs = model(images)
+            outputs = model(images, labels_tensor)
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
 
             probs = F.softmax(outputs, dim=1).cpu().numpy()
             preds = torch.max(outputs, 1)[1].cpu().numpy()
 
-            all_labels.extend(labels_tensor)
+            #all_labels.extend(labels_tensor)
+            all_labels.extend(labels_tensor.cpu().numpy())
             all_preds.extend(preds)
             all_probs.extend(probs)
 
