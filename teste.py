@@ -146,11 +146,20 @@ class ResNet50ArcFace(nn.Module):
             return self.arc_margin_product(features, labels)
         return features
 
+class ResNet50Simple(nn.Module):
+    def __init__(self, num_classes, pretrained=True):
+        super(ResNet50Simple, self).__init__()
+        self.backbone = models.resnet50(pretrained=pretrained)
+        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+
+    def forward(self, x):
+        return self.backbone(x)
+            
 # Número de classes no dataset (dependente da codificação de label)
 num_classes = len(label_encoder.classes_)
 
 # Initialize model, criterion, and optimizer
-model = ResNet50ArcFace(num_classes=num_classes).to(device)
+model = ResNet50Simple(num_classes=num_classes).to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
