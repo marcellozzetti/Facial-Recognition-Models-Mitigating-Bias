@@ -191,10 +191,10 @@ for epoch in range(num_epochs):
 
         if device == torch.device("cuda"):
             with torch.amp.autocast("cuda"):
-                outputs = model(images, labels_tensor)
+                outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
         else:
-            outputs = model(images, labels_tensor)
+            outputs = model(images)
             loss = criterion(outputs, labels_tensor)
 
         if scaler and device == torch.device("cuda"):
