@@ -39,14 +39,13 @@ NUM_EPOCHS = 10
 LEARNING_RATES = [0.01, 0.001, 0.0001]
 #os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-print("Teste: ", pre_processing_images.device)
-
-if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
-        print("cleaned")
-        torch.cuda.empty_cache()
+#if torch.cuda.is_available() and pre_processing_images.device == 'cuda':
+#        print("cleaned")
+#        torch.cuda.empty_cache()
 
 print("Step 1 (Imports): End")
 
+print("Teste: CUDA")
 
 print("Step 9 (CNN model): Start")
 
