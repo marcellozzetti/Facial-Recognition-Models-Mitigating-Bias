@@ -73,7 +73,7 @@ dataloaders = {'train': train_loader, 'val': val_loader}
 dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset)}
 
 # Definindo o modelo ResNet50 pré-treinado
-model = models.resnet50(pretrained=True)
+model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
 num_ftrs = model.fc.in_features
 model.fc = nn.Linear(num_ftrs, len(csv_pd['race'].unique()))  # Número de classes a partir do CSV
 model = model.to(device)
@@ -107,7 +107,9 @@ criterion = nn.CrossEntropyLoss()
 scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
 # GradScaler para Mixed Precision
-scaler = GradScaler()
+scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
+
+print("Scaler: ", scaler)
 
 # Função de treino
 def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
