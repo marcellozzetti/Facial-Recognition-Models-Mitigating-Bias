@@ -156,7 +156,7 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 
                 optimizer.zero_grad()
 
-                with torch.amp.autocast("cuda"):, torch.set_grad_enabled(phase == 'train'):
+                with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     print("outputs.shape: ", outputs.shape)  # Deve imprimir [batch_size, 2048]
 
