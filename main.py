@@ -181,9 +181,9 @@ model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 
-#scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
@@ -227,7 +227,7 @@ for epoch in range(NUM_EPOCHS):
             loss.backward()
             optimizer.step()
 
-        #scheduler.step()
+        scheduler.step()
 
     overhead = time.time() - start_time
         
@@ -261,7 +261,7 @@ for epoch in range(NUM_EPOCHS):
     all_probs = softmax(all_probs)
     logloss = log_loss(all_labels, all_probs)
 
-    scheduler.step(epoch_loss)
+    #scheduler.step(epoch_loss)
 
     train_losses.append(epoch_loss / len(val_loader))
     accuracies.append(accuracy)
