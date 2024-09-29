@@ -77,15 +77,10 @@ class FaceDataset(Dataset):
         except (FileNotFoundError, ValueError) as e:
             return None, None
 
-# Transformations and normalization
-#transform = transforms.Compose([
-#    transforms.ToTensor(),
-#    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-#])
-
 transform = transforms.Compose([
-    transforms.RandomHorizontalFlip(),  # Flip horizontal aleatório
-    transforms.RandomRotation(10),      # Rotação aleatória de até 10 graus
+    transforms.RandomRotation(10),
+    transforms.RandomHorizontalFlip(),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalização
 ])
@@ -230,6 +225,8 @@ for epoch in range(NUM_EPOCHS):
             loss.backward()
             optimizer.step()
 
+        scheduler.step()
+
     overhead = time.time() - start_time
         
     print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
@@ -262,7 +259,7 @@ for epoch in range(NUM_EPOCHS):
     all_probs = softmax(all_probs)
     logloss = log_loss(all_labels, all_probs)
 
-    scheduler.step(epoch_loss)
+    #scheduler.step(epoch_loss)
 
     train_losses.append(epoch_loss / len(val_loader))
     accuracies.append(accuracy)
