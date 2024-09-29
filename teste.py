@@ -159,7 +159,7 @@ class ResNet50Simple(nn.Module):
 num_classes = len(label_encoder.classes_)
 
 # Initialize model, criterion, and optimizer
-model = ResNet50Simple(num_classes=num_classes).to(device)
+model = ResNet50ArcFace(num_classes=num_classes).to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
