@@ -139,7 +139,7 @@ class ArcMarginProduct(nn.Module):
 class LResNet50E_IRArc(nn.Module):
     def __init__(self, num_classes=len(label_encoder.classes_)):
         super(LResNet50E_IRArc, self).__init__()
-        self.backbone = models.resnet50(pretrained=True)
+        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
         self.dropout = nn.Dropout(p=0.2)
         
         # Retirar a última camada fully connected do ResNet50
