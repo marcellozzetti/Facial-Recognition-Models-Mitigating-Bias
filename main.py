@@ -84,10 +84,11 @@ class FaceDataset(Dataset):
 #])
 
 transform = transforms.Compose([
-    transforms.RandomHorizontalFlip(),  # Flip horizontal aleatório
-    transforms.RandomRotation(10),      # Rotação aleatória de até 10 graus
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(10),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalização
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
@@ -150,8 +151,10 @@ class LResNet50E_IR(nn.Module):
         self.backbone.fc = self.fc
 
     def forward(self, x):
-        x = self.backbone(x)
-        x = self.dropout(x)
+        x = self.backbone(x)  # Passar pela ResNet
+        x = F.relu(self.fc1(x))  # Ativação ReLU na primeira camada FC
+        x = self.dropout(x)  # Aplicar dropout
+        x = self.fc2(x)  # Passar pela segunda camada FC
         return x
 
 # Initialize model, criterion, and optimizer
@@ -160,7 +163,8 @@ model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
