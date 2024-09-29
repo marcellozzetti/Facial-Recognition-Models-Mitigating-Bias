@@ -87,18 +87,28 @@ class ArcMarginProduct(nn.Module):
         super(ArcMarginProduct, self).__init__()
         self.s = s
         self.m = m
-        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
+        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))  # [n_classes, in_features]
         nn.init.xavier_uniform_(self.weight)
 
     def forward(self, input, label):
-        cosine = nn.functional.linear(nn.functional.normalize(input), nn.functional.normalize(self.weight))
-        theta = torch.acos(cosine.clamp(-1.0, 1.0))
-        target_logit = torch.cos(theta + self.m)
-        one_hot = torch.zeros_like(cosine)
-        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
+        # input shape: [batch_size, in_features], expected to be [batch_size, 2048] for ResNet50
+        # weight shape: [n_classes, in_features], expected to be [n_classes, 2048]
+        
+        # Normalizando entrada e pesos
+        cosine = nn.functional.linear(nn.functional.normalize(input), nn.functional.normalize(self.weight))  # MatMul
+        theta = torch.acos(cosine.clamp(-1.0, 1.0))  # Theta = arccos(cosine)
+        target_logit = torch.cos(theta + self.m)  # Aplica margem
+
+        # One-hot encoding dos rótulos
+        one_hot = torch.zeros_like(cosine)  # Cria um tensor vazio de mesma forma que cosine
+        one_hot.scatter_(1, label.view(-1, 1).long(), 1)  # Marca as classes corretas
+
+        # Combina logits com margem e ajusta escala
         output = (one_hot * target_logit) + ((1.0 - one_hot) * cosine)
-        output *= self.s
+        output *= self.s  # Multiplica pela escala
+
         return output
+
 
 arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
 
@@ -146,8 +156,10 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 
                 optimizer.zero_grad()
 
-                with autocast(), torch.set_grad_enabled(phase == 'train'):
+                with torch.amp.autocast("cuda"):, torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
+                    print("outputs.shape: ", outputs.shape)  # Deve imprimir [batch_size, 2048]
+
                     logits = arcface(outputs, labels)
                     _, preds = torch.max(logits, 1)
                     loss = criterion(logits, labels)
