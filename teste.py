@@ -240,18 +240,22 @@ for epoch in range(NUM_EPOCHS):
             images = images.to(device)
             labels = labels.to(device)
 
-            outputs = model(images)
+            outputs = model(images)  # Aqui temos as saídas (logits) das previsões
+
+            # Obtenção de probabilidades sobre as classes para o cálculo correto de log_loss
+            probs = F.softmax(outputs, dim=1).cpu().numpy()
+            all_probs.extend(probs)  # Agora as probabilidades são válidas
+
             val_loss = criterion(outputs, labels)
+            epoch_loss += val_loss.item()
 
             all_labels.extend(labels.cpu().numpy())
             all_preds.extend(torch.argmax(outputs, dim=1).cpu().numpy())
-            all_probs.extend(softmax(outputs.cpu().numpy()))
 
-            epoch_loss += val_loss.item()
-
+        # Correção: Cálculo de log_loss entre all_labels e all_probs, com número de classes compatíveis
         val_accuracy = accuracy_score(all_labels, all_preds)
-        val_precision = precision_score(all_labels, all_preds, average='weighted')
-        val_log_loss = log_loss(all_labels, all_probs)
+        val_precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)  # Corrigido
+        val_log_loss = log_loss(all_labels, all_probs)  # Agora 'all_probs' tem o mesmo número de classes que 'all_labels'
 
         accuracies.append(val_accuracy)
         precisions.append(val_precision)
@@ -262,6 +266,7 @@ for epoch in range(NUM_EPOCHS):
     gc.collect()
     if cuda_available:
         torch.cuda.empty_cache()
+        
 
 print("Step 10 (Training execution): End")
 
