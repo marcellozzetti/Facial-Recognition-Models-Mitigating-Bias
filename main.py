@@ -173,15 +173,41 @@ class LResNet50E_IR(nn.Module):
         x = self.dropout(x)
         return x
 
+# Modificação na classe LResNet50E_IR para incluir ArcFace
+class LResNet50E_IRArc(nn.Module):
+    def __init__(self, num_classes=len(label_encoder.classes_)):
+        super(LResNet50E_IR, self).__init__()
+        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+        self.dropout = nn.Dropout(p=0.2)
+        
+        # Retirar a última camada fully connected do ResNet50
+        self.in_features = self.backbone.fc.in_features
+        self.backbone.fc = nn.Identity()  # Mantenha as features sem aplicar FC
+        
+        # Camada ArcFace
+        self.arc_margin = ArcMarginProduct(self.in_features, num_classes)
+
+    def forward(self, x, labels=None):
+        # Extração das features (embeddings) do backbone
+        features = self.backbone(x)
+        features = self.dropout(features)
+        
+        # Aplicar ArcFace se os rótulos estiverem disponíveis (durante o treino)
+        if labels is not None:
+            output = self.arc_margin(features, labels)
+        else:
+            output = features  # Para inferência/testes
+        return output
+            
 # Initialize model, criterion, and optimizer
-model = LResNet50E_IR().to(device)
+model = LResNet50E_IRArc().to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
-#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 
-scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+#scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
@@ -225,7 +251,7 @@ for epoch in range(NUM_EPOCHS):
             loss.backward()
             optimizer.step()
 
-        scheduler.step()
+        #scheduler.step()
 
     overhead = time.time() - start_time
         
@@ -259,7 +285,7 @@ for epoch in range(NUM_EPOCHS):
     all_probs = softmax(all_probs)
     logloss = log_loss(all_labels, all_probs)
 
-    #scheduler.step(epoch_loss)
+    scheduler.step(epoch_loss)
 
     train_losses.append(epoch_loss / len(val_loader))
     accuracies.append(accuracy)
