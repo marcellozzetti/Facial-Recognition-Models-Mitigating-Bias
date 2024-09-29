@@ -77,12 +77,19 @@ class FaceDataset(Dataset):
         except (FileNotFoundError, ValueError) as e:
             return None, None
 
+#transform = transforms.Compose([
+#    transforms.RandomRotation(10),
+#    transforms.RandomHorizontalFlip(),
+#    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+#    transforms.ToTensor(),
+#    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalização
+#])
+
 transform = transforms.Compose([
-    transforms.RandomRotation(10),
-    transforms.RandomHorizontalFlip(),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalização
+        transforms.ToPILImage(),
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
