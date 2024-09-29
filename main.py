@@ -176,7 +176,7 @@ class LResNet50E_IR(nn.Module):
 # Modificação na classe LResNet50E_IR para incluir ArcFace
 class LResNet50E_IRArc(nn.Module):
     def __init__(self, num_classes=len(label_encoder.classes_)):
-        super(LResNet50E_IR, self).__init__()
+        super(LResNet50E_IRArc, self).__init__()
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
         self.dropout = nn.Dropout(p=0.2)
         
