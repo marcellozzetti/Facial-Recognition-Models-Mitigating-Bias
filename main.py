@@ -35,7 +35,7 @@ import pre_processing_images
 
 # Constants
 BATCH_SIZE = 256
-NUM_EPOCHS = 10
+NUM_EPOCHS = 20
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 # Check if Cuda is available
