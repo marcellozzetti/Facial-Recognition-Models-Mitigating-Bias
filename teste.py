@@ -2,10 +2,16 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms, models
+from torch.utils.data import DataLoader, random_split
+from torchvision import transforms, models
 from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
+import pandas as pd
+import os
+import cv2
+from PIL import Image
+from torch.utils.data import Dataset
+import pre_processing_images
 
 # Definindo o dispositivo (GPU se disponível)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -14,33 +20,62 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 batch_size = 32
 learning_rate = 0.001
 num_epochs = 25
+train_val_split = 0.8  # 80% treino, 20% validação
 
-# Transformações para Data Augmentation
-data_transforms = {
-    'train': transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ]),
-    'val': transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ]),
-}
+# Dataset customizado usando CSV para as labels
+class FaceDataset(Dataset):
+    def __init__(self, csv_pd, img_dir, transform=None):
+        self.labels_df = csv_pd
+        self.img_dir = img_dir
+        self.transform = transform
 
-# Carregando o dataset FairFace
-data_dir = 'path_to_fairface_dataset'
-image_datasets = {x: datasets.ImageFolder(root=f"{data_dir}/{x}", transform=data_transforms[x]) for x in ['train', 'val']}
-dataloaders = {x: DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in ['train', 'val']}
-dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
-class_names = image_datasets['train'].classes
+    def __len__(self):
+        return len(self.labels_df)
+
+    def __getitem__(self, idx):
+        img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
+        label = self.labels_df.iloc[idx, 3]  # 'race' is the classe no CSV
+
+        try:
+            img = cv2.imread(img_name)
+            if img is None:
+                raise FileNotFoundError(f"Image {img_name} not found")
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            if self.transform:
+                img = Image.fromarray(img)
+                img = self.transform(img)
+            return img, label
+        except (FileNotFoundError, ValueError) as e:
+            return None, None
+
+# Transformações e Data Augmentation
+transform = transforms.Compose([
+    transforms.RandomRotation(10),
+    transforms.RandomHorizontalFlip(),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+# Carregando o dataset do CSV
+csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
+dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
+
+# Dividindo o dataset em treino e validação
+train_size = int(train_val_split * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+
+# Criando os DataLoaders
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
+dataloaders = {'train': train_loader, 'val': val_loader}
+dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset)}
 
 # Definindo o modelo ResNet50 pré-treinado
 model = models.resnet50(pretrained=True)
 num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, len(class_names))  # Ajusta a última camada para o número de classes no FairFace
+model.fc = nn.Linear(num_ftrs, len(csv_pd['race'].unique()))  # Número de classes a partir do CSV
 model = model.to(device)
 
 # Definindo a camada ArcFace
@@ -62,7 +97,7 @@ class ArcMarginProduct(nn.Module):
         output *= self.s
         return output
 
-arcface = ArcMarginProduct(num_ftrs, len(class_names)).to(device)
+arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
 
 # Definindo o otimizador e a função de perda
 optimizer = optim.AdamW([{'params': model.parameters()}, {'params': arcface.parameters()}], lr=learning_rate)
