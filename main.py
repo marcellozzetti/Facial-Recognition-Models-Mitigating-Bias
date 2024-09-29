@@ -143,21 +143,15 @@ class ArcMarginProduct(nn.Module):
         self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
 
-    def forward(self, input, label):
-        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
-        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
-        phi = cosine - self.m
-        if self.easy_margin:
-            phi = torch.where(cosine > 0, phi, cosine)
-        else:
-            phi = torch.where(cosine > (1.0 - self.m), phi, cosine)
-        one_hot = torch.zeros(cosine.size(), device=input.device)
-        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
-        if self.ls_eps > 0:
-            phi = phi - self.ls_eps
-        output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
-        output = output * self.s
-        return output
+    def forward(self, x, labels=None):
+       features = self.backbone(x)
+       features = self.dropout(features)
+
+       if labels is not None:
+           output = self.arc_margin(features, labels)  # Durante o treino
+       else:
+           output = self.arc_margin(features, torch.zeros(x.size(0), dtype=torch.long, device=x.device))  # Para inferência/testes
+       return output
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
 class LResNet50E_IR(nn.Module):
