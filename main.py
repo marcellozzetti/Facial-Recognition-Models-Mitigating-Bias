@@ -35,7 +35,7 @@ import pre_processing_images
 
 # Constants
 BATCH_SIZE = 256
-NUM_EPOCHS = 15
+NUM_EPOCHS = 40
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 # Check if Cuda is available
@@ -176,7 +176,7 @@ class LResNet50E_IR(nn.Module):
         return x
 
 # Initialize model, criterion, and optimizer
-model = LResNet50E_IRArc().to(device)
+model = LResNet50E_IR().to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
