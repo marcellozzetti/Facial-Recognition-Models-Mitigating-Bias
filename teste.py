@@ -15,6 +15,8 @@ from torch.utils.data import Dataset
 import torchvision.models as models
 from torchvision.models import ResNet50_Weights
 import pre_processing_images
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_score, log_loss
 
 # Definindo o dispositivo (GPU se disponível)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -37,7 +39,7 @@ class FaceDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
-        label = self.labels_df.iloc[idx, 3]  # 'race' is the class in the CSV
+        label = self.labels_df.iloc[idx, 3]  # 'race' is the classe no CSV
 
         try:
             img = cv2.imread(img_name)
@@ -75,14 +77,12 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_w
 dataloaders = {'train': train_loader, 'val': val_loader}
 dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset)}
 
-# Definindo o modelo ResNet50 pré-treinado, sem a camada fc
-def get_resnet50_model():
-    model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-    model.fc = nn.Identity()  # Remover a camada fully connected (fc) para obter [batch_size, 2048]
-    return model
+print("dataset_sizes: ", dataset_sizes)
 
-# Criar o modelo
-model = get_resnet50_model()
+# Definindo o modelo ResNet50 pré-treinado
+model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+num_ftrs = model.fc.in_features
+model.fc = nn.Linear(num_ftrs, len(csv_pd['race'].unique()))  # Número de classes a partir do CSV
 model = model.to(device)
 
 # Definindo a camada ArcFace
@@ -95,7 +95,6 @@ class ArcMarginProduct(nn.Module):
         nn.init.xavier_uniform_(self.weight)
 
     def forward(self, input, label):
-        
         # Normalizando entrada e pesos
         cosine = nn.functional.linear(nn.functional.normalize(input), nn.functional.normalize(self.weight))  # MatMul
         theta = torch.acos(cosine.clamp(-1.0, 1.0))  # Theta = arccos(cosine)
@@ -111,10 +110,8 @@ class ArcMarginProduct(nn.Module):
 
         return output
 
-# Inicializar ArcFace com 2048 in_features (da ResNet50) e o número de classes do dataset
-arcface = ArcMarginProduct(in_features=2048, out_features=len(csv_pd['race'].unique())).to(device)
+arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
 
-# Codificar labels
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 
@@ -123,17 +120,24 @@ optimizer = optim.AdamW([{'params': model.parameters()}, {'params': arcface.para
 criterion = nn.CrossEntropyLoss()
 
 # Definindo o scheduler para ajustar a taxa de aprendizado
-#scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
-scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5, factor=0.5)
+scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
 # GradScaler para Mixed Precision
-scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
+scaler = torch.amp.GradScaler() if device == torch.device("cuda") else None
+
+# Inicializando listas para armazenar as métricas
+train_losses = []
+val_losses = []
+accuracies = []
+precisions = []
+log_losses = []
 
 # Função de treino
 def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
+    start_time = time.time()  # Começo do tempo de treinamento
     best_model_wts = model.state_dict()
     best_acc = 0.0
-    
+
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs - 1}')
         print('-' * 10)
@@ -146,6 +150,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             
             running_loss = 0.0
             running_corrects = 0
+            all_labels = []
+            all_preds = []
             
             # Iterando sobre os dados
             for inputs, labels in tqdm(dataloaders[phase]):
@@ -156,16 +162,15 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 
                 # Transforme os labels usando o LabelEncoder, depois converta para Tensor
                 labels = label_encoder.transform(labels)
-                labels = torch.tensor(labels).to(device)
+                labels_tensor = torch.tensor(labels).to(device)
 
                 optimizer.zero_grad()
 
-                with torch.amp.autocast("cuda"):
+                with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
-
-                    logits = arcface(outputs, labels)
+                    logits = arcface(outputs, labels_tensor)
                     _, preds = torch.max(logits, 1)
-                    loss = criterion(logits, labels)
+                    loss = criterion(logits, labels_tensor)
 
                     if phase == 'train':
                         scaler.scale(loss).backward()
@@ -173,21 +178,34 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                         scaler.update()
 
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
+                running_corrects += torch.sum(preds == labels_tensor.data)
 
-            #if phase == 'train':
-            #    scheduler.step()
+                # Coletando rótulos e previsões para calcular métricas
+                all_labels.extend(labels_tensor.cpu().numpy())
+                all_preds.extend(preds.cpu().numpy())
+
+            if phase == 'train':
+                scheduler.step()
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
-            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
-            
+            # Cálculo das métricas
+            train_losses.append(epoch_loss) if phase == 'train' else val_losses.append(epoch_loss)
+            accuracies.append(epoch_acc.item())
+            precisions.append(precision_score(all_labels, all_preds, average='weighted', zero_division=0))
+            log_losses.append(log_loss(all_labels, torch.softmax(logits, dim=1).cpu().numpy()))
+
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Precision: {precisions[-1]:.4f} Log Loss: {log_losses[-1]:.4f}')
+
             # Melhor modelo
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = model.state_dict()
-                scheduler.step(epoch_loss)
+
+    end_time = time.time()  # Fim do tempo de treinamento
+    overhead = (end_time - start_time) / num_epochs
+    print(f'Overhead (tempo por época): {overhead:.4f} segundos')
 
     print(f'Best val Acc: {best_acc:.4f}')
     model.load_state_dict(best_model_wts)
@@ -196,5 +214,40 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 # Iniciando o treinamento
 model_trained = train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=num_epochs)
 
-# Salvando o modelo treinado
-torch.save(model_trained.state_dict(), 'fairface_resnet50_arcface.pth')
+# Plotando as métricas gerais
+epochs_range = range(1, num_epochs + 1)
+plt.figure(figsize=(12, 8))
+
+plt.subplot(2, 2, 1)
+plt.plot(epochs_range, train_losses, label='Train Loss')
+plt.plot(epochs_range, val_losses, label='Val Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Loss over Epochs')
+plt.legend()
+
+plt.subplot(2, 2, 2)
+plt.plot(epochs_range, accuracies, label='Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.title('Accuracy over Epochs')
+plt.legend()
+
+plt.subplot(2, 2, 3)
+plt.plot(epochs_range, precisions, label='Precision')
+plt.xlabel('Epoch')
+plt.ylabel('Precision')
+plt.title('Precision over Epochs')
+plt.legend()
+
+plt.subplot(2, 2, 4)
+plt.plot(epochs_range, log_losses, label='Log Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Log Loss')
+plt.title('Log Loss over Epochs')
+plt.legend()
+
+plt.tight_layout()
+plt.savefig('output/training_metrics.png')
+plt.show()
+plt.close()
