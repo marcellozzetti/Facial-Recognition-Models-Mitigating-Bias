@@ -195,7 +195,7 @@ accuracies = []
 precisions = []
 log_losses = []
 
-scaler = torch.cuda.amp.GradScaler() if cuda_available else None
+scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 for epoch in range(NUM_EPOCHS):
     model.train()
