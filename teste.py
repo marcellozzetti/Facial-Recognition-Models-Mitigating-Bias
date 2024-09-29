@@ -164,6 +164,7 @@ class ResNet50ArcFace(nn.Module):
         super(ResNet50ArcFace, self).__init__()
         self.backbone = models.resnet50(weights=weights)
         self.backbone.fc = nn.Linear(self.backbone.fc.in_features, feature_dim)
+        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
         self.arc_margin_product = ArcMarginModel(in_features=feature_dim, out_features=num_classes)
 
     def forward(self, x, labels=None):
