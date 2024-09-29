@@ -101,6 +101,9 @@ class ArcMarginProduct(nn.Module):
 
 arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
 
+label_encoder = LabelEncoder()
+label_encoder.fit(csv_pd['race'])
+
 # Definindo o otimizador e a função de perda
 optimizer = optim.AdamW([{'params': model.parameters()}, {'params': arcface.parameters()}], lr=learning_rate)
 criterion = nn.CrossEntropyLoss()
@@ -134,7 +137,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             # Iterando sobre os dados
             for inputs, labels in tqdm(dataloaders[phase]):
                 inputs = inputs.to(device)
-                labels = labels.to(device)
+                labels = label_encoder.transform(labels).to(device)
+                #labels = labels.to(device)
 
                 optimizer.zero_grad()
 
