@@ -37,7 +37,7 @@ class FaceDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
-        label = self.labels_df.iloc[idx, 3]  # 'race' is the classe no CSV
+        label = self.labels_df.iloc[idx, 3]  # 'race' is the class in the CSV
 
         try:
             img = cv2.imread(img_name)
@@ -75,10 +75,14 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_w
 dataloaders = {'train': train_loader, 'val': val_loader}
 dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset)}
 
-# Definindo o modelo ResNet50 pré-treinado
-model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, len(csv_pd['race'].unique()))  # Número de classes a partir do CSV
+# Definindo o modelo ResNet50 pré-treinado, sem a camada fc
+def get_resnet50_model():
+    model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+    model.fc = nn.Identity()  # Remover a camada fully connected (fc) para obter [batch_size, 2048]
+    return model
+
+# Criar o modelo
+model = get_resnet50_model()
 model = model.to(device)
 
 # Definindo a camada ArcFace
@@ -109,9 +113,10 @@ class ArcMarginProduct(nn.Module):
 
         return output
 
+# Inicializar ArcFace com 2048 in_features (da ResNet50) e o número de classes do dataset
+arcface = ArcMarginProduct(in_features=2048, out_features=len(csv_pd['race'].unique())).to(device)
 
-arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
-
+# Codificar labels
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 
@@ -156,7 +161,7 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 
                 optimizer.zero_grad()
 
-                with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
+               with torch.amp.autocast("cuda"):
                     outputs = model(inputs)
                     print("outputs.shape: ", outputs.shape)  # Deve imprimir [batch_size, 2048]
 
