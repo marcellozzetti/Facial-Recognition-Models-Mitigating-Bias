@@ -77,7 +77,7 @@ class FaceDataset(Dataset):
         except (FileNotFoundError, ValueError) as e:
             return None, None
 
-transforms = transforms.Compose([
+transform = transforms.Compose([
     transforms.RandomRotation(30),
     transforms.RandomHorizontalFlip(),
     transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
