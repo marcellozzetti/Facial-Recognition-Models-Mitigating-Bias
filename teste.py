@@ -11,6 +11,8 @@ import os
 import cv2
 from PIL import Image
 from torch.utils.data import Dataset
+import torchvision.models as models
+from torchvision.models import ResNet50_Weights
 import pre_processing_images
 
 # Definindo o dispositivo (GPU se disponível)
