@@ -164,14 +164,14 @@ class ResNet50ArcFace(nn.Module):
         super(ResNet50ArcFace, self).__init__()
         self.backbone = models.resnet50(weights=weights)
         self.backbone.fc = nn.Linear(self.backbone.fc.in_features, feature_dim)
-        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+        self.fc = nn.Linear(feature_dim, num_classes)  # Adicionei essa camada para mapear features para classes
         self.arc_margin_product = ArcMarginModel(in_features=feature_dim, out_features=num_classes)
 
     def forward(self, x, labels=None):
-        features = self.backbone(x)
+        features = self.backbone(x)  # Extraímos as features do backbone
         if labels is not None:
-            return self.arc_margin_product(features, labels)
-        return features
+            return self.arc_margin_product(features, labels)  # ArcMargin é usado durante o treino
+        return self.fc(features)  # Retorna as logits sobre as classes na validação/teste
             
 # Initialize model, criterion, and optimizer
 model = ResNet50ArcFace().to(device)
