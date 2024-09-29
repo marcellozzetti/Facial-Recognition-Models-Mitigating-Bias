@@ -35,7 +35,7 @@ import pre_processing_images
 
 # Constants
 BATCH_SIZE = 256
-NUM_EPOCHS = 10
+NUM_EPOCHS = 15
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 # Check if Cuda is available
@@ -112,6 +112,30 @@ label_encoder.fit(csv_pd['race'])
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 
+class ArcFace(torch.nn.Module):
+    def __init__(self, s=64.0, margin=0.5):
+        super(ArcFace, self).__init__()
+        self.s = s
+        self.margin = margin
+        self.cos_m = math.cos(margin)
+        self.sin_m = math.sin(margin)
+        self.theta = math.cos(math.pi - margin)
+        self.sinmm = math.sin(math.pi - margin) * margin
+        self.easy_margin = False
+
+    def forward(self, logits: torch.Tensor, labels: torch.Tensor):
+        index = torch.where(labels != -1)[0]
+        target_logit = logits[index, labels[index].view(-1)]
+
+        with torch.no_grad():
+            target_logit.arccos_()
+            logits.arccos_()
+            final_target_logit = target_logit + self.margin
+            logits[index, labels[index].view(-1)] = final_target_logit
+            logits.cos_()
+        logits = logits * self.s   
+        return logits
+            
 class ArcMarginProduct(nn.Module):
     def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
         super(ArcMarginProduct, self).__init__()
@@ -160,7 +184,9 @@ model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+
+scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
@@ -172,7 +198,6 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training execution
-num_epochs = NUM_EPOCHS
 train_losses = []
 accuracies = []
 precisions = []
@@ -180,7 +205,7 @@ log_losses = []
 
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
-for epoch in range(num_epochs):
+for epoch in range(NUM_EPOCHS):
     model.train()
     start_time = time.time()
     
@@ -207,8 +232,8 @@ for epoch in range(num_epochs):
 
     overhead = time.time() - start_time
         
-    print(f'Epoch {epoch+1}/{num_epochs}, Overhead: {overhead:.4f}s')
-    print(f"Epoch {epoch+1}/{num_epochs}, Learning rate: {scheduler.get_last_lr()}")
+    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
+    print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
 
     model.eval()
     all_labels = []
@@ -244,7 +269,7 @@ for epoch in range(num_epochs):
     precisions.append(precision)
     log_losses.append(logloss)
 
-    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(train_loader):.4f}, '
+    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss/len(train_loader):.4f}, '
           f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
     del images, labels, outputs, loss
@@ -256,7 +281,7 @@ torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
 
 # Plotting general metrics
-epochs_range = range(1, num_epochs + 1)
+epochs_range = range(1, NUM_EPOCHS + 1)
 plt.figure(figsize=(12, 8))
 
 plt.subplot(2, 2, 1)
