@@ -153,8 +153,22 @@ class LResNet50E_IR(nn.Module):
         x = self.dropout(x)
         return x
 
+# Modelo ResNet50 para o ArcFace
+class ResNet50ArcFace(nn.Module):
+    def __init__(self, num_classes, feature_dim=512, weights=ResNet50_Weights.DEFAULT):
+        super(ResNet50ArcFace, self).__init__()
+        self.backbone = models.resnet50(weights=weights)
+        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, feature_dim)
+        self.arc_margin_product = ArcMarginModel(in_features=feature_dim, out_features=num_classes)
+
+    def forward(self, x, labels=None):
+        features = self.backbone(x)
+        if labels is not None:
+            return self.arc_margin_product(features, labels)
+        return features
+            
 # Initialize model, criterion, and optimizer
-model = LResNet50E_IR().to(device)
+model = ResNet50ArcFace().to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
