@@ -194,7 +194,7 @@ class LResNet50E_IRArc(nn.Module):
         return output
             
 # Initialize model, criterion, and optimizer
-model = LResNet50E_IRArc().to(device)
+model = LResNet50E_IR().to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
