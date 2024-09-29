@@ -5,6 +5,7 @@ from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader, random_split
 from torchvision import transforms, models
 from torch.cuda.amp import autocast, GradScaler
+from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
 import pandas as pd
 import os
