@@ -115,8 +115,6 @@ scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 # GradScaler para Mixed Precision
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
-print("Scaler: ", scaler)
-
 # Função de treino
 def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
     best_model_wts = model.state_dict()
@@ -137,9 +135,14 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             
             # Iterando sobre os dados
             for inputs, labels in tqdm(dataloaders[phase]):
+                if inputs is None or labels is None:
+                    continue  # Pule entradas inválidas
+            
                 inputs = inputs.to(device)
-                labels = label_encoder.transform(labels).to(device)
-                #labels = labels.to(device)
+                
+                # Transforme os labels usando o LabelEncoder, depois converta para Tensor
+                labels = label_encoder.transform(labels)
+                labels = torch.tensor(labels).to(device)
 
                 optimizer.zero_grad()
 
