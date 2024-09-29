@@ -151,8 +151,8 @@ class LResNet50E_IR(nn.Module):
         self.backbone.fc = self.fc
 
     def forward(self, x):
-        x = self.backbone(x)  # Passa pelas camadas de convolução
-        x = self.head(x)  # Cabeça de classificação existente
+        x = self.backbone(x)
+        x = self.dropout(x)
         return x
 
 # Initialize model, criterion, and optimizer
