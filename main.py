@@ -151,10 +151,8 @@ class LResNet50E_IR(nn.Module):
         self.backbone.fc = self.fc
 
     def forward(self, x):
-        x = self.backbone(x)  # Passar pela ResNet
-        x = F.relu(self.fc1(x))  # Ativação ReLU na primeira camada FC
-        x = self.dropout(x)  # Aplicar dropout
-        x = self.fc2(x)  # Passar pela segunda camada FC
+        x = self.backbone(x)  # Passa pelas camadas de convolução
+        x = self.head(x)  # Cabeça de classificação existente
         return x
 
 # Initialize model, criterion, and optimizer
