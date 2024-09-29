@@ -107,76 +107,44 @@ label_encoder.fit(csv_pd['race'])
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 
-class ArcFace(torch.nn.Module):
-    def __init__(self, s=64.0, margin=0.5):
-        super(ArcFace, self).__init__()
-        self.s = s
-        self.margin = margin
-        self.cos_m = math.cos(margin)
-        self.sin_m = math.sin(margin)
-        self.theta = math.cos(math.pi - margin)
-        self.sinmm = math.sin(math.pi - margin) * margin
-        self.easy_margin = False
-
-    def forward(self, logits: torch.Tensor, labels: torch.Tensor):
-        index = torch.where(labels != -1)[0]
-        target_logit = logits[index, labels[index].view(-1)]
-
-        with torch.no_grad():
-            target_logit.arccos_()
-            logits.arccos_()
-            final_target_logit = target_logit + self.margin
-            logits[index, labels[index].view(-1)] = final_target_logit
-            logits.cos_()
-        logits = logits * self.s   
-        return logits
-            
 class ArcMarginProduct(nn.Module):
-    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
+    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False):
         super(ArcMarginProduct, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
         self.s = s
         self.m = m
         self.easy_margin = easy_margin
-        self.ls_eps = ls_eps
         self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
 
-    def forward(self, x, labels=None):
-       features = self.backbone(x)
-       features = self.dropout(features)
+    def forward(self, input, label):
+        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
+        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
+        phi = cosine - self.m
+        
+        if self.easy_margin:
+            phi = torch.where(cosine > 0, phi, cosine)
+        else:
+            phi = torch.where(cosine > (1.0 - self.m), phi, cosine)
+        
+        one_hot = torch.zeros(cosine.size(), device=input.device)
+        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
 
-       if labels is not None:
-           output = self.arc_margin(features, labels)  # Durante o treino
-       else:
-           output = self.arc_margin(features, torch.zeros(x.size(0), dtype=torch.long, device=x.device))  # Para inferência/testes
-       return output
+        output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
+        output *= self.s
+        
+        return output
 
-# Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
-class LResNet50E_IR(nn.Module):
-    def __init__(self, num_classes=len(label_encoder.classes_)):
-        super(LResNet50E_IR, self).__init__()
-        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.2)
-        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
-        self.backbone.fc = self.fc
-
-    def forward(self, x):
-        x = self.backbone(x)
-        x = self.dropout(x)
-        return x
-
-# Modificação na classe LResNet50E_IR para incluir ArcFace
 class LResNet50E_IRArc(nn.Module):
     def __init__(self, num_classes=len(label_encoder.classes_)):
         super(LResNet50E_IRArc, self).__init__()
-        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+        self.backbone = models.resnet50(pretrained=True)
         self.dropout = nn.Dropout(p=0.2)
         
         # Retirar a última camada fully connected do ResNet50
         self.in_features = self.backbone.fc.in_features
-        self.backbone.fc = nn.Identity()  # Mantenha as features sem aplicar FC
+        self.backbone.fc = nn.Identity()  # Manter as features sem aplicar FC
         
         # Camada ArcFace
         self.arc_margin = ArcMarginProduct(self.in_features, num_classes)
@@ -192,9 +160,23 @@ class LResNet50E_IRArc(nn.Module):
         else:
             output = features  # Para inferência/testes
         return output
-            
+
+# Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
+class LResNet50E_IR(nn.Module):
+    def __init__(self, num_classes=len(label_encoder.classes_)):
+        super(LResNet50E_IR, self).__init__()
+        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+        self.dropout = nn.Dropout(p=0.2)
+        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+        self.backbone.fc = self.fc
+
+    def forward(self, x):
+        x = self.backbone(x)
+        x = self.dropout(x)
+        return x
+
 # Initialize model, criterion, and optimizer
-model = LResNet50E_IR().to(device)
+model = LResNet50E_IRArc().to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
