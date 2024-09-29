@@ -123,7 +123,8 @@ optimizer = optim.AdamW([{'params': model.parameters()}, {'params': arcface.para
 criterion = nn.CrossEntropyLoss()
 
 # Definindo o scheduler para ajustar a taxa de aprendizado
-scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+#scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+scheduler = lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=5, factor=0.5)
 
 # GradScaler para Mixed Precision
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
@@ -174,8 +175,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
 
-            if phase == 'train':
-                scheduler.step()
+            #if phase == 'train':
+            #    scheduler.step()
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
@@ -186,6 +187,7 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = model.state_dict()
+                scheduler.step(epoch_loss)
 
     print(f'Best val Acc: {best_acc:.4f}')
     model.load_state_dict(best_model_wts)
