@@ -35,7 +35,7 @@ import pre_processing_images
 
 # Constants
 BATCH_SIZE = 256
-NUM_EPOCHS = 10
+NUM_EPOCHS = 20
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 # Check if Cuda is available
@@ -43,8 +43,8 @@ cuda_available = torch.cuda.is_available()
 device = torch.device("cuda" if cuda_available else "cpu")
 
 if torch.cuda.is_available() and device == torch.device("cuda"):
-        gc.collect()
-        torch.cuda.empty_cache()
+    gc.collect()
+    torch.cuda.empty_cache()
 
 print("Step 1 (Imports): End")
 
@@ -57,6 +57,9 @@ class FaceDataset(Dataset):
         self.labels_df = csv_pd
         self.img_dir = img_dir
         self.transform = transform
+        # LabelEncoder is applied here
+        self.label_encoder = LabelEncoder()
+        self.labels_df['encoded_race'] = self.label_encoder.fit_transform(self.labels_df['race'])
 
     def __len__(self):
         return len(self.labels_df)
@@ -64,6 +67,7 @@ class FaceDataset(Dataset):
     def __getitem__(self, idx):
         img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
         label = self.labels_df.iloc[idx, 3]  # 'race' is the class
+        encoded_label = self.labels_df.iloc[idx, -1]  # 'encoded_race'
 
         try:
             img = cv2.imread(img_name)
@@ -73,13 +77,16 @@ class FaceDataset(Dataset):
             if self.transform:
                 img = Image.fromarray(img)
                 img = self.transform(img)
-            return img, label
+            return img, encoded_label
         except (FileNotFoundError, ValueError) as e:
             return None, None
 
 transform = transforms.Compose([
+    transforms.RandomRotation(30),
+    transforms.RandomHorizontalFlip(),
+    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
 ])
 
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
@@ -91,80 +98,87 @@ val_size = int(0.1 * len(dataset))
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
-class ArcMarginProduct(nn.Module):
-    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
-        super(ArcMarginProduct, self).__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-        self.s = s  # scale factor
-        self.m = m  # margin
-        self.easy_margin = easy_margin
-        self.ls_eps = ls_eps  # label smoothing
-        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
-        nn.init.xavier_uniform_(self.weight)
-
-    def forward(self, input, label):
-        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
-        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
-        phi = cosine - self.m
-        if self.easy_margin:
-            phi = torch.where(cosine > 0, phi, cosine)
-        else:
-            phi = torch.where(cosine > (1.0 - self.m), phi, cosine)
-        one_hot = torch.zeros(cosine.size(), device=input.device)
-        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
-        if self.ls_eps > 0:
-            phi = phi - self.ls_eps
-        output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
-        output = output * self.s
-        return output
-
 def collate_fn(batch):
     batch = [item for item in batch if item[0] is not None and item[1] is not None]
     if len(batch) == 0:
         return torch.empty(0), torch.empty(0)
     return torch.utils.data.dataloader.default_collate(batch)
 
-label_encoder = LabelEncoder()
-label_encoder.fit(csv_pd['race'])
-
 # Create DataLoaders using a filter function: collate_fn
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 
+class ArcMarginModel(nn.Module):
+    def __init__(self, in_features, out_features, easy_margin=False, margin_m=0.5, margin_s=64.0):
+        super(ArcMarginModel, self).__init__()
+        
+        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
+        nn.init.xavier_uniform_(self.weight)
+        
+        self.easy_margin = easy_margin
+        self.m = margin_m
+        self.s = margin_s
+        
+        self.cos_m = math.cos(self.m)
+        self.sin_m = math.sin(self.m)
+        self.th = math.cos(math.pi - self.m)
+        self.mm = math.sin(math.pi - self.m) * self.m
+    
+    def forward(self, input, label):
+        x = F.normalize(input)
+        W = F.normalize(self.weight)
+        cosine = F.linear(x, W)
+        
+        # Fix: clamp cosine to avoid numerical issues
+        cosine = cosine.clamp(-1, 1)
+        
+        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
+        phi = cosine * self.cos_m - sine * self.sin_m  # cos(theta + m)
+        if self.easy_margin:
+            phi = torch.where(cosine > 0, phi, cosine)
+        else:
+            phi = torch.where(cosine > self.th, phi, cosine - self.mm)
+        one_hot = torch.zeros(cosine.size(), device=device)
+        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
+        output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
+        output *= self.s
+        return output
+
+# Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
+class LResNet50E_IR(nn.Module):
+    def __init__(self, num_classes=len(dataset.label_encoder.classes_)):
+        super(LResNet50E_IR, self).__init__()
+        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+        self.dropout = nn.Dropout(p=0.2)
+        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
+        self.backbone.fc = self.fc
+
+    def forward(self, x):
+        x = self.backbone(x)
+        x = self.dropout(x)
+        return x
+
 # Modelo ResNet50 para o ArcFace
 class ResNet50ArcFace(nn.Module):
-    def __init__(self, num_classes, feature_dim=512, weights=ResNet50_Weights.DEFAULT):
+    def __init__(self, num_classes=len(dataset.label_encoder.classes_), feature_dim=512, weights=ResNet50_Weights.DEFAULT):
         super(ResNet50ArcFace, self).__init__()
         self.backbone = models.resnet50(weights=weights)
         self.backbone.fc = nn.Linear(self.backbone.fc.in_features, feature_dim)
-        self.arc_margin_product = ArcMarginProduct(in_features=feature_dim, out_features=num_classes)
+        self.arc_margin_product = ArcMarginModel(in_features=feature_dim, out_features=num_classes)
 
     def forward(self, x, labels=None):
         features = self.backbone(x)
         if labels is not None:
             return self.arc_margin_product(features, labels)
         return features
-
-class ResNet50Simple(nn.Module):
-    def __init__(self, num_classes, weights=ResNet50_Weights.DEFAULT):
-        super(ResNet50Simple, self).__init__()
-        self.backbone = models.resnet50(weights=weights)
-        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
-
-    def forward(self, x):
-        return self.backbone(x)
             
-# Número de classes no dataset (dependente da codificação de label)
-num_classes = len(label_encoder.classes_)
-
 # Initialize model, criterion, and optimizer
-model = ResNet50ArcFace(num_classes=num_classes).to(device)
+model = ResNet50ArcFace().to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
-scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.005)
+scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
@@ -176,32 +190,32 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training execution
-num_epochs = NUM_EPOCHS
 train_losses = []
 accuracies = []
 precisions = []
 log_losses = []
 
-scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
+scaler = torch.cuda.amp.GradScaler() if cuda_available else None
 
-for epoch in range(num_epochs):
+for epoch in range(NUM_EPOCHS):
     model.train()
     start_time = time.time()
     
     for images, labels in train_loader:
         images = images.to(device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+        labels = labels.to(device)  # Labels are already encoded in the dataset
+
         optimizer.zero_grad()
 
-        if device == torch.device("cuda"):
-            with torch.amp.autocast("cuda"):
-                outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
+        if cuda_available:
+            with torch.cuda.amp.autocast(device_type="cuda"):
+                outputs = model(images, labels)
+                loss = criterion(outputs, labels)
         else:
-            outputs = model(images)
-            loss = criterion(outputs, labels_tensor)
+            outputs = model(images, labels)
+            loss = criterion(outputs, labels)
 
-        if scaler and device == torch.device("cuda"):
+        if scaler and cuda_available:
             scaler.scale(loss).backward()
             scaler.step(optimizer)
             scaler.update()
@@ -209,10 +223,11 @@ for epoch in range(num_epochs):
             loss.backward()
             optimizer.step()
 
+        scheduler.step()  # Move scheduler step inside the batch loop
+
     overhead = time.time() - start_time
-        
-    print(f'Epoch {epoch+1}/{num_epochs}, Overhead: {overhead:.4f}s')
-    print(f"Epoch {epoch+1}/{num_epochs}, Learning rate: {scheduler.get_last_lr()}")
+    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
+    print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
 
     model.eval()
     all_labels = []
@@ -223,38 +238,32 @@ for epoch in range(num_epochs):
     with torch.no_grad():
         for images, labels in val_loader:
             images = images.to(device)
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            outputs = model(images, labels_tensor)
-            loss = criterion(outputs, labels_tensor)
-            epoch_loss += loss.item()
+            labels = labels.to(device)
 
-            probs = F.softmax(outputs, dim=1).cpu().numpy()
-            preds = torch.max(outputs, 1)[1].cpu().numpy()
+            outputs = model(images)
+            val_loss = criterion(outputs, labels)
 
-            all_labels.extend(labels_tensor.cpu().numpy())
-            all_preds.extend(preds)
-            all_probs.extend(probs)
+            all_labels.extend(labels.cpu().numpy())
+            all_preds.extend(torch.argmax(outputs, dim=1).cpu().numpy())
+            all_probs.extend(softmax(outputs.cpu().numpy()))
 
-    all_labels = [label.item() for label in all_labels]
-    accuracy = accuracy_score(all_labels, all_preds)
-    precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
-    all_probs = softmax(all_probs)
-    logloss = log_loss(all_labels, all_probs)
+            epoch_loss += val_loss.item()
 
-    scheduler.step(epoch_loss)
+        val_accuracy = accuracy_score(all_labels, all_preds)
+        val_precision = precision_score(all_labels, all_preds, average='weighted')
+        val_log_loss = log_loss(all_labels, all_probs)
 
-    train_losses.append(epoch_loss / len(val_loader))
-    accuracies.append(accuracy)
-    precisions.append(precision)
-    log_losses.append(logloss)
+        accuracies.append(val_accuracy)
+        precisions.append(val_precision)
+        log_losses.append(val_log_loss)
 
-    print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(train_loader):.4f}, '
-          f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS} - Validation Accuracy: {val_accuracy:.4f}, Precision: {val_precision:.4f}, Log Loss: {val_log_loss:.4f}')
 
-    del images, labels, outputs, loss
     gc.collect()
-    if torch.cuda.is_available() and device == torch.device("cuda"):
+    if cuda_available:
         torch.cuda.empty_cache()
+
+print("Step 10 (Training execution): End")
 
 torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
