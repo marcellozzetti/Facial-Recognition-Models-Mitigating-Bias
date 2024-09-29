@@ -108,21 +108,21 @@ train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, nu
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 
 class ArcMarginModel(nn.Module):
-    def __init__(self, args):
+    def __init__(self, in_features, out_features, easy_margin=False, margin_m=0.5, margin_s=64.0):
         super(ArcMarginModel, self).__init__()
-
-        self.weight = Parameter(torch.FloatTensor(num_classes, args.emb_size))
+        
+        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
-
-        self.easy_margin = args.easy_margin
-        self.m = args.margin_m
-        self.s = args.margin_s
-
+        
+        self.easy_margin = easy_margin
+        self.m = margin_m
+        self.s = margin_s
+        
         self.cos_m = math.cos(self.m)
         self.sin_m = math.sin(self.m)
         self.th = math.cos(math.pi - self.m)
         self.mm = math.sin(math.pi - self.m) * self.m
-
+    
     def forward(self, input, label):
         x = F.normalize(input)
         W = F.normalize(self.weight)
