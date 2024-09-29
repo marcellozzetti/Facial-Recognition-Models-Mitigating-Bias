@@ -95,8 +95,6 @@ class ArcMarginProduct(nn.Module):
         nn.init.xavier_uniform_(self.weight)
 
     def forward(self, input, label):
-        # input shape: [batch_size, in_features], expected to be [batch_size, 2048] for ResNet50
-        # weight shape: [n_classes, in_features], expected to be [n_classes, 2048]
         
         # Normalizando entrada e pesos
         cosine = nn.functional.linear(nn.functional.normalize(input), nn.functional.normalize(self.weight))  # MatMul
@@ -163,7 +161,6 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 
                 with torch.amp.autocast("cuda"):
                     outputs = model(inputs)
-                    print("outputs.shape: ", outputs.shape)  # Deve imprimir [batch_size, 2048]
 
                     logits = arcface(outputs, labels)
                     _, preds = torch.max(logits, 1)
