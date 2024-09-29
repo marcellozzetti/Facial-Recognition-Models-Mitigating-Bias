@@ -208,7 +208,7 @@ for epoch in range(NUM_EPOCHS):
         optimizer.zero_grad()
 
         if cuda_available:
-            with torch.cuda.amp.autocast(device_type="cuda"):
+            with torch.amp.autocast("cuda"):
                 outputs = model(images, labels)
                 loss = criterion(outputs, labels)
         else:
