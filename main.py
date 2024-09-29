@@ -182,7 +182,6 @@ scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=N
 #scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=2, verbose=True)
 
 
-
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
     return exp_x / exp_x.sum(axis=1, keepdims=True)
@@ -241,7 +240,7 @@ for epoch in range(num_epochs):
         for images, labels in val_loader:
             images = images.to(device)
             labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            outputs = model(images)
+            outputs = model(images, labels_tensor)
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
 
