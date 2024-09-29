@@ -1,336 +1,137 @@
-print("Step 1 (Imports): Start")
-
-import os
-import time
-import json
-import math
-import ssl
-import gc
-import io
-import zipfile
-import requests
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.patches import Rectangle, Circle
-from PIL import Image
-from scipy.spatial import distance
-from sklearn.metrics import accuracy_score, precision_score, log_loss
-from sklearn.utils import resample
-from sklearn.preprocessing import LabelEncoder
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset, random_split
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-import torch.nn.functional as F
-import torchvision.transforms as transforms
-import torchvision.models as models
-from torchvision.models import ResNet50_Weights
-import cv2
-from mtcnn.mtcnn import MTCNN
-import pre_processing_images
+from torch.optim import lr_scheduler
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms, models
+from torch.cuda.amp import autocast, GradScaler
+from tqdm import tqdm
 
-# Constants
-BATCH_SIZE = 256
-NUM_EPOCHS = 20
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+# Definindo o dispositivo (GPU se disponível)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Check if Cuda is available
-cuda_available = torch.cuda.is_available()
-device = torch.device("cuda" if cuda_available else "cpu")
+# Hiperparâmetros
+batch_size = 32
+learning_rate = 0.001
+num_epochs = 25
 
-if torch.cuda.is_available() and device == torch.device("cuda"):
-    gc.collect()
-    torch.cuda.empty_cache()
+# Transformações para Data Augmentation
+data_transforms = {
+    'train': transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+    'val': transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
+}
 
-print("Step 1 (Imports): End")
+# Carregando o dataset FairFace
+data_dir = 'path_to_fairface_dataset'
+image_datasets = {x: datasets.ImageFolder(root=f"{data_dir}/{x}", transform=data_transforms[x]) for x in ['train', 'val']}
+dataloaders = {x: DataLoader(image_datasets[x], batch_size=batch_size, shuffle=True, num_workers=4) for x in ['train', 'val']}
+dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
+class_names = image_datasets['train'].classes
 
+# Definindo o modelo ResNet50 pré-treinado
+model = models.resnet50(pretrained=True)
+num_ftrs = model.fc.in_features
+model.fc = nn.Linear(num_ftrs, len(class_names))  # Ajusta a última camada para o número de classes no FairFace
+model = model.to(device)
 
-print("Step 9 (CNN model): Start")
-
-# Custom Dataset using CSV for labels
-class FaceDataset(Dataset):
-    def __init__(self, csv_pd, img_dir, transform=None):
-        self.labels_df = csv_pd
-        self.img_dir = img_dir
-        self.transform = transform
-        # LabelEncoder is applied here
-        self.label_encoder = LabelEncoder()
-        self.labels_df['encoded_race'] = self.label_encoder.fit_transform(self.labels_df['race'])
-
-    def __len__(self):
-        return len(self.labels_df)
-
-    def __getitem__(self, idx):
-        img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
-        label = self.labels_df.iloc[idx, 3]  # 'race' is the class
-        encoded_label = self.labels_df.iloc[idx, -1]  # 'encoded_race'
-
-        try:
-            img = cv2.imread(img_name)
-            if img is None:
-                raise FileNotFoundError(f"Image {img_name} not found")
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            if self.transform:
-                img = Image.fromarray(img)
-                img = self.transform(img)
-            return img, encoded_label
-        except (FileNotFoundError, ValueError) as e:
-            return None, None
-
-transform = transforms.Compose([
-    transforms.RandomRotation(30),
-    transforms.RandomHorizontalFlip(),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-])
-
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
-
-# Split dataset into training and validation sets
-train_size = int(0.8 * len(dataset))
-val_size = int(0.1 * len(dataset))
-test_size = len(dataset) - train_size - val_size
-train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
-
-def collate_fn(batch):
-    batch = [item for item in batch if item[0] is not None and item[1] is not None]
-    if len(batch) == 0:
-        return torch.empty(0), torch.empty(0)
-    return torch.utils.data.dataloader.default_collate(batch)
-
-# Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
-
-class ArcMarginModel(nn.Module):
-    def __init__(self, in_features, out_features, easy_margin=False, margin_m=0.5, margin_s=64.0):
-        super(ArcMarginModel, self).__init__()
-        
+# Definindo a camada ArcFace
+class ArcMarginProduct(nn.Module):
+    def __init__(self, in_features, out_features, s=30.0, m=0.50):
+        super(ArcMarginProduct, self).__init__()
+        self.s = s
+        self.m = m
         self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
-        
-        self.easy_margin = easy_margin
-        self.m = margin_m
-        self.s = margin_s
-        
-        self.cos_m = math.cos(self.m)
-        self.sin_m = math.sin(self.m)
-        self.th = math.cos(math.pi - self.m)
-        self.mm = math.sin(math.pi - self.m) * self.m
-    
+
     def forward(self, input, label):
-        x = F.normalize(input)
-        W = F.normalize(self.weight)
-        cosine = F.linear(x, W)
-        
-        # Fix: clamp cosine to avoid numerical issues
-        cosine = cosine.clamp(-1, 1)
-        
-        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
-        phi = cosine * self.cos_m - sine * self.sin_m  # cos(theta + m)
-        if self.easy_margin:
-            phi = torch.where(cosine > 0, phi, cosine)
-        else:
-            phi = torch.where(cosine > self.th, phi, cosine - self.mm)
-        one_hot = torch.zeros(cosine.size(), device=device)
+        cosine = nn.functional.linear(nn.functional.normalize(input), nn.functional.normalize(self.weight))
+        theta = torch.acos(cosine.clamp(-1.0, 1.0))
+        target_logit = torch.cos(theta + self.m)
+        one_hot = torch.zeros_like(cosine)
         one_hot.scatter_(1, label.view(-1, 1).long(), 1)
-        output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
+        output = (one_hot * target_logit) + ((1.0 - one_hot) * cosine)
         output *= self.s
         return output
 
-# Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
-class LResNet50E_IR(nn.Module):
-    def __init__(self, num_classes=len(dataset.label_encoder.classes_)):
-        super(LResNet50E_IR, self).__init__()
-        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.2)
-        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
-        self.backbone.fc = self.fc
+arcface = ArcMarginProduct(num_ftrs, len(class_names)).to(device)
 
-    def forward(self, x):
-        x = self.backbone(x)
-        x = self.dropout(x)
-        return x
-
-# Modelo ResNet50 para o ArcFace
-class ResNet50ArcFace(nn.Module):
-    def __init__(self, num_classes=len(dataset.label_encoder.classes_), feature_dim=512, weights=ResNet50_Weights.DEFAULT):
-        super(ResNet50ArcFace, self).__init__()
-        self.backbone = models.resnet50(weights=weights)
-        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, feature_dim)
-        self.fc = nn.Linear(feature_dim, num_classes)  # Adicionei essa camada para mapear features para classes
-        self.arc_margin_product = ArcMarginModel(in_features=feature_dim, out_features=num_classes)
-
-    def forward(self, x, labels=None):
-        features = self.backbone(x)  # Extraímos as features do backbone
-        if labels is not None:
-            return self.arc_margin_product(features, labels)  # ArcMargin é usado durante o treino
-        return self.fc(features)  # Retorna as logits sobre as classes na validação/teste
-            
-# Initialize model, criterion, and optimizer
-model = ResNet50ArcFace().to(device)
-model = nn.DataParallel(model)
-
+# Definindo o otimizador e a função de perda
+optimizer = optim.AdamW([{'params': model.parameters()}, {'params': arcface.parameters()}], lr=learning_rate)
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.005)
-scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 
-def softmax(x):
-    exp_x = np.exp(x - np.max(x))
-    return exp_x / exp_x.sum(axis=1, keepdims=True)
+# Definindo o scheduler para ajustar a taxa de aprendizado
+scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
-print("Step 9 (CNN model): End")
+# GradScaler para Mixed Precision
+scaler = GradScaler()
 
-
-print("Step 10 (Training execution): Start")
-
-# Training execution
-train_losses = []
-accuracies = []
-precisions = []
-log_losses = []
-
-scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
-
-for epoch in range(NUM_EPOCHS):
-    model.train()
-    start_time = time.time()
+# Função de treino
+def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
+    best_model_wts = model.state_dict()
+    best_acc = 0.0
     
-    for images, labels in train_loader:
-        images = images.to(device)
-        labels = labels.to(device)  # Labels are already encoded in the dataset
+    for epoch in range(num_epochs):
+        print(f'Epoch {epoch}/{num_epochs - 1}')
+        print('-' * 10)
 
-        optimizer.zero_grad()
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                model.train()  # Modo de treinamento
+            else:
+                model.eval()   # Modo de validação
+            
+            running_loss = 0.0
+            running_corrects = 0
+            
+            # Iterando sobre os dados
+            for inputs, labels in tqdm(dataloaders[phase]):
+                inputs = inputs.to(device)
+                labels = labels.to(device)
 
-        if cuda_available:
-            with torch.amp.autocast("cuda"):
-                outputs = model(images, labels)
-                loss = criterion(outputs, labels)
-        else:
-            outputs = model(images, labels)
-            loss = criterion(outputs, labels)
+                optimizer.zero_grad()
 
-        if scaler and cuda_available:
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
-        else:
-            loss.backward()
-            optimizer.step()
+                with autocast(), torch.set_grad_enabled(phase == 'train'):
+                    outputs = model(inputs)
+                    logits = arcface(outputs, labels)
+                    _, preds = torch.max(logits, 1)
+                    loss = criterion(logits, labels)
 
-        scheduler.step()  # Move scheduler step inside the batch loop
+                    if phase == 'train':
+                        scaler.scale(loss).backward()
+                        scaler.step(optimizer)
+                        scaler.update()
 
-    overhead = time.time() - start_time
-    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
-    print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
 
-    model.eval()
-    all_labels = []
-    all_preds = []
-    all_probs = []
-    epoch_loss = 0.0
+            if phase == 'train':
+                scheduler.step()
 
-    with torch.no_grad():
-        for images, labels in val_loader:
-            images = images.to(device)
-            labels = labels.to(device)
+            epoch_loss = running_loss / dataset_sizes[phase]
+            epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
-            outputs = model(images)  # Aqui temos as saídas (logits) das previsões
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+            
+            # Melhor modelo
+            if phase == 'val' and epoch_acc > best_acc:
+                best_acc = epoch_acc
+                best_model_wts = model.state_dict()
 
-            # Obtenção de probabilidades sobre as classes para o cálculo correto de log_loss
-            probs = F.softmax(outputs, dim=1).cpu().numpy()
-            all_probs.extend(probs)  # Agora as probabilidades são válidas
+    print(f'Best val Acc: {best_acc:.4f}')
+    model.load_state_dict(best_model_wts)
+    return model
 
-            val_loss = criterion(outputs, labels)
-            epoch_loss += val_loss.item()
+# Iniciando o treinamento
+model_trained = train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=num_epochs)
 
-            all_labels.extend(labels.cpu().numpy())
-            all_preds.extend(torch.argmax(outputs, dim=1).cpu().numpy())
-
-        # Correção: Cálculo de log_loss entre all_labels e all_probs, com número de classes compatíveis
-        val_accuracy = accuracy_score(all_labels, all_preds)
-        val_precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)  # Corrigido
-        val_log_loss = log_loss(all_labels, all_probs)  # Agora 'all_probs' tem o mesmo número de classes que 'all_labels'
-
-        accuracies.append(val_accuracy)
-        precisions.append(val_precision)
-        log_losses.append(val_log_loss)
-
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS} - Validation Accuracy: {val_accuracy:.4f}, Precision: {val_precision:.4f}, Log Loss: {val_log_loss:.4f}')
-
-    gc.collect()
-    if cuda_available:
-        torch.cuda.empty_cache()
-        
-
-print("Step 10 (Training execution): End")
-
-torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
-print('Finished Training and Model Saved')
-
-# Plotting general metrics
-epochs_range = range(1, num_epochs + 1)
-plt.figure(figsize=(12, 8))
-
-plt.subplot(2, 2, 1)
-plt.plot(epochs_range, train_losses, label='Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title('Loss over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 2)
-plt.plot(epochs_range, accuracies, label='Accuracy')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.title('Accuracy over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 3)
-plt.plot(epochs_range, precisions, label='Precision')
-plt.xlabel('Epoch')
-plt.ylabel('Precision')
-plt.title('Precision over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 4)
-plt.plot(epochs_range, log_losses, label='Log Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Log Loss')
-plt.title('Log Loss over Epochs')
-plt.legend()
-
-plt.tight_layout()
-plt.savefig('output/training_metrics.png')
-plt.show()
-plt.close()
-
-print("Step 11 (Training execution): End")
-
-print("Step 12 (Testing): Start")
-test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
-
-model.eval()
-all_test_preds = []
-all_test_labels = []
-
-with torch.no_grad():
-    for images, labels in test_loader:
-        images = images.to(device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-        outputs = model(images)
-        preds = torch.max(outputs, 1)[1].cpu().numpy()
-
-        all_test_labels.extend(labels_tensor.cpu().numpy())
-        all_test_preds.extend(preds)
-
-test_accuracy = accuracy_score(all_test_labels, all_test_preds)
-print(f'Test Accuracy: {test_accuracy:.4f}')
-
-print("Step 12 (Testing): End")
+# Salvando o modelo treinado
+torch.save(model_trained.state_dict(), 'fairface_resnet50_arcface.pth')
