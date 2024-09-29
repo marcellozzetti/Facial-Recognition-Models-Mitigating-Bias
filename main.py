@@ -107,32 +107,36 @@ label_encoder.fit(csv_pd['race'])
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 
-class ArcMarginProduct(nn.Module):
-    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
-        super(ArcMarginProduct, self).__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-        self.s = s
-        self.m = m
-        self.easy_margin = easy_margin
-        self.ls_eps = ls_eps
-        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
+class ArcMarginModel(nn.Module):
+    def __init__(self, args):
+        super(ArcMarginModel, self).__init__()
+
+        self.weight = Parameter(torch.FloatTensor(num_classes, args.emb_size))
         nn.init.xavier_uniform_(self.weight)
 
+        self.easy_margin = args.easy_margin
+        self.m = args.margin_m
+        self.s = args.margin_s
+
+        self.cos_m = math.cos(self.m)
+        self.sin_m = math.sin(self.m)
+        self.th = math.cos(math.pi - self.m)
+        self.mm = math.sin(math.pi - self.m) * self.m
+
     def forward(self, input, label):
-        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
+        x = F.normalize(input)
+        W = F.normalize(self.weight)
+        cosine = F.linear(x, W)
         sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
-        phi = cosine - self.m
+        phi = cosine * self.cos_m - sine * self.sin_m  # cos(theta + m)
         if self.easy_margin:
             phi = torch.where(cosine > 0, phi, cosine)
         else:
-            phi = torch.where(cosine > (1.0 - self.m), phi, cosine)
-        one_hot = torch.zeros(cosine.size(), device=input.device)
+            phi = torch.where(cosine > self.th, phi, cosine - self.mm)
+        one_hot = torch.zeros(cosine.size(), device=device)
         one_hot.scatter_(1, label.view(-1, 1).long(), 1)
-        if self.ls_eps > 0:
-            phi = phi - self.ls_eps
         output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
-        output = output * self.s
+        output *= self.s
         return output
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
