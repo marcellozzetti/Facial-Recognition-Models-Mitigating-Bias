@@ -155,7 +155,7 @@ class LResNet50E_IR(nn.Module):
 
 # Modelo ResNet50 para o ArcFace
 class ResNet50ArcFace(nn.Module):
-    def __init__(self, num_classes, feature_dim=512, weights=ResNet50_Weights.DEFAULT):
+    def __init__(self, num_classes=len(label_encoder.classes_), feature_dim=512, weights=ResNet50_Weights.DEFAULT):
         super(ResNet50ArcFace, self).__init__()
         self.backbone = models.resnet50(weights=weights)
         self.backbone.fc = nn.Linear(self.backbone.fc.in_features, feature_dim)
