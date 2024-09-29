@@ -227,7 +227,7 @@ for epoch in range(NUM_EPOCHS):
             loss.backward()
             optimizer.step()
 
-        scheduler.step()
+        #scheduler.step()
 
     overhead = time.time() - start_time
         
