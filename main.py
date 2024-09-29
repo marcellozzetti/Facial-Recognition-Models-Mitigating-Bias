@@ -35,7 +35,7 @@ import pre_processing_images
 
 # Constants
 BATCH_SIZE = 256
-NUM_EPOCHS = 20
+NUM_EPOCHS = 10
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 # Check if Cuda is available
@@ -77,12 +77,17 @@ class FaceDataset(Dataset):
         except (FileNotFoundError, ValueError) as e:
             return None, None
 
+# Transformations and normalization
+#transform = transforms.Compose([
+#    transforms.ToTensor(),
+#    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+#])
+
 transform = transforms.Compose([
-    transforms.RandomRotation(30),
-    transforms.RandomHorizontalFlip(),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+    transforms.RandomHorizontalFlip(),  # Flip horizontal aleatório
+    transforms.RandomRotation(10),      # Rotação aleatória de até 10 graus
     transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])  # Normalização
 ])
 
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
@@ -107,36 +112,32 @@ label_encoder.fit(csv_pd['race'])
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
 
-class ArcMarginModel(nn.Module):
-    def __init__(self, in_features, out_features, easy_margin=False, margin_m=0.5, margin_s=64.0):
-        super(ArcMarginModel, self).__init__()
-        
+class ArcMarginProduct(nn.Module):
+    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False, ls_eps=0.0):
+        super(ArcMarginProduct, self).__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.s = s
+        self.m = m
+        self.easy_margin = easy_margin
+        self.ls_eps = ls_eps
         self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
-        
-        self.easy_margin = easy_margin
-        self.m = margin_m
-        self.s = margin_s
-        
-        self.cos_m = math.cos(self.m)
-        self.sin_m = math.sin(self.m)
-        self.th = math.cos(math.pi - self.m)
-        self.mm = math.sin(math.pi - self.m) * self.m
-    
+
     def forward(self, input, label):
-        x = F.normalize(input)
-        W = F.normalize(self.weight)
-        cosine = F.linear(x, W)
+        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
         sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
-        phi = cosine * self.cos_m - sine * self.sin_m  # cos(theta + m)
+        phi = cosine - self.m
         if self.easy_margin:
             phi = torch.where(cosine > 0, phi, cosine)
         else:
-            phi = torch.where(cosine > self.th, phi, cosine - self.mm)
-        one_hot = torch.zeros(cosine.size(), device=device)
+            phi = torch.where(cosine > (1.0 - self.m), phi, cosine)
+        one_hot = torch.zeros(cosine.size(), device=input.device)
         one_hot.scatter_(1, label.view(-1, 1).long(), 1)
+        if self.ls_eps > 0:
+            phi = phi - self.ls_eps
         output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
-        output *= self.s
+        output = output * self.s
         return output
 
 # Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
@@ -153,34 +154,13 @@ class LResNet50E_IR(nn.Module):
         x = self.dropout(x)
         return x
 
-# Modelo ResNet50 para o ArcFace
-class ResNet50ArcFace(nn.Module):
-    def __init__(self, num_classes=len(label_encoder.classes_), feature_dim=512, weights=ResNet50_Weights.DEFAULT):
-        super(ResNet50ArcFace, self).__init__()
-        self.backbone = models.resnet50(weights=weights)
-        self.backbone.fc = nn.Linear(self.backbone.fc.in_features, feature_dim)
-        self.arc_margin_product = ArcMarginModel(in_features=feature_dim, out_features=num_classes)
-
-    def forward(self, x, labels=None):
-        features = self.backbone(x)
-        if labels is not None:
-            return self.arc_margin_product(features, labels)
-        return features
-            
 # Initialize model, criterion, and optimizer
-model = ResNet50ArcFace().to(device)
+model = LResNet50E_IR().to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.005)
-#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
-scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
-
-# Definir otimizador
-#optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-# Definir scheduler para reduzir o learning rate com base na performance
-#scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.1, patience=2, verbose=True)
-
+optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
@@ -240,14 +220,13 @@ for epoch in range(num_epochs):
         for images, labels in val_loader:
             images = images.to(device)
             labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            outputs = model(images, labels_tensor)
+            outputs = model(images)
             loss = criterion(outputs, labels_tensor)
             epoch_loss += loss.item()
 
             probs = F.softmax(outputs, dim=1).cpu().numpy()
             preds = torch.max(outputs, 1)[1].cpu().numpy()
 
-            #all_labels.extend(labels_tensor)
             all_labels.extend(labels_tensor.cpu().numpy())
             all_preds.extend(preds)
             all_probs.extend(probs)
@@ -258,8 +237,7 @@ for epoch in range(num_epochs):
     all_probs = softmax(all_probs)
     logloss = log_loss(all_labels, all_probs)
 
-    #scheduler.step(epoch_loss)
-    scheduler.step()
+    scheduler.step(epoch_loss)
 
     train_losses.append(epoch_loss / len(val_loader))
     accuracies.append(accuracy)
@@ -337,5 +315,3 @@ test_accuracy = accuracy_score(all_test_labels, all_test_preds)
 print(f'Test Accuracy: {test_accuracy:.4f}')
 
 print("Step 12 (Testing): End")
-
-
