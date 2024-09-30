@@ -30,7 +30,7 @@ class FaceDataset(Dataset):
         return self.classes
 
 def dataset_transformation():
-    return = transforms.Compose([
+    return transforms.Compose([
         transforms.RandomRotation(10),
         transforms.RandomHorizontalFlip(),
         transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
