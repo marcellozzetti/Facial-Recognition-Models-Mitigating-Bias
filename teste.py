@@ -191,8 +191,12 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 running_corrects += torch.sum(preds == labels_tensor.data)
             
                 # Coletando labels e probabilidades
+                #all_labels.extend(labels_tensor.cpu().numpy())
+                #all_probs.extend(probs.cpu().numpy())
+                # Coletando labels e probabilidades
                 all_labels.extend(labels_tensor.cpu().numpy())
-                all_probs.extend(probs.cpu().numpy())
+                all_probs.extend(probs.detach().cpu().numpy())  # Use .detach() para evitar rastreamento de gradientes
+
             
             # Após o loop, calcula log_loss usando all_labels e all_probs
             epoch_loss = running_loss / dataset_sizes[phase]
