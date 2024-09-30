@@ -79,65 +79,78 @@ train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], [
 
 # Training function
 def train_model(model, criterion, optimizer, scheduler, num_epochs):
-    for epoch in range(num_epochs):
+    
+    for epoch in range(NUM_EPOCHS):
         model.train()
         start_time = time.time()
         
         for images, labels in train_loader:
             images = images.to(device)
-            labels_tensor = torch.tensor(label_encoder.transform(labels), dtype=torch.long).to(device)
+            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
             optimizer.zero_grad()
-
-            with torch.amp.autocast() if device.type == "cuda" else dummy_context():
+    
+            if device == torch.device("cuda"):
+                with torch.amp.autocast("cuda"):
+                    outputs = model(images)
+                    loss = criterion(outputs, labels_tensor)
+            else:
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
-
-            if scaler and device.type == "cuda":
+    
+            if scaler and device == torch.device("cuda"):
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
                 scaler.update()
             else:
                 loss.backward()
                 optimizer.step()
-
+    
+            #scheduler.step()
+    
         overhead = time.time() - start_time
-        print(f'Epoch {epoch+1}/{num_epochs}, Overhead: {overhead:.4f}s')
-
+            
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
+        print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
+    
         model.eval()
+        all_labels = []
+        all_preds = []
+        all_probs = []
         epoch_loss = 0.0
-        all_labels, all_preds, all_probs = [], [], []
-
+    
         with torch.no_grad():
             for images, labels in val_loader:
                 images = images.to(device)
-                labels_tensor = torch.tensor(label_encoder.transform(labels), dtype=torch.long).to(device)
+                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
                 epoch_loss += loss.item()
-
+    
                 probs = F.softmax(outputs, dim=1).cpu().numpy()
                 preds = torch.max(outputs, 1)[1].cpu().numpy()
-
+    
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_preds.extend(preds)
                 all_probs.extend(probs)
-
+    
+        all_labels = [label.item() for label in all_labels]
         accuracy = accuracy_score(all_labels, all_preds)
         precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+        all_probs = softmax(all_probs)
         logloss = log_loss(all_labels, all_probs)
-
+    
         scheduler.step(epoch_loss)
-
+    
         train_losses.append(epoch_loss / len(val_loader))
         accuracies.append(accuracy)
         precisions.append(precision)
         log_losses.append(logloss)
-
-        print(f'Epoch {epoch+1}/{num_epochs}, Loss: {epoch_loss/len(val_loader):.4f}, '
+    
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss/len(train_loader):.4f}, '
               f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
-        
-        clean_memory()  # Clean memory after each epoch
 
+    clean_memory()
+    
     return model
 
 # Train the model
