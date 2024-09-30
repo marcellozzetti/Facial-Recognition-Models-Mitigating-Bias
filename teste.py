@@ -206,13 +206,22 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 # Collect labels and probabilities
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_probs.extend(probs.detach().cpu().numpy())
+
+            # Verifique se há NaNs ou valores infinitos em all_probs
+            if np.any(np.isnan(all_probs)):
+                print("Encontrados NaNs em all_probs")
+            if np.any(np.isinf(all_probs)):
+                print("Encontrados valores infinitos em all_probs")
             
-            # Check for NaNs in all_probs
-            if any(np.isnan(all_probs)):
-                all_probs = npy.nan_to_num(all_probs)  # Replace NaNs with 0
+            # Imprima o tamanho de all_labels
+            print(f"Tamanho de all_labels: {len(all_labels)}")
             
-            # Calculate log_loss
-            log_losses.append(log_loss(all_labels, all_probs))
+            # Calcule o log_loss
+            try:
+                log_losses.append(log_loss(all_labels, all_probs))
+            except ValueError as e:
+                print(f"Erro ao calcular log_loss: {e}")
+    
             #epoch_loss = running_loss / dataset_sizes[phase]
             #epoch_acc = running_corrects.double() / dataset_sizes[phase]
             #log_losses.append(log_loss(all_labels, all_probs))  # Agora deve funcionar
