@@ -70,6 +70,8 @@ num_classes = len(dataset.classes)
 # Create DataLoaders using a filter function: collate_fn
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
+dataloaders = {'train': train_loader, 'val': val_loader, 'test': test_loader}
+dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset), 'test': len(test_dataset)}
 
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR(num_classes).to(device)
