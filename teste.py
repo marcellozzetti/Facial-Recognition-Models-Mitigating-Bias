@@ -133,67 +133,73 @@ train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], [
 def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
     best_model_wts = model.state_dict()
     best_acc = 0.0
-    
+
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs - 1}')
         print('-' * 10)
 
         start_time = time.time()
-    
+
         for phase in ['train', 'val']:
             if phase == 'train':
                 model.train()  # Modo de treinamento
             else:
                 model.eval()   # Modo de validação
-            
+
             running_loss = 0.0
             running_corrects = 0
             all_probs = []
             all_labels = []
-    
+
             for inputs, labels in tqdm(dataloaders[phase]):
                 inputs = inputs.to(device)
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-    
+
                 optimizer.zero_grad()
-    
-                with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
+
+                with torch.amp.autocast("cuda", enabled=device == torch.device("cuda")), \
+                     torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     logits = arcface(outputs, labels_tensor)
-    
+
+                    # Corrigir cálculo das predições
                     probs = F.softmax(logits, dim=1)
-                    _, preds = torch.max(logits, 1)
+                    _, preds = torch.max(probs, 1)  # Usar softmax e obter a predição
+
                     loss = criterion(logits, labels_tensor)
-    
+
                     if phase == 'train':
                         scaler.scale(loss).backward()
                         scaler.step(optimizer)
                         scaler.update()
-    
+
                 # Acumule métricas
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels_tensor.data)
-    
+
                 # Coleta de rótulos e probabilidades
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_probs.extend(probs.detach().cpu().numpy())
-    
+
             # Cálculo do log_loss
             try:
                 log_loss_value = log_loss(all_labels, all_probs)
                 log_losses.append(log_loss_value)
             except ValueError as e:
                 print(f"Erro ao calcular log_loss: {e}")
-    
+
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
             epoch_loss = running_loss / dataset_sizes[phase]
-    
+
             elapsed_time = time.time() - start_time
             print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Log Loss: {log_losses[-1]:.4f} Overhead: {elapsed_time:.2f}s')
-    
+
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = model.state_dict()
+
+        if phase == 'train':
+            scheduler.step()  # Ajusta a taxa de aprendizado apenas no treinamento
 
     print(f'Best val Acc: {best_acc:4f}')
     model.load_state_dict(best_model_wts)
