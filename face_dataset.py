@@ -16,7 +16,7 @@ class FaceDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
-        label = self.labels_df.iloc[idx, 3]  # Coluna com o rótulo 'race'
+        label = self.labels_df.iloc[idx, 3]
 
         img = cv2.imread(img_name)
         if img is None:
