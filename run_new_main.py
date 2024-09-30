@@ -1,161 +1,227 @@
+import os
+import time
+import json
+import gc
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, random_split
-from torchvision import transforms, datasets
-from torch.optim import lr_scheduler
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 import torch.nn.functional as F
-from sklearn.preprocessing import LabelEncoder
-from torch.cuda.amp import autocast, GradScaler
-import matplotlib.pyplot as plt
-from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report
-import seaborn as sns
-import pandas as pd
-from face_dataset import FaceDataset 
-import pre_processing_images
+import torchvision.transforms as transforms
 import torchvision.models as models
-from torchvision.models import ResNet101_Weights
+from torchvision.models import ResNet50_Weights
+from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report, log_loss
+from sklearn.preprocessing import LabelEncoder
+from face_dataset import FaceDataset, dataset_transformation
+from models import LResNet50E_IR
+import pre_processing_images
 
-# Definindo o dispositivo (GPU se disponível)
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
-# Hiperparameters
-BATCH_SIZE = 64
-NUM_EPOCHS = 24
+# Hyperparameters
+BATCH_SIZE = 128
+NUM_EPOCHS = 4
 TRAIN_VAL_SPLIT = 0.8
 VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
+
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-# Carregando o dataset do CSV
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
+# Check if CUDA is available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Dividindo o dataset em treino, validação e teste
-train_size = int(train_val_split * len(dataset))
-val_size = (len(dataset) - train_size) // 2
+# Clean memory
+def clean_memory():
+    if device.type == "cuda":
+        gc.collect()
+        torch.cuda.empty_cache()
+
+def softmax(x):
+    exp_x = np.exp(x - np.max(x))
+    return exp_x / exp_x.sum(axis=1, keepdims=True)
+
+clean_memory()
+
+print("Step 9 (CNN model): Start")
+
+# Load dataset
+csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
+dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
+
+# Split dataset into training, validation, and test sets
+train_size = int(TRAIN_VAL_SPLIT * len(dataset))
+val_size = int(VAL_VAL_SPLIT * len(dataset))
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
-# Criando os DataLoaders
-train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
-val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
-test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
+# Create DataLoaders
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
+val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 
-dataloaders = {'train': train_loader, 'val': val_loader, 'test': test_loader}
-dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset), 'test': len(test_dataset)}
-
-# Definindo a arquitetura LResNet100E-IR (ResNet100 aprimorada)
-class LResNet100E_IR(nn.Module):
-    def __init__(self, num_classes):
-        super(LResNet100E_IR, self).__init__()
-        #self.resnet = models.resnet101(pretrained=True)
-        self.resnet = models.resnet101(weights=ResNet101_Weights.DEFAULT)
-        #self.resnet = torch.hub.load('zhanghang1989/ResNeSt', 'resnest100', pretrained=True)  # Exemplo para carregar a ResNet100
-        self.resnet.fc = nn.Identity()  # Mantém a saída de 2048
-        
-        # Definindo a camada ArcFace
-        self.arcface = ArcMarginProduct(in_features=2048, out_features=num_classes)
-
-    def forward(self, x, labels):
-        features = self.resnet(x)  # Extrair características
-        logits = self.arcface(features, labels)  # Calcular os logits com ArcFace
-        return logits
-
-# Definindo a camada ArcFace
-class ArcMarginProduct(nn.Module):
-    def __init__(self, in_features, out_features, s=30.0, m=0.50):
-        super(ArcMarginProduct, self).__init__()
-        self.s = s
-        self.m = m
-        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
-        nn.init.xavier_uniform_(self.weight)
-
-    def forward(self, input, label):
-        # Normalizando entrada e pesos
-        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
-        theta = torch.acos(cosine.clamp(-1.0, 1.0))
-        target_logit = torch.cos(theta + self.m)
-
-        # One-hot encoding dos rótulos
-        one_hot = torch.zeros_like(cosine)
-        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
-
-        # Combina logits com margem e ajusta escala
-        output = (one_hot * target_logit) + ((1.0 - one_hot) * cosine)
-        output *= self.s
-
-        return output
-
-# Instanciando o modelo
+label_encoder = LabelEncoder()
+label_encoder.fit(csv_pd['race'])
 num_classes = len(dataset.classes)
-model = LResNet100E_IR(num_classes).to(device)
 
-# Definindo o otimizador e a função de perda
-optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
+# Initialize model, criterion, and optimizer
+model = LResNet50E_IR(num_classes).to(device)
+model = nn.DataParallel(model)
+
 criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+#scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
+scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
-# Definindo o scheduler para ajustar a taxa de aprendizado
-scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+print("Step 9 (CNN model): End")
 
-# GradScaler para Mixed Precision
-scaler = GradScaler() if device == torch.device("cuda") else None
+print("Step 10 (Training execution): Start")
+# Initializing metrics lists
+train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
 
-# Função de treino
-def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
-    best_model_wts = model.state_dict()
-    best_acc = 0.0
-
-    for epoch in range(num_epochs):
-        print(f'Epoch {epoch}/{num_epochs - 1}')
-        print('-' * 10)
-
-        for phase in ['train', 'val']:
-            if phase == 'train':
-                model.train()
+# Training function
+def train_model(model, criterion, optimizer, scheduler, num_epochs):
+    
+    for epoch in range(NUM_EPOCHS):
+        model.train()
+        start_time = time.time()
+        
+        for images, labels in train_loader:
+            images = images.to(device)
+            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+            optimizer.zero_grad()
+    
+            if device == torch.device("cuda"):
+                with torch.amp.autocast("cuda"):
+                    outputs = model(images)
+                    loss = criterion(outputs, labels_tensor)
             else:
-                model.eval()
+                outputs = model(images)
+                loss = criterion(outputs, labels_tensor)
+    
+            if scaler and device == torch.device("cuda"):
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                optimizer.step()
+    
+            scheduler.step()
+    
+        overhead = time.time() - start_time
+            
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
+        print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
+    
+        model.eval()
+        all_labels = []
+        all_preds = []
+        all_probs = []
+        epoch_loss = 0.0
+    
+        with torch.no_grad():
+            for images, labels in val_loader:
+                images = images.to(device)
+                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                outputs = model(images)
+                loss = criterion(outputs, labels_tensor)
+                epoch_loss += loss.item()
+    
+                probs = F.softmax(outputs, dim=1).cpu().numpy()
+                preds = torch.max(outputs, 1)[1].cpu().numpy()
+    
+                all_labels.extend(labels_tensor.cpu().numpy())
+                all_preds.extend(preds)
+                all_probs.extend(probs)
+    
+        all_labels = [label.item() for label in all_labels]
+        accuracy = accuracy_score(all_labels, all_preds)
+        precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+        all_probs = softmax(all_probs)
+        logloss = log_loss(all_labels, all_probs)
+    
+        #scheduler.step(epoch_loss)
+    
+        train_losses.append(epoch_loss / len(val_loader))
+        accuracies.append(accuracy)
+        precisions.append(precision)
+        log_losses.append(logloss)
+    
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss/len(train_loader):.4f}, '
+              f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
-            running_loss = 0.0
-            running_corrects = 0
-
-            for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-
-                optimizer.zero_grad()
-
-                with autocast(device == 'cuda'), torch.set_grad_enabled(phase == 'train'):
-                    logits = model(inputs, labels)
-                    _, preds = torch.max(logits, 1)
-
-                    loss = criterion(logits, labels)
-
-                    if phase == 'train':
-                        scaler.scale(loss).backward()
-                        scaler.step(optimizer)
-                        scaler.update()
-
-                running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
-
-            epoch_loss = running_loss / dataset_sizes[phase]
-            epoch_acc = running_corrects.double() / dataset_sizes[phase]
-
-            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
-
-            if phase == 'val' and epoch_acc > best_acc:
-                best_acc = epoch_acc
-                best_model_wts = model.state_dict()
-
-        scheduler.step()
-
-    print(f'Best val Acc: {best_acc:4f}')
-    model.load_state_dict(best_model_wts)
+    clean_memory()
+    
     return model
 
-# Treinando o modelo
-model = train_model(model, criterion, optimizer, scheduler, num_epochs=num_epochs)
+# Train the model
+model = train_model(model, criterion, optimizer, scheduler, num_epochs=NUM_EPOCHS)
+
+torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
+print('Finished Training and Model Saved')
+
+# Plotting general metrics
+epochs_range = range(1, NUM_EPOCHS + 1)
+plt.figure(figsize=(12, 8))
+
+plt.subplot(2, 2, 1)
+plt.plot(epochs_range, train_losses, label='Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Loss over Epochs')
+plt.legend()
+
+plt.subplot(2, 2, 2)
+plt.plot(epochs_range, accuracies, label='Accuracy')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.title('Accuracy over Epochs')
+plt.legend()
+
+plt.subplot(2, 2, 3)
+plt.plot(epochs_range, precisions, label='Precision')
+plt.xlabel('Epoch')
+plt.ylabel('Precision')
+plt.title('Precision over Epochs')
+plt.legend()
+
+plt.subplot(2, 2, 4)
+plt.plot(epochs_range, log_losses, label='Log Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Log Loss')
+plt.title('Log Loss over Epochs')
+plt.legend()
+
+plt.tight_layout()
+plt.savefig('output/training_metrics.png')
+plt.show()
+plt.close()
+
+print("Step 11 (Training execution): End")
+
+print("Step 12 (Testing): Start")
+model.eval()
+all_test_preds = []
+all_test_labels = []
+
+with torch.no_grad():
+    for images, labels in test_loader:
+        images = images.to(device)
+        labels_tensor = torch.tensor(label_encoder.transform(labels), dtype=torch.long).to(device)
+        outputs = model(images)
+        preds = torch.max(outputs, 1)[1].cpu().numpy()
+
+        all_test_labels.extend(labels_tensor.cpu().numpy())
+        all_test_preds.extend(preds)
+
+test_accuracy = accuracy_score(all_test_labels, all_test_preds)
+print(f'Test Accuracy: {test_accuracy:.4f}')
+
+
 
 # Avaliando o modelo no conjunto de teste
 def evaluate_model(model, test_loader, criterion):
