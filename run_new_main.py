@@ -18,7 +18,7 @@ from torchvision.models import ResNet50_Weights
 from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report, log_loss
 from sklearn.preprocessing import LabelEncoder
 from face_dataset import FaceDataset, dataset_transformation
-from models import LResNet50E_IR
+from models import LResNet50E_IR, LResNet50E_IRArc
 import pre_processing_images
 import datetime
 from tqdm import tqdm
