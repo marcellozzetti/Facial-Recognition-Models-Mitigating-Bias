@@ -31,7 +31,6 @@ import cv2
 from mtcnn.mtcnn import MTCNN
 import plotly.express as px
 import plotly.graph_objs as go
-import pre_processing_images
 
 print("Step 1 (Imports): End")
 
@@ -204,7 +203,7 @@ if PERFORM_ADJUSTMENTS:
     print(f"Removed {len(failed_images)} images that failed processing.")
 print("Step 7 (Images Adjustments): End")
 
-# Step 8: Rebalance Dataset
+
 print("Step 8 (Rebalance Dataset): Start")
 csv_concatenated_pd = pd.read_csv(CSV_CONCAT_DATASET_FILTERED_FILE)
 class_column = 'race'
