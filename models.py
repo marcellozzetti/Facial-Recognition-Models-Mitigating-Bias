@@ -30,9 +30,11 @@ class ArcMarginProduct(nn.Module):
         return output
 
 # Definindo a arquitetura LResNet100E-IR (ResNet100 aprimorada)
-class LResNet100E_IRArch(nn.Module):
-    def __init__(self, num_classes=None):
-        super(LResNet100E_IRArch, self).__init__()
+class LResNet100E_IRArc(nn.Module):
+    def __init__(self, num_classes):
+        super(LResNet100E_IRArc, self).__init__()
+        if num_classes is None:
+            raise ValueError("num_classes must be specified")
         self.resnet = models.resnet101(weights=ResNet101_Weights.DEFAULT)
         self.resnet.fc = nn.Identity()  # Mantém a saída de 2048
         
@@ -46,8 +48,10 @@ class LResNet100E_IRArch(nn.Module):
 
 # Define o modelo (LResNet50E-IR, uma ResNet50 modificada para ArcFace)
 class LResNet50E_IR(nn.Module):
-    def __init__(self, num_classes=None):
+    def __init__(self, num_classes):
         super(LResNet50E_IR, self).__init__()
+        if num_classes is None:
+            raise ValueError("num_classes must be specified")
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
         self.dropout = nn.Dropout(p=0.2)
         self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
@@ -59,8 +63,10 @@ class LResNet50E_IR(nn.Module):
         return x
 
 class LResNet50E_IRArc(nn.Module):
-    def __init__(self, num_classes=None):
+    def __init__(self, num_classes):
         super(LResNet50E_IRArc, self).__init__()
+        if num_classes is None:
+            raise ValueError("num_classes must be specified")
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
         self.dropout = nn.Dropout(p=0.2)
         
