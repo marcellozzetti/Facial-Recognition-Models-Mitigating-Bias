@@ -10,6 +10,7 @@ from sklearn.preprocessing import LabelEncoder
 from tqdm import tqdm
 import pandas as pd
 import os
+import numpy as np
 import cv2
 from PIL import Image
 from torch.utils.data import Dataset
@@ -208,7 +209,7 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             
             # Check for NaNs in all_probs
             if any(np.isnan(all_probs)):
-                all_probs = np.nan_to_num(all_probs)  # Replace NaNs with 0
+                all_probs = npy.nan_to_num(all_probs)  # Replace NaNs with 0
             
             # Calculate log_loss
             log_losses.append(log_loss(all_labels, all_probs))
