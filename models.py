@@ -29,23 +29,6 @@ class ArcMarginProduct(nn.Module):
 
         return output
 
-# Definindo a arquitetura LResNet100E-IR (ResNet100 aprimorada)
-class LResNet100E_IRArc(nn.Module):
-    def __init__(self, num_classes):
-        super(LResNet100E_IRArc, self).__init__()
-        if num_classes is None:
-            raise ValueError("num_classes must be specified")
-        self.resnet = models.resnet101(weights=ResNet101_Weights.DEFAULT)
-        self.resnet.fc = nn.Identity()  # Mantém a saída de 2048
-        
-        # Definindo a camada ArcFace
-        self.arcface = ArcMarginProduct(in_features=2048, out_features=num_classes)
-
-    def forward(self, x, labels):
-        features = self.resnet(x)  # Extrair características
-        logits = self.arcface(features, labels)  # Calcular os logits com ArcFace
-        return logits
-
 # Define o modelo (LResNet50E-IR, uma ResNet50 modificada para ArcFace)
 class LResNet50E_IR(nn.Module):
     def __init__(self, num_classes):
