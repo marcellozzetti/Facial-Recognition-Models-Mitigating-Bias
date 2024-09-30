@@ -21,7 +21,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Hiperparameters
 BATCH_SIZE = 64
-NUM_EPOCHS = 40
+NUM_EPOCHS = 24
 TRAIN_VAL_SPLIT = 0.8
 VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
