@@ -75,7 +75,7 @@ model = LResNet50E_IR(num_classes).to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
+optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
@@ -92,7 +92,7 @@ print("Step 10 (Training execution): Start")
 train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
 
 # Função de treino
-def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
+def train_model(model, criterion, optimizer, scheduler, num_epochs):
     best_model_wts = model.state_dict()
     best_acc = 0.0
 
@@ -172,7 +172,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     return model
 
 # Treinando o modelo
-model = train_model(model, criterion, optimizer, scheduler, num_epochs=num_epochs)
+model = train_model(model, criterion, optimizer, scheduler, num_epochs=NUM_EPOCHS)
 
 torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
@@ -217,7 +217,7 @@ plt.close()
 print("Step 11 (Training execution): End")
 
 print("Step 12 (Testing): Start")
-test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 
 model.eval()
 all_test_preds = []
