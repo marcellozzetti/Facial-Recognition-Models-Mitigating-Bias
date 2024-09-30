@@ -29,9 +29,9 @@ import torchvision.models as models
 from torchvision.models import ResNet50_Weights
 import cv2
 from mtcnn.mtcnn import MTCNN
-import pre_processing_images
-from face_dataset import FaceDataset 
+from face_dataset import FaceDataset, dataset_transformation
 from models import LResNet50E_IR
+import pre_processing_images
 
 # Hiperparameters
 BATCH_SIZE = 64
@@ -54,7 +54,7 @@ if torch.cuda.is_available() and device == torch.device("cuda"):
 print("Step 9 (CNN model): Start")
 
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=face_dataset.dataset_transformation)
+dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
 
 # Split dataset into training and validation sets
 train_size = int(TRAIN_VAL_SPLIT * len(dataset))
