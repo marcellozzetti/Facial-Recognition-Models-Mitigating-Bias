@@ -18,7 +18,7 @@ from torchvision.models import ResNet50_Weights
 from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report, log_loss
 from sklearn.preprocessing import LabelEncoder
 from face_dataset import FaceDataset, dataset_transformation
-from models import LResNet50E_IR, LResNet50E_IRArc
+from models import LResNet50E_IR, ArcFaceLoss
 import pre_processing_images
 import datetime
 from tqdm import tqdm
@@ -70,10 +70,15 @@ num_classes = len(dataset.classes)
 model = LResNet50E_IR(num_classes).to(device)
 model = nn.DataParallel(model)
 
-criterion = nn.CrossEntropyLoss()
+#criterion = nn.CrossEntropyLoss()
+criterion = ArcFaceLoss().to(device)
+
 optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+#optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+
 #scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
 scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 print("Step 9 (CNN model): End")
