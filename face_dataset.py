@@ -3,12 +3,12 @@ import cv2
 from PIL import Image
 from torch.utils.data import Dataset
 
-# Dataset customizado usando CSV para as labels
 class FaceDataset(Dataset):
     def __init__(self, csv_pd, img_dir, transform=None):
         self.labels_df = csv_pd
         self.img_dir = img_dir
         self.transform = transform
+        self.classes = self.labels_df['race'].unique()
 
     def __len__(self):
         return len(self.labels_df)
@@ -25,3 +25,6 @@ class FaceDataset(Dataset):
             img = Image.fromarray(img)
             img = self.transform(img)
         return img, label
+
+    def get_classes(self):
+        return self.classes
