@@ -1,18 +1,8 @@
-# Definindo a arquitetura LResNet100E-IR (ResNet100 aprimorada)
-class LResNet100E_IRArch(nn.Module):
-    def __init__(self, num_classes):
-        super(LResNet100E_IR, self).__init__()
-        self.resnet = models.resnet101(weights=ResNet101_Weights.DEFAULT)
-        #self.resnet = torch.hub.load('zhanghang1989/ResNeSt', 'resnest100', pretrained=True)  # Exemplo para carregar a ResNet100
-        self.resnet.fc = nn.Identity()  # Mantém a saída de 2048
-        
-        # Definindo a camada ArcFace
-        self.arcface = ArcMarginProduct(in_features=2048, out_features=num_classes)
-
-    def forward(self, x, labels):
-        features = self.resnet(x)  # Extrair características
-        logits = self.arcface(features, labels)  # Calcular os logits com ArcFace
-        return logits
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torchvision import models
+from torchvision.models import ResNet101_Weights, ResNet50_Weights
 
 # Definindo a camada ArcFace
 class ArcMarginProduct(nn.Module):
@@ -39,9 +29,24 @@ class ArcMarginProduct(nn.Module):
 
         return output
 
-# Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
+# Definindo a arquitetura LResNet100E-IR (ResNet100 aprimorada)
+class LResNet100E_IRArch(nn.Module):
+    def __init__(self, num_classes):
+        super(LResNet100E_IRArch, self).__init__()
+        self.resnet = models.resnet101(weights=ResNet101_Weights.DEFAULT)
+        self.resnet.fc = nn.Identity()  # Mantém a saída de 2048
+        
+        # Definindo a camada ArcFace
+        self.arcface = ArcMarginProduct(in_features=2048, out_features=num_classes)
+
+    def forward(self, x, labels):
+        features = self.resnet(x)  # Extrair características
+        logits = self.arcface(features, labels)  # Calcular os logits com ArcFace
+        return logits
+
+# Define o modelo (LResNet50E-IR, uma ResNet50 modificada para ArcFace)
 class LResNet50E_IR(nn.Module):
-    def __init__(self, num_classes=len(label_encoder.classes_)):
+    def __init__(self, num_classes):
         super(LResNet50E_IR, self).__init__()
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
         self.dropout = nn.Dropout(p=0.2)
@@ -54,7 +59,7 @@ class LResNet50E_IR(nn.Module):
         return x
 
 class LResNet50E_IRArc(nn.Module):
-    def __init__(self, num_classes=len(label_encoder.classes_)):
+    def __init__(self, num_classes):
         super(LResNet50E_IRArc, self).__init__()
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
         self.dropout = nn.Dropout(p=0.2)
