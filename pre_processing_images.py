@@ -1,4 +1,4 @@
-print("Step 1 (Imports): Starting")
+print("Step 1 (Imports): Start")
 
 # Imports
 import os
