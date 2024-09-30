@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader, random_split
 from torchvision import transforms, models
 from torch.cuda.amp import autocast, GradScaler
 from sklearn.preprocessing import LabelEncoder
-import torch.nn.functional as F  # Importação necessária para usar F.softmax
+import torch.nn.functional as F
 from tqdm import tqdm
 import pandas as pd
 import os
@@ -15,11 +15,9 @@ import numpy as np
 import cv2
 from PIL import Image
 from torch.utils.data import Dataset
-import torchvision.models as models
-from torchvision.models import ResNet50_Weights
-import pre_processing_images
 import matplotlib.pyplot as plt
-from sklearn.metrics import precision_score, log_loss, accuracy_score
+from sklearn.metrics import precision_score, log_loss, accuracy_score, classification_report, confusion_matrix
+import seaborn as sns
 
 # Definindo o dispositivo (GPU se disponível)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -42,19 +40,16 @@ class FaceDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
-        label = self.labels_df.iloc[idx, 3]  # 'race' é a classe no CSV
+        label = self.labels_df.iloc[idx, 3]  # Coluna com o rótulo 'race'
 
-        try:
-            img = cv2.imread(img_name)
-            if img is None:
-                raise FileNotFoundError(f"Image {img_name} not found")
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            if self.transform:
-                img = Image.fromarray(img)
-                img = self.transform(img)
-            return img, label
-        except (FileNotFoundError, ValueError) as e:
-            return None, None
+        img = cv2.imread(img_name)
+        if img is None:
+            raise FileNotFoundError(f"Image {img_name} not found")
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        if self.transform:
+            img = Image.fromarray(img)
+            img = self.transform(img)
+        return img, label
 
 # Transformações e Data Augmentation
 transform = transforms.Compose([
@@ -66,8 +61,8 @@ transform = transforms.Compose([
 ])
 
 # Carregando o dataset do CSV
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
+csv_pd = pd.read_csv('path_to_csv')  # Definir o caminho correto
+dataset = FaceDataset(csv_pd, 'path_to_images', transform=transform)
 
 # Dividindo o dataset em treino, validação e teste
 train_size = int(train_val_split * len(dataset))
@@ -95,22 +90,22 @@ class ArcMarginProduct(nn.Module):
         super(ArcMarginProduct, self).__init__()
         self.s = s
         self.m = m
-        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))  # [n_classes, in_features]
+        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
 
     def forward(self, input, label):
         # Normalizando entrada e pesos
-        cosine = nn.functional.linear(nn.functional.normalize(input), nn.functional.normalize(self.weight))  # MatMul
-        theta = torch.acos(cosine.clamp(-1.0, 1.0))  # Theta = arccos(cosine)
-        target_logit = torch.cos(theta + self.m)  # Aplica margem
+        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
+        theta = torch.acos(cosine.clamp(-1.0, 1.0))
+        target_logit = torch.cos(theta + self.m)
 
         # One-hot encoding dos rótulos
-        one_hot = torch.zeros_like(cosine)  # Cria um tensor vazio de mesma forma que cosine
-        one_hot.scatter_(1, label.view(-1, 1).long(), 1)  # Marca as classes corretas
+        one_hot = torch.zeros_like(cosine)
+        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
 
         # Combina logits com margem e ajusta escala
         output = (one_hot * target_logit) + ((1.0 - one_hot) * cosine)
-        output *= self.s  # Multiplica pela escala
+        output *= self.s
 
         return output
 
@@ -127,22 +122,15 @@ criterion = nn.CrossEntropyLoss()
 scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
 # GradScaler para Mixed Precision
-scaler = torch.amp.GradScaler() if device == torch.device("cuda") else None
+scaler = GradScaler() if device == torch.device("cuda") else None
 
 # Inicializando listas para armazenar as métricas
-train_losses = []
-val_losses = []
-test_losses = []
-accuracies = []
-precisions = []
-log_losses = []
+train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
 
 # Função de treino
 def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
     best_model_wts = model.state_dict()
     best_acc = 0.0
-    train_losses = []
-    val_losses = []
     
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs - 1}')
@@ -162,27 +150,16 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             all_labels = []
     
             for inputs, labels in tqdm(dataloaders[phase]):
-                if inputs is None or labels is None:
-                    continue
-                
                 inputs = inputs.to(device)
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
     
                 optimizer.zero_grad()
     
-                with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
+                with autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     logits = arcface(outputs, labels_tensor)
     
-                    # Verificação para NaNs
-                    if torch.isnan(logits).any():
-                        print("Found NaNs in logits")
-                        continue
-    
-                    # Calcule as probabilidades
-                    #probs = F.softmax(logits, dim=1)  # softmax normaliza as saídas
-                    probs = torch.softmax(logits, dim=1)
-    
+                    probs = F.softmax(logits, dim=1)
                     _, preds = torch.max(logits, 1)
                     loss = criterion(logits, labels_tensor)
     
@@ -198,9 +175,6 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 # Coleta de rótulos e probabilidades
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_probs.extend(probs.detach().cpu().numpy())
-
-                #print("all_labels: ", all_labels)
-                #print("all_probs: ", all_probs)
     
             # Cálculo do log_loss
             try:
@@ -212,10 +186,9 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
             epoch_loss = running_loss / dataset_sizes[phase]
     
-            elapsed_time = time.time() - start_time  # Calculando o overhead
+            elapsed_time = time.time() - start_time
             print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Log Loss: {log_losses[-1]:.4f} Overhead: {elapsed_time:.2f}s')
     
-            # Melhor modelo
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = model.state_dict()
@@ -227,44 +200,6 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 # Treinando o modelo
 model = train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=num_epochs)
 
-# Plotando as métricas gerais
-epochs_range = range(1, num_epochs + 1)
-plt.figure(figsize=(12, 8))
-
-plt.subplot(2, 2, 1)
-plt.plot(epochs_range, train_losses, label='Train Loss')
-plt.plot(epochs_range, val_losses, label='Val Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title('Loss over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 2)
-plt.plot(epochs_range, accuracies, label='Accuracy')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.title('Accuracy over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 3)
-plt.plot(epochs_range, precisions, label='Precision')
-plt.xlabel('Epoch')
-plt.ylabel('Precision')
-plt.title('Precision over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 4)
-plt.plot(epochs_range, log_losses, label='Log Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Log Loss')
-plt.title('Log Loss over Epochs')
-plt.legend()
-
-plt.tight_layout()
-plt.savefig('output/training_metrics.png')
-plt.show()
-plt.close()
-
 # Avaliando o modelo no conjunto de teste
 def evaluate_model(model, arcface, test_loader, criterion, device, label_encoder):
     model.eval()
@@ -275,45 +210,46 @@ def evaluate_model(model, arcface, test_loader, criterion, device, label_encoder
 
     with torch.no_grad():
         for inputs, labels in test_loader:
-            if inputs is None or labels is None:
-                continue
-            
             inputs = inputs.to(device)
             labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
 
             outputs = model(inputs)
             logits = arcface(outputs, labels_tensor)
+
+            # Calcular as probabilidades e previsões
+            probs = F.softmax(logits, dim=1)
             _, preds = torch.max(logits, 1)
 
-            # Atualizando as listas de métricas
             loss = criterion(logits, labels_tensor)
+
             test_loss += loss.item() * inputs.size(0)
             running_corrects += torch.sum(preds == labels_tensor.data)
 
+            # Coletar rótulos verdadeiros e previsões
             all_labels.extend(labels_tensor.cpu().numpy())
             all_preds.extend(preds.cpu().numpy())
 
-    epoch_loss = test_loss / len(test_loader.dataset)
-    epoch_acc = running_corrects.double() / len(test_loader.dataset)
+    # Cálculo das métricas de desempenho
+    test_loss /= len(test_loader.dataset)
+    test_acc = running_corrects.double() / len(test_loader.dataset)
+    
     precision = precision_score(all_labels, all_preds, average='weighted')
+    confusion_mtx = confusion_matrix(all_labels, all_preds)
+    report = classification_report(all_labels, all_preds, target_names=label_encoder.classes_)
 
-    print(f'Test Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Precision: {precision:.4f}')
-
-    # Exibindo relatório de classificação
-    print("\nClassification Report:")
-    print(classification_report(all_labels, all_preds, target_names=label_encoder.classes_))
-
-    # Gerando matriz de confusão
-    cm = confusion_matrix(all_labels, all_preds)
-    plt.figure(figsize=(10, 7))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
-                xticklabels=label_encoder.classes_, 
-                yticklabels=label_encoder.classes_)
-    plt.ylabel('Actual')
-    plt.xlabel('Predicted')
+    print(f'Test Loss: {test_loss:.4f}')
+    print(f'Test Acc: {test_acc:.4f}')
+    print(f'Precision: {precision:.4f}')
+    
+    # Exibindo a matriz de confusão
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues", xticklabels=label_encoder.classes_, yticklabels=label_encoder.classes_)
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
     plt.title('Confusion Matrix')
-    plt.savefig('output/test_metrics.png')
     plt.show()
+    
+    print("\nClassification Report:\n", report)
 
 # Avaliando o modelo no conjunto de teste
 evaluate_model(model, arcface, test_loader, criterion, device, label_encoder)
