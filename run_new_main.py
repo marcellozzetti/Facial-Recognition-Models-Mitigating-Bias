@@ -102,7 +102,8 @@ label_encoder.fit(csv_pd['race'])
 num_classes = len(label_encoder.classes_)
 
 # Initialize model, criterion, optimizer
-model = LResNet50E_IR(num_classes).to(device)
+#model = LResNet50E_IR(num_classes).to(device)
+model = LResNet50E_IRArc(num_classes).to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
@@ -153,7 +154,9 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
                 
                 # Forward pass
-                outputs = model(images)
+                #outputs = model(images)
+                outputs = model(images, labels=labels_tensor)
+
                 loss = criterion(outputs, labels_tensor)
                 epoch_loss += loss.item()
         
