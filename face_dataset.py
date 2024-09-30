@@ -2,6 +2,7 @@ import os
 import cv2
 from PIL import Image
 from torch.utils.data import Dataset
+from torchvision import transforms
 
 class FaceDataset(Dataset):
     def __init__(self, csv_pd, img_dir, transform=None):
