@@ -18,6 +18,7 @@ from torch.utils.data import Dataset
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_score, log_loss, accuracy_score, classification_report, confusion_matrix
 import seaborn as sns
+import pre_processing_images
 
 # Definindo o dispositivo (GPU se disponível)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -61,7 +62,7 @@ transform = transforms.Compose([
 ])
 
 # Carregando o dataset do CSV
-csv_pd = pd.read_csv('path_to_csv')  # Definir o caminho correto
+csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
 dataset = FaceDataset(csv_pd, 'path_to_images', transform=transform)
 
 # Dividindo o dataset em treino, validação e teste
