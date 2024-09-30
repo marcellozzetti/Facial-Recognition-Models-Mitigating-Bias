@@ -87,6 +87,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 def softmax(x):
     exp_x = np.exp(x - np.max(x))
@@ -102,8 +103,6 @@ train_losses = []
 accuracies = []
 precisions = []
 log_losses = []
-
-scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 for epoch in range(NUM_EPOCHS):
     model.train()
