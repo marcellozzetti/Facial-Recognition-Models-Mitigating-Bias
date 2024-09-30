@@ -11,6 +11,8 @@ class FaceDataset(Dataset):
         self.transform = transform
         self.classes = self.labels_df['race'].unique()
 
+        print("numero classes: ", self.labels_df['race'].unique())
+
     def __len__(self):
         return len(self.labels_df)
 
@@ -26,8 +28,6 @@ class FaceDataset(Dataset):
             img = Image.fromarray(img)
             img = self.transform(img)
 
-        print("img_name: ", img_name)
-        print("label: ", label)
         return img, label
 
     def get_classes(self):
@@ -37,7 +37,7 @@ def dataset_transformation(img):
     transform = transforms.Compose([
         transforms.RandomRotation(10),
         transforms.RandomHorizontalFlip(),
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+        #transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
