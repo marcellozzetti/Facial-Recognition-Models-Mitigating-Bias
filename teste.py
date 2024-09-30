@@ -82,8 +82,8 @@ print("dataset_sizes: ", dataset_sizes)
 
 # Definindo o modelo ResNet50 pré-treinado
 model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, len(csv_pd['race'].unique()))  # Número de classes a partir do CSV
+num_ftrs = model.fc.in_features  # Isso deve retornar 2048
+model.fc = nn.Identity()  # Mantém a saída de 2048
 model = model.to(device)
 
 # Definindo a camada ArcFace
