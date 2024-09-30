@@ -64,7 +64,7 @@ transform = transforms.Compose([
 
 # Carregando o dataset do CSV
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, 'path_to_images', transform=transform)
+dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
 
 # Dividindo o dataset em treino, validação e teste
 train_size = int(train_val_split * len(dataset))
