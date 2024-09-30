@@ -42,7 +42,7 @@ IMG_PROCESSED_DIR = os.path.join(BASE_DIR, 'fairface/dataset/output/processed_im
 CSV_CONCAT_DATASET_FILE = os.path.join(BASE_DIR, 'fairface/dataset/fairface_concat_dataset.csv')
 CSV_CONCAT_DATASET_FILTERED_FILE = os.path.join(BASE_DIR, 'Facial-Recognition-Models-Mitigating-Bias/dataset/fairface_concat_filtered_dataset.csv')
 CSV_BALANCED_CONCAT_DATASET_FILE = os.path.join(BASE_DIR, 'fairface/dataset/fairface_balanced_concat_dataset.csv')
-MODEL_FAIRFACE_FILE = os.path.join(BASE_DIR, 'fairface/dataset/output/fairface_model.pth')
+MODEL_FAIRFACE_FILE = os.path.join(BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}.pth')
 
 PERFORM_ADJUSTMENTS = False
 MAX_SAMPLES = 5000
