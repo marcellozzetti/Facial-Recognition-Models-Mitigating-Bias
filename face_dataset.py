@@ -29,7 +29,7 @@ class FaceDataset(Dataset):
     def get_classes(self):
         return self.classes
 
-def transformation():
+def dataset_transformation():
 # Transformações e Data Augmentation
     return = transforms.Compose([
         transforms.RandomRotation(10),
