@@ -18,6 +18,7 @@ from torch.utils.data import Dataset
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_score, log_loss, accuracy_score, classification_report, confusion_matrix
 import seaborn as sns
+from torchvision.models import ResNet50_Weights
 import pre_processing_images
 
 # Definindo o dispositivo (GPU se disponível)
