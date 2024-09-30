@@ -12,6 +12,7 @@ from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, c
 import seaborn as sns
 import pandas as pd
 from face_dataset import FaceDataset 
+import pre_processing_images
 
 # Definindo o dispositivo (GPU se disponível)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
