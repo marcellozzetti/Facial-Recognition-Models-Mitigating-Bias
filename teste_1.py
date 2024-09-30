@@ -10,6 +10,7 @@ from torch.cuda.amp import autocast, GradScaler
 import matplotlib.pyplot as plt
 from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report
 import seaborn as sns
+import pandas as pd
 from face_dataset import FaceDataset 
 
 # Definindo o dispositivo (GPU se disponível)
