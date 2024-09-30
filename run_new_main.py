@@ -21,6 +21,7 @@ from face_dataset import FaceDataset, dataset_transformation
 from models import LResNet50E_IR
 import pre_processing_images
 import datetime
+from tqdm import tqdm
 
 # Hyperparameters
 BATCH_SIZE = 128
@@ -117,9 +118,10 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         model.train()
         start_time = time.time()
         
-        for images, labels in train_loader:
+        for images, labels in tqdm(train_loader):    
             images = images.to(device)
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+            labels_tensor = label_encoder.transform(labels).to(device)
+            #labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
             optimizer.zero_grad()
     
             if scaler:
@@ -149,9 +151,10 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         epoch_loss = 0.0
     
         with torch.no_grad():
-            for images, labels in val_loader:
+            for images, labels in tqdm(val_loader):
                 images = images.to(device)
-                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                labels_tensor = label_encoder.transform(labels).to(device)
+                #labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
                 epoch_loss += loss.item()
