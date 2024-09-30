@@ -11,8 +11,6 @@ class FaceDataset(Dataset):
         self.transform = transform
         self.classes = self.labels_df['race'].unique()
 
-        print("numero classes: ", self.labels_df['race'].unique())
-
     def __len__(self):
         return len(self.labels_df)
 
