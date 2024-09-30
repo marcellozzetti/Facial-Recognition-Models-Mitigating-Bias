@@ -88,86 +88,91 @@ print("Step 9 (CNN model): End")
 
 
 print("Step 10 (Training execution): Start")
+# Inicializando listas para armazenar as métricas
+train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
 
-# Training execution
-train_losses = []
-accuracies = []
-precisions = []
-log_losses = []
+# Função de treino
+def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
+    best_model_wts = model.state_dict()
+    best_acc = 0.0
 
-for epoch in range(NUM_EPOCHS):
-    model.train()
-    start_time = time.time()
-    
-    for images, labels in train_loader:
-        images = images.to(device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-        optimizer.zero_grad()
+    for epoch in range(num_epochs):
+        print(f'Epoch {epoch}/{num_epochs - 1}')
+        print('-' * 10)
 
-        if device == torch.device("cuda"):
-            with torch.amp.autocast("cuda"):
-                outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
-        else:
-            outputs = model(images)
-            loss = criterion(outputs, labels_tensor)
+        start_time = time.time()
 
-        if scaler and device == torch.device("cuda"):
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
-        else:
-            loss.backward()
-            optimizer.step()
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                model.train()  # Modo de treinamento
+            else:
+                model.eval()   # Modo de validação
 
-        #scheduler.step()
+            running_loss = 0.0
+            running_corrects = 0
+            all_probs = []
+            all_labels = []
 
-    overhead = time.time() - start_time
-        
-    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
-    print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
+            for inputs, labels in tqdm(dataloaders[phase]):
+                inputs = inputs.to(device)
+                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
 
-    model.eval()
-    all_labels = []
-    all_preds = []
-    all_probs = []
-    epoch_loss = 0.0
+                optimizer.zero_grad()
 
-    with torch.no_grad():
-        for images, labels in val_loader:
-            images = images.to(device)
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            outputs = model(images)
-            loss = criterion(outputs, labels_tensor)
-            epoch_loss += loss.item()
+                with torch.amp.autocast("cuda", enabled=device == torch.device("cuda")), \
+                     torch.set_grad_enabled(phase == 'train'):
+                    outputs = model(inputs)
+                         
+                    probs = F.softmax(outputs, dim=1)
+                    _, preds = torch.max(probs, 1)
 
-            probs = F.softmax(outputs, dim=1).cpu().numpy()
-            preds = torch.max(outputs, 1)[1].cpu().numpy()
+                    loss = criterion(outputs, labels_tensor)  # Usar as saídas para calcular a perda
 
-            all_labels.extend(labels_tensor.cpu().numpy())
-            all_preds.extend(preds)
-            all_probs.extend(probs)
+                    if phase == 'train':
+                        scaler.scale(loss).backward()
+                        scaler.step(optimizer)
+                        scaler.update()
 
-    all_labels = [label.item() for label in all_labels]
-    accuracy = accuracy_score(all_labels, all_preds)
-    precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
-    all_probs = softmax(all_probs)
-    logloss = log_loss(all_labels, all_probs)
+                # Acumule métricas
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels_tensor.data)
 
-    scheduler.step(epoch_loss)
+                # Coleta de rótulos e probabilidades
+                all_labels.extend(labels_tensor.cpu().numpy())
+                all_probs.extend(probs.detach().cpu().numpy())
 
-    train_losses.append(epoch_loss / len(val_loader))
-    accuracies.append(accuracy)
-    precisions.append(precision)
-    log_losses.append(logloss)
+            # Cálculo do log_loss
+            try:
+                log_loss_value = log_loss(all_labels, all_probs)
+                log_losses.append(log_loss_value)
+            except ValueError as e:
+                print(f"Erro ao calcular log_loss: {e}")
 
-    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss/len(train_loader):.4f}, '
-          f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
+            epoch_acc = running_corrects.double() / dataset_sizes[phase]
+            epoch_loss = running_loss / dataset_sizes[phase]
+
+            elapsed_time = time.time() - start_time
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Log Loss: {log_losses[-1]:.4f} Overhead: {elapsed_time:.2f}s')
+
+            if phase == 'val' and epoch_acc > best_acc:
+                best_acc = epoch_acc
+                best_model_wts = model.state_dict()
+
+        if phase == 'train':
+            scheduler.step()  # Ajusta a taxa de aprendizado apenas no treinamento
+
+    print(f'Best val Acc: {best_acc:4f}')
+    model.load_state_dict(best_model_wts)
 
     del images, labels, outputs, loss
     gc.collect()
     if torch.cuda.is_available() and device == torch.device("cuda"):
         torch.cuda.empty_cache()
+            
+    return model
+
+# Treinando o modelo
+model = train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=num_epochs)
 
 torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
