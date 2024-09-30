@@ -180,8 +180,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                         continue
     
                     # Calcule as probabilidades
-                    probs = F.softmax(logits, dim=1)  # softmax normaliza as saídas
-                    #probs = torch.softmax(logits, dim=1)
+                    #probs = F.softmax(logits, dim=1)  # softmax normaliza as saídas
+                    probs = torch.softmax(logits, dim=1)
     
                     _, preds = torch.max(logits, 1)
                     loss = criterion(logits, labels_tensor)
