@@ -1,7 +1,10 @@
-
+import os
+import cv2
+from PIL import Image
+from torch.utils.data import Dataset
 
 # Dataset customizado usando CSV para as labels
-def class FaceDataset(Dataset):
+class FaceDataset(Dataset):
     def __init__(self, csv_pd, img_dir, transform=None):
         self.labels_df = csv_pd
         self.img_dir = img_dir
