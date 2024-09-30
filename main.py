@@ -37,8 +37,6 @@ experiments = {
     "ArcFaceLoss&Adam": {},
 }
 
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
-
 # Check if CUDA is available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
