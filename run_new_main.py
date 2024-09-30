@@ -148,32 +148,41 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         all_preds = []
         all_probs = []
         epoch_loss = 0.0
-    
+        
         with torch.no_grad():
             for images, labels in tqdm(val_loader):
                 images = images.to(device)
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                
+                # Forward pass
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
                 epoch_loss += loss.item()
-    
+        
+                # Get probabilities
                 probs = F.softmax(outputs, dim=1).cpu().numpy()
-                preds = torch.max(outputs, 1)[1].cpu().numpy()
-    
+                
+                # Get predicted class (argmax)
+                preds = torch.argmax(outputs, dim=1).cpu().numpy()
+        
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_preds.extend(preds)
                 all_probs.extend(probs)
-    
-        all_labels = [label.item() for label in all_labels]
+        
+        # Calculating metrics
         accuracy = accuracy_score(all_labels, all_preds)
         precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+        
+        # Ensure all_probs is an array before calculating log_loss
+        all_probs = np.array(all_probs)
         logloss = log_loss(all_labels, all_probs)
-    
+        
+        # Append metrics for tracking
         train_losses.append(epoch_loss / len(val_loader))
         accuracies.append(accuracy)
         precisions.append(precision)
         log_losses.append(logloss)
-    
+        
         print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss:.4f}, '
               f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
