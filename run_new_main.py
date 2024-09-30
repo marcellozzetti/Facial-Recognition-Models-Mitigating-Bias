@@ -47,28 +47,6 @@ timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 
 print("Step 9 (CNN model): Start")
 
-# Load dataset
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
-
-# Split dataset into training, validation, and test sets
-train_size = int(TRAIN_VAL_SPLIT * len(dataset))
-val_size = int(VAL_VAL_SPLIT * len(dataset))
-test_size = len(dataset) - train_size - val_size
-train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
-
-# Create DataLoaders
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
-val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
-test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
-
-label_encoder = LabelEncoder()
-label_encoder.fit(csv_pd['race'])
-num_classes = len(dataset.classes)
-
-print("Step 9 (CNN model): End")
-
-print("Step 10 (Training execution): Start")
 # Initializing metrics lists
 train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
 
@@ -95,8 +73,8 @@ num_classes = len(label_encoder.classes_)
 model = LResNet50E_IR(num_classes).to(device)
 model = nn.DataParallel(model)
 
-#criterion = nn.CrossEntropyLoss()
-criterion = ArcFaceLoss().to(device)
+criterion = nn.CrossEntropyLoss()
+#criterion = ArcFaceLoss().to(device)
 
 optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
 #optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
@@ -105,6 +83,10 @@ optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight
 scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
+
+print("Step 9 (CNN model): End")
+
+print("Step 10 (Training execution): Start")
 
 # Training function
 def train_model(model, criterion, optimizer, scheduler, num_epochs):
