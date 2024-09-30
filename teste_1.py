@@ -13,6 +13,8 @@ import seaborn as sns
 import pandas as pd
 from face_dataset import FaceDataset 
 import pre_processing_images
+import torchvision.models as models
+from torchvision.models import ResNet101_Weights
 
 # Definindo o dispositivo (GPU se disponível)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,7 +56,8 @@ dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset), 'test': l
 class LResNet100E_IR(nn.Module):
     def __init__(self, num_classes):
         super(LResNet100E_IR, self).__init__()
-        self.resnet = torch.models.resnet101(pretrained=True)
+        #self.resnet = models.resnet101(pretrained=True)
+        self.resnet = models.resnet101(weights=ResNet101_Weights.DEFAULT)
         #self.resnet = torch.hub.load('zhanghang1989/ResNeSt', 'resnest100', pretrained=True)  # Exemplo para carregar a ResNet100
         self.resnet.fc = nn.Identity()  # Mantém a saída de 2048
         
