@@ -120,8 +120,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         
         for images, labels in tqdm(train_loader):    
             images = images.to(device)
-            labels_tensor = label_encoder.transform(labels).to(device)
-            #labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
             optimizer.zero_grad()
     
             if scaler:
@@ -153,8 +152,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         with torch.no_grad():
             for images, labels in tqdm(val_loader):
                 images = images.to(device)
-                labels_tensor = label_encoder.transform(labels).to(device)
-                #labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
                 epoch_loss += loss.item()
