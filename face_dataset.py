@@ -1,7 +1,7 @@
 
 
 # Dataset customizado usando CSV para as labels
-class FaceDataset(Dataset):
+def class FaceDataset(Dataset):
     def __init__(self, csv_pd, img_dir, transform=None):
         self.labels_df = csv_pd
         self.img_dir = img_dir
