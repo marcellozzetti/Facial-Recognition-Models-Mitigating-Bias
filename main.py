@@ -172,13 +172,11 @@ for exp in experiments.keys():
     
     if "CrossEntropyLoss" in exp:
         criterion = nn.CrossEntropyLoss()
-        print("## CrossEntropyLoss ##")
     else:
         criterion = ArcFaceLoss().to(device)
 
     if "SGD" in exp:
         optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
-        print("## SGD ##")
     else:
         optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
