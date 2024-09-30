@@ -65,7 +65,6 @@ test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 num_classes = len(dataset.classes)
-print("num_classes: ", num_classes) #####
 
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR(num_classes).to(device)
