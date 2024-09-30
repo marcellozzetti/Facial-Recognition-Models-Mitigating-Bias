@@ -25,13 +25,15 @@ class FaceDataset(Dataset):
         if self.transform:
             img = Image.fromarray(img)
             img = self.transform(img)
+
+        print("img_name: ", img_name)
+        print("label: ", label)
         return img, label
 
     def get_classes(self):
         return self.classes
 
 def dataset_transformation(img):
-    # Example transformations
     transform = transforms.Compose([
         transforms.RandomRotation(10),
         transforms.RandomHorizontalFlip(),
