@@ -146,6 +146,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs - 1}')
         print('-' * 10)
+
+        start_time = time.time()
     
         for phase in ['train', 'val']:
             if phase == 'train':
