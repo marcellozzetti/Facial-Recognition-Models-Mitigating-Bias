@@ -53,8 +53,9 @@ if torch.cuda.is_available() and device == torch.device("cuda"):
 
 print("Step 9 (CNN model): Start")
 
+dataset_transformation
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
+dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=face_dataset.dataset_transformation)
 
 # Split dataset into training and validation sets
 train_size = int(TRAIN_VAL_SPLIT * len(dataset))
