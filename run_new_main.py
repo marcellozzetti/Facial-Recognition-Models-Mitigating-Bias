@@ -43,6 +43,8 @@ def clean_memory():
 
 clean_memory()
 
+timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+
 print("Step 9 (CNN model): Start")
 
 # Load dataset
@@ -190,6 +192,10 @@ model = train_model(model, criterion, optimizer, scheduler, num_epochs=NUM_EPOCH
 torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
 
+print("Step 11 (Training execution): End")
+
+print("Step 12 (Plotting execution): Start")
+
 # Plotting general metrics
 epochs_range = range(1, NUM_EPOCHS + 1)
 plt.figure(figsize=(12, 8))
@@ -221,32 +227,67 @@ plt.xlabel('Epoch')
 plt.ylabel('Log Loss')
 plt.title('Log Loss over Epochs')
 plt.legend()
-
 plt.tight_layout()
-# Gerar o timestamp atual
-timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-# Nome do arquivo com timestamp
-filename = f'output/training_metrics_{timestamp}.png'
-plt.savefig(filename)
+plt.savefig(f'output/training_metrics_{timestamp}.png')
 plt.show()
 plt.close()
 
-print("Step 11 (Training execution): End")
+print("Step 12 (Plotting execution): End")
 
-print("Step 12 (Testing): Start")
-model.eval()
-all_test_preds = []
-all_test_labels = []
 
-with torch.no_grad():
-    for images, labels in test_loader:
-        images = images.to(device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-        outputs = model(images)
-        preds = torch.max(outputs, 1)[1].cpu().numpy()
+print("Step 13 (Testing): Start")
 
-        all_test_labels.extend(labels_tensor.cpu().numpy())
-        all_test_preds.extend(preds)
+def evaluate_model(model, test_loader):
+    # Validation
+    model.eval()
+    all_labels = []
+    all_preds = []
+    all_probs = []
+    epoch_loss = 0.0
+        
+    with torch.no_grad():
+        for images, labels in tqdm(test_loader):
+            images = images.to(device)
+            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                
+            # Forward pass
+            outputs = model(images)
+            loss = criterion(outputs, labels_tensor)
+            epoch_loss += loss.item()
+        
+            # Get probabilities
+            probs = F.softmax(outputs, dim=1).cpu().numpy()
+                
+            # Get predicted class (argmax)
+            preds = torch.argmax(outputs, dim=1).cpu().numpy()
+        
+            all_labels.extend(labels_tensor.cpu().numpy())
+            all_preds.extend(preds)
+            all_probs.extend(probs)
+        
 
-test_accuracy = accuracy_score(all_test_labels, all_test_preds)
-print(f'Test Accuracy: {test_accuracy:.4f}')
+    # Calculating metrics
+    accuracy = accuracy_score(all_labels, all_preds)
+    precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+        
+    # Ensure all_probs is an array before calculating log_loss
+    all_probs = np.array(all_probs)
+    logloss = log_loss(all_labels, all_probs)
+
+    print(f'Test Accuracy: {accuracy:.4f}, Test Precision: {precision:.4f}, Test Log Loss: {logloss:.4f}')
+
+    confusion_mtx = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.savefig(f'output/confusion_tx_{timestamp}.png')
+    plt.show()
+
+    report = classification_report(all_labels, all_preds, target_names=dataset.classes)
+    print("\nClassification Report:\n", report)
+
+# Avaliando o modelo no conjunto de teste
+evaluate_model(model, test_loader, criterion)
+
+print("Step 13 (Testing): End")
