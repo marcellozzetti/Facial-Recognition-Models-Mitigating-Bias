@@ -82,84 +82,61 @@ print("Step 10 (Training execution): Start")
 # Initializing metrics lists
 train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
 
-# Training function
-def train_model(model, criterion, optimizer, scheduler, num_epochs):
-    
-    for epoch in range(NUM_EPOCHS):
-        model.train()
-        start_time = time.time()
-        
-        for images, labels in train_loader:
-            images = images.to(device)
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            optimizer.zero_grad()
-    
-            if device == torch.device("cuda"):
-                with torch.amp.autocast("cuda"):
-                    outputs = model(images)
-                    loss = criterion(outputs, labels_tensor)
-            else:
-                outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
-    
-            if scaler and device == torch.device("cuda"):
-                scaler.scale(loss).backward()
-                scaler.step(optimizer)
-                scaler.update()
-            else:
-                loss.backward()
-                optimizer.step()
-    
-            scheduler.step()
-    
-        overhead = time.time() - start_time
-            
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
-        print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
-    
-        model.eval()
-        all_labels = []
-        all_preds = []
-        all_probs = []
-        epoch_loss = 0.0
-    
-        with torch.no_grad():
-            for images, labels in val_loader:
-                images = images.to(device)
-                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-                outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
-                epoch_loss += loss.item()
-    
-                probs = F.softmax(outputs, dim=1).cpu().numpy()
-                preds = torch.max(outputs, 1)[1].cpu().numpy()
-    
-                all_labels.extend(labels_tensor.cpu().numpy())
-                all_preds.extend(preds)
-                all_probs.extend(probs)
-    
-        all_labels = [label.item() for label in all_labels]
-        accuracy = accuracy_score(all_labels, all_preds)
-        precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
-        all_probs = softmax(all_probs)
-        logloss = log_loss(all_labels, all_probs)
-    
-        #scheduler.step(epoch_loss)
-    
-        train_losses.append(epoch_loss / len(val_loader))
-        accuracies.append(accuracy)
-        precisions.append(precision)
-        log_losses.append(logloss)
-    
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss/len(train_loader):.4f}, '
-              f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
+# Função de treino
+def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
+    best_model_wts = model.state_dict()
+    best_acc = 0.0
 
-    clean_memory()
-    
+    for epoch in range(num_epochs):
+        print(f'Epoch {epoch}/{num_epochs - 1}')
+        print('-' * 10)
+
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                model.train()
+            else:
+                model.eval()
+
+            running_loss = 0.0
+            running_corrects = 0
+
+            for inputs, labels in dataloaders[phase]:
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+
+                optimizer.zero_grad()
+
+                with autocast(device == 'cuda'), torch.set_grad_enabled(phase == 'train'):
+                    logits = model(inputs, labels)
+                    _, preds = torch.max(logits, 1)
+
+                    loss = criterion(logits, labels)
+
+                    if phase == 'train':
+                        scaler.scale(loss).backward()
+                        scaler.step(optimizer)
+                        scaler.update()
+
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
+
+            epoch_loss = running_loss / dataset_sizes[phase]
+            epoch_acc = running_corrects.double() / dataset_sizes[phase]
+
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+
+            if phase == 'val' and epoch_acc > best_acc:
+                best_acc = epoch_acc
+                best_model_wts = model.state_dict()
+
+        scheduler.step()
+
+    print(f'Best val Acc: {best_acc:4f}')
+    model.load_state_dict(best_model_wts)
     return model
 
-# Train the model
-model = train_model(model, criterion, optimizer, scheduler, num_epochs=NUM_EPOCHS)
+# Treinando o modelo
+model = train_model(model, criterion, optimizer, scheduler, num_epochs=num_epochs)
 
 torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
@@ -202,6 +179,52 @@ plt.show()
 plt.close()
 
 print("Step 11 (Training execution): End")
+
+# Avaliando o modelo no conjunto de teste
+def evaluate_model(model, test_loader, criterion):
+    model.eval()
+    test_loss = 0.0
+    running_corrects = 0
+    all_labels = []
+    all_preds = []
+
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+
+            logits = model(inputs, labels)
+            _, preds = torch.max(logits, 1)
+
+            loss = criterion(logits, labels)
+
+            test_loss += loss.item() * inputs.size(0)
+            running_corrects += torch.sum(preds == labels.data)
+
+            all_labels.extend(labels.cpu().numpy())
+            all_preds.extend(preds.cpu().numpy())
+
+    test_loss /= len(test_loader.dataset)
+    test_acc = running_corrects.double() / len(test_loader.dataset)
+
+    print(f'Test Loss: {test_loss:.4f}')
+    print(f'Test Acc: {test_acc:.4f}')
+
+    precision = precision_score(all_labels, all_preds, average='weighted')
+    print(f'Precision: {precision:.4f}')
+
+    confusion_mtx = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.show()
+
+    report = classification_report(all_labels, all_preds, target_names=dataset.classes)
+    print("\nClassification Report:\n", report)
+
+# Avaliando o modelo no conjunto de teste
+evaluate_model(model, test_loader, criterion)
 
 print("Step 12 (Testing): Start")
 model.eval()
