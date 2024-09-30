@@ -19,20 +19,13 @@ from torchvision.models import ResNet101_Weights
 # Definindo o dispositivo (GPU se disponível)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Hiperparâmetros
-batch_size = 64
-learning_rate = 0.001
-num_epochs = 25
-train_val_split = 0.7  # 70% treino, 15% validação, 15% teste
-
-# Transformações e Data Augmentation
-transform = transforms.Compose([
-    transforms.RandomRotation(10),
-    transforms.RandomHorizontalFlip(),
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-])
+# Hiperparameters
+BATCH_SIZE = 64
+NUM_EPOCHS = 40
+TRAIN_VAL_SPLIT = 0.8
+VAL_VAL_SPLIT = 0.1
+LEARNING_RATE = 0.001
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
 # Carregando o dataset do CSV
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
