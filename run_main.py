@@ -92,7 +92,7 @@ print("Step 10 (Training execution): Start")
 train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
 
 # Função de treino
-def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
+def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     best_model_wts = model.state_dict()
     best_acc = 0.0
 
@@ -172,7 +172,7 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
     return model
 
 # Treinando o modelo
-model = train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=num_epochs)
+model = train_model(model, criterion, optimizer, scheduler, num_epochs=num_epochs)
 
 torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
