@@ -161,10 +161,10 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 
             all_probs = []  # Para armazenar todas as probabilidades
             all_labels = []  # Para armazenar todos os rótulos
-            
+
             for inputs, labels in tqdm(dataloaders[phase]):
                 if inputs is None or labels is None:
-                    continue  # Pule entradas inválidas
+                    continue  # Skip invalid entries
             
                 inputs = inputs.to(device)
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
@@ -175,9 +175,21 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                     outputs = model(inputs)
                     logits = arcface(outputs, labels_tensor)
             
-                    # Calcula softmax das logits
+                    # Check for NaNs in logits
+                    if torch.isnan(logits).any():
+                        print("Found NaNs in logits")
+            
+                    # Calculate probabilities
                     probs = torch.softmax(logits, dim=1)
-                    
+            
+                    # Check the shape and sum of probabilities
+                    print(f"Shape of probs: {probs.shape}")
+                    print(f"Sum of probs: {probs.sum(dim=1)}")  # Should be 1 for each sample
+            
+                    # Verify no NaNs in probs
+                    if torch.isnan(probs).any():
+                        print("Found NaNs in probabilities")
+            
                     _, preds = torch.max(logits, 1)
                     loss = criterion(logits, labels_tensor)
             
@@ -186,22 +198,23 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                         scaler.step(optimizer)
                         scaler.update()
             
-                # Atualizando as listas de métricas
+                # Update metric lists
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels_tensor.data)
             
-                # Coletando labels e probabilidades
-                #all_labels.extend(labels_tensor.cpu().numpy())
-                #all_probs.extend(probs.cpu().numpy())
-                # Coletando labels e probabilidades
+                # Collect labels and probabilities
                 all_labels.extend(labels_tensor.cpu().numpy())
-                all_probs.extend(probs.detach().cpu().numpy())  # Use .detach() para evitar rastreamento de gradientes
-
+                all_probs.extend(probs.detach().cpu().numpy())
             
-            # Após o loop, calcula log_loss usando all_labels e all_probs
-            epoch_loss = running_loss / dataset_sizes[phase]
-            epoch_acc = running_corrects.double() / dataset_sizes[phase]
-            log_losses.append(log_loss(all_labels, all_probs))  # Agora deve funcionar
+            # Check for NaNs in all_probs
+            if any(np.isnan(all_probs)):
+                all_probs = np.nan_to_num(all_probs)  # Replace NaNs with 0
+            
+            # Calculate log_loss
+            log_losses.append(log_loss(all_labels, all_probs))
+            #epoch_loss = running_loss / dataset_sizes[phase]
+            #epoch_acc = running_corrects.double() / dataset_sizes[phase]
+            #log_losses.append(log_loss(all_labels, all_probs))  # Agora deve funcionar
 
             elapsed_time = time.time() - start_time  # Calculando o overhead
             print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Log Loss: {log_losses[-1]:.4f} Overhead: {elapsed_time:.2f}s')
