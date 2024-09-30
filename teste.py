@@ -122,7 +122,7 @@ class ArcMarginProduct(nn.Module):
 
         return output
 
-#arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
+arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
