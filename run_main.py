@@ -35,7 +35,7 @@ from models import LResNet50E_IR
 import pre_processing_images
 
 # Hiperparameters
-BATCH_SIZE = 64
+BATCH_SIZE = 4
 NUM_EPOCHS = 24
 TRAIN_VAL_SPLIT = 0.8
 VAL_VAL_SPLIT = 0.1
