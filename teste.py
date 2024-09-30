@@ -17,7 +17,7 @@ import torchvision.models as models
 from torchvision.models import ResNet50_Weights
 import pre_processing_images
 import matplotlib.pyplot as plt
-from sklearn.metrics import precision_score, log_loss
+from sklearn.metrics import precision_score, log_loss, accuracy_score
 
 # Definindo o dispositivo (GPU se disponível)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -26,7 +26,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 batch_size = 32
 learning_rate = 0.001
 num_epochs = 25
-train_val_split = 0.8  # 80% treino, 20% validação
+train_val_split = 0.7  # 70% treino, 15% validação, 15% teste
 
 # Dataset customizado usando CSV para as labels
 class FaceDataset(Dataset):
@@ -40,7 +40,7 @@ class FaceDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
-        label = self.labels_df.iloc[idx, 3]  # 'race' is the classe no CSV
+        label = self.labels_df.iloc[idx, 3]  # 'race' é a classe no CSV
 
         try:
             img = cv2.imread(img_name)
@@ -67,16 +67,19 @@ transform = transforms.Compose([
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
 
-# Dividindo o dataset em treino e validação
+# Dividindo o dataset em treino, validação e teste
 train_size = int(train_val_split * len(dataset))
-val_size = len(dataset) - train_size
-train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+val_test_split = (len(dataset) - train_size) // 2
+val_size = val_test_split
+test_size = len(dataset) - train_size - val_size
+train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
 # Criando os DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
-dataloaders = {'train': train_loader, 'val': val_loader}
-dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset)}
+test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
+dataloaders = {'train': train_loader, 'val': val_loader, 'test': test_loader}
+dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset), 'test': len(test_dataset)}
 
 print("dataset_sizes: ", dataset_sizes)
 
@@ -129,6 +132,7 @@ scaler = torch.amp.GradScaler() if device == torch.device("cuda") else None
 # Inicializando listas para armazenar as métricas
 train_losses = []
 val_losses = []
+test_losses = []
 accuracies = []
 precisions = []
 log_losses = []
@@ -138,8 +142,7 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
     best_model_wts = model.state_dict()
     best_acc = 0.0
     train_losses = []
-    accuracies = []
-    log_losses = []
+    val_losses = []
     
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs - 1}')
@@ -155,6 +158,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             running_corrects = 0
             all_labels = []  # Para armazenar todos os rótulos
             all_preds = []   # Para armazenar todas as previsões
+            
+            start_time = time.time()  # Medindo tempo de execução
             
             # Iterando sobre os dados
             for inputs, labels in tqdm(dataloaders[phase]):
@@ -188,26 +193,24 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_preds.extend(preds.cpu().numpy())
 
-            if phase == 'train':
-                scheduler.step()
-
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
             log_losses.append(log_loss(all_labels, torch.softmax(logits.detach(), dim=1).cpu().numpy()))
 
-            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Log Loss: {log_losses[-1]:.4f}')
+            elapsed_time = time.time() - start_time  # Calculando o overhead
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Log Loss: {log_losses[-1]:.4f} Overhead: {elapsed_time:.2f}s')
 
             # Melhor modelo
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = model.state_dict()
 
-    print(f'Best val Acc: {best_acc:.4f}')
+    print(f'Best val Acc: {best_acc:4f}')
     model.load_state_dict(best_model_wts)
     return model
 
-# Iniciando o treinamento
-model_trained = train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=num_epochs)
+# Treinando o modelo
+model = train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=num_epochs)
 
 # Plotando as métricas gerais
 epochs_range = range(1, num_epochs + 1)
@@ -246,3 +249,40 @@ plt.tight_layout()
 plt.savefig('output/training_metrics.png')
 plt.show()
 plt.close()
+
+# Avaliando o modelo no conjunto de teste
+def evaluate_model(model, arcface, test_loader):
+    model.eval()
+    test_loss = 0.0
+    running_corrects = 0
+    all_labels = []
+    all_preds = []
+
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            if inputs is None or labels is None:
+                continue
+            
+            inputs = inputs.to(device)
+            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+
+            outputs = model(inputs)
+            logits = arcface(outputs, labels_tensor)
+            _, preds = torch.max(logits, 1)
+
+            # Atualizando as listas de métricas
+            loss = criterion(logits, labels_tensor)
+            test_loss += loss.item() * inputs.size(0)
+            running_corrects += torch.sum(preds == labels_tensor.data)
+
+            all_labels.extend(labels_tensor.cpu().numpy())
+            all_preds.extend(preds.cpu().numpy())
+
+    epoch_loss = test_loss / dataset_sizes['test']
+    epoch_acc = running_corrects.double() / dataset_sizes['test']
+    precision = precision_score(all_labels, all_preds, average='weighted')
+
+    print(f'Test Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Precision: {precision:.4f}')
+
+# Avaliando o modelo no conjunto de teste
+evaluate_model(model, arcface, test_loader)
