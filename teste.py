@@ -83,8 +83,19 @@ dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset), 'test': l
 # Definindo o modelo ResNet50 pré-treinado
 model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
 num_ftrs = model.fc.in_features  # Isso deve retornar 2048
-model.fc = nn.Identity()  # Mantém a saída de 2048
+
+# Modificando a camada final para corresponder ao número de classes
+num_classes = len(csv_pd['race'].unique())
+model.fc = nn.Linear(num_ftrs, num_classes)
+
+# Movendo o modelo para o dispositivo (GPU ou CPU)
 model = model.to(device)
+
+# Definindo o modelo ResNet50 pré-treinado
+#model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+#num_ftrs = model.fc.in_features  # Isso deve retornar 2048
+#model.fc = nn.Identity()  # Mantém a saída de 2048
+#model = model.to(device)
 
 # Definindo a camada ArcFace
 class ArcMarginProduct(nn.Module):
@@ -111,13 +122,16 @@ class ArcMarginProduct(nn.Module):
 
         return output
 
-arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
+#arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 
 # Definindo o otimizador e a função de perda
-optimizer = optim.AdamW([{'params': model.parameters()}, {'params': arcface.parameters()}], lr=learning_rate)
+optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
+
+# Definindo o otimizador e a função de perda
+#optimizer = optim.AdamW([{'params': model.parameters()}, {'params': arcface.parameters()}], lr=learning_rate)
 criterion = nn.CrossEntropyLoss()
 
 # Definindo o scheduler para ajustar a taxa de aprendizado
@@ -160,13 +174,18 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 with torch.amp.autocast("cuda", enabled=device == torch.device("cuda")), \
                      torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
-                    logits = arcface(outputs, labels_tensor)
+                    #logits = arcface(outputs, labels_tensor)
 
                     # Corrigir cálculo das predições
-                    probs = F.softmax(logits, dim=1)
-                    _, preds = torch.max(probs, 1)  # Usar softmax e obter a predição
+                    #probs = F.softmax(logits, dim=1)
+                    #_, preds = torch.max(probs, 1)  # Usar softmax e obter a predição
 
-                    loss = criterion(logits, labels_tensor)
+                    #loss = criterion(logits, labels_tensor)
+                         
+                    probs = F.softmax(outputs, dim=1)
+                    _, preds = torch.max(probs, 1)
+
+                    loss = criterion(outputs, labels_tensor)  # Usar as saídas para calcular a perda
 
                     if phase == 'train':
                         scaler.scale(loss).backward()
