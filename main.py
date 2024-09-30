@@ -55,7 +55,7 @@ timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 print("Step 9 (CNN model): Start")
 
 # Load dataset
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
+csv_pd = pd.read_csv(pre_processing_images.CSV_CONCAT_DATASET_FILTERED_FILE) #CSV_CONCAT_DATASET_FILTERED_FILE
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
 
 # Split dataset
@@ -170,11 +170,13 @@ for exp in experiments.keys():
     
     if "CrossEntropyLoss" in exp:
         criterion = nn.CrossEntropyLoss()
+        print("## CrossEntropyLoss ##")
     else:
         criterion = ArcFaceLoss().to(device)
 
     if "SGD" in exp:
         optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+        print("## SGD ##")
     else:
         optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
