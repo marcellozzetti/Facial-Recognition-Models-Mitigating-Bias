@@ -66,21 +66,6 @@ label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 num_classes = len(dataset.classes)
 
-# Initialize model, criterion, and optimizer
-model = LResNet50E_IR(num_classes).to(device)
-model = nn.DataParallel(model)
-
-#criterion = nn.CrossEntropyLoss()
-criterion = ArcFaceLoss().to(device)
-
-optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
-#optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-
-#scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
-scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
-
-scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
-
 print("Step 9 (CNN model): End")
 
 print("Step 10 (Training execution): Start")
@@ -106,15 +91,20 @@ label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 num_classes = len(label_encoder.classes_)
 
-# Initialize model, criterion, optimizer
-#model = LResNet50E_IR(num_classes).to(device)
-model = LResNet50E_IRArc(num_classes).to(device)
+# Initialize model, criterion, and optimizer
+model = LResNet50E_IR(num_classes).to(device)
 model = nn.DataParallel(model)
 
-criterion = nn.CrossEntropyLoss()
+#criterion = nn.CrossEntropyLoss()
+criterion = ArcFaceLoss().to(device)
+
 optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+#optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+
+#scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
 scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
-scaler = torch.amp.GradScaler() if torch.cuda.is_available() else None
+
+scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 # Training function
 def train_model(model, criterion, optimizer, scheduler, num_epochs):
