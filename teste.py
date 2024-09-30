@@ -261,7 +261,7 @@ plt.show()
 plt.close()
 
 # Avaliando o modelo no conjunto de teste
-def evaluate_model(model, arcface, test_loader):
+def evaluate_model(model, arcface, test_loader, criterion, device, label_encoder):
     model.eval()
     test_loss = 0.0
     running_corrects = 0
@@ -288,11 +288,27 @@ def evaluate_model(model, arcface, test_loader):
             all_labels.extend(labels_tensor.cpu().numpy())
             all_preds.extend(preds.cpu().numpy())
 
-    epoch_loss = test_loss / dataset_sizes['test']
-    epoch_acc = running_corrects.double() / dataset_sizes['test']
+    epoch_loss = test_loss / len(test_loader.dataset)
+    epoch_acc = running_corrects.double() / len(test_loader.dataset)
     precision = precision_score(all_labels, all_preds, average='weighted')
 
     print(f'Test Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Precision: {precision:.4f}')
 
+    # Exibindo relatório de classificação
+    print("\nClassification Report:")
+    print(classification_report(all_labels, all_preds, target_names=label_encoder.classes_))
+
+    # Gerando matriz de confusão
+    cm = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+                xticklabels=label_encoder.classes_, 
+                yticklabels=label_encoder.classes_)
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+    plt.title('Confusion Matrix')
+    plt.savefig('output/test_metrics.png')
+    plt.show()
+
 # Avaliando o modelo no conjunto de teste
-evaluate_model(model, arcface, test_loader)
+evaluate_model(model, arcface, test_loader, criterion, device, label_encoder)
