@@ -74,7 +74,7 @@ csv_concatenated_pd.to_csv(CSV_CONCAT_DATASET_FILE, index=False)
 print("Step 3 (Join Dataset): End")
 
 # Step 4: Import Dataset
-print("Step 4 (Import dataSet): Start")
+print("Step 4 (Import DataSet): Start")
 csv_concatenated_pd = pd.read_csv(CSV_CONCAT_DATASET_FILE)
 print("Dataset size:")
 print(f"Rows: {csv_concatenated_pd.shape[0]}")
@@ -99,7 +99,7 @@ for column in class_columns:
     fig.add_trace(go.Histogram(x=csv_concatenated_pd[column], name=f'Histogram {column}'))
 fig.update_layout(title='Analytical Class Dashboard', xaxis_title='Class', yaxis_title='Count', barmode='overlay')
 fig.show()
-print("Step 4 (Import dataSet): End")
+print("Step 4 (Import DataSet): End")
 
 
 print("Step 5 (Image Functions): Start")
