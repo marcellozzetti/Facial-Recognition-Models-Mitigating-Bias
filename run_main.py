@@ -20,6 +20,7 @@ from sklearn.preprocessing import LabelEncoder
 from face_dataset import FaceDataset, dataset_transformation
 from models import LResNet50E_IR
 import pre_processing_images
+import datetime
 
 # Hyperparameters
 BATCH_SIZE = 128
@@ -197,7 +198,11 @@ plt.title('Log Loss over Epochs')
 plt.legend()
 
 plt.tight_layout()
-plt.savefig('output/training_metrics.png')
+# Gerar o timestamp atual
+timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+# Nome do arquivo com timestamp
+filename = f'output/training_metrics_{timestamp}.png'
+plt.savefig(filename)
 plt.show()
 plt.close()
 
