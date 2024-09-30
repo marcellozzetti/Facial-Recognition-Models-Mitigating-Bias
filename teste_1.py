@@ -221,7 +221,7 @@ for epoch in range(NUM_EPOCHS):
     all_labels = [label.item() for label in all_labels]
     accuracy = accuracy_score(all_labels, all_preds)
     precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
-    all_probs = softmax(all_probs)
+    all_probs = F.softmax(all_probs)
     logloss = log_loss(all_labels, all_probs)
 
     scheduler.step(epoch_loss)
