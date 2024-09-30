@@ -237,19 +237,21 @@ print("Step 12 (Plotting execution): End")
 
 print("Step 13 (Testing): Start")
 
-def evaluate_model(model, test_loader):
-    # Validation
+def evaluate_model(model, test_loader, criterion, label_encoder):
+    # Ensure the model is in evaluation mode
     model.eval()
     all_labels = []
     all_preds = []
     all_probs = []
     epoch_loss = 0.0
-        
+
     with torch.no_grad():
         for images, labels in tqdm(test_loader):
             images = images.to(device)
+            
+            # Apply label encoding and convert to tensor
             labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-                
+            
             # Forward pass
             outputs = model(images)
             loss = criterion(outputs, labels_tensor)
@@ -257,7 +259,7 @@ def evaluate_model(model, test_loader):
         
             # Get probabilities
             probs = F.softmax(outputs, dim=1).cpu().numpy()
-                
+            
             # Get predicted class (argmax)
             preds = torch.argmax(outputs, dim=1).cpu().numpy()
         
@@ -265,17 +267,17 @@ def evaluate_model(model, test_loader):
             all_preds.extend(preds)
             all_probs.extend(probs)
         
-
     # Calculating metrics
     accuracy = accuracy_score(all_labels, all_preds)
     precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
-        
-    # Ensure all_probs is an array before calculating log_loss
+    
+    # Ensure all_probs is a numpy array and calculate log loss
     all_probs = np.array(all_probs)
     logloss = log_loss(all_labels, all_probs)
 
     print(f'Test Accuracy: {accuracy:.4f}, Test Precision: {precision:.4f}, Test Log Loss: {logloss:.4f}')
 
+    # Plot confusion matrix
     confusion_mtx = confusion_matrix(all_labels, all_preds)
     plt.figure(figsize=(10, 8))
     sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
@@ -283,11 +285,18 @@ def evaluate_model(model, test_loader):
     plt.xlabel('Predicted Label')
     plt.savefig(f'output/confusion_tx_{timestamp}.png')
     plt.show()
-
-    report = classification_report(all_labels, all_preds, target_names=dataset.classes)
+    
+    # Generate classification report
+    report = classification_report(all_labels, all_preds, target_names=label_encoder.classes_)
     print("\nClassification Report:\n", report)
 
-# Avaliando o modelo no conjunto de teste
-evaluate_model(model, test_loader, criterion)
+    # Save the classification report to a file
+    report_filename = f'output/classification_report_{timestamp}.txt'
+    with open(report_filename, 'w') as f:
+        f.write(report)
+    
+    print(f"\nClassification report saved to {report_filename}")
+
+evaluate_model(model, test_loader, criterion, label_encoder)
 
 print("Step 13 (Testing): End")
