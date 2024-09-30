@@ -35,7 +35,8 @@ from face_dataset import FaceDataset
 # Hiperparameters
 BATCH_SIZE = 64
 NUM_EPOCHS = 40
-TRAIN_VAL_SPLIT = 0.7
+TRAIN_VAL_SPLIT = 0.8
+VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
@@ -63,8 +64,8 @@ csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
 
 # Split dataset into training and validation sets
-train_size = int(0.8 * len(dataset))
-val_size = int(0.1 * len(dataset))
+train_size = int(TRAIN_VAL_SPLIT * len(dataset))
+val_size = int(VAL_VAL_SPLIT * len(dataset))
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
@@ -75,74 +76,6 @@ label_encoder.fit(csv_pd['race'])
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 
-class ArcMarginProduct(nn.Module):
-    def __init__(self, in_features, out_features, s=30.0, m=0.50, easy_margin=False):
-        super(ArcMarginProduct, self).__init__()
-        self.in_features = in_features
-        self.out_features = out_features
-        self.s = s
-        self.m = m
-        self.easy_margin = easy_margin
-        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
-        nn.init.xavier_uniform_(self.weight)
-
-    def forward(self, input, label):
-        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
-        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
-        phi = cosine - self.m
-        
-        if self.easy_margin:
-            phi = torch.where(cosine > 0, phi, cosine)
-        else:
-            phi = torch.where(cosine > (1.0 - self.m), phi, cosine)
-        
-        one_hot = torch.zeros(cosine.size(), device=input.device)
-        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
-
-        output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
-        output *= self.s
-        
-        return output
-
-class LResNet50E_IRArc(nn.Module):
-    def __init__(self, num_classes=len(label_encoder.classes_)):
-        super(LResNet50E_IRArc, self).__init__()
-        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.2)
-        
-        # Retirar a última camada fully connected do ResNet50
-        self.in_features = self.backbone.fc.in_features
-        self.backbone.fc = nn.Identity()  # Manter as features sem aplicar FC
-        
-        # Camada ArcFace
-        self.arc_margin = ArcMarginProduct(self.in_features, num_classes)
-
-    def forward(self, x, labels=None):
-        # Extração das features (embeddings) do backbone
-        features = self.backbone(x)
-        features = self.dropout(features)
-        
-        # Aplicar ArcFace se os rótulos estiverem disponíveis (durante o treino)
-        if labels is not None:
-            output = self.arc_margin(features, labels)
-        else:
-            output = features  # Para inferência/testes
-        return output
-
-# Define the model (LResNet50E-IR, a modified ResNet50 for ArcFace)
-class LResNet50E_IR(nn.Module):
-    def __init__(self, num_classes=len(label_encoder.classes_)):
-        super(LResNet50E_IR, self).__init__()
-        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.2)
-        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
-        self.backbone.fc = self.fc
-
-    def forward(self, x):
-        x = self.backbone(x)
-        x = self.dropout(x)
-        return x
-
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR().to(device)
 model = nn.DataParallel(model)
@@ -150,7 +83,6 @@ model = nn.DataParallel(model)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.01, momentum=0.9, weight_decay=0.0005)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
-
 #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 
 def softmax(x):
