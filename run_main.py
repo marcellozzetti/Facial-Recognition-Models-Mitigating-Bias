@@ -15,7 +15,7 @@ import torch.nn.functional as F
 import torchvision.transforms as transforms
 import torchvision.models as models
 from torchvision.models import ResNet50_Weights
-from sklearn.metrics import accuracy_score, precision_score, log_loss
+from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report, log_loss
 from sklearn.preprocessing import LabelEncoder
 from face_dataset import FaceDataset, dataset_transformation
 from models import LResNet50E_IR
@@ -219,3 +219,51 @@ with torch.no_grad():
 
 test_accuracy = accuracy_score(all_test_labels, all_test_preds)
 print(f'Test Accuracy: {test_accuracy:.4f}')
+
+
+
+# Avaliando o modelo no conjunto de teste
+def evaluate_model(model, test_loader, criterion):
+    model.eval()
+    test_loss = 0.0
+    running_corrects = 0
+    all_labels = []
+    all_preds = []
+
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+
+            logits = model(inputs, labels)
+            _, preds = torch.max(logits, 1)
+
+            loss = criterion(logits, labels)
+
+            test_loss += loss.item() * inputs.size(0)
+            running_corrects += torch.sum(preds == labels.data)
+
+            all_labels.extend(labels.cpu().numpy())
+            all_preds.extend(preds.cpu().numpy())
+
+    test_loss /= len(test_loader.dataset)
+    test_acc = running_corrects.double() / len(test_loader.dataset)
+
+    print(f'Test Loss: {test_loss:.4f}')
+    print(f'Test Acc: {test_acc:.4f}')
+
+    precision = precision_score(all_labels, all_preds, average='weighted')
+    print(f'Precision: {precision:.4f}')
+
+    confusion_mtx = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.show()
+
+    report = classification_report(all_labels, all_preds, target_names=dataset.classes)
+    print("\nClassification Report:\n", report)
+
+# Avaliando o modelo no conjunto de teste
+evaluate_model(model, test_loader, criterion)
