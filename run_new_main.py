@@ -76,8 +76,8 @@ model = nn.DataParallel(model)
 criterion = nn.CrossEntropyLoss()
 #criterion = ArcFaceLoss().to(device)
 
-optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
-#optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+#optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
 #scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
 scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
