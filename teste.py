@@ -23,7 +23,7 @@ import seaborn as sns
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Hiperparâmetros
-batch_size = 32
+batch_size = 64
 learning_rate = 0.001
 num_epochs = 25
 train_val_split = 0.7  # 70% treino, 15% validação, 15% teste
