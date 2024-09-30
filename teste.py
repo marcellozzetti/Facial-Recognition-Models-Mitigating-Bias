@@ -169,8 +169,6 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 
                 with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
-                    print(f'Outputs shape: {outputs.shape}')  # Deve ser (batch_size, 2048)
-                    
                     logits = arcface(outputs, labels_tensor)
                     _, preds = torch.max(logits, 1)
                     loss = criterion(logits, labels_tensor)
