@@ -97,17 +97,14 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                     loss = criterion(outputs, labels_tensor)
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
-                print("Optimizer step (with scaler) called.")
                 scaler.update()
             else:
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
                 loss.backward()
                 optimizer.step()
-                print("Optimizer step called.")
     
             scheduler.step()
-            print("Scheduler step called.")
     
         overhead = time.time() - start_time
         print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
