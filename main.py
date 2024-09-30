@@ -125,7 +125,6 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
                 
                 # Forward pass
-                #outputs = model(images)
                 outputs = model(images)
 
                 loss = criterion(outputs, labels_tensor)
