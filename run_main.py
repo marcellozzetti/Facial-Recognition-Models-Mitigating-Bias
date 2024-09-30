@@ -72,7 +72,8 @@ model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
-scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
+#scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
+scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 print("Step 9 (CNN model): End")
@@ -109,7 +110,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                 loss.backward()
                 optimizer.step()
     
-            #scheduler.step()
+            scheduler.step()
     
         overhead = time.time() - start_time
             
@@ -143,7 +144,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         all_probs = softmax(all_probs)
         logloss = log_loss(all_labels, all_probs)
     
-        scheduler.step(epoch_loss)
+        #scheduler.step(epoch_loss)
     
         train_losses.append(epoch_loss / len(val_loader))
         accuracies.append(accuracy)
