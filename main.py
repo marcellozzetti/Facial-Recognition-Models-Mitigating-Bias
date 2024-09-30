@@ -99,14 +99,17 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                     loss = criterion(outputs, labels_tensor)
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
+                print("Optimizer step (with scaler) called.")
                 scaler.update()
             else:
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
                 loss.backward()
                 optimizer.step()
+                print("Optimizer step called.")
     
             scheduler.step()
+            print("Scheduler step called.")
     
         overhead = time.time() - start_time
         print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
@@ -182,8 +185,11 @@ for exp in experiments.keys():
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
     
     model = train_model(model, criterion, optimizer, scheduler, NUM_EPOCHS)
+
+    model_file = f'fairface/dataset/output/fairface_model_{exp}.pth'
     
-    torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}.pth')
+    torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}.pth'))
+
     print(f'Finished Training and Model Saved - {exp}')
 
     print(f'Step 11 (Training execution): End - {exp}')
