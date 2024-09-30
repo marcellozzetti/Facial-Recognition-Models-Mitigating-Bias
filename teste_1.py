@@ -37,6 +37,7 @@ import pre_processing_images
 BATCH_SIZE = 256
 NUM_EPOCHS = 40
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+learning_rate = 0.001
 
 # Check if Cuda is available
 cuda_available = torch.cuda.is_available()
