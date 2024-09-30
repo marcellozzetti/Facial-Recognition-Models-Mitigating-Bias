@@ -31,10 +31,10 @@ VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 
 experiments = {
-    "CrossEntropyLoss & SGD": {},
-    "CrossEntropyLoss & Adam": {},
-    "ArcFaceLoss & SGD": {},
-    "ArcFaceLoss & Adam": {},
+    "CrossEntropyLoss&SGD": {},
+    "CrossEntropyLoss&Adam": {},
+    "ArcFaceLoss&SGD": {},
+    "ArcFaceLoss&Adam": {},
 }
 
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
@@ -50,7 +50,7 @@ def clean_memory():
 
 clean_memory()
 
-timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 
 print("Step 9 (CNN model): Start")
 
