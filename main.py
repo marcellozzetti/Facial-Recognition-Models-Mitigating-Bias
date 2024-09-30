@@ -54,9 +54,6 @@ timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 
 print("Step 9 (CNN model): Start")
 
-# Initializing metrics lists
-train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
-
 # Load dataset
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
@@ -167,6 +164,9 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
 for exp in experiments.keys():
 
     print(f'Step 10 (Training execution): Start - {exp}')
+
+    # Initializing metrics lists
+    train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
     
     if "CrossEntropyLoss" in exp:
         criterion = nn.CrossEntropyLoss()
@@ -180,8 +180,7 @@ for exp in experiments.keys():
 
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
     
-    model = train_model(model, criterion, optimizer, scheduler, num_epochs=NUM_EPOCHS)
-
+    model = train_model(model, criterion, optimizer, scheduler, NUM_EPOCHS)
 
     torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
     print(f'Finished Training and Model Saved - {exp}')
