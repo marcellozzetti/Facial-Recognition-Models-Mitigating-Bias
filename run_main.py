@@ -21,10 +21,11 @@ from face_dataset import FaceDataset, dataset_transformation
 from models import LResNet50E_IR
 import pre_processing_images
 import datetime
+from tqdm import tqdm
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 4
+NUM_EPOCHS = 2
 TRAIN_VAL_SPLIT = 0.8
 VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
@@ -40,11 +41,9 @@ def clean_memory():
         gc.collect()
         torch.cuda.empty_cache()
 
-def softmax(x):
-    exp_x = np.exp(x - np.max(x))
-    return exp_x / exp_x.sum(axis=1, keepdims=True)
-
 clean_memory()
+
+timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
 
 print("Step 9 (CNN model): Start")
 
@@ -83,80 +82,108 @@ print("Step 10 (Training execution): Start")
 # Initializing metrics lists
 train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
 
+# Load dataset
+csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
+dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
+
+# Split dataset
+train_size = int(TRAIN_VAL_SPLIT * len(dataset))
+val_size = int(VAL_VAL_SPLIT * len(dataset))
+test_size = len(dataset) - train_size - val_size
+train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+
+# Create DataLoaders
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
+val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
+test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
+
+label_encoder = LabelEncoder()
+label_encoder.fit(csv_pd['race'])
+num_classes = len(label_encoder.classes_)
+
+# Initialize model, criterion, optimizer
+model = LResNet50E_IR(num_classes).to(device)
+model = nn.DataParallel(model)
+
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+scaler = torch.amp.GradScaler() if torch.cuda.is_available() else None
+
 # Training function
 def train_model(model, criterion, optimizer, scheduler, num_epochs):
-    
-    for epoch in range(NUM_EPOCHS):
+    for epoch in range(num_epochs):
         model.train()
         start_time = time.time()
         
-        for images, labels in train_loader:
+        for images, labels in tqdm(train_loader):    
             images = images.to(device)
             labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
             optimizer.zero_grad()
     
-            if device == torch.device("cuda"):
+            if scaler:
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
                     loss = criterion(outputs, labels_tensor)
-            else:
-                outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
-    
-            if scaler and device == torch.device("cuda"):
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
                 scaler.update()
             else:
+                outputs = model(images)
+                loss = criterion(outputs, labels_tensor)
                 loss.backward()
                 optimizer.step()
     
             scheduler.step()
     
         overhead = time.time() - start_time
-            
         print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
         print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
-    
+
+        # Validation
         model.eval()
         all_labels = []
         all_preds = []
         all_probs = []
         epoch_loss = 0.0
-    
+        
         with torch.no_grad():
-            for images, labels in val_loader:
+            for images, labels in tqdm(val_loader):
                 images = images.to(device)
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                
+                # Forward pass
                 outputs = model(images)
                 loss = criterion(outputs, labels_tensor)
                 epoch_loss += loss.item()
-    
+        
+                # Get probabilities
                 probs = F.softmax(outputs, dim=1).cpu().numpy()
-                preds = torch.max(outputs, 1)[1].cpu().numpy()
-    
+                
+                # Get predicted class (argmax)
+                preds = torch.argmax(outputs, dim=1).cpu().numpy()
+        
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_preds.extend(preds)
                 all_probs.extend(probs)
-    
-        all_labels = [label.item() for label in all_labels]
+        
+        # Calculating metrics
         accuracy = accuracy_score(all_labels, all_preds)
         precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
-        all_probs = softmax(all_probs)
+        
+        # Ensure all_probs is an array before calculating log_loss
+        all_probs = np.array(all_probs)
         logloss = log_loss(all_labels, all_probs)
-    
-        #scheduler.step(epoch_loss)
-    
+        
+        # Append metrics for tracking
         train_losses.append(epoch_loss / len(val_loader))
         accuracies.append(accuracy)
         precisions.append(precision)
         log_losses.append(logloss)
-    
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss/len(train_loader):.4f}, '
+        
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss:.4f}, '
               f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
-    clean_memory()
-    
     return model
 
 # Train the model
@@ -164,6 +191,10 @@ model = train_model(model, criterion, optimizer, scheduler, num_epochs=NUM_EPOCH
 
 torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
 print('Finished Training and Model Saved')
+
+print("Step 11 (Training execution): End")
+
+print("Step 12 (Plotting execution): Start")
 
 # Plotting general metrics
 epochs_range = range(1, NUM_EPOCHS + 1)
@@ -196,32 +227,76 @@ plt.xlabel('Epoch')
 plt.ylabel('Log Loss')
 plt.title('Log Loss over Epochs')
 plt.legend()
-
 plt.tight_layout()
-# Gerar o timestamp atual
-timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-# Nome do arquivo com timestamp
-filename = f'output/training_metrics_{timestamp}.png'
-plt.savefig(filename)
+plt.savefig(f'output/training_metrics_{timestamp}.png')
 plt.show()
 plt.close()
 
-print("Step 11 (Training execution): End")
+print("Step 12 (Plotting execution): End")
 
-print("Step 12 (Testing): Start")
-model.eval()
-all_test_preds = []
-all_test_labels = []
 
-with torch.no_grad():
-    for images, labels in test_loader:
-        images = images.to(device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels), dtype=torch.long).to(device)
-        outputs = model(images)
-        preds = torch.max(outputs, 1)[1].cpu().numpy()
+print("Step 13 (Testing): Start")
 
-        all_test_labels.extend(labels_tensor.cpu().numpy())
-        all_test_preds.extend(preds)
+def evaluate_model(model, test_loader, criterion, label_encoder):
+    # Ensure the model is in evaluation mode
+    model.eval()
+    all_labels = []
+    all_preds = []
+    all_probs = []
+    epoch_loss = 0.0
 
-test_accuracy = accuracy_score(all_test_labels, all_test_preds)
-print(f'Test Accuracy: {test_accuracy:.4f}')
+    with torch.no_grad():
+        for images, labels in tqdm(test_loader):
+            images = images.to(device)
+            
+            # Apply label encoding and convert to tensor
+            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+            
+            # Forward pass
+            outputs = model(images)
+            loss = criterion(outputs, labels_tensor)
+            epoch_loss += loss.item()
+        
+            # Get probabilities
+            probs = F.softmax(outputs, dim=1).cpu().numpy()
+            
+            # Get predicted class (argmax)
+            preds = torch.argmax(outputs, dim=1).cpu().numpy()
+        
+            all_labels.extend(labels_tensor.cpu().numpy())
+            all_preds.extend(preds)
+            all_probs.extend(probs)
+        
+    # Calculating metrics
+    accuracy = accuracy_score(all_labels, all_preds)
+    precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+    
+    # Ensure all_probs is a numpy array and calculate log loss
+    all_probs = np.array(all_probs)
+    logloss = log_loss(all_labels, all_probs)
+
+    print(f'Test Accuracy: {accuracy:.4f}, Test Precision: {precision:.4f}, Test Log Loss: {logloss:.4f}')
+
+    # Plot confusion matrix
+    confusion_mtx = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.savefig(f'output/confusion_tx_{timestamp}.png')
+    plt.show()
+    
+    # Generate classification report
+    report = classification_report(all_labels, all_preds, target_names=label_encoder.classes_)
+    print("\nClassification Report:\n", report)
+
+    # Save the classification report to a file
+    report_filename = f'output/classification_report_{timestamp}.txt'
+    with open(report_filename, 'w') as f:
+        f.write(report)
+    
+    print(f"\nClassification report saved to {report_filename}")
+
+evaluate_model(model, test_loader, criterion, label_encoder)
+
+print("Step 13 (Testing): End")
