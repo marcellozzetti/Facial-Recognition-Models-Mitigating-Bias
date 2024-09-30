@@ -241,7 +241,7 @@ all_test_labels = []
 with torch.no_grad():
     for images, labels in test_loader:
         images = images.to(device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels), dtype=torch.long).to(device)
+        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
         outputs = model(images)
         preds = torch.max(outputs, 1)[1].cpu().numpy()
 
