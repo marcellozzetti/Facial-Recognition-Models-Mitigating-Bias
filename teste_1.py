@@ -54,7 +54,8 @@ dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset), 'test': l
 class LResNet100E_IR(nn.Module):
     def __init__(self, num_classes):
         super(LResNet100E_IR, self).__init__()
-        self.resnet = torch.hub.load('zhanghang1989/ResNeSt', 'resnest100', pretrained=True)  # Exemplo para carregar a ResNet100
+        self.resnet = torchvision.models.resnet101(pretrained=True)
+        #self.resnet = torch.hub.load('zhanghang1989/ResNeSt', 'resnest100', pretrained=True)  # Exemplo para carregar a ResNet100
         self.resnet.fc = nn.Identity()  # Mantém a saída de 2048
         
         # Definindo a camada ArcFace
