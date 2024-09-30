@@ -150,7 +150,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                 
                 # Forward pass
                 #outputs = model(images)
-                outputs = model(images, labels=labels_tensor)
+                outputs = model(images)
 
                 loss = criterion(outputs, labels_tensor)
                 epoch_loss += loss.item()
