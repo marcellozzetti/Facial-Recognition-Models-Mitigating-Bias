@@ -77,8 +77,10 @@ label_encoder.fit(csv_pd['race'])
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 
+# Instanciando o modelo
+num_classes = len(dataset.classes)
 # Initialize model, criterion, and optimizer
-model = LResNet50E_IR().to(device)
+model = LResNet50E_IR(num_classes).to(device)
 model = nn.DataParallel(model)
 
 criterion = nn.CrossEntropyLoss()
