@@ -41,10 +41,6 @@ def clean_memory():
         gc.collect()
         torch.cuda.empty_cache()
 
-def softmax(x):
-    exp_x = np.exp(x - np.max(x))
-    return exp_x / exp_x.sum(axis=1, keepdims=True)
-
 clean_memory()
 
 print("Step 9 (CNN model): Start")
