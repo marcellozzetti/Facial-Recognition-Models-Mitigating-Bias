@@ -34,8 +34,8 @@ from mtcnn.mtcnn import MTCNN
 import pre_processing_images
 
 # Constants
-BATCH_SIZE = 256
-NUM_EPOCHS = 40
+BATCH_SIZE = 128
+NUM_EPOCHS = 24
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 learning_rate = 0.001
 
