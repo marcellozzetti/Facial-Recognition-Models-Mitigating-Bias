@@ -124,7 +124,7 @@ criterion = nn.CrossEntropyLoss()
 scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
 # GradScaler para Mixed Precision
-scaler = GradScaler() if device == torch.device("cuda") else None
+scaler = torch.amp.GradScaler() if device == torch.device("cuda") else None
 
 # Inicializando listas para armazenar as métricas
 train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
@@ -157,7 +157,7 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
     
                 optimizer.zero_grad()
     
-                with autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
+                with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     logits = arcface(outputs, labels_tensor)
     
