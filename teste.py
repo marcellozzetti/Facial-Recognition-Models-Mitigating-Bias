@@ -7,6 +7,7 @@ from torch.utils.data import DataLoader, random_split
 from torchvision import transforms, models
 from torch.cuda.amp import autocast, GradScaler
 from sklearn.preprocessing import LabelEncoder
+import torch.nn.functional as F  # Importação necessária para usar F.softmax
 from tqdm import tqdm
 import pandas as pd
 import os
