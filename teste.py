@@ -135,10 +135,12 @@ log_losses = []
 
 # Função de treino
 def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
-    start_time = time.time()  # Começo do tempo de treinamento
     best_model_wts = model.state_dict()
     best_acc = 0.0
-
+    train_losses = []
+    accuracies = []
+    log_losses = []
+    
     for epoch in range(num_epochs):
         print(f'Epoch {epoch}/{num_epochs - 1}')
         print('-' * 10)
@@ -151,8 +153,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             
             running_loss = 0.0
             running_corrects = 0
-            all_labels = []
-            all_preds = []
+            all_labels = []  # Para armazenar todos os rótulos
+            all_preds = []   # Para armazenar todas as previsões
             
             # Iterando sobre os dados
             for inputs, labels in tqdm(dataloaders[phase]):
@@ -162,14 +164,14 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 inputs = inputs.to(device)
                 
                 # Transforme os labels usando o LabelEncoder, depois converta para Tensor
-                labels = label_encoder.transform(labels)
-                labels_tensor = torch.tensor(labels).to(device)
+                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
 
                 optimizer.zero_grad()
 
                 with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     logits = arcface(outputs, labels_tensor)
+
                     _, preds = torch.max(logits, 1)
                     loss = criterion(logits, labels_tensor)
 
@@ -178,10 +180,11 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                         scaler.step(optimizer)
                         scaler.update()
 
+                # Atualizando as listas de métricas
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels_tensor.data)
-
-                # Coletando rótulos e previsões para calcular métricas
+                
+                # Coletando labels e previsões para cálculo das métricas
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_preds.extend(preds.cpu().numpy())
 
@@ -190,23 +193,14 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
 
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
+            log_losses.append(log_loss(all_labels, torch.softmax(logits.detach(), dim=1).cpu().numpy()))
 
-            # Cálculo das métricas
-            train_losses.append(epoch_loss) if phase == 'train' else val_losses.append(epoch_loss)
-            accuracies.append(epoch_acc.item())
-            precisions.append(precision_score(all_labels, all_preds, average='weighted', zero_division=0))
-            log_losses.append(log_loss(all_labels, torch.softmax(logits, dim=1).cpu().numpy()))
-
-            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Precision: {precisions[-1]:.4f} Log Loss: {log_losses[-1]:.4f}')
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Log Loss: {log_losses[-1]:.4f}')
 
             # Melhor modelo
             if phase == 'val' and epoch_acc > best_acc:
                 best_acc = epoch_acc
                 best_model_wts = model.state_dict()
-
-    end_time = time.time()  # Fim do tempo de treinamento
-    overhead = (end_time - start_time) / num_epochs
-    print(f'Overhead (tempo por época): {overhead:.4f} segundos')
 
     print(f'Best val Acc: {best_acc:.4f}')
     model.load_state_dict(best_model_wts)
