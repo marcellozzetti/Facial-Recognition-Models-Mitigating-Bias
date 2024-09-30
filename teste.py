@@ -82,8 +82,6 @@ test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num
 dataloaders = {'train': train_loader, 'val': val_loader, 'test': test_loader}
 dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset), 'test': len(test_dataset)}
 
-print("dataset_sizes: ", dataset_sizes)
-
 # Definindo o modelo ResNet50 pré-treinado
 model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
 num_ftrs = model.fc.in_features  # Isso deve retornar 2048
@@ -222,8 +220,9 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             except ValueError as e:
                 print(f"Erro ao calcular log_loss: {e}")
     
-            #epoch_loss = running_loss / dataset_sizes[phase]
-            #epoch_acc = running_corrects.double() / dataset_sizes[phase]
+            #epoch_loss = running_loss / len(dataloader)  # calque o loss médio após o loop do dataloader
+            epoch_acc = running_corrects.double() / dataset_sizes[phase]
+            epoch_loss = running_loss / dataset_sizes[phase]
             #log_losses.append(log_loss(all_labels, all_probs))  # Agora deve funcionar
 
             elapsed_time = time.time() - start_time  # Calculando o overhead
