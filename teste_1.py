@@ -24,7 +24,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset, random_split
-from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.optim import lr_scheduler
 import torch.nn.functional as F
 import torchvision.transforms as transforms
 import torchvision.models as models
