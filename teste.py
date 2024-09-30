@@ -199,8 +199,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_probs.extend(probs.detach().cpu().numpy())
 
-                print("all_labels: ", all_labels)
-                print("all_probs: ", all_probs)
+                #print("all_labels: ", all_labels)
+                #print("all_probs: ", all_probs)
     
             # Cálculo do log_loss
             try:
