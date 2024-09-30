@@ -106,8 +106,6 @@ scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=N
 
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
-print("scaler: ", scaler)
-
 # Training function
 def train_model(model, criterion, optimizer, scheduler, num_epochs):
     for epoch in range(num_epochs):
