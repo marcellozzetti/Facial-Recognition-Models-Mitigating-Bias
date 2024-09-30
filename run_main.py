@@ -31,6 +31,7 @@ import cv2
 from mtcnn.mtcnn import MTCNN
 import pre_processing_images
 from face_dataset import FaceDataset 
+from models import LResNet50E_IR
 
 # Hiperparameters
 BATCH_SIZE = 64
