@@ -53,14 +53,15 @@ val_size = int(VAL_VAL_SPLIT * len(dataset))
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
-label_encoder = LabelEncoder()
-label_encoder.fit(csv_pd['race'])
-num_classes = len(dataset.classes)
-
 # Create DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
+
+label_encoder = LabelEncoder()
+label_encoder.fit(csv_pd['race'])
+num_classes = len(dataset.classes)
+print("num_classes: ", num_classes) #####
 
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR(num_classes).to(device)
@@ -69,7 +70,7 @@ model = nn.DataParallel(model)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
 scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
-scaler = torch.amp.GradScaler() if device.type == "cuda" else None
+scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 print("Step 9 (CNN model): End")
 
