@@ -224,7 +224,7 @@ for exp in experiments.keys():
     plt.title('Log Loss over Epochs')
     plt.legend()
     plt.tight_layout()
-    plt.savefig(f'output/training_metrics_{timestamp}.png')
+    plt.savefig(f'output/training_metrics_{exp}_{timestamp}.png')
     plt.show()
     plt.close()
 
