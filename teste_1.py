@@ -1,83 +1,27 @@
-print("Step 1 (Imports): Start")
-
-import os
-import time
-import json
-import math
-import ssl
-import gc
-import io
-import zipfile
-import requests
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.patches import Rectangle, Circle
-from PIL import Image
-from scipy.spatial import distance
-from sklearn.metrics import accuracy_score, precision_score, log_loss
-from sklearn.utils import resample
-from sklearn.preprocessing import LabelEncoder
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, random_split
+from torchvision import transforms, datasets
 from torch.optim import lr_scheduler
 import torch.nn.functional as F
-import torchvision.transforms as transforms
-import torchvision.models as models
-from torchvision.models import ResNet50_Weights
-import cv2
-from mtcnn.mtcnn import MTCNN
-import pre_processing_images
+from sklearn.preprocessing import LabelEncoder
+from torch.cuda.amp import autocast, GradScaler
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report
+import seaborn as sns
+import face_dataset
 
-# Constants
-BATCH_SIZE = 128
-NUM_EPOCHS = 24
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+# Definindo o dispositivo (GPU se disponível)
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+# Hiperparâmetros
+batch_size = 64
 learning_rate = 0.001
+num_epochs = 25
+train_val_split = 0.7  # 70% treino, 15% validação, 15% teste
 
-# Check if Cuda is available
-cuda_available = torch.cuda.is_available()
-device = torch.device("cuda" if cuda_available else "cpu")
-
-if torch.cuda.is_available() and device == torch.device("cuda"):
-        gc.collect()
-        torch.cuda.empty_cache()
-
-print("Step 1 (Imports): End")
-
-
-print("Step 9 (CNN model): Start")
-
-# Custom Dataset using CSV for labels
-class FaceDataset(Dataset):
-    def __init__(self, csv_pd, img_dir, transform=None):
-        self.labels_df = csv_pd
-        self.img_dir = img_dir
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.labels_df)
-
-    def __getitem__(self, idx):
-        img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
-        label = self.labels_df.iloc[idx, 3]  # 'race' is the class
-
-        try:
-            img = cv2.imread(img_name)
-            if img is None:
-                raise FileNotFoundError(f"Image {img_name} not found")
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            if self.transform:
-                img = Image.fromarray(img)
-                img = self.transform(img)
-            return img, label
-        except (FileNotFoundError, ValueError) as e:
-            return None, None
-
+# Transformações e Data Augmentation
 transform = transforms.Compose([
     transforms.RandomRotation(10),
     transforms.RandomHorizontalFlip(),
@@ -86,33 +30,38 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
+# Carregando o dataset do CSV
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=transform)
 
-# Split dataset into training and validation sets
-train_size = int(0.8 * len(dataset))
-val_size = int(0.1 * len(dataset))
+# Dividindo o dataset em treino, validação e teste
+train_size = int(train_val_split * len(dataset))
+val_size = (len(dataset) - train_size) // 2
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
-def collate_fn(batch):
-    batch = [item for item in batch if item[0] is not None and item[1] is not None]
-    if len(batch) == 0:
-        return torch.empty(0), torch.empty(0)
-    return torch.utils.data.dataloader.default_collate(batch)
+# Criando os DataLoaders
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
+test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
 
-label_encoder = LabelEncoder()
-label_encoder.fit(csv_pd['race'])
+dataloaders = {'train': train_loader, 'val': val_loader, 'test': test_loader}
+dataset_sizes = {'train': len(train_dataset), 'val': len(val_dataset), 'test': len(test_dataset)}
 
-# Create DataLoaders using a filter function: collate_fn
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True, collate_fn=collate_fn)
-val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
+# Definindo a arquitetura LResNet100E-IR (ResNet100 aprimorada)
+class LResNet100E_IR(nn.Module):
+    def __init__(self, num_classes):
+        super(LResNet100E_IR, self).__init__()
+        self.resnet = torch.hub.load('zhanghang1989/ResNeSt', 'resnest100', pretrained=True)  # Exemplo para carregar a ResNet100
+        self.resnet.fc = nn.Identity()  # Mantém a saída de 2048
+        
+        # Definindo a camada ArcFace
+        self.arcface = ArcMarginProduct(in_features=2048, out_features=num_classes)
 
-# Definindo o modelo ResNet50 pré-treinado
-model = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-num_ftrs = model.fc.in_features  # Isso deve retornar 2048
-model.fc = nn.Identity()  # Mantém a saída de 2048
-model = model.to(device)
+    def forward(self, x, labels):
+        features = self.resnet(x)  # Extrair características
+        logits = self.arcface(features, labels)  # Calcular os logits com ArcFace
+        return logits
 
 # Definindo a camada ArcFace
 class ArcMarginProduct(nn.Module):
@@ -120,185 +69,137 @@ class ArcMarginProduct(nn.Module):
         super(ArcMarginProduct, self).__init__()
         self.s = s
         self.m = m
-        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))  # [n_classes, in_features]
+        self.weight = nn.Parameter(torch.FloatTensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
 
     def forward(self, input, label):
         # Normalizando entrada e pesos
-        cosine = nn.functional.linear(nn.functional.normalize(input), nn.functional.normalize(self.weight))  # MatMul
-        theta = torch.acos(cosine.clamp(-1.0, 1.0))  # Theta = arccos(cosine)
-        target_logit = torch.cos(theta + self.m)  # Aplica margem
+        cosine = F.linear(F.normalize(input), F.normalize(self.weight))
+        theta = torch.acos(cosine.clamp(-1.0, 1.0))
+        target_logit = torch.cos(theta + self.m)
 
         # One-hot encoding dos rótulos
-        one_hot = torch.zeros_like(cosine)  # Cria um tensor vazio de mesma forma que cosine
-        one_hot.scatter_(1, label.view(-1, 1).long(), 1)  # Marca as classes corretas
+        one_hot = torch.zeros_like(cosine)
+        one_hot.scatter_(1, label.view(-1, 1).long(), 1)
 
         # Combina logits com margem e ajusta escala
         output = (one_hot * target_logit) + ((1.0 - one_hot) * cosine)
-        output *= self.s  # Multiplica pela escala
+        output *= self.s
 
         return output
 
-arcface = ArcMarginProduct(num_ftrs, len(csv_pd['race'].unique())).to(device)
-
-label_encoder = LabelEncoder()
-label_encoder.fit(csv_pd['race'])
+# Instanciando o modelo
+num_classes = len(dataset.classes)
+model = LResNet100E_IR(num_classes).to(device)
 
 # Definindo o otimizador e a função de perda
-optimizer = optim.AdamW([{'params': model.parameters()}, {'params': arcface.parameters()}], lr=learning_rate)
+optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
 criterion = nn.CrossEntropyLoss()
 
 # Definindo o scheduler para ajustar a taxa de aprendizado
 scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
 # GradScaler para Mixed Precision
-scaler = torch.amp.GradScaler() if device == torch.device("cuda") else None
+scaler = GradScaler() if device == torch.device("cuda") else None
 
-print("Step 9 (CNN model): End")
+# Função de treino
+def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
+    best_model_wts = model.state_dict()
+    best_acc = 0.0
 
+    for epoch in range(num_epochs):
+        print(f'Epoch {epoch}/{num_epochs - 1}')
+        print('-' * 10)
 
-print("Step 10 (Training execution): Start")
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                model.train()
+            else:
+                model.eval()
 
-# Training execution
-train_losses = []
-accuracies = []
-precisions = []
-log_losses = []
+            running_loss = 0.0
+            running_corrects = 0
 
-for epoch in range(NUM_EPOCHS):
-    model.train()
-    start_time = time.time()
-    
-    for images, labels in train_loader:
-        images = images.to(device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-        optimizer.zero_grad()
+            for inputs, labels in dataloaders[phase]:
+                inputs = inputs.to(device)
+                labels = labels.to(device)
 
-        if device == torch.device("cuda"):
-            with torch.amp.autocast("cuda"):
-                outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
-        else:
-            outputs = model(images)
-            loss = criterion(outputs, labels_tensor)
+                optimizer.zero_grad()
 
-        if scaler and device == torch.device("cuda"):
-            scaler.scale(loss).backward()
-            scaler.step(optimizer)
-            scaler.update()
-        else:
-            loss.backward()
-            optimizer.step()
+                with autocast(device == 'cuda'), torch.set_grad_enabled(phase == 'train'):
+                    logits = model(inputs, labels)
+                    _, preds = torch.max(logits, 1)
 
-        #scheduler.step()
+                    loss = criterion(logits, labels)
 
-    overhead = time.time() - start_time
-        
-    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
-    print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
+                    if phase == 'train':
+                        scaler.scale(loss).backward()
+                        scaler.step(optimizer)
+                        scaler.update()
 
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
+
+            epoch_loss = running_loss / dataset_sizes[phase]
+            epoch_acc = running_corrects.double() / dataset_sizes[phase]
+
+            print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
+
+            if phase == 'val' and epoch_acc > best_acc:
+                best_acc = epoch_acc
+                best_model_wts = model.state_dict()
+
+        scheduler.step()
+
+    print(f'Best val Acc: {best_acc:4f}')
+    model.load_state_dict(best_model_wts)
+    return model
+
+# Treinando o modelo
+model = train_model(model, criterion, optimizer, scheduler, num_epochs=num_epochs)
+
+# Avaliando o modelo no conjunto de teste
+def evaluate_model(model, test_loader, criterion):
     model.eval()
+    test_loss = 0.0
+    running_corrects = 0
     all_labels = []
     all_preds = []
-    all_probs = []
-    epoch_loss = 0.0
 
     with torch.no_grad():
-        for images, labels in val_loader:
-            images = images.to(device)
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            outputs = model(images)
-            loss = criterion(outputs, labels_tensor)
-            epoch_loss += loss.item()
+        for inputs, labels in test_loader:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
 
-            probs = F.softmax(outputs, dim=1).cpu().numpy()
-            preds = torch.max(outputs, 1)[1].cpu().numpy()
+            logits = model(inputs, labels)
+            _, preds = torch.max(logits, 1)
 
-            all_labels.extend(labels_tensor.cpu().numpy())
-            all_preds.extend(preds)
-            all_probs.extend(probs)
+            loss = criterion(logits, labels)
 
-    all_labels = [label.item() for label in all_labels]
-    accuracy = accuracy_score(all_labels, all_preds)
-    precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
-    all_probs = F.softmax(all_probs)
-    logloss = log_loss(all_labels, all_probs)
+            test_loss += loss.item() * inputs.size(0)
+            running_corrects += torch.sum(preds == labels.data)
 
-    scheduler.step(epoch_loss)
+            all_labels.extend(labels.cpu().numpy())
+            all_preds.extend(preds.cpu().numpy())
 
-    train_losses.append(epoch_loss / len(val_loader))
-    accuracies.append(accuracy)
-    precisions.append(precision)
-    log_losses.append(logloss)
+    test_loss /= len(test_loader.dataset)
+    test_acc = running_corrects.double() / len(test_loader.dataset)
 
-    print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss/len(train_loader):.4f}, '
-          f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
+    print(f'Test Loss: {test_loss:.4f}')
+    print(f'Test Acc: {test_acc:.4f}')
 
-    del images, labels, outputs, loss
-    gc.collect()
-    if torch.cuda.is_available() and device == torch.device("cuda"):
-        torch.cuda.empty_cache()
+    precision = precision_score(all_labels, all_preds, average='weighted')
+    print(f'Precision: {precision:.4f}')
 
-torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
-print('Finished Training and Model Saved')
+    confusion_mtx = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.show()
 
-# Plotting general metrics
-epochs_range = range(1, NUM_EPOCHS + 1)
-plt.figure(figsize=(12, 8))
+    report = classification_report(all_labels, all_preds, target_names=dataset.classes)
+    print("\nClassification Report:\n", report)
 
-plt.subplot(2, 2, 1)
-plt.plot(epochs_range, train_losses, label='Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title('Loss over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 2)
-plt.plot(epochs_range, accuracies, label='Accuracy')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.title('Accuracy over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 3)
-plt.plot(epochs_range, precisions, label='Precision')
-plt.xlabel('Epoch')
-plt.ylabel('Precision')
-plt.title('Precision over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 4)
-plt.plot(epochs_range, log_losses, label='Log Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Log Loss')
-plt.title('Log Loss over Epochs')
-plt.legend()
-
-plt.tight_layout()
-plt.savefig('output/training_metrics.png')
-plt.show()
-plt.close()
-
-print("Step 11 (Training execution): End")
-
-print("Step 12 (Testing): Start")
-test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True, collate_fn=collate_fn)
-
-model.eval()
-all_test_preds = []
-all_test_labels = []
-
-with torch.no_grad():
-    for images, labels in test_loader:
-        images = images.to(device)
-        labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-        outputs = model(images)
-        preds = torch.max(outputs, 1)[1].cpu().numpy()
-
-        all_test_labels.extend(labels_tensor.cpu().numpy())
-        all_test_preds.extend(preds)
-
-test_accuracy = accuracy_score(all_test_labels, all_test_preds)
-print(f'Test Accuracy: {test_accuracy:.4f}')
-
-print("Step 12 (Testing): End")
+# Avaliando o modelo no conjunto de teste
+evaluate_model(model, test_loader, criterion)
