@@ -53,7 +53,6 @@ if torch.cuda.is_available() and device == torch.device("cuda"):
 
 print("Step 9 (CNN model): Start")
 
-dataset_transformation
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=face_dataset.dataset_transformation)
 
@@ -65,13 +64,12 @@ train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, va
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
+num_classes = len(dataset.classes)
 
 # Create DataLoaders using a filter function: collate_fn
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 
-# Instanciando o modelo
-num_classes = len(dataset.classes)
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR(num_classes).to(device)
 model = nn.DataParallel(model)
