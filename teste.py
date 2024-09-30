@@ -156,46 +156,48 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
             
             running_loss = 0.0
             running_corrects = 0
-            all_labels = []  # Para armazenar todos os rótulos
-            all_preds = []   # Para armazenar todas as previsões
             
             start_time = time.time()  # Medindo tempo de execução
+
+            all_probs = []  # Para armazenar todas as probabilidades
+            all_labels = []  # Para armazenar todos os rótulos
             
-            # Iterando sobre os dados
             for inputs, labels in tqdm(dataloaders[phase]):
                 if inputs is None or labels is None:
                     continue  # Pule entradas inválidas
             
                 inputs = inputs.to(device)
-                
-                # Transforme os labels usando o LabelEncoder, depois converta para Tensor
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-
+            
                 optimizer.zero_grad()
-
+            
                 with torch.amp.autocast("cuda"), torch.set_grad_enabled(phase == 'train'):
                     outputs = model(inputs)
                     logits = arcface(outputs, labels_tensor)
-
+            
+                    # Calcula softmax das logits
+                    probs = torch.softmax(logits, dim=1)
+                    
                     _, preds = torch.max(logits, 1)
                     loss = criterion(logits, labels_tensor)
-
+            
                     if phase == 'train':
                         scaler.scale(loss).backward()
                         scaler.step(optimizer)
                         scaler.update()
-
+            
                 # Atualizando as listas de métricas
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels_tensor.data)
-                
-                # Coletando labels e previsões para cálculo das métricas
+            
+                # Coletando labels e probabilidades
                 all_labels.extend(labels_tensor.cpu().numpy())
-                all_preds.extend(preds.cpu().numpy())
-
+                all_probs.extend(probs.cpu().numpy())
+            
+            # Após o loop, calcula log_loss usando all_labels e all_probs
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
-            log_losses.append(log_loss(all_labels, torch.softmax(logits.detach(), dim=1).cpu().numpy()))
+            log_losses.append(log_loss(all_labels, all_probs))  # Agora deve funcionar
 
             elapsed_time = time.time() - start_time  # Calculando o overhead
             print(f'{phase} Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f} Log Loss: {log_losses[-1]:.4f} Overhead: {elapsed_time:.2f}s')
