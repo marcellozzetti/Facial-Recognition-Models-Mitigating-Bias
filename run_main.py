@@ -12,6 +12,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from tqdm import tqdm
 from matplotlib.patches import Rectangle, Circle
 from PIL import Image
 from scipy.spatial import distance
