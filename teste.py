@@ -179,7 +179,8 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                         continue
     
                     # Calcule as probabilidades
-                    probs = torch.softmax(logits, dim=1)
+                    probs = F.softmax(logits, dim=1)  # softmax normaliza as saídas
+                    #probs = torch.softmax(logits, dim=1)
     
                     _, preds = torch.max(logits, 1)
                     loss = criterion(logits, labels_tensor)
@@ -196,6 +197,9 @@ def train_model(model, arcface, criterion, optimizer, scheduler, num_epochs=25):
                 # Coleta de rótulos e probabilidades
                 all_labels.extend(labels_tensor.cpu().numpy())
                 all_probs.extend(probs.detach().cpu().numpy())
+
+                print("all_labels: ", all_labels)
+                print("all_probs: ", all_probs)
     
             # Cálculo do log_loss
             try:
