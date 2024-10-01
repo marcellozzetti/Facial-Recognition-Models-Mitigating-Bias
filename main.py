@@ -32,9 +32,7 @@ LEARNING_RATE = 0.001
 
 experiments = {
     "CrossEntropyLoss&SGD": {},
-    "CrossEntropyLoss&Adam": {},
     "ArcFaceLoss&SGD": {},
-    "ArcFaceLoss&Adam": {},
 }
 
 # Check if CUDA is available
@@ -170,10 +168,7 @@ for exp in experiments.keys():
     else:
         criterion = ArcFaceLoss().to(device)
 
-    if "SGD" in exp:
-        optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
-    else:
-        optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
 
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
     
@@ -184,7 +179,7 @@ for exp in experiments.keys():
     print(f'Finished Training and Model Saved - {exp}')
 
     print(f'Step 11 (Training execution): End - {exp}')
-
+    
     
     print(f'Step 12 (Plotting execution): Start - {exp}')
 
