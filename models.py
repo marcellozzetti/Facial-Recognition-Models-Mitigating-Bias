@@ -21,8 +21,12 @@ class ArcFaceLoss(nn.Module):
         one_hot = torch.zeros(cos_theta.size(), device=cos_theta.device)
         one_hot.scatter_(1, labels.unsqueeze(1), 1)
 
+        # Compute the angle for the labels
+        theta = torch.acos(cos_theta)
+        theta = theta.clamp(0, 3.14159265)
+
         # Apply margin
-        arcface_logits = cos_theta - one_hot * self.margin
+        arcface_logits = cos_theta - one_hot * (self.margin * torch.cos(theta))
         arcface_logits = arcface_logits * self.scale
 
         return F.cross_entropy(arcface_logits, labels)
