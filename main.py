@@ -51,7 +51,7 @@ timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 print("Step 9 (CNN model): Start")
 
 # Load dataset
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
+csv_pd = pd.read_csv(pre_processing_images.CSV_CONCAT_DATASET_FILTERED_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
 
 # Split dataset
