@@ -31,7 +31,7 @@ VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 
 experiments = {
-    "CrossEntropyLoss&SGD": {},
+    #"CrossEntropyLoss&SGD": {},
     "ArcFaceLoss&SGD": {},
 }
 
