@@ -139,6 +139,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_
                 print(f"Outputs 1: {outputs}")
 
                 if arc_margin is not None:
+                    print("arch enabled 3")
                     outputs = arc_margin(outputs, labels)
 
                 print(f"Outputs 2: {outputs}")
