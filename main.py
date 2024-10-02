@@ -71,9 +71,8 @@ print("class_weights", class_weights)
 print("weights", weights)
 sampler = WeightedRandomSampler(weights, len(weights))
 
-# DataLoader com oversampling
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, sampler=sampler, num_workers=6, pin_memory=True)
 # Create DataLoaders
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, sampler=sampler, num_workers=6, pin_memory=True) # DataLoader com oversampling
 #train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
