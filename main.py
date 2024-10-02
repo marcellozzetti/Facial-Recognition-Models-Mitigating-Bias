@@ -19,6 +19,7 @@ from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, c
 from sklearn.preprocessing import LabelEncoder
 from face_dataset import FaceDataset, dataset_transformation
 from models import LResNet50E_IR, ArcFaceLoss
+from sklearn.utils.class_weight import compute_class_weight
 import pre_processing_images
 import datetime
 from tqdm import tqdm
@@ -65,10 +66,15 @@ test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
 # Frequence of each class  Sampler
-class_weights = 1.0 / num_classes
+class_weights = compute_class_weight('balanced', classes=label_encoder.classes_, y=y)
+class_weights_list = class_weights.tolist()  # Isso agora será uma lista
 print("class_weights", class_weights)
-weights = [class_weights[label_encoder.transform([label])[0]] for label in csv_pd['race']]
+print("class_weights_list", class_weights_list)
+weights = [class_weights_list[label_encoder.transform([label])[0]] for label in csv_pd['race']]
 print("weights", weights)
+
+class_weights = compute_class_weight('balanced', classes=classes, y=y)
+class_weights_list = class_weights.tolist()  # Isso agora será uma lista
 
 sampler = WeightedRandomSampler(weights, len(weights))
 
