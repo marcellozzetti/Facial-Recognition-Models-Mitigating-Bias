@@ -57,8 +57,7 @@ class FaceDataset(Dataset):
         if self.transform:
             #img = Image.fromarray(img)
             img = self.transform(img)
-            img = Image.fromarray(img)
-
+            
         label_index = self.label_encoder.transform([label])[0]
 
         return img, label_index
