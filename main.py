@@ -74,11 +74,6 @@ train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, nu
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 
-# Initialize model, criterion, and optimizer
-model = LResNet50E_IR(num_classes).to(device)
-model = nn.DataParallel(model)
-scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
-
 print("Step 9 (CNN model): End")
 
 print("Step 10 (Training execution): Start")
@@ -168,11 +163,21 @@ for exp in experiments.keys():
 
     # Initializing metrics lists
     train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
+
+    # Initialize model, criterion, and optimizer
+    scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
     
     if "CrossEntropyLoss" in exp:
+        model = LResNet50E_IR(num_classes).to(device)
         criterion = nn.CrossEntropyLoss()
+    
     else:
-        criterion = ArcFaceLoss().to(device)
+        model = LResNet50E_IR(num_classes=512).to(device)
+        # Inicializando a camada ArcMarginProduct
+        arc_margin = ArcMarginProduct(512, num_classes=num_classes, margin=0.5, scale=64).to(device)
+        criterion = ArcFaceLoss(margin=0.5, scale=64).to(device)
+
+    model = nn.DataParallel(model)
 
     #optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
