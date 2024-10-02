@@ -66,7 +66,7 @@ test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
 # Frequence of each class  Sampler
-class_weights = compute_class_weight('balanced', classes=label_encoder.classes_, y=y)
+class_weights = compute_class_weight('balanced', classes=label_encoder.classes_, y=csv_pd['race'])
 class_weights_list = class_weights.tolist()  # Isso agora será uma lista
 print("class_weights", class_weights)
 print("class_weights_list", class_weights_list)
