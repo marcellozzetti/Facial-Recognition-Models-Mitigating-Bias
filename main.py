@@ -90,21 +90,21 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
             images = images.to(device)
             
             print("labels train", labels)
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            print("labels_tensor train", labels_tensor)
+            #labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+            #print("labels_tensor train", labels_tensor)
         
             optimizer.zero_grad()
     
             if scaler:
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
-                    loss = criterion(outputs, labels_tensor)
+                    loss = criterion(outputs, labels)
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
                 scaler.update()
             else:
                 outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
+                loss = criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
     
