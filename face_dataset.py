@@ -5,11 +5,12 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 
 class FaceDataset(Dataset):
-    def __init__(self, csv_pd, img_dir, transform=None):
+    def __init__(self, csv_pd, img_dir, transform=None, label_encoder=None):
         self.labels_df = csv_pd
         self.img_dir = img_dir
         self.transform = transform
         self.classes = self.labels_df['race'].unique()
+        self.label_encoder = label_encoder
 
     def __len__(self):
         return len(self.labels_df)
@@ -26,7 +27,13 @@ class FaceDataset(Dataset):
             img = Image.fromarray(img)
             img = self.transform(img)
 
-        return img, label
+        # Converte a label para índice numérico usando o label_encoder
+        label_index = self.label_encoder.transform([label])[0]
+
+        print("label", label)
+        print("label_index", label_index)
+
+        return img, label_index
 
     def get_classes(self):
         return self.classes
