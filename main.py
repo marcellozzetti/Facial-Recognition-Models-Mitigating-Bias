@@ -174,7 +174,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, num_epochs):
         precisions.append(precision)
         log_losses.append(logloss)
         
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss:.4f}, '
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Epoch Loss: {epoch_loss:.4f}, '
               f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
     return model
