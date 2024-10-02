@@ -29,6 +29,7 @@ from tqdm import tqdm
 BATCH_SIZE = 128
 NUM_EPOCHS = 8
 TRAIN_VAL_SPLIT = 0.8
+TEST_SIZE = 0.1
 VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 
@@ -75,10 +76,10 @@ X = csv_pd['file']  # Coluna com os caminhos das imagens
 y = csv_pd['race']        # Coluna com as classes
 
 # Primeiro, separe treino e teste
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, stratify=y, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, stratify=y, random_state=42)
 
 # Agora, separe validação e treino a partir do conjunto de treino
-X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.15, stratify=y_train, random_state=42)
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=TEST_SIZE, stratify=y_train, random_state=42)
 
 # Criação dos DataLoaders
 train_dataset = FaceDataset(X_train.tolist(), y_train.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
