@@ -95,7 +95,6 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
                     outputs = model(images)
 
                     if arc_face_margin is not None:
-                        print("arch enabled 1")
                         outputs = arc_face_margin(outputs, labels)
             
                     loss = criterion(outputs, labels)
@@ -107,7 +106,6 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
                 outputs = model(images)
 
                 if arc_face_margin is not None:
-                    print("arch enabled 2")
                     outputs = arc_face_margin(outputs, labels)        
                 
                 loss = criterion(outputs, labels)
@@ -139,7 +137,6 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
                 print(f"Outputs 1: {outputs}")
 
                 if arc_face_margin is not None:
-                    print("arch enabled 3")
                     outputs = arc_face_margin(outputs, labels)
 
                 print(f"Outputs 2: {outputs}")
