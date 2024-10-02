@@ -71,7 +71,7 @@ num_classes = len(label_encoder.classes_)
 
 
 # Separar características e rótulos
-X = csv_pd['image_path']  # Coluna com os caminhos das imagens
+X = csv_pd['file']  # Coluna com os caminhos das imagens
 y = csv_pd['race']        # Coluna com as classes
 
 # Primeiro, separe treino e teste
