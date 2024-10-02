@@ -93,9 +93,11 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
             if scaler:
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
-                    if arch_margin:
+
+                    print("verify arc_margin 1", arc_margin)
+                    if arc_margin is not None:
+                        print("arch enabled 1")
                         outputs = arc_margin(outputs, labels)
-                        print("arch enabled")
             
                     loss = criterion(outputs, labels)
                 
@@ -105,9 +107,10 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
             else:
                 outputs = model(images)
 
-                if arch_margin:
-                    outputs = arc_margin(outputs, labels)
-                    print("arch enabled")
+                print("verify arc_margin 2", arc_margin)
+                if arc_margin is not None:
+                    print("arch enabled 2")
+                    outputs = arc_margin(outputs, labels)        
                 
                 loss = criterion(outputs, labels)
                 loss.backward()
@@ -135,7 +138,8 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
                 # Forward pass
                 outputs = model(images)
 
-                if arc_margin:
+                if arc_margin is not None:
+                     print("arch enabled 3")
                     outputs = arc_margin(outputs, labels)
 
                 loss = criterion(outputs, labels)
@@ -200,7 +204,7 @@ for exp in experiments.keys():
 
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
     
-    model = train_model(model, criterion, optimizer, scheduler, scaler,arch_margin, NUM_EPOCHS)
+    model = train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, NUM_EPOCHS)
     
     torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}_{timestamp}.pth'))
 
