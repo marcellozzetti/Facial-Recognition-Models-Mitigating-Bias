@@ -88,10 +88,43 @@ test_dataset = FaceDataset(X_test.tolist(), y_test.tolist(), pre_processing_imag
 
 
 
+
+
 # Create DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
+
+
+
+loader = train_loader
+
+# Inicialize as variáveis para calcular média e desvio padrão
+mean = 0.
+std = 0.
+total_images = 0
+
+# Calcule média e desvio padrão
+for images, _ in loader:
+    batch_samples = images.size(0)  # Número de amostras no batch
+    images = images.view(batch_samples, images.size(1), -1)  # (N, C, H*W)
+    mean += images.mean(2).sum(0)  # Soma das médias
+    std += images.std(2).sum(0)    # Soma dos desvios padrões
+    total_images += batch_samples
+
+mean /= total_images
+std /= total_images
+
+print("Mean: ", mean)
+print("Std: ", std)
+
+
+
+
+
+
+
+
 
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR(num_classes).to(device)
