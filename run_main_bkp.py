@@ -19,6 +19,8 @@ from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, c
 from sklearn.preprocessing import LabelEncoder
 from face_dataset import FaceDataset, dataset_transformation
 from models import LResNet50E_IR, ArcFaceLoss
+from sklearn.utils.class_weight import compute_class_weight
+from sklearn.model_selection import train_test_split
 import pre_processing_images
 import datetime
 from tqdm import tqdm
@@ -27,10 +29,14 @@ from tqdm import tqdm
 BATCH_SIZE = 128
 NUM_EPOCHS = 8
 TRAIN_VAL_SPLIT = 0.8
+TEST_SIZE = 0.1
 VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 
-os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
+experiments = {
+    "CrossEntropyLoss&SGD": {},
+#    "ArcFaceLoss&SGD.5DROPOUT": {},
+}
 
 # Check if CUDA is available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -43,45 +49,55 @@ def clean_memory():
 
 clean_memory()
 
-timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 
 print("Step 9 (CNN model): Start")
 
-# Initializing metrics lists
-train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
-
 # Load dataset
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE)
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
+csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
+
+label_encoder = LabelEncoder()
+label_encoder.fit(csv_pd['race'])
+num_classes = len(label_encoder.classes_)
+
+#dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
 
 # Split dataset
-train_size = int(TRAIN_VAL_SPLIT * len(dataset))
-val_size = int(VAL_VAL_SPLIT * len(dataset))
-test_size = len(dataset) - train_size - val_size
-train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+#train_size = int(TRAIN_VAL_SPLIT * len(dataset))
+#val_size = int(VAL_VAL_SPLIT * len(dataset))
+#test_size = len(dataset) - train_size - val_size
+#train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
+
+
+
+
+# Separar características e rótulos
+X = csv_pd['file']  # Coluna com os caminhos das imagens
+y = csv_pd['race']        # Coluna com as classes
+
+# Primeiro, separe treino e teste
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, stratify=y, random_state=42)
+
+# Agora, separe validação e treino a partir do conjunto de treino
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=TEST_SIZE, stratify=y_train, random_state=42)
+
+# Criação dos DataLoaders
+train_dataset = FaceDataset(X_train.tolist(), y_train.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
+val_dataset = FaceDataset(X_val.tolist(), y_val.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
+test_dataset = FaceDataset(X_test.tolist(), y_test.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
+
+
+
+
 
 # Create DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 
-label_encoder = LabelEncoder()
-label_encoder.fit(csv_pd['race'])
-num_classes = len(label_encoder.classes_)
-
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR(num_classes).to(device)
 model = nn.DataParallel(model)
-
-criterion = nn.CrossEntropyLoss()
-#criterion = ArcFaceLoss().to(device)
-
-#optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
-optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-
-#scheduler = ReduceLROnPlateau(optimizer, 'min', patience=3)
-scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
-
 scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
 
 print("Step 9 (CNN model): End")
@@ -89,26 +105,27 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training function
-def train_model(model, criterion, optimizer, scheduler, num_epochs):
+def train_model(model, criterion, optimizer, scheduler, scaler, num_epochs):
     for epoch in range(num_epochs):
         model.train()
         start_time = time.time()
         
-        for images, labels in tqdm(train_loader):    
+        for images, labels in tqdm(train_loader):
             images = images.to(device)
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+            labels = labels.to(device)
+        
             optimizer.zero_grad()
     
             if scaler:
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
-                    loss = criterion(outputs, labels_tensor)
+                    loss = criterion(outputs, labels)
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
                 scaler.update()
             else:
                 outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
+                loss = criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
     
@@ -128,13 +145,12 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         with torch.no_grad():
             for images, labels in tqdm(val_loader):
                 images = images.to(device)
-                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                labels = labels.to(device)
                 
                 # Forward pass
-                #outputs = model(images)
                 outputs = model(images)
 
-                loss = criterion(outputs, labels_tensor)
+                loss = criterion(outputs, labels)
                 epoch_loss += loss.item()
         
                 # Get probabilities
@@ -143,7 +159,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                 # Get predicted class (argmax)
                 preds = torch.argmax(outputs, dim=1).cpu().numpy()
         
-                all_labels.extend(labels_tensor.cpu().numpy())
+                all_labels.extend(labels.cpu().numpy())
                 all_preds.extend(preds)
                 all_probs.extend(probs)
         
@@ -161,122 +177,138 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         precisions.append(precision)
         log_losses.append(logloss)
         
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Loss: {epoch_loss:.4f}, '
+        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Epoch Loss: {epoch_loss:.4f}, '
               f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
 
     return model
 
-# Train the model
-model = train_model(model, criterion, optimizer, scheduler, num_epochs=NUM_EPOCHS)
+# Loop for each experiemnt
+for exp in experiments.keys():
 
-torch.save(model.state_dict(), pre_processing_images.MODEL_FAIRFACE_FILE)
-print('Finished Training and Model Saved')
+    print(f'Step 10 (Training execution): Start - {exp}')
 
-print("Step 11 (Training execution): End")
-
-print("Step 12 (Plotting execution): Start")
-
-# Plotting general metrics
-epochs_range = range(1, NUM_EPOCHS + 1)
-plt.figure(figsize=(12, 8))
-
-plt.subplot(2, 2, 1)
-plt.plot(epochs_range, train_losses, label='Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Loss')
-plt.title('Loss over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 2)
-plt.plot(epochs_range, accuracies, label='Accuracy')
-plt.xlabel('Epoch')
-plt.ylabel('Accuracy')
-plt.title('Accuracy over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 3)
-plt.plot(epochs_range, precisions, label='Precision')
-plt.xlabel('Epoch')
-plt.ylabel('Precision')
-plt.title('Precision over Epochs')
-plt.legend()
-
-plt.subplot(2, 2, 4)
-plt.plot(epochs_range, log_losses, label='Log Loss')
-plt.xlabel('Epoch')
-plt.ylabel('Log Loss')
-plt.title('Log Loss over Epochs')
-plt.legend()
-plt.tight_layout()
-plt.savefig(f'output/training_metrics_{timestamp}.png')
-plt.show()
-plt.close()
-
-print("Step 12 (Plotting execution): End")
-
-
-print("Step 13 (Testing): Start")
-
-def evaluate_model(model, test_loader, criterion, label_encoder):
-    # Ensure the model is in evaluation mode
-    model.eval()
-    all_labels = []
-    all_preds = []
-    all_probs = []
-    epoch_loss = 0.0
-
-    with torch.no_grad():
-        for images, labels in tqdm(test_loader):
-            images = images.to(device)
-            
-            # Apply label encoding and convert to tensor
-            labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            
-            # Forward pass
-            outputs = model(images)
-            loss = criterion(outputs, labels_tensor)
-            epoch_loss += loss.item()
-        
-            # Get probabilities
-            probs = F.softmax(outputs, dim=1).cpu().numpy()
-            
-            # Get predicted class (argmax)
-            preds = torch.argmax(outputs, dim=1).cpu().numpy()
-        
-            all_labels.extend(labels_tensor.cpu().numpy())
-            all_preds.extend(preds)
-            all_probs.extend(probs)
-        
-    # Calculating metrics
-    accuracy = accuracy_score(all_labels, all_preds)
-    precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+    # Initializing metrics lists
+    train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
     
-    # Ensure all_probs is a numpy array and calculate log loss
-    all_probs = np.array(all_probs)
-    logloss = log_loss(all_labels, all_probs)
+    if "CrossEntropyLoss" in exp:
+        criterion = nn.CrossEntropyLoss()
+    else:
+        criterion = ArcFaceLoss().to(device)
 
-    print(f'Test Accuracy: {accuracy:.4f}, Test Precision: {precision:.4f}, Test Log Loss: {logloss:.4f}')
+    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
 
-    # Plot confusion matrix
-    confusion_mtx = confusion_matrix(all_labels, all_preds)
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
-    plt.ylabel('True Label')
-    plt.xlabel('Predicted Label')
-    plt.savefig(f'output/confusion_tx_{timestamp}.png')
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+    
+    model = train_model(model, criterion, optimizer, scheduler, scaler, NUM_EPOCHS)
+    
+    torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}_{timestamp}.pth'))
+
+    print(f'Finished Training and Model Saved - {exp}')
+
+    print(f'Step 11 (Training execution): End - {exp}')
+    
+    
+    print(f'Step 12 (Plotting execution): Start - {exp}')
+
+    # Plotting general metrics
+    epochs_range = range(1, NUM_EPOCHS + 1)
+    plt.figure(figsize=(12, 8))
+    
+    plt.subplot(2, 2, 1)
+    plt.plot(epochs_range, train_losses, label='Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Loss over Epochs')
+    plt.legend()
+    
+    plt.subplot(2, 2, 2)
+    plt.plot(epochs_range, accuracies, label='Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy over Epochs')
+    plt.legend()
+    
+    plt.subplot(2, 2, 3)
+    plt.plot(epochs_range, precisions, label='Precision')
+    plt.xlabel('Epoch')
+    plt.ylabel('Precision')
+    plt.title('Precision over Epochs')
+    plt.legend()
+    
+    plt.subplot(2, 2, 4)
+    plt.plot(epochs_range, log_losses, label='Log Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Log Loss')
+    plt.title('Log Loss over Epochs')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f'output/training_metrics_{exp}_{timestamp}.png')
     plt.show()
+    plt.close()
+
+    print(f'Step 12 (Plotting execution): End - {exp}')
+
+
+    print(f'Step 13 (Testing): Start - {exp}')
     
-    # Generate classification report
-    report = classification_report(all_labels, all_preds, target_names=label_encoder.classes_)
-    print("\nClassification Report:\n", report)
-
-    # Save the classification report to a file
-    report_filename = f'output/classification_report_{timestamp}.txt'
-    with open(report_filename, 'w') as f:
-        f.write(report)
+    def evaluate_model(model, test_loader, criterion, label_encoder):
+        # Ensure the model is in evaluation mode
+        model.eval()
+        all_labels = []
+        all_preds = []
+        all_probs = []
+        epoch_loss = 0.0
     
-    print(f"\nClassification report saved to {report_filename}")
+        with torch.no_grad():
+            for images, labels in tqdm(test_loader):
+                images = images.to(device)
+                labels = labels.to(device)
+                
+                # Forward pass
+                outputs = model(images)
+                loss = criterion(outputs, labels)
+                epoch_loss += loss.item()
+            
+                # Get probabilities
+                probs = F.softmax(outputs, dim=1).cpu().numpy()
+                
+                # Get predicted class (argmax)
+                preds = torch.argmax(outputs, dim=1).cpu().numpy()
+            
+                all_labels.extend(labels.cpu().numpy())
+                all_preds.extend(preds)
+                all_probs.extend(probs)
+            
+        # Calculating metrics
+        accuracy = accuracy_score(all_labels, all_preds)
+        precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+        
+        # Ensure all_probs is a numpy array and calculate log loss
+        all_probs = np.array(all_probs)
+        logloss = log_loss(all_labels, all_probs)
+    
+        print(f'Test Accuracy: {accuracy:.4f}, Test Precision: {precision:.4f}, Test Log Loss: {logloss:.4f}')
+    
+        # Plot confusion matrix
+        confusion_mtx = confusion_matrix(all_labels, all_preds)
+        plt.figure(figsize=(10, 8))
+        sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
+        plt.ylabel('True Label')
+        plt.xlabel('Predicted Label')
+        plt.savefig(f'output/confusion_tx_{exp}_{timestamp}.png')
+        plt.show()
+        
+        # Generate classification report
+        report = classification_report(all_labels, all_preds, target_names=label_encoder.classes_)
+        print("\nClassification Report:\n", report)
+    
+        # Save the classification report to a file
+        report_filename = f'output/classification_report_{exp}_{timestamp}.txt'
+        with open(report_filename, 'w') as f:
+            f.write(report)
+        
+        print(f"\nClassification report saved to {report_filename}")
+    
+    evaluate_model(model, test_loader, criterion, label_encoder)
 
-evaluate_model(model, test_loader, criterion, label_encoder)
-
-print("Step 13 (Testing): End")
+    print(f'Step 13 (Testing): End - {exp}')
