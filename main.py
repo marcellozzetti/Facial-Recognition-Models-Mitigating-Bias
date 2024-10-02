@@ -51,7 +51,7 @@ timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 print("Step 9 (CNN model): Start")
 
 # Load dataset
-csv_pd = pd.read_csv(pre_processing_images.CSV_CONCAT_DATASET_FILTERED_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
+csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
 
 label_encoder = LabelEncoder()
@@ -64,14 +64,11 @@ val_size = int(VAL_VAL_SPLIT * len(dataset))
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
-
-# Calculando a frequência de cada classe
+# Frequence of each class  Sampler
 class_weights = 1.0 / num_classes
 weights = [class_weights[label_encoder.transform([label])[0]] for label in csv_pd['race']]
 print("class_weights", class_weights)
 print("weights", weights)
-
-# Criando um sampler para o DataLoader
 sampler = WeightedRandomSampler(weights, len(weights))
 
 # DataLoader com oversampling
