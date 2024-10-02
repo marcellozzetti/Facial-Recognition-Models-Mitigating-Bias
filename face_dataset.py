@@ -4,36 +4,6 @@ from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms
 
-class FaceDatasetOld(Dataset):
-    def __init__(self, csv_pd, img_dir, transform=None, label_encoder=None):
-        self.labels_df = csv_pd
-        self.img_dir = img_dir
-        self.transform = transform
-        self.classes = self.labels_df['race'].unique()
-        self.label_encoder = label_encoder
-
-    def __len__(self):
-        return len(self.labels_df)
-
-    def __getitem__(self, idx):
-        img_name = os.path.join(self.img_dir, self.labels_df.iloc[idx, 0])
-        label = self.labels_df.iloc[idx, 3]
-
-        img = cv2.imread(img_name)
-        if img is None:
-            raise FileNotFoundError(f"Image {img_name} not found")
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        if self.transform:
-            #img = Image.fromarray(img)
-            img = self.transform(img)
-
-        label_index = self.label_encoder.transform([label])[0]
-
-        return img, label_index
-
-    def get_classes(self):
-        return self.classes
-
 class FaceDataset(Dataset):
     def __init__(self, img_paths, labels, img_dir, transform=None, label_encoder=None):
         self.img_paths = img_paths
@@ -61,9 +31,6 @@ class FaceDataset(Dataset):
         label_index = self.label_encoder.transform([label])[0]
 
         return img, label_index
-
-                              # Converte a imagem em tensor
-
 
 def dataset_transformation_train(img):
     transform = transforms.Compose([
