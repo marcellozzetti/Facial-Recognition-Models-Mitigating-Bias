@@ -186,7 +186,7 @@ for exp in experiments.keys():
     else:
         model = LResNet50E_IR(512).to(device)
         # Inicializando a camada ArcMarginProduct
-        arc_margin = ArcMarginProduct(512, num_classes=num_classes, margin=0.5, scale=64).to(device)
+        arc_margin = ArcMarginProduct(512, num_classes, margin=0.5, scale=64).to(device)
         criterion = ArcFaceLoss(margin=0.5, scale=64).to(device)
 
     model = nn.DataParallel(model)
