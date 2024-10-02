@@ -79,7 +79,7 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training function
-def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_epochs):
+def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin, num_epochs):
     for epoch in range(num_epochs):
         model.train()
         start_time = time.time()
@@ -94,9 +94,9 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
 
-                    if arc_margin is not None:
+                    if arc_face_margin is not None:
                         print("arch enabled 1")
-                        outputs = arc_margin(outputs, labels)
+                        outputs = arc_face_margin(outputs, labels)
             
                     loss = criterion(outputs, labels)
                 
@@ -106,9 +106,9 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_
             else:
                 outputs = model(images)
 
-                if arc_margin is not None:
+                if arc_face_margin is not None:
                     print("arch enabled 2")
-                    outputs = arc_margin(outputs, labels)        
+                    outputs = arc_face_margin(outputs, labels)        
                 
                 loss = criterion(outputs, labels)
                 loss.backward()
@@ -138,9 +138,9 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_
 
                 print(f"Outputs 1: {outputs}")
 
-                if arc_margin is not None:
+                if arc_face_margin is not None:
                     print("arch enabled 3")
-                    outputs = arc_margin(outputs, labels)
+                    outputs = arc_face_margin(outputs, labels)
 
                 print(f"Outputs 2: {outputs}")
 
@@ -183,7 +183,7 @@ for exp in experiments.keys():
 
     # Initializing metrics lists
     train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
-    arch_margin = None
+    arc_margin = None
 
     # Initialize model, criterion, and optimizer
     scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
@@ -204,7 +204,7 @@ for exp in experiments.keys():
 
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
     
-    model = train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, NUM_EPOCHS)
+    model = train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, NUM_EPOCHS)
     
     torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}_{timestamp}.pth'))
 
