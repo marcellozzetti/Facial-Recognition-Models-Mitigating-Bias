@@ -90,8 +90,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
             images = images.to(device)
             
             print("labels train", labels)
-            #labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-            #print("labels_tensor train", labels_tensor)
+            labels = labels.to(device)
+            print("labels_tensor train", labels_tensor)
         
             optimizer.zero_grad()
     
