@@ -17,7 +17,7 @@ import torchvision.models as models
 from torchvision.models import ResNet50_Weights
 from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report, log_loss
 from sklearn.preprocessing import LabelEncoder
-from face_dataset import FaceDataset, dataset_transformation
+from face_dataset import FaceDataset, dataset_transformation_train, dataset_transformation_val
 from models import LResNet50E_IR, ArcFaceLoss
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.model_selection import train_test_split
@@ -60,35 +60,16 @@ label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 num_classes = len(label_encoder.classes_)
 
-#dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
+# Create DataSets
+X = csv_pd['file']
+y = csv_pd['race']
 
-# Split dataset
-#train_size = int(TRAIN_VAL_SPLIT * len(dataset))
-#val_size = int(VAL_VAL_SPLIT * len(dataset))
-#test_size = len(dataset) - train_size - val_size
-#train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
-
-
-
-
-# Separar características e rótulos
-X = csv_pd['file']  # Coluna com os caminhos das imagens
-y = csv_pd['race']        # Coluna com as classes
-
-# Primeiro, separe treino e teste
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, stratify=y, random_state=42)
-
-# Agora, separe validação e treino a partir do conjunto de treino
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=TEST_SIZE, stratify=y_train, random_state=42)
 
-# Criação dos DataLoaders
 train_dataset = FaceDataset(X_train.tolist(), y_train.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
 val_dataset = FaceDataset(X_val.tolist(), y_val.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
 test_dataset = FaceDataset(X_test.tolist(), y_test.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
-
-
-
-
 
 # Create DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
