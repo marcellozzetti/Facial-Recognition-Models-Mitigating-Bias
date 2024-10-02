@@ -81,17 +81,14 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training function
-def train_model(model, criterion, optimizer, scheduler, num_epochs):
+def train_model(model, criterion, optimizer, scheduler, scaler, num_epochs):
     for epoch in range(num_epochs):
         model.train()
         start_time = time.time()
         
         for images, labels in tqdm(train_loader):
             images = images.to(device)
-            
-            print("labels train", labels)
             labels = labels.to(device)
-            print("labels_tensor train", labels)
         
             optimizer.zero_grad()
     
@@ -124,13 +121,12 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         with torch.no_grad():
             for images, labels in tqdm(val_loader):
                 images = images.to(device)
-                
-                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                labels = labels.to(device)
                 
                 # Forward pass
                 outputs = model(images)
 
-                loss = criterion(outputs, labels_tensor)
+                loss = criterion(outputs, labels)
                 epoch_loss += loss.item()
         
                 # Get probabilities
@@ -139,7 +135,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
                 # Get predicted class (argmax)
                 preds = torch.argmax(outputs, dim=1).cpu().numpy()
         
-                all_labels.extend(labels_tensor.cpu().numpy())
+                all_labels.extend(labels.cpu().numpy())
                 all_preds.extend(preds)
                 all_probs.extend(probs)
         
@@ -179,7 +175,7 @@ for exp in experiments.keys():
 
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
     
-    model = train_model(model, criterion, optimizer, scheduler, NUM_EPOCHS)
+    model = train_model(model, criterion, optimizer, scheduler, scaler, NUM_EPOCHS)
     
     torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}_{timestamp}.pth'))
 
@@ -242,13 +238,11 @@ for exp in experiments.keys():
         with torch.no_grad():
             for images, labels in tqdm(test_loader):
                 images = images.to(device)
-                
-                # Apply label encoding and convert to tensor
-                labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                labels = labels.to(device)
                 
                 # Forward pass
                 outputs = model(images)
-                loss = criterion(outputs, labels_tensor)
+                loss = criterion(outputs, labels)
                 epoch_loss += loss.item()
             
                 # Get probabilities
@@ -257,7 +251,7 @@ for exp in experiments.keys():
                 # Get predicted class (argmax)
                 preds = torch.argmax(outputs, dim=1).cpu().numpy()
             
-                all_labels.extend(labels_tensor.cpu().numpy())
+                all_labels.extend(labels.cpu().numpy())
                 all_preds.extend(preds)
                 all_probs.extend(probs)
             
