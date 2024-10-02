@@ -91,7 +91,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
             
             print("labels train", labels)
             labels = labels.to(device)
-            print("labels_tensor train", labels_tensor)
+            print("labels_tensor train", labels)
         
             optimizer.zero_grad()
     
