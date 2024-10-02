@@ -32,8 +32,8 @@ VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 
 experiments = {
-    "CrossEntropyLoss&SGD&.5DROPOUT": {},
-#    "ArcFaceLoss&SGD.5DROPOUT": {},
+#    "CrossEntropyLoss&SGD&.5DROPOUT": {},
+    "ArcFaceLoss&SGD.5DROPOUT": {},
 }
 
 # Check if CUDA is available
@@ -65,19 +65,8 @@ val_size = int(VAL_VAL_SPLIT * len(dataset))
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
-# Frequence of each class  Sampler
-class_weights = compute_class_weight('balanced', classes=label_encoder.classes_, y=csv_pd['race'])
-class_weights_list = class_weights.tolist()  # Isso agora será uma lista
-print("class_weights", class_weights)
-print("class_weights_list", class_weights_list)
-weights = [class_weights_list[label_encoder.transform([label])[0]] for label in csv_pd['race']]
-#print("weights", weights)
-
-sampler = WeightedRandomSampler(weights, len(weights))
-
 # Create DataLoaders
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, sampler=sampler, num_workers=6, pin_memory=True) # DataLoader com oversampling
-#train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 
