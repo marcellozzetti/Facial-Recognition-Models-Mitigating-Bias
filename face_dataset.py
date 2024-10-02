@@ -60,9 +60,6 @@ class FaceDataset(Dataset):
 
         label_index = self.label_encoder.transform([label])[0]
 
-        print("label", label)
-        print("label_index", label_index)
-
         return img, label_index #check if label ou label_index
         
 def dataset_transformation(img):
