@@ -87,29 +87,10 @@ class ArcFaceLoss(nn.Module):
         self.mm = math.sin(math.pi - margin) * margin
 
     def forward(self, logits, labels):
-        # Normalize logits
-        logits = F.normalize(logits, dim=1)
+        # Não normalize os logits aqui, normalização já foi feita no ArcMarginProduct
         
-        # Compute cosine similarity between logits and weights
-        cos_theta = logits @ logits.T
-        cos_theta = cos_theta.clamp(-1, 1)  # Ensure values are in range [-1, 1]
-        
-        # Convert labels to one-hot encoding
-        one_hot = torch.zeros_like(cos_theta, device=cos_theta.device)
-        one_hot.scatter_(1, labels.view(-1, 1), 1)
-        
-        # Apply margin to the correct class angles
-        theta = torch.acos(cos_theta)
-        phi = torch.cos(theta + self.margin)
-        
-        # Apply condition for easy margin
-        phi = torch.where(cos_theta > self.th, phi, cos_theta - self.mm)
-        
-        # Combine cos_theta with one-hot and scale
-        arcface_logits = (one_hot * phi) + ((1.0 - one_hot) * cos_theta)
-        arcface_logits = arcface_logits * self.scale
-        
-        return F.cross_entropy(arcface_logits, labels)
+        # Calcular a perda de cross entropy diretamente nos logits modificados
+        return F.cross_entropy(logits, labels)
 
 
 class ArcMarginProduct(nn.Module):
@@ -117,7 +98,7 @@ class ArcMarginProduct(nn.Module):
         super(ArcMarginProduct, self).__init__()
         self.in_features = in_features
         self.out_features = out_features
-        self.s = s  # Escala
+        self.s = s
         self.m = m  # Margem angular
 
         self.weight = nn.Parameter(torch.Tensor(out_features, in_features))
@@ -132,7 +113,9 @@ class ArcMarginProduct(nn.Module):
     def forward(self, input, label):
         # Normalizando input e pesos
         cosine = F.linear(F.normalize(input), F.normalize(self.weight))
-        sine = torch.sqrt(1.0 - torch.pow(cosine, 2))
+        # Garantir que cosine está no intervalo [-1, 1] para evitar erros numéricos
+        cosine = cosine.clamp(-1, 1)
+        sine = torch.sqrt(1.0 - cosine ** 2 + 1e-7)  # Adiciona pequena constante para estabilidade
         phi = cosine * self.cos_m - sine * self.sin_m  # Ajuste angular
 
         if self.easy_margin:
