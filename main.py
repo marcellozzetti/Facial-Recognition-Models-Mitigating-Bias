@@ -32,8 +32,8 @@ TEST_SIZE = 0.1
 LEARNING_RATE = 0.001
 
 experiments = {
-    "CrossEntropyLoss&SGD": {},
-#    "ArcFaceLoss&SGD": {},
+#    "CrossEntropyLoss&SGD": {},
+    "ArcFaceLoss&SGD": {},
 }
 
 # Check if CUDA is available
