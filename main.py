@@ -111,6 +111,8 @@ def train_model(model, criterion, optimizer, scheduler, scaler, num_epochs):
         for images, labels in tqdm(train_loader):
             images = images.to(device)
             labels = labels.to(device)
+
+            print("labels: ", )
         
             optimizer.zero_grad()
     
