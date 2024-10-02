@@ -61,14 +61,26 @@ class FaceDataset(Dataset):
         label_index = self.label_encoder.transform([label])[0]
 
         return img, label_index
-        
-def dataset_transformation(img):
+
+                              # Converte a imagem em tensor
+
+
+def dataset_transformation_train(img):
     transform = transforms.Compose([
-        #transforms.RandomRotation(10),
-        #transforms.RandomHorizontalFlip(),
-        #transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
+        transforms.ToPILImage(),
+        transforms.Resize((224, 224)),
+        transforms.RandomRotation(degrees=15),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+    return transform(img)
+
+def dataset_transformation_val(img):
+    transform = transforms.Compose([
+        transforms.ToPILImage(),
         transforms.ToTensor(),
         transforms.Resize((224, 224)),
-        transforms.Normalize(mean=[0.4299, 0.3433, 0.3033], std=[0.2393, 0.2142, 0.2048])
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
     return transform(img)
