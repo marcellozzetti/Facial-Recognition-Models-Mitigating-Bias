@@ -174,6 +174,7 @@ for exp in experiments.keys():
 
     # Initializing metrics lists
     train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
+    arch_margin = None
 
     # Initialize model, criterion, and optimizer
     scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
@@ -195,7 +196,7 @@ for exp in experiments.keys():
 
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
     
-    model = train_model(model, criterion, optimizer, scheduler, scaler, NUM_EPOCHS)
+    model = train_model(model, criterion, optimizer, scheduler, scaler,arch_margin, NUM_EPOCHS)
     
     torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}_{timestamp}.pth'))
 
