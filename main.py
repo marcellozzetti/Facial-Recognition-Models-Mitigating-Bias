@@ -53,7 +53,7 @@ print("Step 9 (CNN model): Start")
 
 # Load dataset
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
-dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
+dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
@@ -119,7 +119,9 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         with torch.no_grad():
             for images, labels in tqdm(val_loader):
                 images = images.to(device)
+                print("labels train", labels)
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+                print("labels_tensor train", labels_tensor)
                 
                 # Forward pass
                 outputs = model(images)
