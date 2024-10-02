@@ -25,14 +25,14 @@ from tqdm import tqdm
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 24
+NUM_EPOCHS = 8
 TRAIN_VAL_SPLIT = 0.8
 VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 
 experiments = {
     "CrossEntropyLoss&SGD&.5DROPOUT": {},
-    "ArcFaceLoss&SGD.5DROPOUT": {},
+#    "ArcFaceLoss&SGD.5DROPOUT": {},
 }
 
 # Check if CUDA is available
@@ -51,8 +51,12 @@ timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 print("Step 9 (CNN model): Start")
 
 # Load dataset
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
+csv_pd = pd.read_csv(pre_processing_images.CSV_CONCAT_DATASET_FILTERED_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
 dataset = FaceDataset(csv_pd, pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation)
+
+label_encoder = LabelEncoder()
+label_encoder.fit(csv_pd['race'])
+num_classes = len(label_encoder.classes_)
 
 # Split dataset
 train_size = int(TRAIN_VAL_SPLIT * len(dataset))
@@ -60,14 +64,22 @@ val_size = int(VAL_VAL_SPLIT * len(dataset))
 test_size = len(dataset) - train_size - val_size
 train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, val_size, test_size])
 
+
+# Calculando a frequência de cada classe
+class_weights = 1.0 / num_classes
+weights = [class_weights[label_encoder.transform([label])[0]] for label in csv_pd['race']]
+print("class_weights", class_weights)
+print("weights", weights)
+
+# Criando um sampler para o DataLoader
+sampler = WeightedRandomSampler(weights, len(weights))
+
+# DataLoader com oversampling
+train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, sampler=sampler, num_workers=6, pin_memory=True)
 # Create DataLoaders
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
+#train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
 val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
 test_loader = DataLoader(test_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=6, pin_memory=True)
-
-label_encoder = LabelEncoder()
-label_encoder.fit(csv_pd['race'])
-num_classes = len(label_encoder.classes_)
 
 # Initialize model, criterion, and optimizer
 model = LResNet50E_IR(num_classes).to(device)
