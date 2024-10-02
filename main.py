@@ -139,7 +139,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
                 outputs = model(images)
 
                 if arc_margin is not None:
-                     print("arch enabled 3")
+                    print("arch enabled 3")
                     outputs = arc_margin(outputs, labels)
 
                 loss = criterion(outputs, labels)
