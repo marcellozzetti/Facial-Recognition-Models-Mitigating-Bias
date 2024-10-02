@@ -29,7 +29,7 @@ class FaceDatasetOld(Dataset):
 
         label_index = self.label_encoder.transform([label])[0]
 
-        return img, label_index #check if label ou label_index
+        return img, label_index
 
     def get_classes(self):
         return self.classes
@@ -60,7 +60,7 @@ class FaceDataset(Dataset):
 
         label_index = self.label_encoder.transform([label])[0]
 
-        return img, label_index #check if label ou label_index
+        return img, label_index
         
 def dataset_transformation(img):
     transform = transforms.Compose([
