@@ -24,8 +24,8 @@ class FaceDatasetOld(Dataset):
             raise FileNotFoundError(f"Image {img_name} not found")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if self.transform:
+            #img = self.transform(img)
             img = Image.fromarray(img)
-            img = self.transform(img)
 
         label_index = self.label_encoder.transform([label])[0]
 
