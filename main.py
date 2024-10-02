@@ -32,8 +32,8 @@ VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 
 experiments = {
-#    "CrossEntropyLoss&SGD&.5DROPOUT": {},
-    "ArcFaceLoss&SGD.5DROPOUT": {},
+    "CrossEntropyLoss&SGD&.5DROPOUT": {},
+#    "ArcFaceLoss&SGD.5DROPOUT": {},
 }
 
 # Check if CUDA is available
