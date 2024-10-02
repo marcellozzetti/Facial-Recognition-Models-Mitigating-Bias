@@ -79,7 +79,7 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training function
-def train_model(model, criterion, optimizer, scheduler, scaler, num_epochs):
+def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num_epochs):
     for epoch in range(num_epochs):
         model.train()
         start_time = time.time()
@@ -93,18 +93,29 @@ def train_model(model, criterion, optimizer, scheduler, scaler, num_epochs):
             if scaler:
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
+                    if arch_margin:
+                        outputs = arc_margin(outputs, labels)
+                        print("arch enabled")
+            
                     loss = criterion(outputs, labels)
+                
                 scaler.scale(loss).backward()
                 scaler.step(optimizer)
                 scaler.update()
             else:
                 outputs = model(images)
+
+                if arch_margin:
+                    outputs = arc_margin(outputs, labels)
+                    print("arch enabled")
+                
                 loss = criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
     
             scheduler.step()
-    
+
+        
         overhead = time.time() - start_time
         print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
         print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
