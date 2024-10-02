@@ -85,9 +85,6 @@ train_dataset = FaceDataset(X_train.tolist(), y_train.tolist(), pre_processing_i
 val_dataset = FaceDataset(X_val.tolist(), y_val.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
 test_dataset = FaceDataset(X_test.tolist(), y_test.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
 
-print("len train: ", len(train_dataset))
-print("len val: ", len(val_dataset))
-print("len test: ", len(test_dataset))
 
 
 # Create DataLoaders
