@@ -30,6 +30,8 @@ BATCH_SIZE = 128
 NUM_EPOCHS = 8
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.001
+SCALE = 30
+MARGIN = 0.5
 
 experiments = {
 #    "CrossEntropyLoss&SGD": {},
@@ -191,8 +193,8 @@ for exp in experiments.keys():
     
     else:
         model = LResNet50E_IR(512).to(device)
-        arc_margin = ArcMarginProduct(512, num_classes, 64, 0.5).to(device)
-        criterion = ArcFaceLoss(margin=0.5, scale=64).to(device)
+        arc_margin = ArcMarginProduct(512, num_classes, SCALE, MARGIN).to(device)
+        criterion = ArcFaceLoss(margin=0.5, scale=SCALE).to(device)
 
     model = nn.DataParallel(model)
 
