@@ -31,22 +31,6 @@ class ArcFaceLossOld(nn.Module):
         arcface_logits = arcface_logits * self.scale
 
         return F.cross_entropy(arcface_logits, labels)
-        
-
-class LResNet50E_IROld(nn.Module):
-    def __init__(self, num_classes):
-        super(LResNet50E_IR, self).__init__()
-        if num_classes is None:
-            raise ValueError("num_classes must be specified")
-        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.2)
-        self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
-        self.backbone.fc = self.fc
-
-    def forward(self, x):
-        x = self.backbone(x)
-        x = self.dropout(x)
-        return x
 
 
 class LResNet50E_IR(nn.Module):
