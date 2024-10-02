@@ -136,8 +136,12 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
                 # Forward pass
                 outputs = model(images)
 
+                print(f"Outputs 1: {outputs}")
+
                 if arc_margin is not None:
                     outputs = arc_margin(outputs, labels)
+
+                print(f"Outputs 2: {outputs}")
 
                 loss = criterion(outputs, labels)
                 epoch_loss += loss.item()
