@@ -137,7 +137,6 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
                 outputs = model(images)
 
                 if arc_margin is not None:
-                    print("arch enabled 3")
                     outputs = arc_margin(outputs, labels)
 
                 loss = criterion(outputs, labels)
@@ -190,9 +189,7 @@ for exp in experiments.keys():
     
     else:
         model = LResNet50E_IR(512).to(device)
-        # Inicializando a camada ArcMarginProduct
         arc_margin = ArcMarginProduct(512, num_classes, 64, 0.5).to(device)
-        
         criterion = ArcFaceLoss(margin=0.5, scale=64).to(device)
 
     model = nn.DataParallel(model)
