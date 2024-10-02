@@ -1,8 +1,9 @@
 import torch
+import math
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision import models
-from torchvision.models import ResNet101_Weights, ResNet50_Weights
+from torchvision.models import ResNet50_Weights
 
 
 class ArcFaceLossOld(nn.Module):
