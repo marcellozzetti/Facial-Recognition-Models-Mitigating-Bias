@@ -200,8 +200,10 @@ for exp in experiments.keys():
 
     #optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    #optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=1e-5)
 
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+    #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
     
     model = train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, NUM_EPOCHS)
     
