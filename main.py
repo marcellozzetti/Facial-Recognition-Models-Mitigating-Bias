@@ -94,7 +94,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
 
-                    if arc_margin is not None:
+                    if arc_margin:
                         print("arch enabled 1")
                         outputs = arc_margin(outputs, labels)
             
@@ -106,7 +106,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_
             else:
                 outputs = model(images)
 
-                if arc_margin is not None:
+                if arc_margin:
                     print("arch enabled 2")
                     outputs = arc_margin(outputs, labels)        
                 
@@ -138,7 +138,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_
 
                 print(f"Outputs 1: {outputs}")
 
-                if arc_margin is not None:
+                if arc_margin:
                     outputs = arc_margin(outputs, labels)
 
                 print(f"Outputs 2: {outputs}")
