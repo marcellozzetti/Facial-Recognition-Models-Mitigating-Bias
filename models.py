@@ -38,7 +38,7 @@ class LResNet50E_IR(nn.Module):
         if num_classes is None:
             raise ValueError("num_classes must be specified")
         self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
-        self.dropout = nn.Dropout(p=0.5)
+        self.dropout = nn.Dropout(p=0.2)
         self.fc = nn.Linear(self.backbone.fc.in_features, num_classes)
         self.backbone.fc = self.fc
 
