@@ -28,9 +28,7 @@ from tqdm import tqdm
 # Hyperparameters
 BATCH_SIZE = 128
 NUM_EPOCHS = 8
-TRAIN_VAL_SPLIT = 0.8
 TEST_SIZE = 0.1
-VAL_VAL_SPLIT = 0.1
 LEARNING_RATE = 0.001
 
 experiments = {
@@ -176,7 +174,8 @@ for exp in experiments.keys():
     else:
         criterion = ArcFaceLoss().to(device)
 
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+    #optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
     
