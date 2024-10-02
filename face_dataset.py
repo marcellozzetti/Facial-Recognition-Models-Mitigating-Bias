@@ -55,8 +55,9 @@ class FaceDataset(Dataset):
             
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if self.transform:
-            img = Image.fromarray(img)
+            #img = Image.fromarray(img)
             img = self.transform(img)
+            img = Image.fromarray(img)
 
         label_index = self.label_encoder.transform([label])[0]
 
