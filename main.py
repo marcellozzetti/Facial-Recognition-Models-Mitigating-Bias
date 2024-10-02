@@ -94,9 +94,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
 
-                    print("verify arc_margin 1", arc_margin)
                     if arc_margin is not None:
-                        print("arch enabled 1")
                         outputs = arc_margin(outputs, labels)
             
                     loss = criterion(outputs, labels)
