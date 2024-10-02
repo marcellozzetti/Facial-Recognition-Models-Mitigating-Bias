@@ -71,10 +71,7 @@ class_weights_list = class_weights.tolist()  # Isso agora será uma lista
 print("class_weights", class_weights)
 print("class_weights_list", class_weights_list)
 weights = [class_weights_list[label_encoder.transform([label])[0]] for label in csv_pd['race']]
-print("weights", weights)
-
-class_weights = compute_class_weight('balanced', classes=classes, y=y)
-class_weights_list = class_weights.tolist()  # Isso agora será uma lista
+#print("weights", weights)
 
 sampler = WeightedRandomSampler(weights, len(weights))
 
