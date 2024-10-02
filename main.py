@@ -67,9 +67,9 @@ y = csv_pd['race']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=TEST_SIZE, stratify=y, random_state=42)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=TEST_SIZE, stratify=y_train, random_state=42)
 
-train_dataset = FaceDataset(X_train.tolist(), y_train.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
-val_dataset = FaceDataset(X_val.tolist(), y_val.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
-test_dataset = FaceDataset(X_test.tolist(), y_test.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation, label_encoder=label_encoder)
+train_dataset = FaceDataset(X_train.tolist(), y_train.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation_train, label_encoder=label_encoder)
+val_dataset = FaceDataset(X_val.tolist(), y_val.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation_val, label_encoder=label_encoder)
+test_dataset = FaceDataset(X_test.tolist(), y_test.tolist(), pre_processing_images.IMG_PROCESSED_DIR, transform=dataset_transformation_val, label_encoder=label_encoder)
 
 # Create DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True, num_workers=6, pin_memory=True)
