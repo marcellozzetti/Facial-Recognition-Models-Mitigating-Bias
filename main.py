@@ -86,9 +86,13 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         model.train()
         start_time = time.time()
         
-        for images, labels in tqdm(train_loader):    
+        for images, labels in tqdm(train_loader):
             images = images.to(device)
+            
+            print("labels train", labels)
             labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
+            print("labels_tensor train", labels_tensor)
+        
             optimizer.zero_grad()
     
             if scaler:
@@ -120,9 +124,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
         with torch.no_grad():
             for images, labels in tqdm(val_loader):
                 images = images.to(device)
-                print("labels train", labels)
+                
                 labels_tensor = torch.tensor(label_encoder.transform(labels)).to(device)
-                print("labels_tensor train", labels_tensor)
                 
                 # Forward pass
                 outputs = model(images)
