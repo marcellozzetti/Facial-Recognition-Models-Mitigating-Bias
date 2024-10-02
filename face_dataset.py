@@ -27,13 +27,9 @@ class FaceDataset(Dataset):
             img = Image.fromarray(img)
             img = self.transform(img)
 
-        # Converte a label para índice numérico usando o label_encoder
         label_index = self.label_encoder.transform([label])[0]
 
-        print("label", label)
-        print("label_index", label_index)
-
-        return img, label_index
+        return img, label_index #check if label ou label_index
 
     def get_classes(self):
         return self.classes
