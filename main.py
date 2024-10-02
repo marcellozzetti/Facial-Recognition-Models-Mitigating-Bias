@@ -30,8 +30,8 @@ BATCH_SIZE = 128
 NUM_EPOCHS = 8
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.001
-SCALE = 128
-MARGIN = 0.5
+SCALE = 30
+MARGIN = 0.35
 
 experiments = {
 #    "CrossEntropyLoss&SGD": {},
