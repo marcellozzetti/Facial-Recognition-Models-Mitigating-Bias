@@ -79,7 +79,7 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training function
-def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num_epochs):
+def train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, num_epochs):
     for epoch in range(num_epochs):
         model.train()
         start_time = time.time()
@@ -94,7 +94,8 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
 
-                    if arc_margin and arc_margin is not None:
+                    if arc_margin is not None:
+                        print("arch enabled 1")
                         outputs = arc_margin(outputs, labels)
             
                     loss = criterion(outputs, labels)
@@ -105,8 +106,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
             else:
                 outputs = model(images)
 
-                print("verify arc_margin 2", arc_margin)
-                if arc_margin and arc_margin is not None:
+                if arc_margin is not None:
                     print("arch enabled 2")
                     outputs = arc_margin(outputs, labels)        
                 
@@ -138,7 +138,7 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arch_margin, num
 
                 print(f"Outputs 1: {outputs}")
 
-                if arc_margin and arc_margin is not None:
+                if arc_margin is not None:
                     outputs = arc_margin(outputs, labels)
 
                 print(f"Outputs 2: {outputs}")
