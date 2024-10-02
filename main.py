@@ -66,9 +66,10 @@ train_dataset, val_dataset, test_dataset = random_split(dataset, [train_size, va
 
 # Frequence of each class  Sampler
 class_weights = 1.0 / num_classes
-weights = [class_weights[label_encoder.transform([label])[0]] for label in csv_pd['race']]
 print("class_weights", class_weights)
+weights = [class_weights[label_encoder.transform([label])[0]] for label in csv_pd['race']]
 print("weights", weights)
+
 sampler = WeightedRandomSampler(weights, len(weights))
 
 # Create DataLoaders
