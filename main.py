@@ -136,12 +136,10 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
                 # Forward pass
                 outputs = model(images)
 
-                print(f"Outputs 1: {outputs}")
-
+                #print(f"Outputs 1: {outputs}")
                 if arc_face_margin is not None:
                     outputs = arc_face_margin(outputs, labels)
-
-                print(f"Outputs 2: {outputs}")
+                #print(f"Outputs 2: {outputs}")
 
                 loss = criterion(outputs, labels)
                 epoch_loss += loss.item()
@@ -257,7 +255,7 @@ for exp in experiments.keys():
 
     print(f'Step 13 (Testing): Start - {exp}')
     
-    def evaluate_model(model, test_loader, criterion, label_encoder):
+    def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder):
         # Ensure the model is in evaluation mode
         model.eval()
         all_labels = []
@@ -272,6 +270,10 @@ for exp in experiments.keys():
                 
                 # Forward pass
                 outputs = model(images)
+                
+                if arc_face_margin is not None:
+                    outputs = arc_face_margin(outputs, labels)
+                    
                 loss = criterion(outputs, labels)
                 epoch_loss += loss.item()
             
@@ -315,6 +317,6 @@ for exp in experiments.keys():
         
         print(f"\nClassification report saved to {report_filename}")
     
-    evaluate_model(model, test_loader, criterion, label_encoder)
+    evaluate_model(model, test_loader, criterion, arc_margin, label_encoder)
 
     print(f'Step 13 (Testing): End - {exp}')
