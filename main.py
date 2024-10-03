@@ -27,14 +27,14 @@ from tqdm import tqdm
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 8
+NUM_EPOCHS = 16
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.001
 SCALE = 10
 MARGIN = 0.35
 
 experiments = {
-#    "CrossEntropyLoss&SGD": {},
+    "CrossEntropyLoss&SGD": {},
     "ArcFaceLoss&SGD": {},
 }
 
