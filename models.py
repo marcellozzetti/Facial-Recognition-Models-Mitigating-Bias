@@ -6,33 +6,6 @@ from torchvision import models
 from torchvision.models import ResNet50_Weights
 
 
-class ArcFaceLossOld(nn.Module):
-    def __init__(self, margin=0.5, scale=64):
-        super(ArcFaceLoss, self).__init__()
-        self.margin = margin
-        self.scale = scale
-
-    def forward(self, logits, labels):
-        # Normalize logits to get the unit vectors
-        logits = F.normalize(logits, dim=1)
-        cos_theta = logits @ logits.T
-        cos_theta = cos_theta.clamp(-1, 1)
-
-        # Convert labels to one-hot encoding
-        one_hot = torch.zeros(cos_theta.size(), device=cos_theta.device)
-        one_hot.scatter_(1, labels.unsqueeze(1), 1)
-
-        # Compute the angle for the labels
-        theta = torch.acos(cos_theta)
-        theta = theta.clamp(0, 3.14159265)
-
-        # Apply margin
-        arcface_logits = cos_theta - one_hot * (self.margin * torch.cos(theta))
-        arcface_logits = arcface_logits * self.scale
-
-        return F.cross_entropy(arcface_logits, labels)
-
-
 class LResNet50E_IR(nn.Module):
     def __init__(self, num_classes):
         super(LResNet50E_IR, self).__init__()
@@ -71,9 +44,6 @@ class ArcFaceLoss(nn.Module):
         self.mm = math.sin(math.pi - margin) * margin
 
     def forward(self, logits, labels):
-        # Não normalize os logits aqui, normalização já foi feita no ArcMarginProduct
-        
-        # Calcular a perda de cross entropy diretamente nos logits modificados
         return F.cross_entropy(logits, labels)
 
 
