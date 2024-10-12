@@ -26,7 +26,7 @@ import datetime
 from tqdm import tqdm
 
 # Hyperparameters
-BATCH_SIZE = 128
+BATCH_SIZE = 2
 NUM_EPOCHS = 16
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.01
