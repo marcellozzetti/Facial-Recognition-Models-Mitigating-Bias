@@ -35,7 +35,7 @@ MARGIN = 0.35
 
 experiments = {
     #"CrossEntropyLoss&SGD": {},
-    #"CrossEntropyLoss&SGD": {},
+    #"ArcFaceLoss&SGD": {},
     "CrossEntropyLoss&AdamW": {},
 }
 
