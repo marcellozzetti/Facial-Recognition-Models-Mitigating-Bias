@@ -27,7 +27,7 @@ from tqdm import tqdm
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 2
+NUM_EPOCHS = 24
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.01
 SCALE = 10
