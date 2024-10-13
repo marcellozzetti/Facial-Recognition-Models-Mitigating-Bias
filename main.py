@@ -40,9 +40,10 @@ experiments = {
     #"ArcFaceLoss&AdamW": {},
     #"CrossEntropyLoss&AdamW&CosineAnnealing": {},
     #"ArcFaceLoss&AdamW&CosineAnnealing": {}, ##FAIL
-    "CrossEntropyLoss&AdamW": {},
-    "ArcFaceLoss&AdamW": {},
-    
+    #"CrossEntropyLoss&AdamW": {}, #filtered
+    #"ArcFaceLoss&AdamW": {}, #filtered
+    "CrossEntropyLoss&AdamW": {}, #dropout .5
+    "ArcFaceLoss&AdamW": {}, #dropout .5
 }
 
 # Check if CUDA is available
@@ -64,7 +65,7 @@ print("Step 9 (CNN model): Start")
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
 
 # Filter class "White" and "Black"
-csv_pd = csv_pd[csv_pd['race'].isin(['White', 'Black'])]
+#csv_pd = csv_pd[csv_pd['race'].isin(['White', 'Black'])]
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
