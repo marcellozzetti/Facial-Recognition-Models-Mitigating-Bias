@@ -126,8 +126,8 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
                 loss.backward()
                 optimizer.step()
     
-            #scheduler.step()
-            scheduler.step(epoch + images.shape[0] / len(train_loader))
+            scheduler.step()
+            #scheduler.step(epoch + images.shape[0] / len(train_loader))
 
         
         overhead = time.time() - start_time
