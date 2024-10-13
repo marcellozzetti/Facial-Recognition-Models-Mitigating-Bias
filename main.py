@@ -37,6 +37,7 @@ experiments = {
     #"CrossEntropyLoss&SGD": {},
     #"ArcFaceLoss&SGD": {},
     "CrossEntropyLoss&AdamW": {},
+    "ArcFaceLoss&AdamW": {},
 }
 
 # Check if CUDA is available
