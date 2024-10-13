@@ -27,7 +27,7 @@ from tqdm import tqdm
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 24
+NUM_EPOCHS = 40
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.01
 SCALE = 10
@@ -42,8 +42,10 @@ experiments = {
     #"ArcFaceLoss&AdamW&CosineAnnealing": {}, ##FAIL
     #"CrossEntropyLoss&AdamW": {}, #filtered
     #"ArcFaceLoss&AdamW": {}, #filtered
-    "CrossEntropyLoss&AdamW": {}, #dropout .5
-    "ArcFaceLoss&AdamW": {}, #dropout .5
+    #"CrossEntropyLoss&AdamW": {}, #dropout .5
+    #"ArcFaceLoss&AdamW": {}, #dropout .5
+    "CrossEntropyLoss&AdamW": {}, #mais epocas
+    "ArcFaceLoss&AdamW": {}, #mais epocas
 }
 
 # Check if CUDA is available
@@ -150,10 +152,8 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
                 # Forward pass
                 outputs = model(images)
 
-                #print(f"Outputs 1: {outputs}")
                 if arc_face_margin is not None:
                     outputs = arc_face_margin(outputs, labels)
-                #print(f"Outputs 2: {outputs}")
 
                 loss = criterion(outputs, labels)
                 epoch_loss += loss.item()
