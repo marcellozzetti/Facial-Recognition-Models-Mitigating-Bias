@@ -70,6 +70,8 @@ label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 num_classes = len(label_encoder.classes_)
 
+print("Labels: ", label_encoder)
+
 # Create DataSets
 X = csv_pd['file']
 y = csv_pd['race']
