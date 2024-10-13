@@ -53,7 +53,7 @@ class ArcMarginProduct(nn.Module):
         self.in_features = in_features
         self.out_features = out_features
         self.s = s
-        self.m = m  # Margem angular
+        self.m = m  # Angular margin
 
         self.weight = nn.Parameter(torch.Tensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
@@ -65,12 +65,12 @@ class ArcMarginProduct(nn.Module):
         self.mm = math.sin(math.pi - m) * m
 
     def forward(self, input, label):
-        # Normalizando input e pesos
+        # Normalize inputs
         cosine = F.linear(F.normalize(input), F.normalize(self.weight))
-        # Garantir que cosine está no intervalo [-1, 1] para evitar erros numéricos
+
         cosine = cosine.clamp(-1, 1)
-        sine = torch.sqrt(1.0 - cosine ** 2 + 1e-7)  # Adiciona pequena constante para estabilidade
-        phi = cosine * self.cos_m - sine * self.sin_m  # Ajuste angular
+        sine = torch.sqrt(1.0 - cosine ** 2 + 1e-7)  # Stabilish
+        phi = cosine * self.cos_m - sine * self.sin_m  # Angular adjust
 
         if self.easy_margin:
             phi = torch.where(cosine > 0, phi, cosine)
@@ -81,6 +81,6 @@ class ArcMarginProduct(nn.Module):
         one_hot.scatter_(1, label.view(-1, 1).long(), 1)
 
         output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
-        output *= self.s  # Aplicando a escala
+        output *= self.s  # Applying scale
 
         return output
