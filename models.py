@@ -21,7 +21,7 @@ class LResNet50E_IR(nn.Module):
         
         # Define a new fully connected layer for the specific number of classes
         self.fc = nn.Linear(in_features, num_classes)
-        self.dropout = nn.Dropout(p=0.2)
+        self.dropout = nn.Dropout(p=0.5)
 
     def forward(self, x):
         # Forward pass through the backbone
