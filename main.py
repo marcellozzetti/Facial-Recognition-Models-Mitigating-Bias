@@ -38,8 +38,10 @@ experiments = {
     #"ArcFaceLoss&SGD": {},
     #"CrossEntropyLoss&AdamW": {},
     #"ArcFaceLoss&AdamW": {},
-    "CrossEntropyLoss&AdamW&CosineAnnealing": {},
-    "ArcFaceLoss&AdamW&CosineAnnealing": {},
+    #"CrossEntropyLoss&AdamW&CosineAnnealing": {},
+    #"ArcFaceLoss&AdamW&CosineAnnealing": {}, ##FAIL
+    "CrossEntropyLoss&AdamW": {},
+    "ArcFaceLoss&AdamW": {},
     
 }
 
@@ -60,6 +62,9 @@ print("Step 9 (CNN model): Start")
 
 # Load dataset
 csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
+
+# Filter class "White" and "Black"
+csv_pd = csv_pd[csv_pd['race'].isin(['White', 'Black'])]
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
@@ -205,8 +210,8 @@ for exp in experiments.keys():
     #optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
     optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=0.0005)
 
-    #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=8, T_mult=2)
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+    #scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=8, T_mult=2)
     
     model = train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, NUM_EPOCHS)
     
