@@ -2,6 +2,7 @@ import torch
 from sklearn.manifold import TSNE
 import numpy as np
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 # Function to generate t-SNE visualization
 def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_margin=None):
