@@ -1,3 +1,5 @@
+import torch
+
 # Function to generate t-SNE visualization
 def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_margin=None):
     model.eval()
