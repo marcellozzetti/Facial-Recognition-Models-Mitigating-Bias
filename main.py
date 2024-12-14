@@ -329,11 +329,17 @@ for exp in experiments.keys():
     plt.close()
 
     print(f'Step 12 (Plotting execution): End - {exp}')
+    
 
     print(f'Step 13 (Testing): Start - {exp}')
     
     evaluate_model(model, test_loader, criterion, arc_margin, label_encoder)
 
     print(f'Step 13 (Testing): End - {exp}')
+    
 
-    run_tsne_for_experiment()
+    print("Step 14 (t-SNE Visualization): Start")
+    
+    generate_tsne_visualization(model, test_loader, label_encoder, arc_margin)
+    
+    print("Step 14 (t-SNE Visualization): End")
