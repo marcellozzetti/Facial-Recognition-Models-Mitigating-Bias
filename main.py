@@ -17,7 +17,6 @@ import torchvision.models as models
 from torchvision.models import ResNet50_Weights
 from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report, log_loss
 from sklearn.preprocessing import LabelEncoder
-from sklearn.manifold import TSNE
 from face_dataset import FaceDataset, dataset_transformation_train, dataset_transformation_val
 from models import LResNet50E_IR, ArcFaceLoss, ArcMarginProduct
 from tsne_analysis import generate_tsne_visualization
