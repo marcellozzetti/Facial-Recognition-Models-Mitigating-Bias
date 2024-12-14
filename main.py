@@ -14,6 +14,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 import torch.nn.functional as F
 import torchvision.transforms as transforms
 import torchvision.models as models
+import torch.utils.checkpoint
 from torchvision.models import ResNet50_Weights
 from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report, log_loss
 from sklearn.preprocessing import LabelEncoder
