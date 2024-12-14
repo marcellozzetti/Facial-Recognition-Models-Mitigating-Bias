@@ -30,7 +30,7 @@ import tsne_analysis
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 40
+NUM_EPOCHS = 2
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.01
 SCALE = 10
@@ -48,7 +48,7 @@ experiments = {
     #"CrossEntropyLoss&AdamW": {}, #dropout .5
     #"ArcFaceLoss&AdamW": {}, #dropout .5
     "CrossEntropyLoss&AdamW": {}, #mais epocas
-    "ArcFaceLoss&AdamW": {}, #mais epocas
+    #"ArcFaceLoss&AdamW": {}, #mais epocas
 }
 
 # Check if CUDA is available
@@ -190,89 +190,8 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
 
     return model
 
-# Loop for each experiemnt
-for exp in experiments.keys():
-
-    print(f'Step 10 (Training execution): Start - {exp}')
-
-    # Initializing metrics lists
-    train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
-    arc_margin = None
-
-    # Initialize model, criterion, and optimizer
-    scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
-    
-    if "CrossEntropyLoss" in exp:
-        model = LResNet50E_IR(num_classes).to(device)
-        criterion = nn.CrossEntropyLoss()
-    
-    else:
-        model = LResNet50E_IR(512).to(device)
-        arc_margin = ArcMarginProduct(512, num_classes, SCALE, MARGIN).to(device)
-        criterion = ArcFaceLoss(margin=MARGIN, scale=SCALE).to(device)
-
-    model = nn.DataParallel(model)
-
-    #optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
-    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=0.0005)
-
-    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
-    #scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=8, T_mult=2)
-    
-    model = train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, NUM_EPOCHS)
-    
-    torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}_{timestamp}.pth'))
-
-    print(f'Finished Training and Model Saved - {exp}')
-
-    print(f'Step 11 (Training execution): End - {exp}')
-    
-    
-    print(f'Step 12 (Plotting execution): Start - {exp}')
-
-    # Plotting general metrics
-    epochs_range = range(1, NUM_EPOCHS + 1)
-    plt.figure(figsize=(12, 8))
-    
-    plt.subplot(2, 2, 1)
-    plt.plot(epochs_range, train_losses, label='Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.title('Loss over Epochs')
-    plt.legend()
-    
-    plt.subplot(2, 2, 2)
-    plt.plot(epochs_range, accuracies, label='Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
-    plt.title('Accuracy over Epochs')
-    plt.legend()
-    
-    plt.subplot(2, 2, 3)
-    plt.plot(epochs_range, precisions, label='Precision')
-    plt.xlabel('Epoch')
-    plt.ylabel('Precision')
-    plt.title('Precision over Epochs')
-    plt.legend()
-    
-    plt.subplot(2, 2, 4)
-    plt.plot(epochs_range, log_losses, label='Log Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Log Loss')
-    plt.title('Log Loss over Epochs')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(f'output/training_metrics_{exp}_{timestamp}.png')
-    plt.show()
-    plt.close()
-
-    print(f'Step 12 (Plotting execution): End - {exp}')
-
-
-    print(f'Step 13 (Testing): Start - {exp}')
-    
-    def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder):
-        # Ensure the model is in evaluation mode
+# Evaluate function
+def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder):
         model.eval()
         all_labels = []
         all_preds = []
@@ -332,10 +251,89 @@ for exp in experiments.keys():
             f.write(report)
         
         print(f"\nClassification report saved to {report_filename}")
+
+# Loop for each experiemnt
+for exp in experiments.keys():
+
+    print(f'Step 10 (Training execution): Start - {exp}')
+
+    # Initializing metrics lists
+    train_losses, val_losses, accuracies, precisions, log_losses = [], [], [], [], []
+    arc_margin = None
+
+    # Initialize model, criterion, and optimizer
+    scaler =  torch.amp.GradScaler(torch.device(device)) if device == torch.device("cuda") else None
+    
+    if "CrossEntropyLoss" in exp:
+        model = LResNet50E_IR(num_classes).to(device)
+        criterion = nn.CrossEntropyLoss()
+    
+    else:
+        model = LResNet50E_IR(512).to(device)
+        arc_margin = ArcMarginProduct(512, num_classes, SCALE, MARGIN).to(device)
+        criterion = ArcFaceLoss(margin=MARGIN, scale=SCALE).to(device)
+
+    model = nn.DataParallel(model)
+
+    #optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9, weight_decay=0.0005)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE, weight_decay=0.0005)
+
+    scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=0.01, epochs=NUM_EPOCHS, steps_per_epoch=len(train_loader))
+    #scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=8, T_mult=2)
+    
+    model = train_model(model, criterion, optimizer, scheduler, scaler, arc_margin, NUM_EPOCHS)
+    
+    torch.save(model.state_dict(), os.path.join(pre_processing_images.BASE_DIR, f'fairface/dataset/output/fairface_model_{exp}_{timestamp}.pth'))
+
+    print(f'Finished Training and Model Saved - {exp}')
+
+    print(f'Step 11 (Training execution): End - {exp}')
+
+    
+    print(f'Step 12 (Plotting execution): Start - {exp}')
+
+    # Plotting general metrics
+    epochs_range = range(1, NUM_EPOCHS + 1)
+    plt.figure(figsize=(12, 8))
+    
+    plt.subplot(2, 2, 1)
+    plt.plot(epochs_range, train_losses, label='Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Loss over Epochs')
+    plt.legend()
+    
+    plt.subplot(2, 2, 2)
+    plt.plot(epochs_range, accuracies, label='Accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.title('Accuracy over Epochs')
+    plt.legend()
+    
+    plt.subplot(2, 2, 3)
+    plt.plot(epochs_range, precisions, label='Precision')
+    plt.xlabel('Epoch')
+    plt.ylabel('Precision')
+    plt.title('Precision over Epochs')
+    plt.legend()
+    
+    plt.subplot(2, 2, 4)
+    plt.plot(epochs_range, log_losses, label='Log Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Log Loss')
+    plt.title('Log Loss over Epochs')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig(f'output/training_metrics_{exp}_{timestamp}.png')
+    plt.show()
+    plt.close()
+
+    print(f'Step 12 (Plotting execution): End - {exp}')
+
+    print(f'Step 13 (Testing): Start - {exp}')
     
     evaluate_model(model, test_loader, criterion, arc_margin, label_encoder)
 
     print(f'Step 13 (Testing): End - {exp}')
 
-    # Insert the function call at the end of each experiment run
     run_tsne_for_experiment()
