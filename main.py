@@ -20,13 +20,12 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.manifold import TSNE
 from face_dataset import FaceDataset, dataset_transformation_train, dataset_transformation_val
 from models import LResNet50E_IR, ArcFaceLoss, ArcMarginProduct
+from tsne_analysis import generate_tsne_visualization
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.model_selection import train_test_split
 import datetime
 from tqdm import tqdm
-
 import pre_processing_images
-import tsne_analysis
 
 # Hyperparameters
 BATCH_SIZE = 128
