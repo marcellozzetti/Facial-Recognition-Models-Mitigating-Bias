@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 # Check if CUDA is available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 
 # Function to generate t-SNE visualization
 def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_margin=None):
