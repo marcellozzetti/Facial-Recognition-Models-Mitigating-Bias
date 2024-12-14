@@ -28,7 +28,7 @@ import pre_processing_images
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 4
+NUM_EPOCHS = 1
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.01
 SCALE = 10
