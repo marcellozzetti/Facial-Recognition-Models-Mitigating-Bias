@@ -50,7 +50,7 @@ MAX_SAMPLES = 5000
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # Initialize the MTCNN detector
-detector = MTCNN(device='cpu')
+detector = MTCNN(cuda=False)
 
 # Check if Cuda is available
 cuda_available = torch.cuda.is_available()
