@@ -28,7 +28,7 @@ from tqdm import tqdm
 import pre_processing_images
 
 # Hyperparameters
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 NUM_EPOCHS = 4
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.01
