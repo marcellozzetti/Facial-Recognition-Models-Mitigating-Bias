@@ -1,8 +1,3 @@
-def run_tsne_for_experiment():
-    print("Step 14 (t-SNE Visualization): Start")
-    generate_tsne_visualization(model, test_loader, label_encoder, arc_face_margin)
-    print("Step 14 (t-SNE Visualization): End")
-    
 # Function to generate t-SNE visualization
 def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_margin=None):
     model.eval()
