@@ -50,8 +50,7 @@ MAX_SAMPLES = 5000
 ssl._create_default_https_context = ssl._create_unverified_context
 
 # Initialize the MTCNN detector
-detector = MTCNN()
-detector = detector.to(device)
+#detector = MTCNN()
 
 # Check if Cuda is available
 cuda_available = torch.cuda.is_available()
@@ -130,6 +129,7 @@ def draw_bounding_procedure(img):
     """Detect faces and draw bounding boxes."""
     plt.imshow(img)
     ax = plt.gca()
+    detector = MTCNN()
     detect_faces = detector.detect_faces(img)
     if len(detect_faces) == 0:
         print("No face detected.")
@@ -159,6 +159,7 @@ def draw_bounding_procedure(img):
 def detect_and_adjust_faces(img, img_name, save_dir=None, draw_bounding=False):
     """Detect and perform face adjustments."""
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    detector = MTCNN()
     detect_faces = detector.detect_faces(img_rgb)
     if len(detect_faces) == 0:
         print("No face detected: {}".format(img_name))
