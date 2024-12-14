@@ -17,6 +17,7 @@ import torchvision.models as models
 from torchvision.models import ResNet50_Weights
 from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, classification_report, log_loss
 from sklearn.preprocessing import LabelEncoder
+from sklearn.manifold import TSNE
 from face_dataset import FaceDataset, dataset_transformation_train, dataset_transformation_val
 from models import LResNet50E_IR, ArcFaceLoss, ArcMarginProduct
 from sklearn.utils.class_weight import compute_class_weight
@@ -336,8 +337,3 @@ for exp in experiments.keys():
 
     # Insert the function call at the end of each experiment run
     run_tsne_for_experiment()
-
-def run_tsne_for_experiment():
-    print("Step 14 (t-SNE Visualization): Start")
-    generate_tsne_visualization(model, test_loader, label_encoder, arc_face_margin)
-    print("Step 14 (t-SNE Visualization): End")
