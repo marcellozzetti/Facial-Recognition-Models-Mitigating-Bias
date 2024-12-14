@@ -333,3 +333,11 @@ for exp in experiments.keys():
     evaluate_model(model, test_loader, criterion, arc_margin, label_encoder)
 
     print(f'Step 13 (Testing): End - {exp}')
+
+    # Insert the function call at the end of each experiment run
+    run_tsne_for_experiment()
+
+def run_tsne_for_experiment():
+    print("Step 14 (t-SNE Visualization): Start")
+    generate_tsne_visualization(model, test_loader, label_encoder, arc_face_margin)
+    print("Step 14 (t-SNE Visualization): End")
