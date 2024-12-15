@@ -23,18 +23,18 @@ def obter_target_layer(model, layer_name):
 def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
     if isinstance(model, torch.nn.DataParallel):
         model = model.module
-    
+
     cam_extractor = GradCAM(model, target_layer=obter_target_layer(model, target_layer_name))
-    
+
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
     for idx in incorrect_indices:
-        image = images[idx].unsqueeze(0).to(device)
-        label = labels[idx].unsqueeze(0).to(device)
+        image = images[idx].unsqueeze(0).to(device)  # Imagem para o modelo
+        label = labels[idx].unsqueeze(0).to(device)  # Rótulo da imagem
 
         # Calcular a previsão
-        output = model(image)  # Output (logits ou probabilidades)
+        output = model(image)  # Obtenção da saída do modelo (logits ou probabilidades)
         pred_class = output.squeeze(0).argmax().item()  # Classe predita
         true_class = label.item()  # Classe correta
 
@@ -42,8 +42,8 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
         if pred_class < 0 or pred_class >= output.size(1):  # Verifica se pred_class está no intervalo de classes
             raise ValueError(f"Predicted class index {pred_class} is out of bounds for the output size {output.size(1)}")
 
-        # Agora passando as pontuações (scores) junto com a classe
-        cam = cam_extractor(input_tensor=image, class_idx=pred_class, scores=output)  # Passando scores
+        # Não é necessário passar `input_tensor` como argumento diretamente
+        cam = cam_extractor(class_idx=pred_class, scores=output)  # Passando apenas as pontuações e índice da classe
 
         # Converta a imagem para numpy e aplique a máscara Grad-CAM
         cam_image = cam.squeeze().cpu().numpy()
