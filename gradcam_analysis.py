@@ -14,10 +14,10 @@ DEFAULT_SAVE_DIR = 'output/grad_cam'
 
 # Available colormaps
 COLORMAPS = {
-    "jet": cv2.COLORMAP_JET,
-    "hot": cv2.COLORMAP_HOT,
-    "cool": cv2.COLORMAP_COOL,
-    "rainbow": cv2.COLORMAP_RAINBOW
+    "jet": cv2.COLORMAP_JET
+    #"hot": cv2.COLORMAP_HOT,
+    #"cool": cv2.COLORMAP_COOL,
+    #"rainbow": cv2.COLORMAP_RAINBOW
 }
 
 def get_target_layer(model: nn.Module, layer_name: str):
