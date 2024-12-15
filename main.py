@@ -196,6 +196,7 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
         all_labels = []
         all_preds = []
         all_probs = []
+        incorrect_indices = []
         epoch_loss = 0.0
     
         with torch.no_grad():
