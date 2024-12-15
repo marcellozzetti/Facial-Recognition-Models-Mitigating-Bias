@@ -5,49 +5,25 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import datetime
 
-def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_margin=None, output_dir='output'):
-    """
-    Generate a 2D t-SNE visualization of model embeddings.
-
-    Args:
-        model (torch.nn.Module): The trained model for feature extraction.
-        data_loader (torch.utils.data.DataLoader): DataLoader providing images and labels.
-        label_encoder (sklearn.preprocessing.LabelEncoder): Encoder to decode class labels.
-        arc_face_margin (callable, optional): Margin layer for ArcFace, if applicable.
-        output_dir (str): Directory to save the t-SNE visualization.
-    """
-    # Device configuration
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
-
-    # Set model to evaluation mode
-    model.eval()
+def generate_tsne_visualization(model, test_loader, label_encoder, arc_margin):
+    model.eval()  # Certifique-se de que o modelo está em modo de avaliação
     embeddings = []
     labels = []
+    
+    # Certifique-se de que os tensores exigem gradientes antes de registrar o hook
+    for images, targets in test_loader:
+        images = images.cuda()
+        targets = targets.cuda()
 
-    with torch.no_grad():  # Ensure no gradients are computed
-        for images, batch_labels in tqdm(data_loader, desc="Extracting embeddings"):
-            images = images.to(device)
-            batch_labels = batch_labels.to(device)
-
-            # Remove hooks if they're being registered by torchcam
-            model.zero_grad()  # Ensure no unnecessary hooks are added
-
+        # Garantir que o modelo exige gradientes
+        with torch.set_grad_enabled(True):
+            # Extração das características do modelo (com gradientes habilitados)
             outputs = model(images)
-
-            # Detach if necessary to avoid errors
-            if isinstance(outputs, torch.Tensor) and not outputs.requires_grad:
-                outputs = outputs.detach()
-
-            if arc_face_margin is not None:
-                outputs = arc_face_margin(outputs, batch_labels)
-
-            embeddings.append(outputs.cpu().numpy())
-            labels.extend(batch_labels.cpu().numpy())
-
-    # Stack embeddings and labels into arrays
-    embeddings = np.vstack(embeddings)
-    labels = np.array(labels)
+            embeddings.append(outputs.cpu().detach().numpy())
+            labels.append(targets.cpu().detach().numpy())
+    
+    embeddings = np.concatenate(embeddings, axis=0)
+    labels = np.concatenate(labels, axis=0)
 
     # Apply t-SNE for dimensionality reduction
     tsne = TSNE(n_components=2, random_state=42, perplexity=30, n_iter=1000)
