@@ -5,43 +5,57 @@ from tqdm import tqdm
 import matplotlib.pyplot as plt
 import datetime
 
-# Function to generate t-SNE visualization
-def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_margin=None):
+def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_margin=None, output_dir='output'):
+    """
+    Generate a 2D t-SNE visualization of model embeddings.
 
-    # Check if CUDA is available
+    Args:
+        model (torch.nn.Module): The trained model for feature extraction.
+        data_loader (torch.utils.data.DataLoader): DataLoader providing images and labels.
+        label_encoder (sklearn.preprocessing.LabelEncoder): Encoder to decode class labels.
+        arc_face_margin (callable, optional): Margin layer for ArcFace, if applicable.
+        output_dir (str): Directory to save the t-SNE visualization.
+    """
+    # Device configuration
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 
+    # Set model to evaluation mode
     model.eval()
     embeddings = []
     labels = []
 
     with torch.no_grad():
-        for images, batch_labels in tqdm(data_loader):
+        for images, batch_labels in tqdm(data_loader, desc="Extracting embeddings"):
             images = images.to(device)
             batch_labels = batch_labels.to(device)
-            
+
             outputs = model(images)
             if arc_face_margin is not None:
                 outputs = arc_face_margin(outputs, batch_labels)
-            
+
             embeddings.append(outputs.cpu().numpy())
             labels.extend(batch_labels.cpu().numpy())
 
-    # Convert lists to arrays
+    # Stack embeddings and labels into arrays
     embeddings = np.vstack(embeddings)
     labels = np.array(labels)
 
-    # Apply t-SNE
-    tsne = TSNE(n_components=2, random_state=42, perplexity=30, max_iter=1000)
+    # Apply t-SNE for dimensionality reduction
+    tsne = TSNE(n_components=2, random_state=42, perplexity=30, n_iter=1000)
     embeddings_2d = tsne.fit_transform(embeddings)
 
-    # Plotting
+    # Plot the t-SNE results
     plt.figure(figsize=(10, 8))
     unique_labels = np.unique(labels)
     for label in unique_labels:
         indices = labels == label
-        plt.scatter(embeddings_2d[indices, 0], embeddings_2d[indices, 1], label=label_encoder.inverse_transform([label])[0], alpha=0.7)
+        plt.scatter(
+            embeddings_2d[indices, 0], 
+            embeddings_2d[indices, 1], 
+            label=label_encoder.inverse_transform([label])[0], 
+            alpha=0.7
+        )
 
     plt.title("t-SNE Visualization of Embeddings")
     plt.xlabel("Dimension 1")
@@ -49,5 +63,9 @@ def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_marg
     plt.legend()
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig(f'output/tsne_visualization_{timestamp}.png')
+
+    # Save the plot
+    save_path = f'{output_dir}/tsne_visualization_{timestamp}.png'
+    plt.savefig(save_path)
+    print(f"t-SNE visualization saved to {save_path}")
     plt.show()
