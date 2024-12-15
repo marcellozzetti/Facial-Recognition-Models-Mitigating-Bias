@@ -67,7 +67,7 @@ timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
 print("Step 9 (CNN model): Start")
 
 # Load dataset
-csv_pd = pd.read_csv(pre_processing_images.CSV_CONCAT_DATASET_FILTERED_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
+csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
 
 # Filter class "White" and "Black"
 #csv_pd = csv_pd[csv_pd['race'].isin(['White', 'Black'])]
