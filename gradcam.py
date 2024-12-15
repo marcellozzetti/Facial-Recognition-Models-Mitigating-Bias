@@ -1,17 +1,19 @@
 import os
+import torch
 import torchcam
 from torchcam.methods import GradCAM
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
-import torch
 import torch.nn as nn
 
+# Nome da camada alvo
 target_layer_name = 'backbone.layer4.2.conv3'
-# Check if CUDA is available
+
+# Verifica se CUDA está disponível
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Capturar a referência ao módulo da camada alvo
+# Captura a referência ao módulo da camada alvo
 def obter_target_layer(model, layer_name):
     target_layer = dict(model.named_modules()).get(layer_name, None)
     if target_layer is None:
@@ -23,24 +25,27 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
     if isinstance(model, torch.nn.DataParallel):
         model = model.module
     
+    # Extração do Grad-CAM
     cam_extractor = GradCAM(model, target_layer=obter_target_layer(model, target_layer_name))
     
+    # Criação do diretório para salvar as imagens, caso não exista
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
     for idx in incorrect_indices:
+        # Pegando a imagem e o label do batch
         image = images[idx].unsqueeze(0).to(device)
         label = labels[idx].unsqueeze(0).to(device)
 
-        # Calcular a previsão e aplicar o Grad-CAM
+        # Calcular a previsão
         output = model(image)
         pred_class = output.squeeze(0).argmax().item()  # Classe predita
         true_class = label.item()  # Classe correta
 
         # Calcular Grad-CAM para a classe predita
-        cam = cam_extractor(pred_class, output)
+        cam = cam_extractor(output, pred_class)  # Passando o output e a classe predita
 
-        # Converta a imagem para numpy e aplique a máscara Grad-CAM
+        # Converte a imagem para numpy e aplica a máscara Grad-CAM
         cam_image = cam.squeeze().cpu().numpy()
         cam_image = cv2.resize(cam_image, (image.shape[3], image.shape[2]))  # Redimensiona a máscara para o tamanho da imagem
         cam_image = np.maximum(cam_image, 0)  # Garante que não haja valores negativos
