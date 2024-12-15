@@ -43,10 +43,13 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
             raise ValueError(f"Predicted class index {pred_class} is out of bounds for the output size {output.size(1)}")
 
         # Não é necessário passar `input_tensor` como argumento diretamente
-        cam = cam_extractor(class_idx=pred_class, scores=output)  # Passando apenas as pontuações e índice da classe
+        cam_list = cam_extractor(class_idx=pred_class, scores=output)  # Obtendo a lista de CAMs
 
-        # Converta a imagem para numpy e aplique a máscara Grad-CAM
-        cam_image = cam.squeeze().cpu().numpy()
+        # Aqui garantimos que estamos pegando o primeiro CAM, se for uma lista
+        cam_image = cam_list[0] if isinstance(cam_list, list) else cam_list
+
+        # Converte a imagem CAM para numpy e aplica a máscara Grad-CAM
+        cam_image = cam_image.squeeze().cpu().numpy()  # Squeeze para remover dimensões extras
         cam_image = cv2.resize(cam_image, (image.shape[3], image.shape[2]))  # Redimensiona a máscara para o tamanho da imagem
         cam_image = np.maximum(cam_image, 0)  # Garante que não haja valores negativos
         cam_image = cam_image / cam_image.max()  # Normaliza para 0-1
