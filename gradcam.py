@@ -8,6 +8,8 @@ import torch
 import torch.nn as nn
 
 target_layer_name = 'backbone.layer4.2.conv3'
+# Check if CUDA is available
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Capturar a referência ao módulo da camada alvo
 def obter_target_layer(model, layer_name):
