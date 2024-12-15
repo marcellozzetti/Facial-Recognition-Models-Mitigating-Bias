@@ -1,39 +1,41 @@
-from torchcam.methods import SmoothGradCAMpp
-from torchcam.utils import overlay_mask
-from torchvision.transforms.functional import to_pil_image
 import os
+import torchcam
+from torchcam.methods import GradCAM
+import matplotlib.pyplot as plt
+import cv2
+import numpy as np
 
-def generate_gradcam_visualization(model, target_layer, loader, device, output_dir="output/gradcam"):
-    os.makedirs(output_dir, exist_ok=True)
-
-    # Grad-CAM instance
-    cam_extractor = SmoothGradCAMpp(model, target_layer)
+# Função para gerar e salvar a visualização de Grad-CAM
+def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
+    cam_extractor = GradCAM(model, target_layers=[model.layer4])  # Altere a camada conforme necessário
     
-    model.eval()  # Certifique-se de que o modelo está em modo de avaliação
-    with torch.no_grad():
-        for batch_idx, (images, labels) in enumerate(loader):
-            images, labels = images.to(device), labels.to(device)
-            
-            # Forward pass para gerar predições
-            outputs = model(images)
-            preds = torch.argmax(outputs, dim=1)
-            
-            for idx in range(min(5, len(images))):  # Limite a visualização para 5 amostras
-                img = images[idx]
-                label = labels[idx].item()
-                pred = preds[idx].item()
-                
-                # Gerar Grad-CAM para a predição
-                activation_map = cam_extractor(pred, outputs[idx].unsqueeze(0))
-                
-                # Overlay da ativação na imagem original
-                heatmap = to_pil_image(activation_map[0].squeeze(0))
-                input_image = to_pil_image(img.cpu())
-                result = overlay_mask(input_image, heatmap, alpha=0.5)
-                
-                # Salvar a visualização
-                result.save(os.path.join(output_dir, f"batch{batch_idx}_sample{idx}_true{label}_pred{pred}.png"))
-            
-            # Limite apenas ao primeiro batch para evitar muitas imagens
-            if batch_idx == 0:
-                break
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    for idx in incorrect_indices:
+        image = images[idx].unsqueeze(0).to(device)
+        label = labels[idx].unsqueeze(0).to(device)
+
+        # Calcular a previsão e aplicar o Grad-CAM
+        output = model(image)
+        cam = cam_extractor(output.squeeze(0).argmax().item(), output)  # Obter a classe predita
+
+        # Converta a imagem para numpy e aplique a máscara Grad-CAM
+        cam_image = cam.squeeze().cpu().numpy()
+        cam_image = cv2.resize(cam_image, (image.shape[3], image.shape[2]))  # Redimensiona a máscara para o tamanho da imagem
+        cam_image = np.maximum(cam_image, 0)  # Garante que não haja valores negativos
+        cam_image = cam_image / cam_image.max()  # Normaliza para 0-1
+
+        # Convert the original image to numpy (for display)
+        original_image = image.squeeze().cpu().numpy().transpose((1, 2, 0))
+        original_image = np.uint8(original_image * 255)  # Transformação para imagem
+
+        # Aplica a máscara Grad-CAM à imagem original
+        heatmap = np.uint8(255 * cam_image)  # Gera o heatmap
+        heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)  # Aplica o mapa de cores
+        superimposed_image = cv2.addWeighted(original_image, 0.6, heatmap, 0.4, 0)
+
+        # Salvar a imagem resultante
+        output_filename = os.path.join(save_dir, f'grad_cam_{idx}.png')
+        cv2.imwrite(output_filename, superimposed_image)
+        print(f"Grad-CAM image saved as {output_filename}")
