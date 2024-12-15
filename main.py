@@ -101,12 +101,6 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training function
-# Inicialização das listas de métricas fora da função
-train_losses = []
-accuracies = []
-precisions = []
-log_losses = []
-
 # Ajuste do scheduler para ser chamado no final da epoch (caso não seja OneCycleLR)
 def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin, num_epochs):
     for epoch in range(num_epochs):
