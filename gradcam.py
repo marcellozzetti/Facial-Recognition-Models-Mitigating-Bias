@@ -7,12 +7,21 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+target_layer_name = 'backbone.layer4.2.conv3'
+
+# Capturar a referência ao módulo da camada alvo
+def obter_target_layer(model, layer_name):
+    target_layer = dict(model.named_modules()).get(layer_name, None)
+    if target_layer is None:
+        raise ValueError(f"Camada alvo '{layer_name}' não encontrada no modelo. Verifique os nomes listados acima.")
+    return target_layer
+
 # Função para gerar e salvar a visualização de Grad-CAM
 def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
     if isinstance(model, torch.nn.DataParallel):
         model = model.module
     
-    cam_extractor = GradCAM(model, target_layers='')  # Altere a camada conforme necessário
+    cam_extractor = GradCAM(model, target_layers=obter_target_layer(model, target_layer_name))
     
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
