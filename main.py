@@ -257,7 +257,120 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
             f.write(report)
         
         print(f"\nClassification report saved to {report_filename}")
+    
+def evaluate_model_with_tsne(model, test_loader, criterion, arc_face_margin, label_encoder, output_dir, timestamp, device):
+    model.eval()
+    all_labels = []
+    all_preds = []
+    all_probs = []
+    incorrect_indices = []
+    epoch_loss = 0.0
+    seen_classes = set()  # To track which classes we've added incorrect indices for
+    
+    embeddings = []  # Lista para armazenar as embeddings
+    labels_list = []  # Lista para armazenar as labels
 
+    with torch.no_grad():
+        for idx, (images, labels) in enumerate(tqdm(test_loader)):
+            images = images.to(device)
+            labels = labels.to(device)
+            
+            # Forward pass
+            outputs = model(images)
+            
+            if arc_face_margin is not None:
+                outputs = arc_face_margin(outputs, labels)
+                
+            loss = criterion(outputs, labels)
+            epoch_loss += loss.item()
+        
+            # Get probabilities
+            probs = F.softmax(outputs, dim=1).cpu().numpy()
+            
+            # Get predicted class (argmax)
+            preds = torch.argmax(outputs, dim=1).cpu().numpy()
+        
+            all_labels.extend(labels.cpu().numpy())
+            all_preds.extend(preds)
+            all_probs.extend(probs)
+
+            # Check incorrect predictions
+            incorrect_preds = np.where(preds != labels.cpu().numpy())[0]
+            
+            # For each incorrect prediction, only add the first occurrence of the class
+            for i in incorrect_preds:
+                pred_class = preds[i]
+                if pred_class not in seen_classes:
+                    incorrect_indices.append(idx * len(images) + i)  # Usar o comprimento das imagens para o índice
+                    seen_classes.add(pred_class)
+            
+            # Armazenar embeddings e labels para a visualização t-SNE
+            embeddings.append(outputs.cpu().numpy())  # Guardar as saídas do modelo
+            labels_list.append(labels.cpu().numpy())  # Guardar as labels
+
+    # Concatenar as embeddings e labels
+    embeddings = np.concatenate(embeddings, axis=0)
+    labels = np.concatenate(labels_list, axis=0)
+
+    # Apply t-SNE for dimensionality reduction
+    tsne = TSNE(n_components=2, random_state=42, perplexity=30, n_iter=1000)
+    embeddings_2d = tsne.fit_transform(embeddings)
+
+    # Plot the t-SNE results
+    plt.figure(figsize=(10, 8))
+    unique_labels = np.unique(labels)
+    for label in unique_labels:
+        indices = labels == label
+        plt.scatter(
+            embeddings_2d[indices, 0], 
+            embeddings_2d[indices, 1], 
+            label=label_encoder.inverse_transform([label])[0], 
+            alpha=0.7
+        )
+
+    plt.title("t-SNE Visualization of Embeddings")
+    plt.xlabel("Dimension 1")
+    plt.ylabel("Dimension 2")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    # Save the t-SNE plot
+    save_path = f'{output_dir}/tsne_visualization_{timestamp}.png'
+    plt.savefig(save_path)
+    print(f"t-SNE visualization saved to {save_path}")
+    plt.show()
+
+    # Calculando métricas
+    accuracy = accuracy_score(all_labels, all_preds)
+    precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
+    
+    # Garantir que all_probs seja um numpy array e calcular o log loss
+    all_probs = np.array(all_probs)
+    logloss = log_loss(all_labels, all_probs)
+
+    print(f'Test Accuracy: {accuracy:.4f}, Test Precision: {precision:.4f}, Test Log Loss: {logloss:.4f}')
+    
+    # Plot confusion matrix
+    confusion_mtx = confusion_matrix(all_labels, all_preds)
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(confusion_mtx, annot=True, fmt="d", cmap="Blues")
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
+    plt.savefig(f'{output_dir}/confusion_mtx_{timestamp}.png')
+    plt.show()
+    
+    # Gerar relatório de classificação
+    report = classification_report(all_labels, all_preds, target_names=label_encoder.classes_)
+    print("\nClassification Report:\n", report)
+    
+    # Salvar o relatório de classificação em um arquivo
+    report_filename = f'{output_dir}/classification_report_{timestamp}.txt'
+    with open(report_filename, 'w') as f:
+        f.write(report)
+    
+    print(f"\nClassification report saved to {report_filename}")
+    
 # Loop for each experiemnt
 for exp in experiments.keys():
 
@@ -339,13 +452,13 @@ for exp in experiments.keys():
 
     print(f'Step 13 (Testing): Start - {exp}')
     
-    evaluate_model(model, test_loader, criterion, arc_margin, label_encoder)
+    evaluate_model_with_tsne(model, test_loader, criterion, arc_margin, label_encoder)
 
     print(f'Step 13 (Testing): End - {exp}')
     
 
     print("Step 14 (t-SNE Visualization): Start")
     
-    generate_tsne_visualization(model, test_loader, label_encoder, arc_margin)
+    #generate_tsne_visualization(model, test_loader, label_encoder, arc_margin)
     
     print("Step 14 (t-SNE Visualization): End")
