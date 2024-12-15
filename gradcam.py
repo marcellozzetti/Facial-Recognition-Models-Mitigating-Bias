@@ -21,7 +21,7 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
     if isinstance(model, torch.nn.DataParallel):
         model = model.module
     
-    cam_extractor = GradCAM(model, target_layers=obter_target_layer(model, target_layer_name))
+    cam_extractor = GradCAM(model, target_layer=obter_target_layer(model, target_layer_name))
     
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
