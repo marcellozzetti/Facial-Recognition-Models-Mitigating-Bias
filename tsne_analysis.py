@@ -8,13 +8,6 @@ import datetime
 def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_margin=None, output_dir='output'):
     """
     Generate a 2D t-SNE visualization of model embeddings.
-
-    Args:
-        model (torch.nn.Module): The trained model for feature extraction.
-        data_loader (torch.utils.data.DataLoader): DataLoader providing images and labels.
-        label_encoder (sklearn.preprocessing.LabelEncoder): Encoder to decode class labels.
-        arc_face_margin (callable, optional): Margin layer for ArcFace, if applicable.
-        output_dir (str): Directory to save the t-SNE visualization.
     """
     # Device configuration
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -25,7 +18,7 @@ def generate_tsne_visualization(model, data_loader, label_encoder, arc_face_marg
     embeddings = []
     labels = []
 
-    with torch.no_grad():
+    with torch.no_grad():  # Ensure no gradients are computed
         for images, batch_labels in tqdm(data_loader, desc="Extracting embeddings"):
             images = images.to(device)
             batch_labels = batch_labels.to(device)
