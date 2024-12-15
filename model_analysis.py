@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from your_model_module import LResNet50E_IR  # Substitua pelo caminho correto do seu modelo
+from models import LResNet50E_IR
 
 # Inicializar o modelo customizado
-num_classes = 10  # Ajuste conforme o número de classes do seu problema
+num_classes = 7  # Ajuste conforme o número de classes do seu problema
 model = LResNet50E_IR(num_classes=num_classes)
 model.eval()  # Coloca o modelo em modo de avaliação
 
