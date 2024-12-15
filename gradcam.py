@@ -9,7 +9,6 @@ import torch.nn as nn
 
 # Função para gerar e salvar a visualização de Grad-CAM
 def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
-    # Verifique se o modelo está usando DataParallel e acesse o modelo subjacente
     if isinstance(model, torch.nn.DataParallel):
         model = model.module
     
@@ -24,7 +23,11 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
 
         # Calcular a previsão e aplicar o Grad-CAM
         output = model(image)
-        cam = cam_extractor(output.squeeze(0).argmax().item(), output)  # Obter a classe predita
+        pred_class = output.squeeze(0).argmax().item()  # Classe predita
+        true_class = label.item()  # Classe correta
+
+        # Calcular Grad-CAM para a classe predita
+        cam = cam_extractor(pred_class, output)
 
         # Converta a imagem para numpy e aplique a máscara Grad-CAM
         cam_image = cam.squeeze().cpu().numpy()
@@ -41,7 +44,7 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
         heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)  # Aplica o mapa de cores
         superimposed_image = cv2.addWeighted(original_image, 0.6, heatmap, 0.4, 0)
 
-        # Salvar a imagem resultante
-        output_filename = os.path.join(save_dir, f'grad_cam_{idx}.png')
+        # Nome do arquivo com a classe correta e predita
+        output_filename = os.path.join(save_dir, f'grad_cam_true_{true_class}_pred_{pred_class}_{idx}.png')
         cv2.imwrite(output_filename, superimposed_image)
         print(f"Grad-CAM image saved as {output_filename}")
