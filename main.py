@@ -26,7 +26,7 @@ from sklearn.model_selection import train_test_split
 import datetime
 from tqdm import tqdm
 import pre_processing_images
-from gradcam import generate_grad_cam
+from gradcam_analysis import generate_grad_cam
 
 # Hyperparameters
 BATCH_SIZE = 128
