@@ -72,6 +72,9 @@ csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CS
 # Filter class "White" and "Black"
 #csv_pd = csv_pd[csv_pd['race'].isin(['White', 'Black'])]
 
+csv_pd = csv_pd.groupby('race').apply(lambda x: x.sample(n=5, random_state=42)).reset_index(drop=True)
+
+
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
 num_classes = len(label_encoder.classes_)
