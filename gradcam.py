@@ -1,6 +1,7 @@
 from torchcam.methods import SmoothGradCAMpp
 from torchcam.utils import overlay_mask
 from torchvision.transforms.functional import to_pil_image
+import os
 
 def generate_gradcam_visualization(model, target_layer, loader, device, output_dir="output/gradcam"):
     os.makedirs(output_dir, exist_ok=True)
