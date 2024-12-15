@@ -27,6 +27,9 @@ class LResNet50E_IR(nn.Module):
         # Forward pass through the backbone
         x = self.backbone(x)
         
+        # Make sure that the output requires gradients
+        x.requires_grad_()  # Ensuring gradients are required for the output
+        
         # Add dropout and fully connected layer
         x = self.dropout(x)
         x = self.fc(x)
