@@ -43,7 +43,8 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
         true_class = label.item()  # Classe correta
 
         # Calcular Grad-CAM para a classe predita
-        cam = cam_extractor(output, pred_class)  # Passando o output e a classe predita
+        # Modificação aqui: passando a classe predita como um tensor
+        cam = cam_extractor(output, class_idx=torch.tensor([pred_class]).to(device))  # Corrigido para tensor
 
         # Converte a imagem para numpy e aplica a máscara Grad-CAM
         cam_image = cam.squeeze().cpu().numpy()
