@@ -1,98 +1,83 @@
 import os
 import torch
-import torchcam
 from torchcam.methods import GradCAM
-import matplotlib.pyplot as plt
 import cv2
 import numpy as np
-import torch.nn as nn
 
-# Nome da camada alvo
-target_layer_name = 'backbone.layer4.2.conv3'
+# Target layer name
+TARGET_LAYER_NAME = 'backbone.layer4.2.conv3'
 
-# Verifica se CUDA está disponível
+# Device setup
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# Captura a referência ao módulo da camada alvo
-def obter_target_layer(model, layer_name):
-    target_layer = dict(model.named_modules()).get(layer_name, None)
+def get_target_layer(model, layer_name):
+    """
+    Retrieves the target layer from the model.
+    """
+    target_layer = dict(model.named_modules()).get(layer_name)
     if target_layer is None:
-        raise ValueError(f"Camada alvo '{layer_name}' não encontrada no modelo. Verifique os nomes listados acima.")
+        raise ValueError(f"Target layer '{layer_name}' not found in the model.")
     return target_layer
 
 def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
+    """
+    Generates Grad-CAM visualizations for incorrectly classified images.
+    
+    Args:
+        model: Trained model.
+        images: Tensor of input images.
+        labels: Tensor of true labels.
+        incorrect_indices: List of indices for misclassified images.
+        save_dir: Directory to save the Grad-CAM visualizations.
+    """
     if isinstance(model, torch.nn.DataParallel):
-        model = model.module
+        model = model.module  # Handle DataParallel wrapper
 
-    cam_extractor = GradCAM(model, target_layer=obter_target_layer(model, target_layer_name))
+    # Initialize Grad-CAM extractor
+    cam_extractor = GradCAM(model, target_layer=get_target_layer(model, TARGET_LAYER_NAME))
 
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
+    # Create output directory if it doesn't exist
+    os.makedirs(save_dir, exist_ok=True)
+
+    # Define colormaps
+    colormaps = {
+        "jet": cv2.COLORMAP_JET
+        #"hot": cv2.COLORMAP_HOT,
+        #"cool": cv2.COLORMAP_COOL,
+        #"rainbow": cv2.COLORMAP_RAINBOW
+    }
 
     for idx in incorrect_indices:
-        image = images[idx].unsqueeze(0).to(device)  # Imagem para o modelo
-        label = labels[idx].unsqueeze(0).to(device)  # Rótulo da imagem
+        image = images[idx].unsqueeze(0).to(device)
+        label = labels[idx].item()
 
-        # Calcular a previsão
-        output = model(image)  # Obtenção da saída do modelo (logits ou probabilidades)
-        pred_class = output.squeeze(0).argmax().item()  # Classe predita
-        true_class = label.item()  # Classe correta
+        # Forward pass and get predictions
+        output = model(image)
+        pred_class = output.squeeze(0).argmax().item()
 
-        # Certificar-se de que pred_class é um índice válido
-        if pred_class < 0 or pred_class >= output.size(1):  # Verifica se pred_class está no intervalo de classes
-            raise ValueError(f"Predicted class index {pred_class} is out of bounds for the output size {output.size(1)}")
+        # Ensure prediction index is valid
+        if pred_class >= output.size(1):
+            raise ValueError(f"Predicted class index {pred_class} is out of bounds.")
 
-        # Não é necessário passar `input_tensor` como argumento diretamente
-        cam_list = cam_extractor(class_idx=pred_class, scores=output)  # Obtendo a lista de CAMs
+        # Generate Grad-CAM mask
+        cam_image = cam_extractor(class_idx=pred_class, scores=output)
+        cam_image = cam_image[0] if isinstance(cam_image, list) else cam_image
+        cam_image = cam_image.squeeze().cpu().numpy()
+        cam_image = np.maximum(cam_image, 0) / cam_image.max()
+        cam_image = cv2.resize(cam_image, (image.shape[3], image.shape[2]))
 
-        # Aqui garantimos que estamos pegando o primeiro CAM, se for uma lista
-        cam_image = cam_list[0] if isinstance(cam_list, list) else cam_list
-
-        # Converte a imagem CAM para numpy e aplica a máscara Grad-CAM
-        cam_image = cam_image.squeeze().cpu().numpy()  # Squeeze para remover dimensões extras
-        cam_image = cv2.resize(cam_image, (image.shape[3], image.shape[2]))  # Redimensiona a máscara para o tamanho da imagem
-        cam_image = np.maximum(cam_image, 0)  # Garante que não haja valores negativos
-        cam_image = cam_image / cam_image.max()  # Normaliza para 0-1
-
-        # Convert the original image to numpy (for display)
+        # Convert the original image to NumPy
         original_image = image.squeeze().cpu().numpy().transpose((1, 2, 0))
-        original_image = np.uint8(original_image * 255)  # Transformação para imagem RGB
+        original_image = np.uint8(original_image * 255)
 
-        # Aplica a máscara Grad-CAM à imagem original
-        heatmap_jet = np.uint8(255 * cam_image)  # Gera o heatmap
-        heatmap_jet = cv2.applyColorMap(heatmap_jet, cv2.COLORMAP_JET)  # Aplica o mapa de cores
-        
-        heatmap_hot = np.uint8(255 * cam_image)  # Gera o heatmap
-        heatmap_hot = cv2.applyColorMap(heatmap_hot, cv2.COLORMAP_HOT)
+        # Generate and save Grad-CAM visualizations with different colormaps
+        for cmap_name, cmap in colormaps.items():
+            heatmap = cv2.applyColorMap(np.uint8(255 * cam_image), cmap)
+            superimposed_image = cv2.addWeighted(original_image, 0.6, heatmap, 0.4, 0)
 
-        heatmap_cool = np.uint8(255 * cam_image)  # Gera o heatmap
-        heatmap_cool = cv2.applyColorMap(heatmap_cool, cv2.COLORMAP_COOL)
-
-        heatmap_rainbow = np.uint8(255 * cam_image)  # Gera o heatmap
-        heatmap_rainbow = cv2.applyColorMap(heatmap_rainbow, cv2.COLORMAP_RAINBOW)
-
-        # Aplica a transparência para sobrepor o heatmap à imagem original
-        superimposed_image_jet = cv2.addWeighted(original_image, 0.6, heatmap_jet, 0.4, 0)
-        superimposed_image_hot = cv2.addWeighted(original_image, 0.6, heatmap_hot, 0.4, 0)
-        superimposed_image_cool = cv2.addWeighted(original_image, 0.6, heatmap_cool, 0.4, 0)
-        superimposed_image_rainbow = cv2.addWeighted(original_image, 0.6, heatmap_rainbow, 0.4, 0)
-
-        # Nome do arquivo com a classe correta e predita
-        output_filename = os.path.join(save_dir, f'grad_cam_true_{true_class}_pred_{pred_class}_{idx}_jet.png')
-        cv2.imwrite(output_filename, superimposed_image_jet)
-        print(f"Grad-CAM image saved as {output_filename}")
-
-        # Nome do arquivo com a classe correta e predita
-        output_filename = os.path.join(save_dir, f'grad_cam_true_{true_class}_pred_{pred_class}_{idx}_hot.png')
-        cv2.imwrite(output_filename, superimposed_image_hot)
-        print(f"Grad-CAM image saved as {output_filename}")
-
-        # Nome do arquivo com a classe correta e predita
-        output_filename = os.path.join(save_dir, f'grad_cam_true_{true_class}_pred_{pred_class}_{idx}_cool.png')
-        cv2.imwrite(output_filename, superimposed_image_cool)
-        print(f"Grad-CAM image saved as {output_filename}")
-
-        # Nome do arquivo com a classe correta e predita
-        output_filename = os.path.join(save_dir, f'grad_cam_true_{true_class}_pred_{pred_class}_{idx}_rainbow.png')
-        cv2.imwrite(output_filename, superimposed_image_rainbow)
-        print(f"Grad-CAM image saved as {output_filename}")
+            # Save image with filename indicating class info
+            output_filename = os.path.join(
+                save_dir, f'grad_cam_true_{label}_pred_{pred_class}_{idx}_{cmap_name}.png'
+            )
+            cv2.imwrite(output_filename, superimposed_image)
+            print(f"Grad-CAM saved: {output_filename}")
