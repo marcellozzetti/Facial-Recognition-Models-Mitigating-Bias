@@ -63,6 +63,7 @@ def clean_memory():
 clean_memory()
 
 timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M')
+output_dir = 'output'
 
 print("Step 9 (CNN model): Start")
 
@@ -258,7 +259,7 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
         
         print(f"\nClassification report saved to {report_filename}")
     
-def evaluate_model_with_tsne(model, test_loader, criterion, arc_face_margin, label_encoder, output_dir, timestamp, device):
+def evaluate_model_with_tsne(model, test_loader, criterion, arc_face_margin, label_encoder):
     model.eval()
     all_labels = []
     all_preds = []
