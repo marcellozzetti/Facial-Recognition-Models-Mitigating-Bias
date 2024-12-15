@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from models import LResNet50E_IR
+#from models import LResNet50E_IR
 
 # Inicializar o modelo customizado
 num_classes = 7  # Ajuste conforme o número de classes do seu problema
