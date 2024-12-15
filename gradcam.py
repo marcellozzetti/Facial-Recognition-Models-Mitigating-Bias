@@ -38,8 +38,12 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
         pred_class = output.squeeze(0).argmax().item()  # Classe predita
         true_class = label.item()  # Classe correta
 
+        # Certificar-se de que pred_class é um índice válido
+        if pred_class < 0 or pred_class >= output.size(1):  # Verifica se pred_class está no intervalo de classes
+            raise ValueError(f"Predicted class index {pred_class} is out of bounds for the output size {output.size(1)}")
+
         # Calcular Grad-CAM para a classe predita
-        cam = cam_extractor(class_idx=torch.tensor([pred_class]).to(device), input_tensor=image)  # Ajuste aqui
+        cam = cam_extractor(class_idx=pred_class, input_tensor=image)  # Passando apenas o índice da classe
 
         # Converta a imagem para numpy e aplique a máscara Grad-CAM
         cam_image = cam.squeeze().cpu().numpy()
