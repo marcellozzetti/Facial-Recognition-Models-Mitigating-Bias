@@ -34,7 +34,7 @@ def download_and_extract_dataset(url, base_dir, target_folder):
         print(f"Error {response.status_code}: Failed to download the dataset.")
 
     print("Step 6 (Images Download): End")
-
+    
 if __name__ == "__main__":
     # Constants for download and extraction
     ZIP_DATASET_URL = (
