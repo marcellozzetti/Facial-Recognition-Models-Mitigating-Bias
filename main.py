@@ -72,8 +72,7 @@ csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CS
 # Filter class "White" and "Black"
 #csv_pd = csv_pd[csv_pd['race'].isin(['White', 'Black'])]
 
-csv_pd = csv_pd.groupby('race').apply(lambda x: x.sample(n=20, random_state=42)).reset_index(drop=True)
-
+#csv_pd = csv_pd.groupby('race').apply(lambda x: x.sample(n=20, random_state=42)).reset_index(drop=True)
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
@@ -102,11 +101,19 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training function
+# Inicialização das listas de métricas fora da função
+train_losses = []
+accuracies = []
+precisions = []
+log_losses = []
+
+# Ajuste do scheduler para ser chamado no final da epoch (caso não seja OneCycleLR)
 def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin, num_epochs):
     for epoch in range(num_epochs):
         model.train()
         start_time = time.time()
-        
+        running_loss = 0.0
+
         for images, labels in tqdm(train_loader):
             images = images.to(device)
             labels = labels.to(device)
@@ -116,10 +123,8 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
             if scaler:
                 with torch.amp.autocast("cuda"):
                     outputs = model(images)
-
                     if arc_face_margin is not None:
                         outputs = arc_face_margin(outputs, labels)
-            
                     loss = criterion(outputs, labels)
                 
                 scaler.scale(loss).backward()
@@ -127,69 +132,57 @@ def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin,
                 scaler.update()
             else:
                 outputs = model(images)
-
                 if arc_face_margin is not None:
                     outputs = arc_face_margin(outputs, labels)        
-                
                 loss = criterion(outputs, labels)
                 loss.backward()
                 optimizer.step()
-    
+
+            running_loss += loss.item()
+
+        # Atualizar scheduler no final de cada epoch
+        if scheduler:
             scheduler.step()
-            #scheduler.step(epoch + images.shape[0] / len(train_loader))
 
-        
         overhead = time.time() - start_time
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Overhead: {overhead:.4f}s')
-        print(f"Epoch {epoch+1}/{NUM_EPOCHS}, Learning rate: {scheduler.get_last_lr()}")
+        avg_loss = running_loss / len(train_loader)
+        print(f'Epoch {epoch+1}/{num_epochs}, Overhead: {overhead:.4f}s, Loss: {avg_loss:.4f}')
+        print(f"Learning rate: {scheduler.get_last_lr() if scheduler else LEARNING_RATE}")
 
-        # Validation
+        # Validação
         model.eval()
-        all_labels = []
-        all_preds = []
-        all_probs = []
-        epoch_loss = 0.0
+        all_labels, all_preds, all_probs = [], [], []
+        val_loss = 0.0
         
         with torch.no_grad():
             for images, labels in tqdm(val_loader):
                 images = images.to(device)
                 labels = labels.to(device)
-                
-                # Forward pass
                 outputs = model(images)
-
                 if arc_face_margin is not None:
                     outputs = arc_face_margin(outputs, labels)
 
                 loss = criterion(outputs, labels)
-                epoch_loss += loss.item()
-        
-                # Get probabilities
+                val_loss += loss.item()
+
                 probs = F.softmax(outputs, dim=1).cpu().numpy()
-                
-                # Get predicted class (argmax)
                 preds = torch.argmax(outputs, dim=1).cpu().numpy()
-        
                 all_labels.extend(labels.cpu().numpy())
                 all_preds.extend(preds)
                 all_probs.extend(probs)
-        
-        # Calculating metrics
+
         accuracy = accuracy_score(all_labels, all_preds)
         precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
-        
-        # Ensure all_probs is an array before calculating log_loss
-        all_probs = np.array(all_probs)
-        logloss = log_loss(all_labels, all_probs)
-        
-        # Append metrics for tracking
-        train_losses.append(epoch_loss / len(val_loader))
+        logloss = log_loss(all_labels, np.array(all_probs))
+
+        # Salvando métricas
+        train_losses.append(avg_loss)
         accuracies.append(accuracy)
         precisions.append(precision)
         log_losses.append(logloss)
         
-        print(f'Epoch {epoch+1}/{NUM_EPOCHS}, Epoch Loss: {epoch_loss:.4f}, '
-              f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Log Loss: {logloss:.4f}')
+        print(f"Validation Loss: {val_loss / len(val_loader):.4f}, Accuracy: {accuracy:.4f}, "
+              f"Precision: {precision:.4f}, Log Loss: {logloss:.4f}")
 
     return model
 
