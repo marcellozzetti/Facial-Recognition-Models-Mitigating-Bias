@@ -215,7 +215,13 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
 
                 # Check incorrect predictions
                 incorrect_preds = np.where(preds != labels.cpu().numpy())[0]
-                incorrect_indices.extend([idx * BATCH_SIZE + i for i in incorrect_preds])
+                
+                # For each incorrect prediction, only add the first occurrence of the class
+                for i in incorrect_preds:
+                    pred_class = preds[i]
+                    # Check if we already added an incorrect index for this class
+                    if pred_class not in [preds[j] for j in incorrect_indices]:
+                        incorrect_indices.append(idx * BATCH_SIZE + i)
     
         # Generate images to Grad-CAM
         generate_grad_cam(model, images, labels, incorrect_indices)
