@@ -26,6 +26,7 @@ from sklearn.model_selection import train_test_split
 import datetime
 from tqdm import tqdm
 import pre_processing_images
+from gradcam import generate_grad_cam
 
 # Hyperparameters
 BATCH_SIZE = 128
@@ -198,7 +199,7 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
         epoch_loss = 0.0
     
         with torch.no_grad():
-            for images, labels in tqdm(test_loader):
+            for idx, (images, labels) in enumerate(tqdm(test_loader)):
                 images = images.to(device)
                 labels = labels.to(device)
                 
@@ -220,6 +221,13 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
                 all_labels.extend(labels.cpu().numpy())
                 all_preds.extend(preds)
                 all_probs.extend(probs)
+
+                # Check incorrect predictions
+                incorrect_preds = np.where(preds != labels.cpu().numpy())[0]
+                incorrect_indices.extend([idx * BATCH_SIZE + i for i in incorrect_preds])
+    
+        # Generate images to Grad-CAM
+        generate_grad_cam(model, images, labels, incorrect_indices)
             
         # Calculating metrics
         accuracy = accuracy_score(all_labels, all_preds)
