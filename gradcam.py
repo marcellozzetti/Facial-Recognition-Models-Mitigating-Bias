@@ -7,6 +7,10 @@ import numpy as np
 
 # Função para gerar e salvar a visualização de Grad-CAM
 def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
+    # Verifique se o modelo está usando DataParallel e acesse o modelo subjacente
+    if isinstance(model, torch.nn.DataParallel):
+        model = model.module
+    
     cam_extractor = GradCAM(model, target_layers=[model.layer4])  # Altere a camada conforme necessário
     
     if not os.path.exists(save_dir):
