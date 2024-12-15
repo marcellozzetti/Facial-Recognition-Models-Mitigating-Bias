@@ -4,6 +4,8 @@ from torchcam.methods import GradCAM
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
+import torch
+import torch.nn as nn
 
 # Função para gerar e salvar a visualização de Grad-CAM
 def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
