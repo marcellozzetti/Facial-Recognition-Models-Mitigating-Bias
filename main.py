@@ -188,6 +188,7 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
         all_probs = []
         incorrect_indices = []
         epoch_loss = 0.0
+        seen_classes = set()  # To track which classes we've added incorrect indices for
     
         with torch.no_grad():
             for idx, (images, labels) in enumerate(tqdm(test_loader)):
@@ -220,8 +221,9 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
                 for i in incorrect_preds:
                     pred_class = preds[i]
                     # Check if we already added an incorrect index for this class
-                    if pred_class not in [preds[j] for j in incorrect_indices]:
+                    if pred_class not in seen_classes:
                         incorrect_indices.append(idx * BATCH_SIZE + i)
+                        seen_classes.add(pred_class)
     
         # Generate images to Grad-CAM
         generate_grad_cam(model, images, labels, incorrect_indices)
