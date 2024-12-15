@@ -1,23 +1,56 @@
 import os
 import torch
+import torch.nn as nn
 from torchcam.methods import GradCAM
 import cv2
 import numpy as np
 
-# Target layer name
-TARGET_LAYER_NAME = 'backbone.layer4.2.conv3'
-
 # Device setup
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# Target layer name
+TARGET_LAYER_NAME = 'backbone.layer4.2.conv3'
 
 def get_target_layer(model, layer_name):
     """
     Retrieves the target layer from the model.
+    Args:
+        model: The neural network model.
+        layer_name: The name of the target layer.
+    Returns:
+        The target layer module.
     """
     target_layer = dict(model.named_modules()).get(layer_name)
     if target_layer is None:
         raise ValueError(f"Target layer '{layer_name}' not found in the model.")
     return target_layer
+
+def list_model_layers(model):
+    """
+    Lists all the layers in the model with their names.
+    Args:
+        model: The neural network model.
+    """
+    print("Listing model layers:")
+    for name, module in model.named_modules():
+        print(name)
+
+def register_layer_hook(layer):
+    """
+    Registers a forward hook to capture activations of a given layer.
+    Args:
+        layer: Target layer for activation capture.
+    Returns:
+        forward_hook: The registered forward hook.
+    """
+    activations = None
+
+    def forward_hook(module, input, output):
+        nonlocal activations
+        activations = output
+
+    hook = layer.register_forward_hook(forward_hook)
+    return hook, lambda: activations
 
 def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
     """
@@ -41,10 +74,10 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
 
     # Define colormaps
     colormaps = {
-        "jet": cv2.COLORMAP_JET
-        #"hot": cv2.COLORMAP_HOT,
-        #"cool": cv2.COLORMAP_COOL,
-        #"rainbow": cv2.COLORMAP_RAINBOW
+        "jet": cv2.COLORMAP_JET,
+        "hot": cv2.COLORMAP_HOT,
+        "cool": cv2.COLORMAP_COOL,
+        "rainbow": cv2.COLORMAP_RAINBOW
     }
 
     for idx in incorrect_indices:
