@@ -56,11 +56,13 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
 
         # Convert the original image to numpy (for display)
         original_image = image.squeeze().cpu().numpy().transpose((1, 2, 0))
-        original_image = np.uint8(original_image * 255)  # Transformação para imagem
+        original_image = np.uint8(original_image * 255)  # Transformação para imagem RGB
 
         # Aplica a máscara Grad-CAM à imagem original
         heatmap = np.uint8(255 * cam_image)  # Gera o heatmap
         heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)  # Aplica o mapa de cores
+
+        # Aplica a transparência para sobrepor o heatmap à imagem original
         superimposed_image = cv2.addWeighted(original_image, 0.6, heatmap, 0.4, 0)
 
         # Nome do arquivo com a classe correta e predita
