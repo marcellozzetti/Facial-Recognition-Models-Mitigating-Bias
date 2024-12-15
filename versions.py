@@ -3,35 +3,35 @@ import torch
 import sys
 import os
 
-# Versão do Python
-print(f"Python Version: {sys.version}")
+def system_info_report():
+    """
+    Generates a report of system and library versions, ensuring critical dependencies are verified.
+    """
+    print("=== System and Library Information ===\n")
 
-# Versão do PyTorch
-print(f"PyTorch Version: {torch.__version__}")
+    # Python Version
+    print(f"Python Version: {sys.version}")
 
-# Versão do sistema operacional
-print(f"OS: {platform.system()} {platform.release()} ({platform.version()})")
+    # PyTorch Version
+    print(f"PyTorch Version: {torch.__version__}")
 
-# Informações sobre a arquitetura da máquina
-print(f"Machine: {platform.machine()}")
-print(f"Processor: {platform.processor()}")
-print(f"Node Name: {platform.node()}")
+    # Operating System Version
+    print(f"OS: {platform.system()} {platform.release()} ({platform.version()})")
 
-# Outras bibliotecas que você quiser verificar
-try:
-    import numpy as np
-    print(f"Numpy Version: {np.__version__}")
-except ImportError:
-    print("Numpy not installed")
+    # Machine Architecture
+    print(f"Machine: {platform.machine()}")
+    print(f"Processor: {platform.processor()}")
+    print(f"Node Name: {platform.node()}")
 
-try:
-    import pandas as pd
-    print(f"Pandas Version: {pd.__version__}")
-except ImportError:
-    print("Pandas not installed")
+    # Additional Library Versions
+    def check_library(name, import_statement, version_attr):
+        try:
+            lib = __import__(import_statement)
+            version = getattr(lib, version_attr, "Unknown")
+            print(f"{name} Version: {version}")
+        except ImportError:
+            print(f"{name} not installed")
 
-try:
-    import torchvision
-    print(f"Torchvision Version: {torchvision.__version__}")
-except ImportError:
-    print("Torchvision not installed")
+    check_library("Numpy", "numpy", "__version__")
+    check_library("Pandas", "pandas", "__version__")
+    check_library("Torchvision", "torchvision", "__version__")
