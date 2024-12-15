@@ -20,20 +20,16 @@ def obter_target_layer(model, layer_name):
         raise ValueError(f"Camada alvo '{layer_name}' não encontrada no modelo. Verifique os nomes listados acima.")
     return target_layer
 
-# Função para gerar e salvar a visualização de Grad-CAM
 def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output/grad_cam'):
     if isinstance(model, torch.nn.DataParallel):
         model = model.module
     
-    # Extração do Grad-CAM
     cam_extractor = GradCAM(model, target_layer=obter_target_layer(model, target_layer_name))
     
-    # Criação do diretório para salvar as imagens, caso não exista
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
     for idx in incorrect_indices:
-        # Pegando a imagem e o label do batch
         image = images[idx].unsqueeze(0).to(device)
         label = labels[idx].unsqueeze(0).to(device)
 
@@ -43,10 +39,9 @@ def generate_grad_cam(model, images, labels, incorrect_indices, save_dir='output
         true_class = label.item()  # Classe correta
 
         # Calcular Grad-CAM para a classe predita
-        # Modificação aqui: passando a classe predita como um tensor
-        cam = cam_extractor(output, class_idx=torch.tensor([pred_class]).to(device))  # Corrigido para tensor
+        cam = cam_extractor(class_idx=torch.tensor([pred_class]).to(device), input_tensor=image)  # Ajuste aqui
 
-        # Converte a imagem para numpy e aplica a máscara Grad-CAM
+        # Converta a imagem para numpy e aplique a máscara Grad-CAM
         cam_image = cam.squeeze().cpu().numpy()
         cam_image = cv2.resize(cam_image, (image.shape[3], image.shape[2]))  # Redimensiona a máscara para o tamanho da imagem
         cam_image = np.maximum(cam_image, 0)  # Garante que não haja valores negativos
