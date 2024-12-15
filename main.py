@@ -21,7 +21,6 @@ from sklearn.metrics import precision_score, accuracy_score, confusion_matrix, c
 from sklearn.preprocessing import LabelEncoder
 from face_dataset import FaceDataset, dataset_transformation_train, dataset_transformation_val
 from models import LResNet50E_IR, ArcFaceLoss, ArcMarginProduct
-from tsne_analysis import generate_tsne_visualization
 from sklearn.utils.class_weight import compute_class_weight
 from sklearn.model_selection import train_test_split
 import datetime
@@ -31,7 +30,7 @@ from gradcam_analysis import generate_grad_cam
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 1
+NUM_EPOCHS = 8
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.01
 SCALE = 10
@@ -103,7 +102,6 @@ print("Step 9 (CNN model): End")
 print("Step 10 (Training execution): Start")
 
 # Training function
-# Ajuste do scheduler para ser chamado no final da epoch (caso não seja OneCycleLR)
 def train_model(model, criterion, optimizer, scheduler, scaler, arc_face_margin, num_epochs):
     for epoch in range(num_epochs):
         model.train()
@@ -457,10 +455,3 @@ for exp in experiments.keys():
     evaluate_model_with_tsne(model, test_loader, criterion, arc_margin, label_encoder)
 
     print(f'Step 13 (Testing): End - {exp}')
-    
-
-    print("Step 14 (t-SNE Visualization): Start")
-    
-    #generate_tsne_visualization(model, test_loader, label_encoder, arc_margin)
-    
-    print("Step 14 (t-SNE Visualization): End")
