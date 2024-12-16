@@ -226,7 +226,7 @@ def evaluate_model(model, test_loader, criterion, arc_face_margin, label_encoder
                         seen_classes.add(pred_class)
     
         # Generate images to Grad-CAM
-        generate_grad_cam(model, images, labels, incorrect_indices)
+        generate_grad_cam(model, images, labels, incorrect_indices, label_encoder)
             
         # Calculating metrics
         accuracy = accuracy_score(all_labels, all_preds)
@@ -342,7 +342,7 @@ def evaluate_model_with_tsne(model, test_loader, criterion, arc_face_margin, lab
     plt.show()
 
     # Generate images to Grad-CAM
-    generate_grad_cam(model, images, labels, incorrect_indices)
+    generate_grad_cam(model, images, labels, incorrect_indices, label_encoder)
 
     # Calculando métricas
     accuracy = accuracy_score(all_labels, all_preds)
