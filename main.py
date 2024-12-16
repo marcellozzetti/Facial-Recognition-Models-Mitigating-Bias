@@ -30,7 +30,7 @@ from gradcam_analysis import generate_grad_cam
 
 # Hyperparameters
 BATCH_SIZE = 128
-NUM_EPOCHS = 8
+NUM_EPOCHS = 1
 TEST_SIZE = 0.1
 LEARNING_RATE = 0.01
 SCALE = 10
