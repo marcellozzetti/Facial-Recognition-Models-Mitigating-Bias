@@ -341,6 +341,9 @@ def evaluate_model_with_tsne(model, test_loader, criterion, arc_face_margin, lab
     print(f"t-SNE visualization saved to {save_path}")
     plt.show()
 
+    # Generate images to Grad-CAM
+    generate_grad_cam(model, images, labels, incorrect_indices)
+
     # Calculando métricas
     accuracy = accuracy_score(all_labels, all_preds)
     precision = precision_score(all_labels, all_preds, average='weighted', zero_division=0)
