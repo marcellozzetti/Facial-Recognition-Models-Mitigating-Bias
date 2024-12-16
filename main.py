@@ -454,7 +454,8 @@ for exp in experiments.keys():
     
 
     print(f'Step 13 (Testing): Start - {exp}')
-    
-    evaluate_model_with_tsne(model, test_loader, criterion, arc_margin, label_encoder)
+
+    evaluate_model(model, test_loader, criterion, arc_margin, label_encoder)
+    #evaluate_model_with_tsne(model, test_loader, criterion, arc_margin, label_encoder)
 
     print(f'Step 13 (Testing): End - {exp}')
