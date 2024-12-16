@@ -313,7 +313,7 @@ def evaluate_model_with_tsne(model, test_loader, criterion, arc_face_margin, lab
     labels = np.concatenate(labels_list, axis=0)
 
     # Apply t-SNE for dimensionality reduction
-    tsne = TSNE(n_components=2, random_state=42, perplexity=30, n_iter=1000)
+    tsne = TSNE(n_components=2, random_state=42, perplexity=30, max_iter=1000)
     embeddings_2d = tsne.fit_transform(embeddings)
 
     # Plot the t-SNE results
