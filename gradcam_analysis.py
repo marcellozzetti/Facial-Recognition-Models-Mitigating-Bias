@@ -40,27 +40,32 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     """
     Saves Grad-CAM visualization and the original image.
     """
-    # Ensure that the Grad-CAM image has the same size as the original image
-    cam_image_resized = cv2.resize(cam_image, (image.shape[1], image.shape[0]))
+    print(f"Original image shape: {image.shape}")
+    print(f"Grad-CAM image shape: {cam_image.shape}")
 
-    # Convert the cam_image to a 3-channel image if it's not already (it could be grayscale)
-    if len(cam_image_resized.shape) == 2:  # Grayscale heatmap, convert to 3 channels
-        cam_image_resized = cv2.cvtColor(cam_image_resized, cv2.COLOR_GRAY2BGR)
+    # Verificar se a máscara de Grad-CAM (cam_image) e a imagem original têm o mesmo tamanho
+    if image.shape[:2] != cam_image.shape[:2]:
+        # Redimensionar a imagem do Grad-CAM para ter o mesmo tamanho da imagem original
+        cam_image = cv2.resize(cam_image, (image.shape[1], image.shape[0]))
+    
+    # Se a imagem do Grad-CAM for em escala de cinza (1 canal), converter para 3 canais
+    if len(cam_image.shape) == 2:  # Caso a máscara de Grad-CAM seja em escala de cinza
+        cam_image = cv2.cvtColor(cam_image, cv2.COLOR_GRAY2BGR)
 
-    # Apply colormap to the heatmap
-    heatmap = cv2.applyColorMap(np.uint8(255 * cam_image_resized), colormap)
+    # Aplicar o colormap à imagem de Grad-CAM
+    heatmap = cv2.applyColorMap(np.uint8(255 * cam_image), colormap)
 
-    # Ensure both image and heatmap are of type uint8
+    # Garantir que a imagem original tenha o tipo uint8
     image = np.uint8(image)
 
-    # Superimpose the original image with the heatmap
+    # Superimpor as duas imagens
     superimposed_image = cv2.addWeighted(image, 0.6, heatmap, 0.4, 0)
 
-    # Save the Grad-CAM visualization
+    # Salvar a visualização do Grad-CAM
     cv2.imwrite(save_path, superimposed_image)
     print(f"Grad-CAM saved: {save_path}")
 
-    # Save the original image
+    # Salvar a imagem original
     cv2.imwrite(original_save_path, image)
     print(f"Original image saved: {original_save_path}")
 
