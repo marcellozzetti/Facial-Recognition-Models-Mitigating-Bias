@@ -40,12 +40,27 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     """
     Saves Grad-CAM visualization and the original image.
     """
+    # Ensure both image and cam_image have the same dimensions
+    cam_image = cv2.resize(cam_image, (image.shape[1], image.shape[0]))
+
+    # Convert the cam_image to a 3-channel image if it's not already
+    if len(cam_image.shape) == 2:  # Grayscale heatmap, convert to 3 channels
+        cam_image = cv2.cvtColor(cam_image, cv2.COLOR_GRAY2BGR)
+
+    # Apply colormap to the heatmap
     heatmap = cv2.applyColorMap(np.uint8(255 * cam_image), colormap)
+    
+    # Ensure that the image and heatmap are of the same type (uint8)
+    image = np.uint8(image)
+
+    # Superimpose the original image with the heatmap
     superimposed_image = cv2.addWeighted(image, 0.6, heatmap, 0.4, 0)
+    
+    # Save the Grad-CAM visualization
     cv2.imwrite(save_path, superimposed_image)
     print(f"Grad-CAM saved: {save_path}")
 
-    # Save original image
+    # Save the original image
     cv2.imwrite(original_save_path, image)
     print(f"Original image saved: {original_save_path}")
 
