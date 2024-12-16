@@ -40,14 +40,11 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     """
     Saves Grad-CAM visualization and the original image.
     """
-    print(f"Original image shape: {image.shape}")
-    print(f"Grad-CAM image shape: {cam_image.shape}")
-
     # Verificar se a máscara de Grad-CAM (cam_image) e a imagem original têm o mesmo tamanho
-    if image.shape[:2] != cam_image.shape[:2]:
+    if image.shape[0] != cam_image.shape[0] or image.shape[1] != cam_image.shape[1]:
         # Redimensionar a imagem do Grad-CAM para ter o mesmo tamanho da imagem original
         cam_image = cv2.resize(cam_image, (image.shape[1], image.shape[0]))
-    
+
     # Se a imagem do Grad-CAM for em escala de cinza (1 canal), converter para 3 canais
     if len(cam_image.shape) == 2:  # Caso a máscara de Grad-CAM seja em escala de cinza
         cam_image = cv2.cvtColor(cam_image, cv2.COLOR_GRAY2BGR)
