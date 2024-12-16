@@ -35,39 +35,63 @@ def denormalize_image(tensor, mean, std):
         t.mul_(s).add_(m)
     return tensor
 
+import cv2
+import numpy as np
+
 def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray, 
                                 save_path: str, colormap: int, original_save_path: str):
     """
-    Salva a visualização do Grad-CAM e a imagem original.
+    Salva a visualização do Grad-CAM e a imagem original, com logs detalhados.
     """
+    # Log: Verificando as formas das imagens
+    print(f"Original image shape: {image.shape}")
+    print(f"Grad-CAM image shape: {cam_image.shape}")
+    
     # Verificar se a máscara de Grad-CAM (cam_image) e a imagem original têm o mesmo tamanho
     if image.shape[0] != cam_image.shape[0] or image.shape[1] != cam_image.shape[1]:
+        print(f"Dimensões não coincidem! Redimensionando Grad-CAM: "
+              f"Imagem original: {image.shape}, Grad-CAM: {cam_image.shape}")
+        
         # Redimensionar a imagem do Grad-CAM para ter o mesmo tamanho da imagem original
         cam_image = cv2.resize(cam_image, (image.shape[1], image.shape[0]))
+        print(f"Grad-CAM redimensionado para: {cam_image.shape}")
 
     # Se a imagem do Grad-CAM for em escala de cinza (1 canal), converter para 3 canais
     if len(cam_image.shape) == 2:  # Caso a máscara de Grad-CAM seja em escala de cinza
+        print("Grad-CAM está em escala de cinza. Convertendo para RGB.")
         cam_image = cv2.cvtColor(cam_image, cv2.COLOR_GRAY2BGR)
+        print(f"Grad-CAM convertido para RGB. Novo formato: {cam_image.shape}")
 
     # Garantir que a imagem do Grad-CAM esteja no intervalo de 0 a 255
     cam_image = np.uint8(255 * cam_image)  # Normalizar para o intervalo de 0 a 255, se necessário
+    print("Grad-CAM normalizado para intervalo de 0 a 255.")
 
     # Aplicar o colormap à imagem de Grad-CAM
     heatmap = cv2.applyColorMap(cam_image, colormap)
+    print(f"Colormap aplicado à máscara de Grad-CAM. Formato do heatmap: {heatmap.shape}")
 
     # Garantir que a imagem original tenha o tipo uint8
     image = np.uint8(image)
+    print("Imagem original convertida para tipo uint8.")
 
     # Superimpor as duas imagens
     superimposed_image = cv2.addWeighted(image, 0.6, heatmap, 0.4, 0)
+    print("Superimposição de Grad-CAM aplicada com sucesso.")
 
     # Salvar a visualização do Grad-CAM
-    cv2.imwrite(save_path, superimposed_image)
-    print(f"Grad-CAM saved: {save_path}")
-
+    try:
+        cv2.imwrite(save_path, superimposed_image)
+        print(f"Grad-CAM salvo em: {save_path}")
+    except Exception as e:
+        print(f"Erro ao salvar Grad-CAM: {e}")
+        
     # Salvar a imagem original
-    cv2.imwrite(original_save_path, image)
-    print(f"Original image saved: {original_save_path}")
+    try:
+        cv2.imwrite(original_save_path, image)
+        print(f"Imagem original salva em: {original_save_path}")
+    except Exception as e:
+        print(f"Erro ao salvar imagem original: {e}")
+
 
 def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tensor, 
                       incorrect_indices: list, label_encoder=None, save_dir: str = DEFAULT_SAVE_DIR):
