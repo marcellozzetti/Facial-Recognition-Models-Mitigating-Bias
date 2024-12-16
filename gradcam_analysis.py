@@ -15,9 +15,6 @@ DEFAULT_SAVE_DIR = 'output/grad_cam'
 # Available colormaps
 COLORMAPS = {
     "jet": cv2.COLORMAP_JET
-    # "hot": cv2.COLORMAP_HOT,
-    # "cool": cv2.COLORMAP_COOL,
-    # "rainbow": cv2.COLORMAP_RAINBOW
 }
 
 def get_target_layer(model: nn.Module, layer_name: str):
@@ -28,6 +25,15 @@ def get_target_layer(model: nn.Module, layer_name: str):
     if target_layer is None:
         raise ValueError(f"Target layer '{layer_name}' not found in the model.")
     return target_layer
+
+def denormalize_image(tensor, mean, std):
+    """
+    Desnormaliza a imagem para o intervalo [0, 255].
+    """
+    tensor = tensor.clone().detach()
+    for t, m, s in zip(tensor, mean, std):
+        t.mul_(s).add_(m)
+    return tensor
 
 def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray, 
                                 save_path: str, colormap: int, original_save_path: str):
@@ -81,7 +87,10 @@ def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tens
 
         # Convert the original image to NumPy
         original_image = image.squeeze().cpu().numpy().transpose((1, 2, 0))
-        original_image = np.uint8(original_image * 255)
+
+        # Denormalizar a imagem
+        original_image = denormalize_image(torch.tensor(original_image), mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        original_image = np.uint8(original_image.permute(1, 2, 0).cpu().numpy() * 255)  # De volta para o intervalo [0, 255]
 
         # Save Grad-CAM visualizations with different colormaps
         for cmap_name, cmap in COLORMAPS.items():
