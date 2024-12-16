@@ -50,7 +50,8 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     print(f"Original image saved: {original_save_path}")
 
 def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tensor, 
-                      incorrect_indices: list, save_dir: str = DEFAULT_SAVE_DIR, label_encoder: None):
+                      incorrect_indices: list, label_encoder=None, save_dir: str = DEFAULT_SAVE_DIR):
+                          
     """
     Generates Grad-CAM visualizations for incorrectly classified images.
     """
