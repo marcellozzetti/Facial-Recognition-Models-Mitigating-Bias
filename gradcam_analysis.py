@@ -35,27 +35,35 @@ def denormalize_image(tensor, mean, std):
         t.mul_(s).add_(m)
     return tensor
 
-def save_grad_cam_visualization(original_image, grad_cam, output_filename, cmap, original_filename):
-    # Verifica se o Grad-CAM precisa de ajuste nos canais
-    if len(grad_cam.shape) == 2:  # Grad-CAM está em escala de cinza
-        grad_cam = np.expand_dims(grad_cam, axis=-1)
-        grad_cam = np.repeat(grad_cam, 3, axis=-1)  # Converte para 3 canais
+def save_grad_cam_visualization(original_image, cam_image, output_filename, cmap, original_filename):
+    """
+    Combina a imagem original com a máscara Grad-CAM e salva as visualizações.
+    """
+    # Se a máscara tem 1 canal, converta para 3 canais
+    if cam_image.ndim == 2:
+        cam_image = np.stack([cam_image] * 3, axis=-1)  # Duplica o canal para RGB
 
-    if original_image.shape[-1] == 3 and grad_cam.shape[-1] == 3:
-        # Aplicar o colormap no Grad-CAM
-        heatmap = cv2.applyColorMap(np.uint8(grad_cam * 255), cmap)
-        heatmap = np.float32(heatmap) / 255.0
+    # Normalizar a máscara para [0, 1]
+    cam_image = (cam_image - cam_image.min()) / (cam_image.max() - cam_image.min() + 1e-8)
 
-        # Sobreposição do heatmap com a imagem original
-        superimposed_img = heatmap * 0.4 + np.float32(original_image) / 255.0
-        cv2.imwrite(output_filename, np.uint8(superimposed_img * 255))
+    # Aplicar o colormap
+    heatmap = cmap(cam_image[:, :, 0])[:, :, :3]  # Remove o canal alpha do colormap
 
-        # Salvar a imagem original também
-        cv2.imwrite(original_filename, cv2.cvtColor(original_image, cv2.COLOR_RGB2BGR))
-    else:
+    # Redimensionar o heatmap para corresponder à imagem original
+    heatmap = cv2.resize(heatmap, (original_image.shape[1], original_image.shape[0]))
+
+    # Verifica compatibilidade de canais
+    if original_image.shape[-1] != 3 or heatmap.shape[-1] != 3:
         raise ValueError(
-            f"Erro na sobreposição: a imagem original tem {original_image.shape[2]} canais e a máscara tem {grad_cam.shape[2]} canais."
+            f"Erro na sobreposição: a imagem original tem {original_image.shape[-1]} canais e a máscara tem {heatmap.shape[-1]} canais."
         )
+
+    # Combina Grad-CAM com a imagem original (0.5 peso para cada)
+    overlay = (0.5 * original_image + 0.5 * (heatmap * 255)).astype(np.uint8)
+
+    # Salvar imagens
+    cv2.imwrite(original_filename, cv2.cvtColor(original_image, cv2.COLOR_RGB2BGR))
+    cv2.imwrite(output_filename, cv2.cvtColor(overlay, cv2.COLOR_RGB2BGR))
 
 def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tensor, 
                       incorrect_indices: list, label_encoder=None, save_dir: str = DEFAULT_SAVE_DIR):
