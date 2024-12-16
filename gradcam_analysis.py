@@ -50,8 +50,8 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     print(f"Original image shape: {image.shape}")
     print(f"Grad-CAM image shape: {cam_image.shape}")
     
-    # Garantir que a imagem original tenha o formato correto (altura, largura, canais)
-    if len(image.shape) == 3 and image.shape[1] == 3:
+    # Garantir que a imagem original tenha o formato (altura, largura, canais)
+    if len(image.shape) == 3 and image.shape[0] == 3:
         image = np.transpose(image, (1, 2, 0))  # Converter para formato (altura, largura, canais)
         print(f"Imagem original reformatada para: {image.shape}")
     
