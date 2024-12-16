@@ -38,6 +38,9 @@ def denormalize_image(tensor, mean, std):
 import cv2
 import numpy as np
 
+import cv2
+import numpy as np
+
 def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray, 
                                 save_path: str, colormap: int, original_save_path: str):
     """
@@ -46,6 +49,11 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     # Log: Verificando as formas das imagens
     print(f"Original image shape: {image.shape}")
     print(f"Grad-CAM image shape: {cam_image.shape}")
+    
+    # Garantir que a imagem original tenha o formato correto (altura, largura, canais)
+    if len(image.shape) == 3 and image.shape[1] == 3:
+        image = np.transpose(image, (1, 2, 0))  # Converter para formato (altura, largura, canais)
+        print(f"Imagem original reformatada para: {image.shape}")
     
     # Verificar se a máscara de Grad-CAM (cam_image) e a imagem original têm o mesmo tamanho
     if image.shape[0] != cam_image.shape[0] or image.shape[1] != cam_image.shape[1]:
