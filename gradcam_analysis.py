@@ -11,7 +11,6 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # Constants
 TARGET_LAYER_NAME = 'backbone.layer4.2.conv3'
 DEFAULT_SAVE_DIR = 'output/grad_cam'
-CLASS_NAMES = ['Class1', 'Class2', 'Class3', 'Class4', 'Class5', 'Class6', 'Class7']  # Example class names
 
 # Available colormaps
 COLORMAPS = {
@@ -45,7 +44,7 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     print(f"Original image saved: {original_save_path}")
 
 def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tensor, 
-                      incorrect_indices: list, save_dir: str = DEFAULT_SAVE_DIR):
+                      incorrect_indices: list, save_dir: str = DEFAULT_SAVE_DIR, label_encoder):
     """
     Generates Grad-CAM visualizations for incorrectly classified images.
     """
@@ -57,6 +56,8 @@ def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tens
 
     # Create output directory if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
+
+    CLASS_NAMES = label_encoder.classes_.tolist()  # Get class names from the encoder
 
     for idx in incorrect_indices:
         image = images[idx].unsqueeze(0).to(DEVICE)
