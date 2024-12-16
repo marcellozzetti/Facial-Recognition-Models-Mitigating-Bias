@@ -15,9 +15,6 @@ DEFAULT_SAVE_DIR = 'output/grad_cam'
 # Available colormaps
 COLORMAPS = {
     "jet": cv2.COLORMAP_JET
-    # "hot": cv2.COLORMAP_HOT,
-    # "cool": cv2.COLORMAP_COOL,
-    # "rainbow": cv2.COLORMAP_RAINBOW
 }
 
 def get_target_layer(model: nn.Module, layer_name: str):
@@ -57,19 +54,22 @@ def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tens
     # Create output directory if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
 
-    CLASS_NAMES = label_encoder.classes_.tolist()  # Get class names from the encoder
+    CLASS_NAMES = label_encoder.classes_.tolist() if label_encoder else [str(i) for i in range(labels.max().item() + 1)]
 
-    for idx in incorrect_indices:
+    max_index = images.shape[0] - 1
+    valid_indices = [idx for idx in incorrect_indices if 0 <= idx <= max_index]
+    
+    if not valid_indices:
+        print(f"No valid indices found in `incorrect_indices`: {incorrect_indices}")
+        return
+
+    for idx in valid_indices:
         image = images[idx].unsqueeze(0).to(DEVICE)
         label = labels[idx].item()
 
         # Forward pass and get predictions
         output = model(image)
         pred_class = output.squeeze(0).argmax().item()
-
-        # Ensure prediction index is valid
-        if pred_class >= output.size(1):
-            raise ValueError(f"Predicted class index {pred_class} is out of bounds.")
 
         # Generate Grad-CAM mask
         cam_image = cam_extractor(class_idx=pred_class, scores=output)
@@ -106,7 +106,7 @@ def main():
     # Example input tensor and labels for testing
     images = torch.randn(10, 3, 224, 224).to(DEVICE)  # Random example images
     labels = torch.randint(0, num_classes, (10,)).to(DEVICE)  # Random labels
-    incorrect_indices = [i for i in range(10)]  # Example: process all images
+    incorrect_indices = [i for i in range(15)]  # Example: some indices are invalid
 
     # Generate Grad-CAM for the incorrect samples
     generate_grad_cam(model, images, labels, incorrect_indices)
