@@ -68,12 +68,11 @@ output_dir = 'output'
 print("Step 9 (CNN model): Start")
 
 # Load dataset
-csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
+#csv_pd = pd.read_csv(pre_processing_images.CSV_BALANCED_CONCAT_DATASET_FILE) #CSV_BALANCED_CONCAT_DATASET_FILE || CSV_CONCAT_DATASET_FILTERED_FILE
+csv_pd = pd.read_csv('https://raw.githubusercontent.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias/main/dataset/fairface_label_train-lab.csv')
 
 # Filter class "White" and "Black"
 #csv_pd = csv_pd[csv_pd['race'].isin(['White', 'Black'])]
-
-csv_pd = csv_pd.groupby('race').apply(lambda x: x.sample(n=20, random_state=42)).reset_index(drop=True)
 
 label_encoder = LabelEncoder()
 label_encoder.fit(csv_pd['race'])
