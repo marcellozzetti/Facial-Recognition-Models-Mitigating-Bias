@@ -58,6 +58,7 @@ def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tens
     os.makedirs(save_dir, exist_ok=True)
 
     CLASS_NAMES = label_encoder.classes_.tolist()  # Get class names from the encoder
+    print("Classes: ", CLASS_NAMES)
 
     for idx in incorrect_indices:
         image = images[idx].unsqueeze(0).to(DEVICE)
