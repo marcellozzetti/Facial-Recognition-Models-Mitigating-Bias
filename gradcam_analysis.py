@@ -35,35 +35,22 @@ def denormalize_image(tensor, mean, std):
         t.mul_(s).add_(m)
     return tensor
 
+def save_grad_cam_visualization(original_image, grad_cam, output_filename, cmap, original_filename):
+    # Verifica se a imagem original tem 3 canais e se a máscara de Grad-CAM está em escala de cinza
+    if len(grad_cam.shape) == 2:  # Grad-CAM está em escala de cinza
+        grad_cam = np.expand_dims(grad_cam, axis=-1)  # Converte para (224, 224, 1)
+        grad_cam = np.repeat(grad_cam, 3, axis=-1)  # Replicando para 3 canais
 
-def save_grad_cam_visualization(original_image, cam_image, output_filename, cmap, original_filename):
-    # Verifica se as dimensões do Grad-CAM e da imagem original coincidem
-    if cam_image.shape != original_image.shape[:2]:
-        print(f"Dimensões não coincidem! Redimensionando Grad-CAM: Imagem original: {original_image.shape}, Grad-CAM: {cam_image.shape}")
-        cam_image = cv2.resize(cam_image, (original_image.shape[1], original_image.shape[0]))  # Redimensiona para combinar com a imagem original
+    # Agora a máscara de Grad-CAM tem o mesmo número de canais que a imagem original
+    if original_image.shape[-1] == 3 and grad_cam.shape[-1] == 3:  # Ambos com 3 canais
+        heatmap = cv2.applyColorMap(np.uint8(grad_cam * 255), cmap)  # Aplica o colormap
+        heatmap = np.float32(heatmap) / 255.0  # Normaliza o heatmap
+        superimposed_img = heatmap * 0.4 + original_image * 0.6  # Sobreposição
 
-    # Converte Grad-CAM para RGB se estiver em escala de cinza
-    if len(cam_image.shape) == 2:  # Se a máscara for em escala de cinza
-        cam_image = cv2.cvtColor(cam_image, cv2.COLOR_GRAY2RGB)
-
-    # Normaliza o Grad-CAM para intervalo [0, 255]
-    cam_image = np.uint8(255 * cam_image / np.max(cam_image))
-
-    # Aplica colormap para o Grad-CAM
-    heatmap = cv2.applyColorMap(cam_image, cmap)
-
-    # Converte a imagem original para tipo uint8
-    original_image = np.uint8(original_image)
-
-    # Realiza a sobreposição
-    if original_image.shape[2] == 3 and heatmap.shape[2] == 3:  # Verifica se ambas têm 3 canais
-        superimposed_image = cv2.addWeighted(original_image, 0.6, heatmap, 0.4, 0)
+        # Salva a imagem resultante
+        cv2.imwrite(output_filename, np.uint8(superimposed_img * 255))
     else:
-        raise ValueError("Erro na sobreposição: a imagem original tem {} canais e a máscara tem {} canais.".format(original_image.shape[2], heatmap.shape[2]))
-
-    # Salva a imagem resultante
-    cv2.imwrite(output_filename, superimposed_image)
-    print(f"Grad-CAM visualizado e salvo como {output_filename}")
+        raise ValueError(f"Erro na sobreposição: a imagem original tem {original_image.shape[2]} canais e a máscara tem {grad_cam.shape[2]} canais.")
 
 
 def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tensor, 
