@@ -35,12 +35,6 @@ def denormalize_image(tensor, mean, std):
         t.mul_(s).add_(m)
     return tensor
 
-import cv2
-import numpy as np
-
-import cv2
-import numpy as np
-
 def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray, 
                                 save_path: str, colormap: int, original_save_path: str):
     """
@@ -83,8 +77,13 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     print("Imagem original convertida para tipo uint8.")
 
     # Superimpor as duas imagens
-    superimposed_image = cv2.addWeighted(image, 0.6, heatmap, 0.4, 0)
-    print("Superimposição de Grad-CAM aplicada com sucesso.")
+    # Redimensionar o heatmap para ter as mesmas dimensões da imagem original (altura, largura, canais)
+    if image.shape[2] == 3 and heatmap.shape[2] == 3:
+        superimposed_image = cv2.addWeighted(image, 0.6, heatmap, 0.4, 0)
+        print("Superimposição de Grad-CAM aplicada com sucesso.")
+    else:
+        print(f"Erro na sobreposição: a imagem original tem {image.shape[2]} canais e a máscara tem {heatmap.shape[2]} canais.")
+        return
 
     # Salvar a visualização do Grad-CAM
     try:
