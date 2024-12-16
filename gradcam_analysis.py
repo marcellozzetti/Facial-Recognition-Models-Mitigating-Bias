@@ -36,68 +36,57 @@ def denormalize_image(tensor, mean, std):
     return tensor
 
 def save_grad_cam_visualization(original_image, grad_cam, output_filename, cmap, original_filename):
-    # Verifica se a imagem original tem 3 canais e se a máscara de Grad-CAM está em escala de cinza
+    # Verifica se o Grad-CAM precisa de ajuste nos canais
     if len(grad_cam.shape) == 2:  # Grad-CAM está em escala de cinza
-        grad_cam = np.expand_dims(grad_cam, axis=-1)  # Converte para (224, 224, 1)
-        grad_cam = np.repeat(grad_cam, 3, axis=-1)  # Replicando para 3 canais
+        grad_cam = np.expand_dims(grad_cam, axis=-1)
+        grad_cam = np.repeat(grad_cam, 3, axis=-1)  # Converte para 3 canais
 
-    # Agora a máscara de Grad-CAM tem o mesmo número de canais que a imagem original
-    if original_image.shape[-1] == 3 and grad_cam.shape[-1] == 3:  # Ambos com 3 canais
-        heatmap = cv2.applyColorMap(np.uint8(grad_cam * 255), cmap)  # Aplica o colormap
-        heatmap = np.float32(heatmap) / 255.0  # Normaliza o heatmap
-        superimposed_img = heatmap * 0.4 + original_image * 0.6  # Sobreposição
+    if original_image.shape[-1] == 3 and grad_cam.shape[-1] == 3:
+        # Aplicar o colormap no Grad-CAM
+        heatmap = cv2.applyColorMap(np.uint8(grad_cam * 255), cmap)
+        heatmap = np.float32(heatmap) / 255.0
 
-        # Salva a imagem resultante
+        # Sobreposição do heatmap com a imagem original
+        superimposed_img = heatmap * 0.4 + np.float32(original_image) / 255.0
         cv2.imwrite(output_filename, np.uint8(superimposed_img * 255))
-    else:
-        raise ValueError(f"Erro na sobreposição: a imagem original tem {original_image.shape[2]} canais e a máscara tem {grad_cam.shape[2]} canais.")
 
+        # Salvar a imagem original também
+        cv2.imwrite(original_filename, cv2.cvtColor(original_image, cv2.COLOR_RGB2BGR))
+    else:
+        raise ValueError(
+            f"Erro na sobreposição: a imagem original tem {original_image.shape[2]} canais e a máscara tem {grad_cam.shape[2]} canais."
+        )
 
 def generate_grad_cam(model: nn.Module, images: torch.Tensor, labels: torch.Tensor, 
                       incorrect_indices: list, label_encoder=None, save_dir: str = DEFAULT_SAVE_DIR):
-                          
     """
-    Generates Grad-CAM visualizations for incorrectly classified images.
+    Gera visualizações Grad-CAM para amostras classificadas incorretamente.
     """
     if isinstance(model, torch.nn.DataParallel):
-        model = model.module  # Handle DataParallel wrapper
+        model = model.module
 
-    # Initialize Grad-CAM extractor
     cam_extractor = GradCAM(model, target_layer=get_target_layer(model, TARGET_LAYER_NAME))
-
-    # Create output directory if it doesn't exist
     os.makedirs(save_dir, exist_ok=True)
 
-    CLASS_NAMES = label_encoder.classes_.tolist()  # Get class names from the encoder
+    CLASS_NAMES = label_encoder.classes_.tolist() if label_encoder else [f'Class_{i}' for i in range(images.size(0))]
     print("Classes: ", CLASS_NAMES)
 
     for idx in incorrect_indices:
         image = images[idx].unsqueeze(0).to(DEVICE)
         label = labels[idx].item()
 
-        # Forward pass and get predictions
         output = model(image)
-        pred_class = output.squeeze(0).argmax().item()
+        pred_class = output.argmax(dim=1).item()
 
-        # Ensure prediction index is valid
-        if pred_class >= output.size(1):
-            raise ValueError(f"Predicted class index {pred_class} is out of bounds.")
-
-        # Generate Grad-CAM mask
-        cam_image = cam_extractor(class_idx=pred_class, scores=output)
-        cam_image = cam_image[0] if isinstance(cam_image, list) else cam_image
-        cam_image = cam_image.squeeze().cpu().numpy()
+        cam_image = cam_extractor(class_idx=pred_class, scores=output).squeeze().cpu().numpy()
         cam_image = np.maximum(cam_image, 0) / cam_image.max()
         cam_image = cv2.resize(cam_image, (image.shape[3], image.shape[2]))
 
-        # Convert the original image to NumPy
-        original_image = image.squeeze().cpu().numpy().transpose((1, 2, 0))
-
-        # Denormalizar a imagem
+        # Denormalizar a imagem original
+        original_image = image.squeeze().cpu().numpy().transpose(1, 2, 0)
         original_image = denormalize_image(torch.tensor(original_image), mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        original_image = np.uint8(original_image.permute(1, 2, 0).cpu().numpy() * 255)  # De volta para o intervalo [0, 255]
+        original_image = np.uint8(original_image.permute(1, 2, 0).cpu().numpy() * 255)
 
-        # Save Grad-CAM visualizations with different colormaps
         for cmap_name, cmap in COLORMAPS.items():
             output_filename = os.path.join(
                 save_dir, f'grad_cam_true_{CLASS_NAMES[label]}_pred_{CLASS_NAMES[pred_class]}_{idx}_{cmap_name}.png'
