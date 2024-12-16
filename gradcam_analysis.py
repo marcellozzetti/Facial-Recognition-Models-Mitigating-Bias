@@ -38,7 +38,7 @@ def denormalize_image(tensor, mean, std):
 def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray, 
                                 save_path: str, colormap: int, original_save_path: str):
     """
-    Saves Grad-CAM visualization and the original image.
+    Salva a visualização do Grad-CAM e a imagem original.
     """
     # Verificar se a máscara de Grad-CAM (cam_image) e a imagem original têm o mesmo tamanho
     if image.shape[0] != cam_image.shape[0] or image.shape[1] != cam_image.shape[1]:
@@ -49,8 +49,11 @@ def save_grad_cam_visualization(image: np.ndarray, cam_image: np.ndarray,
     if len(cam_image.shape) == 2:  # Caso a máscara de Grad-CAM seja em escala de cinza
         cam_image = cv2.cvtColor(cam_image, cv2.COLOR_GRAY2BGR)
 
+    # Garantir que a imagem do Grad-CAM esteja no intervalo de 0 a 255
+    cam_image = np.uint8(255 * cam_image)  # Normalizar para o intervalo de 0 a 255, se necessário
+
     # Aplicar o colormap à imagem de Grad-CAM
-    heatmap = cv2.applyColorMap(np.uint8(255 * cam_image), colormap)
+    heatmap = cv2.applyColorMap(cam_image, colormap)
 
     # Garantir que a imagem original tenha o tipo uint8
     image = np.uint8(image)
