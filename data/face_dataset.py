@@ -1,10 +1,12 @@
-import os
-import cv2
-from PIL import Image
-from torch.utils.data import Dataset
+import os, cv2
+from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
+from PIL import Image
 
 class FaceDataset(Dataset):
+    """
+    Custom Dataset for handling image data and labels stored in a directory structure.
+    """
     def __init__(self, img_paths, labels, img_dir, transform=None, label_encoder=None):
         self.img_paths = img_paths
         self.labels = labels
@@ -32,22 +34,42 @@ class FaceDataset(Dataset):
 
         return img, label_index
 
-def dataset_transformation_train(img):
-    transform = transforms.Compose([
-        transforms.ToPILImage(),
-        transforms.Resize((224, 224)),
-        transforms.RandomRotation(degrees=15),
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-    return transform(img)
+def load_data(data_config):
+    """
+    Loads training, validation, and testing datasets using FaceDataset.
+    """
+    # Define data transformations
+    data_transforms = {
+        'train': transforms.Compose([
+            transforms.Resize((data_config['input_size'], data_config['input_size'])),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+        'val': transforms.Compose([
+            transforms.Resize((data_config['input_size'], data_config['input_size'])),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+        'test': transforms.Compose([
+            transforms.Resize((data_config['input_size'], data_config['input_size'])),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ])
+    }
 
-def dataset_transformation_val(img):
-    transform = transforms.Compose([
-        transforms.ToPILImage(),
-        transforms.ToTensor(),
-        transforms.Resize((224, 224)),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ])
-    return transform(img)
+    # Create datasets
+    datasets = {
+        'train': FaceDataset(data_config['train_dir'], transform=data_transforms['train']),
+        'val': FaceDataset(data_config['val_dir'], transform=data_transforms['val']),
+        'test': FaceDataset(data_config['test_dir'], transform=data_transforms['test'])
+    }
+
+    # Create dataloaders
+    dataloaders = {
+        'train': DataLoader(datasets['train'], batch_size=data_config['batch_size'], shuffle=True, num_workers=data_config['num_workers']),
+        'val': DataLoader(datasets['val'], batch_size=data_config['batch_size'], shuffle=False, num_workers=data_config['num_workers']),
+        'test': DataLoader(datasets['test'], batch_size=data_config['batch_size'], shuffle=False, num_workers=data_config['num_workers'])
+    }
+
+    return dataloaders, datasets['train'].class_to_idx
