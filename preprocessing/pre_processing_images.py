@@ -8,6 +8,72 @@ from utils.config import load_config
 from utils.logging import setup_logging
 from preprocessing.transformations import cropping_procedure, rotate_procedure, alignment_procedure
 
+import cv2
+import numpy as np
+import logging
+
+def cropping_procedure(image, bbox):
+    """
+    Crop the image to the bounding box region.
+    """
+    try:
+        x, y, w, h = bbox
+        return image[y:y+h, x:x+w]
+    except Exception as e:
+        logging.error(f"Cropping failed: {e}")
+        return None
+
+def rotate_procedure(image, angle):
+    """
+    Rotate the image by the specified angle.
+
+    Args:
+        image (numpy.ndarray): Input image.
+        angle (float): Angle to rotate the image.
+
+    Returns:
+        numpy.ndarray: Rotated image.
+    """
+    (h, w) = image.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    return cv2.warpAffine(image, M, (w, h))
+
+def alignment_procedure(image, landmarks):
+    """
+    Align the image based on facial landmarks.
+
+    Args:
+        image (numpy.ndarray): Input image.
+        landmarks (list): Facial landmarks for alignment.
+
+    Returns:
+        numpy.ndarray: Aligned image.
+    """
+    if not landmarks or len(landmarks) < 2:
+        logging.warning("Insufficient landmarks for alignment")
+        return image
+
+    # Example: Implement alignment logic (this is a placeholder)
+    return image
+
+def draw_bounding_procedure(image, bbox, color=(0, 255, 0), thickness=2):
+    """
+    Draw a bounding box on the image.
+
+    Args:
+        image (numpy.ndarray): Input image.
+        bbox (tuple): Bounding box (x, y, w, h).
+        color (tuple): Color of the bounding box.
+        thickness (int): Thickness of the bounding box.
+
+    Returns:
+        numpy.ndarray: Image with bounding box drawn.
+    """
+    x, y, w, h = bbox
+    return cv2.rectangle(image, (x, y), (x+w, y+h), color, thickness)
+
+
 def draw_bounding_procedure(img):
     """
     Detect faces and draw bounding boxes.
