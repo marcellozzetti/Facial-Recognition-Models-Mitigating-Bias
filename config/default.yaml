@@ -1,10 +1,10 @@
 model:
   name: "ResNet50"               # Name of the model
   pretrained: true               # Use pre-trained weights
-  num_classes: 2                 # Number of classes in the dataset
+  num_classes: 7                 # Number of classes in the dataset
 
 training:
-  batch_size: 32                 # Batch size
+  batch_size: 128                # Batch size
   learning_rate: 0.001           # Learning rate
   num_epochs: 25                 # Number of training epochs
   optimizer: "adam"              # Optimizer to use
@@ -16,9 +16,17 @@ data:
   train_split: 0.7               # Percentage of data used for training (70%)
   val_split: 0.2                 # Percentage of data used for validation (20%)
   input_size: 224                # Input image size (224x224)
-  batch_size: 128                # Batch size for data loading
   num_workers: 4                 # Number of workers for the DataLoader
+  file_path: "/home/ubuntu/projects/fairface/dataset/output/processed_images/"
+  file_name: "fairface-processed_images.zip"
 
 logging:
   log_dir: "./logs"              # Directory to save logs
   log_level: "INFO"              # Logging level (INFO, DEBUG, etc.)
+  log_file: "logs/upload.log"
+
+aws:
+  bucket_name: "dataset-fairface"                       # Bucket Name
+  object_name: "dataset/fairface-processed_images.zip"  # Bucket Object
+  access_key: ""                                        # Bucket Access Key
+  secret_access_key: ""                                 # Bucket Secret Access Key
