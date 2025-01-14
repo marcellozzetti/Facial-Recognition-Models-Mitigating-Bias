@@ -15,17 +15,21 @@ data:
   root_dir: "./data/images"      # Root directory containing the images
   train_split: 0.7               # Percentage of data used for training (70%)
   val_split: 0.2                 # Percentage of data used for validation (20%)
-  input_size: 224                # Input image size (224x224)
+  image_size: [224, 224]         # Input image size (224x224)
   num_workers: 4                 # Number of workers for the DataLoader
   file_path: "/home/ubuntu/projects/fairface/dataset/output/processed_images/"
   file_name: "fairface-processed_images.zip"
+  input_dir: "path/to/input/images"
+  output_dir: "path/to/output/images"
 
 logging:
   log_dir: "./logs"              # Directory to save logs
   log_level: "INFO"              # Logging level (INFO, DEBUG, etc.)
-  log_file: "logs/upload.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_bucket_file: "logs/bucket.log"
+  log_preprocessing_file: "logs/preprocessing.log"
 
-aws:
+bucket:
   bucket_name: "dataset-fairface"                       # Bucket Name
   object_name: "dataset/fairface-processed_images.zip"  # Bucket Object
   access_key: ""                                        # Bucket Access Key

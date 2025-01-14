@@ -19,19 +19,19 @@ def upload_to_s3(file_path, config, bucket, object_name=None):
     if object_name is None:
         object_name = os.path.basename(file_path)
 
-    # Retrieve AWS credentials from environment variables
-    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+    # Retrieve Bucket credentials from environment variables
+    bucket_access_key_id = config['bucket']['access_key']
+    bucket_secret_access_key = config['bucket']['secret_access_key']
 
-    if not aws_access_key_id or not aws_secret_access_key:
-        logging.error("AWS credentials are not set in environment variables.")
+    if not bucket_access_key_id or not bucket_secret_access_key:
+        logging.error("Bucket credentials are not set in environment variables.")
         return False
 
     # Initialize S3 client
     s3_client = boto3.client(
         's3',
-        aws_access_key_id=config['aws']['access_key'],
-        aws_secret_access_key=config['aws']['secret_access_key']
+        aws_access_key_id=bucket_access_key_id,
+        aws_secret_access_key=bucket_secret_access_key
     )
 
     try:
@@ -41,7 +41,7 @@ def upload_to_s3(file_path, config, bucket, object_name=None):
     except FileNotFoundError:
         logging.error(f"The file {file_path} was not found.")
     except NoCredentialsError:
-        logging.error("AWS credentials are not available.")
+        logging.error("Bucket credentials are not available.")
     except ClientError as e:
         logging.error(f"Client error: {e}")
     except Exception as e:
@@ -56,9 +56,9 @@ def main():
     # Set up logging
     logging.basicConfig(
         level=config['logging']['log_level'],
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=config['logging']['format'],
         handlers=[
-            logging.FileHandler(config['logging']['log_file']),
+            logging.FileHandler(config['logging']['log_bucket_file']),
             logging.StreamHandler()
         ]
     )
@@ -66,8 +66,8 @@ def main():
     # File and S3 parameters from config
     file_path = config['data']['file_path']
     file_name = config['data']['file_name']
-    bucket_name = config['aws']['bucket_name']
-    object_name = config['aws'].get('object_name', file_name)
+    bucket_name = config['bucket']['bucket_name']
+    object_name = config['bucket'].get('object_name', file_name)
 
     # Upload file to S3
     success = upload_to_s3(os.path.join(file_path, file_name), config, bucket_name, object_name)

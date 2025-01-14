@@ -2,7 +2,6 @@ import os
 import cv2
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
-from PIL import Image
 
 class FaceDataset(Dataset):
     """
@@ -28,7 +27,6 @@ class FaceDataset(Dataset):
             
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         if self.transform:
-            #img = Image.fromarray(img)
             img = self.transform(img)
             
         label_index = self.label_encoder.transform([label])[0]
