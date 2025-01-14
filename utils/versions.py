@@ -1,37 +1,59 @@
 import platform
-import torch
 import sys
-import os
+import importlib
+import logging
+from utils.config import load_config
+from utils.logging import setup_logging
 
-def system_info_report():
+def get_system_info():
     """
-    Generates a report of system and library versions, ensuring critical dependencies are verified.
+    Collect system information, including the operating system and Python version.
     """
-    print("=== System and Library Information ===\n")
+    return {
+        "Python Version": sys.version,
+        "OS": f"{platform.system()} {platform.release()} ({platform.version()})",
+        "Machine": platform.machine(),
+        "Processor": platform.processor(),
+        "Node Name": platform.node()
+    }
 
-    # Python Version
-    print(f"Python Version: {sys.version}")
+def get_library_version(library_name):
+    """
+    Attempt to import a library and retrieve its version.
+    """
+    try:
+        lib = importlib.import_module(library_name)
+        return getattr(lib, '__version__', 'Unknown version')
+    except ImportError:
+        return 'Not installed'
 
-    # PyTorch Version
-    print(f"PyTorch Version: {torch.__version__}")
+def system_info_report(additional_libraries=None):
+    """
+    Generate a report with system information and specified library versions.
+    """
+    if additional_libraries is None:
+        additional_libraries = []
 
-    # Operating System Version
-    print(f"OS: {platform.system()} {platform.release()} ({platform.version()})")
+    # Collect system information
+    report = get_system_info()
 
-    # Machine Architecture
-    print(f"Machine: {platform.machine()}")
-    print(f"Processor: {platform.processor()}")
-    print(f"Node Name: {platform.node()}")
+    # Check critical and additional libraries
+    critical_libraries = ['torch']
+    for lib in critical_libraries + additional_libraries:
+        report[f"{lib.capitalize()} Version"] = get_library_version(lib)
 
-    # Additional Library Versions
-    def check_library(name, import_statement, version_attr):
-        try:
-            lib = __import__(import_statement)
-            version = getattr(lib, version_attr, "Unknown")
-            print(f"{name} Version: {version}")
-        except ImportError:
-            print(f"{name} not installed")
+    # Log the report
+    logging.info("=== System and Library Information ===")
+    for key, value in sorted(report.items()):
+        logging.info(f"{key}: {value}")
 
-    check_library("Numpy", "numpy", "__version__")
-    check_library("Pandas", "pandas", "__version__")
-    check_library("Torchvision", "torchvision", "__version__")
+    return report
+
+# Usage example
+if __name__ == "__main__":
+    config = load_config('configs/default.yaml')
+    setup_logging(config, 'log_version_file')
+    
+    # Additional libraries to check
+    additional_libs = ['numpy', 'pandas']
+    system_info_report(additional_libs)
