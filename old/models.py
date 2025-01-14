@@ -86,4 +86,4 @@ class ArcMarginProduct(nn.Module):
         output = (one_hot * phi) + ((1.0 - one_hot) * cosine)
         output *= self.s  # Applying scale
 
-        return output
+        return outputd
