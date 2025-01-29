@@ -1,0 +1,9 @@
+2025-01-29 18:16:05,670 - root - INFO - === System and Library Information ===
+2025-01-29 18:16:05,670 - root - INFO - Machine: AMD64
+2025-01-29 18:16:05,671 - root - INFO - Node Name: marcello-ozzetti
+2025-01-29 18:16:05,671 - root - INFO - Numpy Version: Not installed
+2025-01-29 18:16:05,671 - root - INFO - OS: Windows 10 (10.0.22631)
+2025-01-29 18:16:05,671 - root - INFO - Pandas Version: Not installed
+2025-01-29 18:16:05,672 - root - INFO - Processor: AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD
+2025-01-29 18:16:05,672 - root - INFO - Python Version: 3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]
+2025-01-29 18:16:05,672 - root - INFO - Torch Version: Not installed

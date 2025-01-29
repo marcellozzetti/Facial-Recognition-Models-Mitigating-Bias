@@ -1,9 +1,14 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import platform
 import sys
 import importlib
 import logging
 from utils.config import load_config
-from utils.logging import setup_logging
+from utils.custom_logging import setup_logging
 
 def get_system_info():
     """

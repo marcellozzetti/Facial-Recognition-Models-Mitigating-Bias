@@ -23,12 +23,12 @@ data:
   output_dir: "path/to/output/images"
 
 logging:
-  log_dir: "./logs"              # Directory to save logs
+  log_dir: "logs"              # Directory to save logs
   log_level: "INFO"              # Logging level (INFO, DEBUG, etc.)
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  log_bucket_file: "logs/bucket.log"
-  log_preprocessing_file: "logs/preprocessing.log"
-  log_version_file: "logs/version.log"
+  log_bucket_file: "bucket.log"
+  log_preprocessing_file: "preprocessing.log"
+  log_version_file: "version.log"
 
 bucket:
   bucket_name: "dataset-fairface"                       # Bucket Name

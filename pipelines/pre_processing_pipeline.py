@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 from preprocessing.pre_processing_images import detect_and_adjust_faces, draw_bounding_procedure
 from utils.config import load_config
-from utils.logging import setup_logging
+from utils.custom_logging import setup_logging
 
 def process_image(image_path, output_dir, face_detector, config):
     """
