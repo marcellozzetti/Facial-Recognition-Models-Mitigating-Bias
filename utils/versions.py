@@ -7,6 +7,7 @@ import platform
 import sys
 import importlib
 import logging
+import torch
 from utils.config import load_config
 from utils.custom_logging import setup_logging
 
@@ -49,8 +50,14 @@ def system_info_report(additional_libraries=None):
 
     # Log the report
     logging.info("=== System and Library Information ===")
+    
     for key, value in sorted(report.items()):
         logging.info(f"{key}: {value}")
+
+    # Check if CUDA is available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    logging.info(f"CUDA available: {torch.cuda.is_available()}")
+    logging.info(f"Device: {device}")
 
     return report
 
