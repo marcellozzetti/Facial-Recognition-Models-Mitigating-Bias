@@ -1,27 +1,31 @@
 model:
-  name: "ResNet50"               # Name of the model
-  pretrained: true               # Use pre-trained weights
-  num_classes: 7                 # Number of classes in the dataset
+  #name: "ResNet50"               # Name of the model
+  #pretrained: true               # Use pre-trained weights
+  #num_classes: 7                 # Number of classes in the dataset
 
 training:
   batch_size: 128                # Batch size
-  learning_rate: 0.001           # Learning rate
-  num_epochs: 25                 # Number of training epochs
-  optimizer: "adam"              # Optimizer to use
-  loss_function: "cross_entropy" # Loss function
-  train_split: 0.7               # Percentage of data used for training (70%)
-  val_split: 0.2                 # Percentage of data used for validation (20%)
-  image_size: [224, 224]         # Input image size (224x224)
+  #learning_rate: 0.001           # Learning rate
+  #num_epochs: 25                 # Number of training epochs
+  #optimizer: "adam"              # Optimizer to use
+  #loss_function: "cross_entropy" # Loss function
+  test_size: 0.2                 # Percentage of data used for test
   num_workers: 4                 # Number of workers for the DataLoader
+  random_state: 42               # Random state for reproducibility
+
+#Under Review
+image:
+  image_size: [224, 224]              # Input image size (224x224)
+  image_mean: [0.485, 0.456, 0.406]   # Image mean
+  image_std: [0.229, 0.224, 0.225]    # Image standard deviation
 
 data:
-  data_csv: "./data/dataset.csv" # Path to the CSV file with image paths and labels
-  root_dir: "./data/images"      # Root directory containing the images
-  file_path: "/home/ubuntu/projects/fairface/dataset/output/processed_images/"
-  file_name: "fairface-processed_images.zip"
-  input_dir: "path/to/input/images"
-  output_dir: "path/to/output/images"
-
+  dataset_file: "/data/dataset/dataset.csv"                           # Path to the CSV file with image paths and labels
+  dataset_image_path: "/data/dataset/processed_images/"               # Root directory containing the images
+  #file_path: "/home/ubuntu/projects/fairface/dataset/output/processed_images/"
+  #file_name: "fairface-processed_images.zip"
+  #input_dir: "path/to/input/images"
+  #output_dir: "path/to/output/images"
 
 #Validated
 bucket:
@@ -38,4 +42,5 @@ logging:
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"    # Log format
   log_bucket_file: "bucket.log"                                     # Log file for bucket operations
   log_preprocessing_file: "preprocessing.log"                       # Log file for preprocessing operations
+  log_face_data_file: "face_data.log"                               # Log file for face data operations
   log_version_file: "version.log"                                   # Log file for version operations

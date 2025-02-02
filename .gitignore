@@ -39,3 +39,8 @@ Thumbs.db
 # Access Keys #
 ######################
 credentials.json
+
+# DataSet Keys #
+######################
+data/dataset/
+
