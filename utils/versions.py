@@ -1,6 +1,5 @@
 import sys
 import os
-
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import platform
@@ -61,11 +60,14 @@ def system_info_report(additional_libraries=None):
 
     return report
 
-# Usage example
-if __name__ == "__main__":
+def main():
+    # Load configuration
     config = load_config('configs/default.yaml')
     setup_logging(config, 'log_version_file')
     
     # Additional libraries to check
     additional_libs = ['numpy', 'pandas']
     system_info_report(additional_libs)
+
+if __name__ == "__main__":
+    main()
