@@ -1,6 +1,6 @@
 import logging
 import cv2
-from preprocessing.transformations import cropping_procedure, rotate_procedure, alignment_procedure
+from transformations import cropping_procedure, alignment_procedure
 
 def detect_and_adjust_faces(image, face_detector, output_size):
     """
