@@ -13,21 +13,24 @@ training:
   num_workers: 4                 # Number of workers for the DataLoader
   random_state: 42               # Random state for reproducibility
 
-#Under Review
+#Validated
 image:
   image_size: [224, 224]              # Input image size (224x224)
   image_mean: [0.485, 0.456, 0.406]   # Image mean
   image_std: [0.229, 0.224, 0.225]    # Image standard deviation
 
-data:
-  dataset_file: "/data/dataset/dataset.csv"                           # Path to the CSV file with image paths and labels
-  dataset_image_path: "/data/dataset/processed_images/"               # Root directory containing the images
-  #file_path: "/home/ubuntu/projects/fairface/dataset/output/processed_images/"
-  #file_name: "fairface-processed_images.zip"
-  #input_dir: "path/to/input/images"
-  #output_dir: "path/to/output/images"
+preprocessing:
+  processing_type: "detect_adjust_image"      # Type of preprocessing (rotate_image, detect_adjust_image)
+  num_workers: 4                              # Number of workers for the Preprocessing
+  rotate_angle: 45                            # Angle for rotation (45, 90, 180, 270 degrees)
+  num_rotations: 8                            # Number of rotations (4 for 90 degrees, 2 for 180 degrees, 1 for 270 degrees)
 
-#Validated
+data:
+  #dataset_file: "/data/dataset/dataset.csv"                                        # Path to the CSV file with image paths and labels
+  #dataset_image_processed_path: "/data/dataset/processed_images/"                  # Root directory containing the images
+  dataset_image_input_path: "data/dataset/bucket/pre-processing/output"             # Path to the directory containing the images
+  dataset_image_output_path: "data/dataset/bucket/pre-processing/output_detected"   # Path to the directory containing the images
+
 bucket:
   function: "download"                                              # Function to perform (download or upload)
   bucket_client: "s3"                                               # Bucket Client (s3 or blob)
