@@ -26,10 +26,10 @@ preprocessing:
   num_rotations: 8                            # Number of rotations (4 for 90 degrees, 2 for 180 degrees, 1 for 270 degrees)
 
 data:
-  #dataset_file: "/data/dataset/dataset.csv"                                        # Path to the CSV file with image paths and labels
-  #dataset_image_processed_path: "/data/dataset/processed_images/"                  # Root directory containing the images
-  dataset_image_input_path: "data/dataset/bucket/pre-processing/output"             # Path to the directory containing the images
-  dataset_image_output_path: "data/dataset/bucket/pre-processing/output_detected"   # Path to the directory containing the images
+  #dataset_file: "/data/dataset/dataset.csv"                                              # Path to the CSV file with image paths and labels
+  #dataset_image_processed_path: "/data/dataset/processed_images/"                        # Root directory containing the images
+  dataset_image_input_path: "data/dataset/bucket/val"                                   # Path to the directory containing the images
+  dataset_image_output_path: "data/dataset/pre-processing/output_detected_adjuste/val"  # Path to the directory containing the images
 
 bucket:
   function: "download"                                              # Function to perform (download or upload)

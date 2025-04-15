@@ -98,7 +98,7 @@ def main():
     logging.info(f"Starting preprocessing with config: {config}")
 
     # Initialize face detector
-    face_detector = MTCNN(keep_all=True)
+    face_detector = MTCNN()
 
     process_preprocessing(
         config['data']['dataset_image_input_path'],
