@@ -1,0 +1,37 @@
+# Normalize line endings: convert to LF on commit, leave working tree alone
+* text=auto eol=lf
+
+# Force LF for source files regardless of OS
+*.py    text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.toml  text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.cfg   text eol=lf
+*.ini   text eol=lf
+
+# Mark binary files explicitly
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.bmp   binary
+*.tiff  binary
+*.pdf   binary
+*.zip   binary
+*.tar   binary
+*.gz    binary
+*.7z    binary
+*.pkl   binary
+*.pt    binary
+*.pth   binary
+*.npy   binary
+*.npz   binary
+*.h5    binary
+*.hdf5  binary
+*.onnx  binary
+
+# Notebooks: text but no LF normalization
+*.ipynb text -text
