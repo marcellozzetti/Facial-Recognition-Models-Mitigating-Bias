@@ -36,9 +36,6 @@ data:
   dataset_image_output_path: "data/processed/fairface_aligned"
 
 bucket:
-  # Function and client only. The presigned URL is loaded at runtime
-  # from configs/credentials.json (key: bucket.<client>.bucket_download_url)
-  # or from the environment variable FACE_BIAS_BUCKET_URL.
   function: "download"             # one of: download, upload
   bucket_client: "s3"              # one of: s3, blob
   bucket_path_file: "data/raw/bucket/"
