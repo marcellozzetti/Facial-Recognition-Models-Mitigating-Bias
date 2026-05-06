@@ -49,22 +49,28 @@ class FaceDataset(Dataset):
 def setup_dataset(config: dict[str, Any]):
     """Load training, validation, and test datasets using FaceDataset."""
     data_transforms = {
-        "train": transforms.Compose([
-            transforms.Resize((config["image"]["input_size"], config["image"]["input_size"])),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize(config["image"]["image_mean"], config["image"]["image_mean"]),
-        ]),
-        "val": transforms.Compose([
-            transforms.Resize((config["image"]["input_size"], config["image"]["input_size"])),
-            transforms.ToTensor(),
-            transforms.Normalize(config["image"]["image_mean"], config["image"]["image_mean"]),
-        ]),
-        "test": transforms.Compose([
-            transforms.Resize((config["image"]["input_size"], config["image"]["input_size"])),
-            transforms.ToTensor(),
-            transforms.Normalize(config["image"]["image_mean"], config["image"]["image_mean"]),
-        ]),
+        "train": transforms.Compose(
+            [
+                transforms.Resize((config["image"]["input_size"], config["image"]["input_size"])),
+                transforms.RandomHorizontalFlip(),
+                transforms.ToTensor(),
+                transforms.Normalize(config["image"]["image_mean"], config["image"]["image_mean"]),
+            ]
+        ),
+        "val": transforms.Compose(
+            [
+                transforms.Resize((config["image"]["input_size"], config["image"]["input_size"])),
+                transforms.ToTensor(),
+                transforms.Normalize(config["image"]["image_mean"], config["image"]["image_mean"]),
+            ]
+        ),
+        "test": transforms.Compose(
+            [
+                transforms.Resize((config["image"]["input_size"], config["image"]["input_size"])),
+                transforms.ToTensor(),
+                transforms.Normalize(config["image"]["image_mean"], config["image"]["image_mean"]),
+            ]
+        ),
     }
 
     csv_pd = pd.read_csv(config["data"]["dataset_file"])

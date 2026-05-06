@@ -25,11 +25,39 @@ def draw_bounding_procedure(img, bbox, landmark):
         ax.add_patch(Circle(mouth_left, radius=2, color="orange"))
         ax.add_patch(Circle(mouth_right, radius=2, color="orange"))
 
-        ax.text(left_eye[0], left_eye[1], "Left Eye", fontsize=8, color="blue", verticalalignment="bottom")
-        ax.text(right_eye[0], right_eye[1], "Right Eye", fontsize=8, color="blue", verticalalignment="bottom")
+        ax.text(
+            left_eye[0],
+            left_eye[1],
+            "Left Eye",
+            fontsize=8,
+            color="blue",
+            verticalalignment="bottom",
+        )
+        ax.text(
+            right_eye[0],
+            right_eye[1],
+            "Right Eye",
+            fontsize=8,
+            color="blue",
+            verticalalignment="bottom",
+        )
         ax.text(nose[0], nose[1], "Nose", fontsize=8, color="green", verticalalignment="bottom")
-        ax.text(mouth_left[0], mouth_left[1], "Mouth Left", fontsize=8, color="orange", verticalalignment="bottom")
-        ax.text(mouth_right[0], mouth_right[1], "Mouth Right", fontsize=8, color="orange", verticalalignment="bottom")
+        ax.text(
+            mouth_left[0],
+            mouth_left[1],
+            "Mouth Left",
+            fontsize=8,
+            color="orange",
+            verticalalignment="bottom",
+        )
+        ax.text(
+            mouth_right[0],
+            mouth_right[1],
+            "Mouth Right",
+            fontsize=8,
+            color="orange",
+            verticalalignment="bottom",
+        )
 
         plt.axis("off")
         plt.show()

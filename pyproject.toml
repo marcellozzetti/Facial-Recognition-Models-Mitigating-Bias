@@ -80,8 +80,10 @@ select = [
 ]
 ignore = [
   "E501",          # line length handled by black
+  "N801",          # paper-name model classes (LResNet50E_IR, etc.)
   "N803",          # ML convention: lowercase X, y is fine
   "N806",          # same for X_train, etc.
+  "N812",          # PyTorch idiom: import torch.nn.functional as F
 ]
 
 [tool.ruff.lint.per-file-ignores]
