@@ -1,49 +1,57 @@
+# Default configuration.
+# Secrets and presigned URLs MUST come from configs/credentials.json (gitignored)
+# or environment variables. Never commit credentials to this file.
+
 model:
-  #name: "ResNet50"               # Name of the model
-  #pretrained: true               # Use pre-trained weights
-  #num_classes: 7                 # Number of classes in the dataset
+  name: "LResNet50E_IR"
+  pretrained: true
+  num_classes: 7
+  dropout: 0.5
 
 training:
-  batch_size: 128                # Batch size
-  #learning_rate: 0.001           # Learning rate
-  #num_epochs: 25                 # Number of training epochs
-  #optimizer: "adam"              # Optimizer to use
-  #loss_function: "cross_entropy" # Loss function
-  test_size: 0.2                 # Percentage of data used for test
-  num_workers: 4                 # Number of workers for the DataLoader
-  random_state: 42               # Random state for reproducibility
+  batch_size: 128
+  learning_rate: 0.001
+  num_epochs: 25
+  optimizer: "adamw"               # one of: sgd, adamw
+  scheduler: "onecyclelr"          # one of: onecyclelr, cosineannealingwarmrestarts
+  loss_function: "cross_entropy"   # one of: cross_entropy, arcface
+  test_size: 0.2
+  num_workers: 4
+  random_state: 42
 
-#Validated
 image:
-  image_size: [224, 224]              # Input image size (224x224)
-  image_mean: [0.485, 0.456, 0.406]   # Image mean
-  image_std: [0.229, 0.224, 0.225]    # Image standard deviation
+  image_size: [224, 224]
+  image_mean: [0.485, 0.456, 0.406]
+  image_std:  [0.229, 0.224, 0.225]
 
 preprocessing:
-  processing_type: "detect_adjust_image"      # Type of preprocessing (rotate_image, detect_adjust_image)
-  num_workers: 4                              # Number of workers for the Preprocessing
-  rotate_angle: 45                            # Angle for rotation (45, 90, 180, 270 degrees)
-  num_rotations: 8                            # Number of rotations (4 for 90 degrees, 2 for 180 degrees, 1 for 270 degrees)
+  processing_type: "detect_adjust_image"   # one of: rotate_image, detect_adjust_image
+  num_workers: 4
+  rotate_angle: 45
+  num_rotations: 8
 
 data:
-  #dataset_file: "/data/dataset/dataset.csv"                                              # Path to the CSV file with image paths and labels
-  #dataset_image_processed_path: "/data/dataset/processed_images/"                        # Root directory containing the images
-  dataset_image_input_path: "data/dataset/bucket/val"                                   # Path to the directory containing the images
-  dataset_image_output_path: "data/dataset/pre-processing/output_detected_adjuste/val"  # Path to the directory containing the images
+  dataset_file: "data/raw/fairface/labels.csv"
+  dataset_image_input_path:  "data/raw/fairface/images"
+  dataset_image_output_path: "data/processed/fairface_aligned"
 
 bucket:
-  function: "download"                                              # Function to perform (download or upload)
-  bucket_client: "s3"                                               # Bucket Client (s3 or blob)
-  bucket_path_file: "data/dataset/bucket/"                          # Path to the file containing the bucket path
-  object_file_name: "fairface_original_images.zip"                  # Name of the object file
-  bucket_name: "dataset-fairface"                                   # Bucket Name
-  bucket_download_url: 'https://dataset-fairface.s3.us-east-1.amazonaws.com/dataset/fairface_original_images.zip?response-content-disposition=inline&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEOz%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLWVhc3QtMSJIMEYCIQDpY79o%2B7JpKptbuQX1CHjhvi9kIYO1Ys3OiahkGK6f3wIhAJsej1vS5Tko0ukMSrxFY4Su1r2NaunanDZGBHw9Y3DpKtADCPT%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMMjA1OTMwNjIwMTEzIgxCqn%2FhV0tXwgV4PQEqpAOzCeX2lScf%2Bf8h4bCri%2Fr6B4wrryZS%2FOh3asmEq1McGctzYte%2Bp75tgSgOrLNJWhOyFnyr1Mq%2BFjfoSTvFESUmpgAeCZpt3XY3ERfPi2biOaB2kQxtkgOZkWsxAiHo0TVEEHQ8mOgq9xXL40YB1R%2FrZVliYXYDyEGMK3KP1n5UmNBUMOy3rnF7SVZT4vD6VWiEA8CQRym9gFykbMgvn54mnIbzGfvJfv2brMg%2FJcOCke3uSgLhsS8RhMkPOa%2F9Hn9uqxS81KA1bTxXChjQvY1WO3fsTj5zFM6KFXSKCdok2G3T9cTiJXtxhqVP1MTfUbMQB8YDyJm%2F0Oki%2F3zXMtcEyjZUlgYYCU%2BNIn1Rx29MxO7Gw%2FHRAlf%2FYju%2BqeKjkjWqLYyymfzpihlbu7w%2F8%2Bf8NdEb5Kw7F2hYcU4KzFBFJaDaJTgVb6zELwtLCR5spBRwLR9klHHJttZDQCGfQzK71dKB%2F%2FccVquM6gmX7M6ofiE1qXELiaR1DP486QM6qK51MQwtR1Nn6Rm4kPQ2mL6Yb94rbJeG%2F%2BuJ5aCxDQSoinjgqNIw9tz%2BvAY64wKKsQF0A5uTQUbyrn53PrzJymHJyq%2BtiFs9U%2Fxf4JVYcY6M2mrA8BD9OLDMYG83zw4JSMxLqwIYXwkgxcbNIXss9wROw4OUGRQK%2F0qy4Gh5j%2F%2BLj2BddaKZSlHE%2FVJ7%2F3k%2BM9fJUFYqwLTMYQHtirlPjZKbVkxIjsLczrRljbvZuuxjKAfjP1syGG2ReyPq1KeOE25OSc1mSsOgF4UnMLnS3PW8EqzJzh689IYWugyP9fCchdnhe24G%2FF0CMLFE0%2BeU6ar0aJzI7YZwfG1NDYHQHubA%2FMHhxZvZXKcpS1fxqEq1wz9a63iNAcUKEaTATLEn6%2BbKUOSYrdDNRVrvjHdCExrY99vq2kfM4Y36fAsSvgm90fnaTUdmWOiCNalShf0gj%2F5m86NObyhqkZ9by3qFv7VJQLFE54Aac3yNMxEp93n0w5P5DFWYRZxVY6H4eW14QBuSQmTsjj2wu42g0fAWwryk&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAS74TL4TIRAUMFFFM%2F20250202%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250202T191206Z&X-Amz-Expires=43200&X-Amz-SignedHeaders=host&X-Amz-Signature=297a3063fa7c50ba45202b80435181549f9110cfdc835f49e560795efc41c9f0'
+  # Function and client only. The presigned URL is loaded at runtime
+  # from configs/credentials.json (key: bucket.<client>.bucket_download_url)
+  # or from the environment variable FACE_BIAS_BUCKET_URL.
+  function: "download"             # one of: download, upload
+  bucket_client: "s3"              # one of: s3, blob
+  bucket_path_file: "data/raw/bucket/"
+  object_file_name: "fairface_original_images.zip"
+  bucket_name: "dataset-fairface"
 
 logging:
-  log_dir: "logs"                                                   # Directory to save logs
-  log_level: "INFO"                                                 # Logging level (INFO, DEBUG, etc.)
-  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"    # Log format
-  log_bucket_file: "bucket.log"                                     # Log file for bucket operations
-  log_preprocessing_file: "preprocessing.log"                       # Log file for preprocessing operations
-  log_face_data_file: "face_data.log"                               # Log file for face data operations
-  log_version_file: "version.log"                                   # Log file for version operations
+  log_dir: "outputs/logs"
+  log_level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_bucket_file: "bucket.log"
+  log_preprocessing_file: "preprocessing.log"
+  log_face_data_file: "face_data.log"
+  log_version_file: "version.log"
+  log_training_file: "training.log"
+  log_evaluation_file: "evaluation.log"
