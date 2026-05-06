@@ -1,16 +1,39 @@
-# Compiled source #
-###################
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# --- Compiled binaries ---
 *.com
 *.class
 *.dll
+*.exe
 *.exes
 *.o
 *.so
 
-# Packages #
-############
-# it's better to unpack these files and commit the raw source
-# git has its own built in compression methods
+# --- Archives (use DVC for datasets, never commit raw archives) ---
 *.7z
 *.dmg
 *.gz
@@ -20,26 +43,38 @@
 *.tar
 *.zip
 
-# Logs and databases #
-######################
+# --- Data: tracked via DVC, not Git ---
+data/raw/
+data/processed/
+data/synthetic/
+data/dataset/
+
+# --- Outputs (training/eval artifacts) ---
+outputs/
+mlruns/
+checkpoints/
+
+# --- Logs and databases ---
 *.log
 *.sql
 *.sqlite
+logs/
 
-# OS generated files #
-######################
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# --- Secrets ---
+configs/credentials.json
+.env
+.env.*
+!.env.example
 
-# Access Keys #
-######################
-credentials.json
+# --- Test/coverage artifacts ---
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.ruff_cache/
+.mypy_cache/
+.cache/
 
-# DataSet Keys #
-######################
-data/dataset/
+# --- Notebooks scratch ---
+.ipynb_checkpoints/
