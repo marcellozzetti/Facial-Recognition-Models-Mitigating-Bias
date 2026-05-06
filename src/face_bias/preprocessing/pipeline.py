@@ -22,8 +22,17 @@ def detect_adjust_image(image_path, output_dir, face_detector, config: dict[str,
         output_size = tuple(config["image"]["image_size"])
         processed_faces = detect_and_adjust_faces(image, face_detector, output_size)
 
+        max_faces = config["preprocessing"].get("max_faces_per_image", 1)
+        original_count = len(processed_faces)
+        if max_faces and original_count > max_faces:
+            processed_faces = processed_faces[:max_faces]
+            logging.info(
+                f"Limited {image_path} to {max_faces} face(s) (had {original_count} detected)"
+            )
+
         for i, face in enumerate(processed_faces):
-            output_path = output_dir / f"{Path(image_path).stem}_face_{i}.jpg"
+            suffix = "" if len(processed_faces) == 1 else f"_face_{i}"
+            output_path = output_dir / f"{Path(image_path).stem}{suffix}.jpg"
             cv2.imwrite(str(output_path), face)
             logging.info(f"Processed face saved: {output_path}")
 
