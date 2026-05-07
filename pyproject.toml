@@ -57,6 +57,8 @@ face-bias-download   = "face_bias.cli.download:main"
 face-bias-preprocess = "face_bias.cli.preprocess:main"
 face-bias-train      = "face_bias.cli.train:main"
 face-bias-evaluate   = "face_bias.cli.evaluate:main"
+face-bias-tsne       = "face_bias.cli.tsne:main"
+face-bias-gradcam    = "face_bias.cli.gradcam:main"
 face-bias-version    = "face_bias.cli.version:main"
 
 [tool.setuptools.packages.find]
