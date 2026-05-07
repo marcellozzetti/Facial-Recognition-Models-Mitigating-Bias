@@ -43,9 +43,7 @@ def predict(
     for images, labels in dataloader:
         images = images.to(device, non_blocking=True)
         labels_dev = labels.to(device, non_blocking=True)
-        logits = (
-            model(images, labels=labels_dev) if hasattr(model, "head_type") else model(images)
-        )
+        logits = model(images, labels=labels_dev) if hasattr(model, "head_type") else model(images)
         proba = torch.softmax(logits, dim=1)
         all_proba.append(proba.cpu().numpy())
         all_pred.append(proba.argmax(dim=1).cpu().numpy())

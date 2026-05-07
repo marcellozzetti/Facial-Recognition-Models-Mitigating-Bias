@@ -26,6 +26,7 @@ class LResNet50E_IR(nn.Module):
         num_classes: int,
         dropout: float = 0.5,
         head: HeadType = "linear",
+        pretrained: bool = True,
         arcface_s: float = 30.0,
         arcface_m: float = 0.5,
         arcface_easy_margin: bool = False,
@@ -36,7 +37,8 @@ class LResNet50E_IR(nn.Module):
         if head not in ("linear", "arcface"):
             raise ValueError(f"head must be 'linear' or 'arcface', got {head!r}")
 
-        self.backbone = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+        weights = ResNet50_Weights.DEFAULT if pretrained else None
+        self.backbone = models.resnet50(weights=weights)
         in_features = self.backbone.fc.in_features
         self.backbone.fc = nn.Identity()
 

@@ -28,6 +28,7 @@ def _build_model(config: dict, num_classes: int) -> torch.nn.Module:
         num_classes=num_classes,
         dropout=model_cfg["dropout"],
         head=model_cfg["head"],
+        pretrained=model_cfg.get("pretrained", True),
         arcface_s=model_cfg["arcface_s"],
         arcface_m=model_cfg["arcface_m"],
         arcface_easy_margin=model_cfg["arcface_easy_margin"],
