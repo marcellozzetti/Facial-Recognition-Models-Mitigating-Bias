@@ -38,14 +38,19 @@ def _build_model(config: dict, num_classes: int) -> torch.nn.Module:
     )
 
 
-def _maybe_start_mlflow(run_id: str, config: dict, output_dir: Path):
+def _maybe_start_mlflow(run_id: str, config: dict, mlruns_root: Path):
     try:
         import mlflow
     except ImportError:
         logging.info("mlflow not installed - skipping experiment tracking")
         return None
 
-    mlflow.set_tracking_uri((output_dir / "mlruns").resolve().as_uri())
+    # Centralised mlruns folder under the top-level output dir so the
+    # absolute path stays within Windows' MAX_PATH (260 chars) even when
+    # the run-specific subdir is several levels deep (e.g. when invoked
+    # by run_all_experiments.py).
+    mlruns_root.mkdir(parents=True, exist_ok=True)
+    mlflow.set_tracking_uri(mlruns_root.resolve().as_uri())
     mlflow.set_experiment(config["model"]["name"])
     run = mlflow.start_run(run_name=run_id)
     mlflow.log_params(
@@ -95,7 +100,8 @@ def main(argv: list[str] | None = None) -> int:
     device = _resolve_device(args.device)
     logging.info(f"Training run_id={run_id} device={device} config={args.config}")
 
-    output_dir = Path(args.output_dir) / run_id
+    output_root = Path(args.output_dir)
+    output_dir = output_root / run_id
     output_dir.mkdir(parents=True, exist_ok=True)
 
     dataloaders, label_encoder, num_classes = setup_dataset(config)
@@ -111,7 +117,7 @@ def main(argv: list[str] | None = None) -> int:
         steps_per_epoch=len(dataloaders["train"]),
     )
 
-    mlflow_run = _maybe_start_mlflow(run_id, config, output_dir)
+    mlflow_run = _maybe_start_mlflow(run_id, config, output_root / "mlruns")
 
     trainer = Trainer(
         model=model,
