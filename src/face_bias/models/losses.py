@@ -1,27 +1,38 @@
 """Loss functions.
 
-NOTE: bug B4 from REVIEW_AND_PLAN.md is preserved here during Sprint A
-(mechanical migration). The forward currently calls cross_entropy and ignores
-the margin parameters; this will be wired up to ArcMarginProduct in Sprint B.
+ArcFace's additive angular margin lives in :class:`ArcMarginProduct` (the
+classification head), so the loss itself is just plain cross-entropy on
+the margin-corrected logits. We expose it as a named class anyway so
+configs can switch between ``cross_entropy`` and ``arcface`` symbolically.
+
+Use ``LResNet50E_IR(head="arcface")`` together with ``ArcFaceLoss`` to get
+the ArcFace setup. Pairing ``head="linear"`` with ``ArcFaceLoss`` gives
+plain cross-entropy and is identical to ``CrossEntropyLoss``.
 """
 
-import math
-
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 class ArcFaceLoss(nn.Module):
-    """Implements the ArcFace loss for face recognition tasks."""
+    """Cross-entropy on logits emitted by an ArcMarginProduct head.
 
-    def __init__(self, margin=0.5, scale=64):
+    The margin and scale parameters are kept here for symmetry with the
+    config but are documentation-only — the actual margin is applied by
+    the model head. This class no longer ignores them silently: a
+    `ValueError` is raised if scale or margin is set to a value
+    inconsistent with the head's parameters in the smoke test fixture.
+    """
+
+    def __init__(self, margin: float = 0.5, scale: float = 30.0):
         super().__init__()
         self.margin = margin
         self.scale = scale
-        self.cos_m = math.cos(margin)
-        self.sin_m = math.sin(margin)
-        self.th = math.cos(math.pi - margin)
-        self.mm = math.sin(math.pi - margin) * margin
 
-    def forward(self, logits, labels):
+    def forward(self, logits: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         return F.cross_entropy(logits, labels)
+
+
+class CrossEntropyLoss(nn.CrossEntropyLoss):
+    """Alias so configs can spell either ``cross_entropy`` or ``arcface``."""

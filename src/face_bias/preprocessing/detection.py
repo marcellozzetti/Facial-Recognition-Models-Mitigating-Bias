@@ -26,10 +26,18 @@ def detect_and_adjust_faces(image, face_detector, output_size):
                 logging.warning("Failed to crop face.")
                 continue
 
-            aligned_face = alignment_procedure(
-                cropped_face,
-                {"left_eye": landmark[0], "right_eye": landmark[1]},
-            )
+            # Adjust landmark coordinates relative to cropped region
+            x1, y1, x2, y2 = bbox.astype(int)
+            border = 70
+            crop_x1 = max(0, x1 - border)
+            crop_y1 = max(0, y1 - border)
+
+            adjusted_landmarks = {
+                "left_eye": (landmark[0][0] - crop_x1, landmark[0][1] - crop_y1),
+                "right_eye": (landmark[1][0] - crop_x1, landmark[1][1] - crop_y1),
+            }
+
+            aligned_face = alignment_procedure(cropped_face, adjusted_landmarks)
             if aligned_face is None or aligned_face.size == 0:
                 logging.warning("Failed to align face.")
                 continue
@@ -48,7 +56,21 @@ def cropping_procedure(img, bbox, border=70):
     """Crop the given face in img based on given coordinates."""
     x1, y1, x2, y2 = bbox
     width, height = x2 - x1, y2 - y1
-    return img[y1 - border : y1 + height + border, x1 - border : x1 + width + border]
+
+    # Ensure cropping coordinates are within image bounds
+    img_height, img_width = img.shape[:2]
+    x1_crop = max(0, x1 - border)
+    y1_crop = max(0, y1 - border)
+    x2_crop = min(img_width, x1 + width + border)
+    y2_crop = min(img_height, y1 + height + border)
+
+    cropped = img[y1_crop:y2_crop, x1_crop:x2_crop]
+
+    # If cropped region is too small, return None
+    if cropped.size == 0 or cropped.shape[0] < 10 or cropped.shape[1] < 10:
+        return None
+
+    return cropped
 
 
 def rotate_procedure(image, angle):
@@ -63,6 +85,7 @@ def alignment_procedure(img, landmarks):
     """Align the image based on left/right eye landmarks."""
     if not landmarks or len(landmarks) < 2:
         logging.warning("Insufficient landmarks for alignment")
+        return None
 
     left_eye_x, left_eye_y = landmarks["left_eye"]
     right_eye_x, right_eye_y = landmarks["right_eye"]

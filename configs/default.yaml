@@ -7,6 +7,10 @@ model:
   pretrained: true
   num_classes: 7
   dropout: 0.5
+  head: "linear"          # one of: linear, arcface
+  arcface_s: 30.0          # only used when head=arcface
+  arcface_m: 0.5           # only used when head=arcface
+  arcface_easy_margin: false
 
 training:
   batch_size: 128
@@ -29,11 +33,12 @@ preprocessing:
   num_workers: 4
   rotate_angle: 45
   num_rotations: 8
+  max_faces_per_image: 1                    # Max faces to keep per image (1 = one face per image)
 
 data:
-  dataset_file: "data/raw/fairface/labels.csv"
-  dataset_image_input_path:  "data/raw/fairface/images"
-  dataset_image_output_path: "data/processed/fairface_aligned"
+  dataset_file: "data/raw/fairface/fairface_labels.csv"
+  dataset_image_input_path:  "data/raw/bucket/train"
+  dataset_image_output_path: "data/processed/fairface_aligned/train"
 
 bucket:
   function: "download"             # one of: download, upload
