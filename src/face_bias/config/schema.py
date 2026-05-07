@@ -61,6 +61,7 @@ class DataConfig(BaseModel):
     dataset_file: Optional[str] = None
     dataset_image_input_path: Optional[str] = None
     dataset_image_output_path: Optional[str] = None
+    balance: Literal["none", "undersample"] = "none"
 
 
 class BucketConfig(BaseModel):

@@ -88,6 +88,29 @@ def _filter_existing_images(csv_pd: pd.DataFrame, image_dir: str) -> pd.DataFram
     return csv_pd.loc[exists_mask].reset_index(drop=True)
 
 
+def _undersample_to_minority(
+    csv_pd: pd.DataFrame, label_column: str, random_state: int
+) -> pd.DataFrame:
+    """Random undersample so every class has the same count as the minority.
+
+    Reproduces the MBA's ``Contagem de Amostras Após o Balanceamento`` from
+    Cap. 4: each ``race`` class is downsampled to the size of the smallest
+    class. Returns a new dataframe in shuffled order.
+    """
+    counts = csv_pd[label_column].value_counts()
+    minority = int(counts.min())
+    logging.info(
+        f"Undersampling {label_column} to minority size {minority} (was: {counts.to_dict()})"
+    )
+    parts = [
+        group.sample(n=minority, random_state=random_state)
+        for _, group in csv_pd.groupby(label_column, sort=False)
+    ]
+    out = pd.concat(parts).sample(frac=1.0, random_state=random_state).reset_index(drop=True)
+    logging.info(f"Balanced dataset size: {len(out)} ({len(counts)} classes x {minority})")
+    return out
+
+
 def setup_dataset(config: dict[str, Any]):
     """Build train/val/test DataLoaders.
 
@@ -101,6 +124,13 @@ def setup_dataset(config: dict[str, Any]):
     image_dir = config["data"]["dataset_image_output_path"]
     csv_pd = pd.read_csv(config["data"]["dataset_file"])
     csv_pd = _filter_existing_images(csv_pd, image_dir)
+
+    if config["data"].get("balance", "none") == "undersample":
+        csv_pd = _undersample_to_minority(
+            csv_pd,
+            label_column="race",
+            random_state=config["training"]["random_state"],
+        )
 
     label_encoder = LabelEncoder()
     label_encoder.fit(csv_pd["race"])
