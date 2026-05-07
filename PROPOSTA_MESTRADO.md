@@ -1,11 +1,13 @@
 # Proposta de Mestrado em IA — Evolução do Trabalho de MBA
 
-**Tema:** Mitigação de viés demográfico em reconhecimento facial: avaliação sistemática de funções de perda quality-adaptive, dados sintéticos balanceados e métricas de equidade.
+**Tema:** Por que balancear a distribuição de classes não basta para reconhecimento facial equitativo — e o que de fato ajuda. Auditoria empírica e intervenções em loss e dados sintéticos sobre o pipeline LResNet50E_IR/FairFace.
 
 **Autor:** Marcello Ozzetti
 **Trabalho de origem:** Dissertação de MBA em IA / USP — *Facial Recognition Models Mitigating Bias*
 **Data desta proposta:** 06 de maio de 2026
+**Última revisão:** 07 de maio de 2026 — recalibração após smoke run dos 11 experimentos
 **Janela de planejamento:** 6 meses (mai/2026 → nov/2026)
+**Hardware:** **RTX 4070 SUPER (12 GB) local — sem dependência de cloud**
 
 ---
 
@@ -15,24 +17,33 @@
 2. [Parte I — Pesquisa Textual Científica (Estado da Arte 2024–2026)](#parte-i--pesquisa-textual-científica-estado-da-arte-20242026)
 3. [Parte II — Avaliação do Trabalho de MBA e Lacunas Identificadas](#parte-ii--avaliação-do-trabalho-de-mba-e-lacunas-identificadas)
 4. [Parte III — Proposta Evolutiva do Mestrado](#parte-iii--proposta-evolutiva-do-mestrado)
-5. [Parte IV — Motivadores com Referências Bibliográficas](#parte-iv--motivadores-com-referências-bibliográficas)
-6. [Parte V — Plano de Trabalho (6 Meses)](#parte-v--plano-de-trabalho-6-meses)
-7. [Parte VI — Riscos, Recursos e Decisões em Aberto](#parte-vi--riscos-recursos-e-decisões-em-aberto)
-8. [Referências](#referências)
+5. [Parte III.5 — Plano de Publicação Científica](#parte-iii5--plano-de-publicação-científica)
+6. [Parte IV — Motivadores com Referências Bibliográficas](#parte-iv--motivadores-com-referências-bibliográficas)
+7. [Parte V — Plano de Trabalho (6 Meses)](#parte-v--plano-de-trabalho-6-meses)
+8. [Parte VI — Riscos, Recursos e Decisões em Aberto](#parte-vi--riscos-recursos-e-decisões-em-aberto)
+9. [Referências](#referências)
 
 ---
 
 ## 1. Sumário Executivo
 
-A dissertação de MBA estabeleceu uma base experimental funcional — pipeline `LResNet50E-IR + ArcFace/CrossEntropy` sobre o dataset **FairFace**, com 11 experimentos comparativos — e identificou três limitações que motivam a continuidade em nível de mestrado:
+A dissertação de MBA estabeleceu uma base experimental funcional — pipeline `LResNet50E-IR` sobre **FairFace** com 11 experimentos comparativos. A re-execução desses 11 experimentos em maio/2026 (rodada smoke documentada em [docs/smoke_results.md](docs/smoke_results.md)) com o pipeline corrigido revelou **um achado central que define o tema do mestrado**:
 
-- **Gargalo persistente** de desempenho na classe *Latino Hispanic* (F1 ≈ 0,50);
-- **Ausência de métricas formais de equidade** (apenas precision/recall por classe);
-- **Avaliação restrita** a um único dataset, uma única arquitetura e um único detector facial (MTCNN).
+> **O undersampling para classes balanceadas não produz reconhecimento facial equitativo.** Mesmo com 10.374 imagens por classe (todas as 7 classes idênticas em tamanho), o modelo treinado mantém **Inequity Rate (F1) = 1,73 e gap max-min = 0,34** entre a melhor classe (Black, F1=0,81) e a pior (Latino_Hispanic, F1=0,47). O fenômeno é estrutural: independente de optimizer (SGD/AdamW), scheduler (OneCycleLR/CosineAnnealing), épocas (5/25/40) ou dropout (0,2/0,5) — nenhuma combinação fechou esse gap.
 
-A proposta de mestrado **não recomeça do zero**: estende o repositório existente para incorporar as evoluções da literatura 2024–2026 (AdaFace, TransFace++, dados sintéticos via DCFace/VariFace, métricas IR/FDR/CEI, datasets RFW/BUPT-Balancedface) e produz uma contribuição original auditável, alinhada ao novo contexto regulatório do **EU AI Act** (vigência plena em ago/2026) e às atualizações do **NIST FRTE/FATE**.
+Esta evidência **falsifica empiricamente a hipótese intuitiva** que o trabalho de MBA assumia (balancear → equidade) e abre a pergunta que organiza a tese: **se balancear o dataset não basta, o que basta?**
 
-**Output esperado em 6 meses:** rascunho do exame de qualificação (60–80 páginas) e submissão de artigo em workshop *tier-A*.
+A proposta de mestrado responde essa pergunta investigando duas frentes documentadas como SOTA na literatura 2024–2026:
+
+1. **Funções de perda quality-adaptive** (AdaFace, MagFace, KP-RPE) — atacam o problema no espaço de loss.
+2. **Augmentação por dados sintéticos** (DCFace pré-treinado) das classes piores — ataca o problema no espaço de dados.
+
+Cada frente é investigada isoladamente e em combinação, com auditoria de fairness padronizada (IR/FDR/Gini) sobre os mesmos splits, alinhada a requisitos regulatórios do **EU AI Act** (vigência plena 02/08/2026) e ao **NIST FRTE/FATE**.
+
+**Outputs esperados em 6 meses:**
+1. **Submissão de artigo científico** em workshop tier-A (target: WACV Workshop on Fair Computer Vision, IJCB 2027, ou ACM FAccT 2027).
+2. **Rascunho de qualificação** (60–80 páginas) com a pergunta empírica e as duas linhas de resposta.
+3. **Repositório open-source** (este, já público) como artefato de reprodutibilidade do paper.
 
 ---
 
@@ -184,28 +195,100 @@ Pipeline funcional e reproduzível com:
 
 ### 3.1 Visão evolutiva
 
-A tese de mestrado **parte do repositório existente** (`pipelines/`, `models/`, `utils/`) e o eleva a três níveis de rigor não cobertos no MBA: **multi-dataset**, **multi-arquitetura** e **fairness-first**.
+A tese parte do repositório `face_bias` já refatorado (Sprints A/B/C/D do código) e o eleva a um nível de rigor científico publicável: **uma pergunta empírica clara, hipóteses falsificáveis, intervenções controladas e auditoria de fairness padronizada**.
 
-Não é uma ruptura — é uma extensão sistemática alinhada às evoluções de 2024–2026 e ao novo contexto regulatório.
+Não é uma ruptura — é uma extensão alinhada às evoluções da literatura 2024–2026 (AdaFace, DCFace, métricas IR/FDR/Gini) e ao contexto regulatório do EU AI Act.
 
-### 3.2 Pergunta de pesquisa
+### 3.2 Pergunta de pesquisa (revisada)
 
-> **Em que medida a combinação de funções de perda quality-adaptive (AdaFace), aumentação por dados sintéticos demograficamente balanceados (DCFace/VariFace) e arquiteturas Vision-Transformer (TransFace++) reduz o gap de equidade demográfica em reconhecimento facial, medido por métricas modernas de fairness (Inequity Rate, FDR, CEI), em comparação ao baseline LResNet50E-IR + ArcFace?**
+> **A rodada de smoke (mai/2026) demonstrou que balancear o conjunto de treinamento via undersampling — a abordagem dominante na dissertação de MBA e em boa parte da literatura aplicada — produz Inequity Rate ≥ 1,73 e gap max-min ≥ 0,32 em F1 entre grupos demográficos, mesmo com 10.374 amostras por classe. *Que intervenções no espaço de loss e/ou no espaço de dados de fato fecham esse gap residual, e em que magnitude?***
+
+A pergunta tem três sub-perguntas:
+
+- **PQ1** — Funções de perda quality-adaptive (AdaFace, MagFace, KP-RPE) reduzem o gap demográfico residual quando aplicadas sobre o conjunto já balanceado?
+- **PQ2** — Augmentação por geração sintética da classe pior (DCFace pré-treinado para Latino_Hispanic) reduz o gap residual? Em que magnitude?
+- **PQ3** — A combinação loss-adaptive + augmentation sintética é meramente aditiva, ou há efeito de interação?
 
 ### 3.3 Hipóteses
 
-- **H1** — Substituir ArcFace por AdaFace reduz o gap de F1 entre o pior e o melhor grupo demográfico em pelo menos 30%, sem perda de acurácia agregada.
-- **H2** — Aumentar a classe minoritária com dados sintéticos via DCFace/VariFace reduz o gap específico de *Latino Hispanic*, com efeito superior a *undersampling*.
-- **H3** — A migração de ResNet50 para TransFace++/ViT-B melhora robustez à variação de pose e iluminação, especialmente em grupos sub-representados.
-- **H4** — O ranking de modelos por acurácia agregada difere significativamente do ranking por Inequity Rate, evidenciando a inadequação de métricas tradicionais para auditoria regulatória sob o EU AI Act.
+> **H0 (FALSIFICADA empiricamente nos 11 experimentos do smoke run, mai/2026):**
+> "Balancear o conjunto de treinamento por undersampling produz reconhecimento facial equitativo (IR ≈ 1,0)."
+> **Resultado observado**: IR = 1,73 em todas as 5 configurações CE 7-class testadas. Esta hipótese, central no trabalho de MBA, é rejeitada e organiza a investigação subsequente.
+
+Hipóteses ativas:
+
+- **H1 (PQ1)** — Substituir CrossEntropy/ArcFace por **AdaFace** sobre o conjunto balanceado reduz o IR (F1) em pelo menos 20% (de 1,73 para ≤ 1,38), mantendo ou melhorando a acurácia agregada.
+- **H2 (PQ2)** — **Augmentar a classe Latino_Hispanic** com 5.000–10.000 imagens sintéticas geradas por DCFace pré-treinado (sem retreinar o gerador) reduz o gap específico Latino_Hispanic ↔ Black em pelo menos 30% (de 0,34 para ≤ 0,24).
+- **H3 (PQ3)** — A combinação **AdaFace + DCFace augmentation** produz redução de gap maior que a soma das reduções individuais (interação positiva).
+- **H4** — O ranking de modelos por acurácia agregada difere significativamente do ranking por IR — implicação direta para auditoria regulatória sob o EU AI Act (já corroborada parcialmente no smoke: o melhor IR foi do Exp. 9, com dropout=0,5, que tem acurácia agregada igual aos melhores).
+- **H5 (qualitativa via t-SNE/Grad-CAM)** — A redução de gap correlaciona-se com **maior compactação intra-classe e separação inter-classe** no espaço de embeddings da classe pior (Latino_Hispanic), observável em t-SNE pré/pós-intervenção.
 
 ### 3.4 Contribuições esperadas
 
-1. **Benchmark cross-dataset reproduzível** (FairFace + RFW + BUPT-Balancedface) com fairness metrics padronizadas.
-2. **Estudo controlado** do impacto isolado de cada variável (loss × backbone × synthetic augmentation) sobre fairness.
-3. **Pipeline open-source** com Grad-CAM integrado para análise interpretável de viés por subgrupo.
-4. **Análise interseccional** raça × gênero × idade, aproveitando labels existentes do FairFace.
-5. **Submissão de artigo** em conferência/revista *tier-A* (target: IEEE TBIOM, IJCB, ou WACV/Workshop).
+1. **Auditoria empírica do mito do balanceamento**: tabela publicável mostrando que 11 configurações balanceadas via undersampling produzem todos IR > 1,5 sobre FairFace, contradizendo a intuição comum em pipelines aplicados.
+2. **Estudo controlado de duas intervenções** (loss-adaptive + augmentation sintética), com decomposição da contribuição de cada uma e da interação entre elas.
+3. **Análise representacional via t-SNE** correlacionando geometria de embeddings com gap de F1 — abre caminho para entender *por quê* o gap persiste.
+4. **Pipeline reproduzível open-source** ([github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias](https://github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias)) — cada experimento do paper roda com `python scripts/run_all_experiments.py --config X`.
+5. **Submissão de artigo científico em workshop tier-A** — ver Parte III.5.
+
+---
+
+## Parte III.5 — Plano de Publicação Científica
+
+### 3.5.1 Objetivo
+
+A tese é projetada para gerar **pelo menos um artigo científico submetido a workshop tier-A**, como deliverable principal acadêmico de externalização do mestrado, em paralelo com o exame de qualificação interno (USP).
+
+### 3.5.2 Título de trabalho proposto
+
+> **"Beyond Class Balancing: An Empirical Study of Loss-Adaptive and Synthetic-Data Interventions for Demographic Equity in Race Classification"**
+
+Variantes alternativas a discutir com o orientador:
+
+- "Why Undersampling Isn't Enough: A Diagnostic of Residual Bias in Balanced Face Classification"
+- "Adaptive Margin Losses Meet Synthetic Augmentation: Closing the Race Gap on FairFace"
+
+### 3.5.3 Estrutura narrativa (3 atos)
+
+| Ato | Conteúdo | Origem dos dados |
+|---|---|---|
+| **1. Diagnóstico** | 11 configurações balanceadas produzem IR ≥ 1,73 em FairFace 7-classes. Mostrar as tabelas de F1 por classe, t-SNE da classe pior. | Rodada smoke (mai/2026) + rodada limpa (em curso) |
+| **2. Intervenção em loss** | AdaFace, MagFace e (opcional) KP-RPE como substitutos de CrossEntropy/ArcFace sobre o mesmo dataset balanceado. Reportar IR antes/depois. | Mês 2-3 |
+| **3. Intervenção em dados** | DCFace pré-treinado para gerar 5-10k faces de Latino_Hispanic. Treinar com mix real+sintético. Combinação com (2). t-SNE pós-intervenção. | Mês 4-5 |
+
+### 3.5.4 Veículos-alvo (em ordem de preferência)
+
+| # | Veículo | Tipo | Periodicidade | Probabilidade de aceite |
+|---|---|---|---|---|
+| 1 | **WACV Workshop on Fair, Data-efficient, and Trusted Computer Vision** | Workshop tier-A | Anual (jan) | Alta |
+| 2 | **IJCB (International Joint Conference on Biometrics) — Track de fairness** | Conferência tier-B+ | Anual (set) | Alta |
+| 3 | **ACM FAccT (Conference on Fairness, Accountability, and Transparency)** | Conferência tier-A interdisciplinar | Anual (jun) | Média |
+| 4 | **CVPR Workshop on Fairness, Accountability, Transparency, and Ethics in Computer Vision** | Workshop tier-A+ | Anual (jun) | Média |
+| 5 | **IEEE TBIOM (Transactions on Biometrics, Behavior, and Identity Science)** | Revista tier-A | Contínua | Baixa-Média (escopo de artigo de revista é mais profundo) |
+
+**Plano A**: WACV Fair-CV Workshop (deadline tipicamente set/out, evento jan). Alinhado com Mês 5 da proposta.
+**Plano B**: IJCB 2027 (deadline tipicamente abr/mai). Alinhado com fim do Mês 6.
+
+### 3.5.5 Critérios mínimos de publicabilidade que a tese deve atingir
+
+| Critério | Como atender |
+|---|---|
+| **Reprodutibilidade total** | Repositório público + DVC nos datasets + seeds fixas + Docker (opcional) |
+| **Comparação justa** | Mesmo split, mesmas seeds, mesmo hardware para todas as condições |
+| **Métricas padronizadas** | IR, FDR, Gini conforme Kotwal & Marcel (2025) — já implementadas em `face_bias/evaluation/metrics.py` |
+| **Significância estatística** | Cada experimento rodado com pelo menos 3 seeds; reportar média ± desvio |
+| **Análise qualitativa** | t-SNE + Grad-CAM por classe pior, antes e depois das intervenções |
+| **Limitação do escopo** | Reconhecer no paper que é avaliação intra-FairFace; cross-dataset (RFW) é trabalho futuro |
+| **Discussão regulatória** | Conectar achados com EU AI Act art. 26 (auditoria de sistemas de alto risco) |
+
+### 3.5.6 Riscos específicos da publicação
+
+| Risco | Mitigação |
+|---|---|
+| Resultado de H1 ou H2 ser nulo | **Null result é publicável**: WACV/FAccT aceitam evidência negativa quando bem documentada e diagnosticada via t-SNE/Grad-CAM. Reframe do paper passa a ser "limites das duas abordagens" |
+| Tempo apertado para 3 seeds × 6 condições | Reduzir condições para 4 e seeds para 2 se necessário; reportar como limitação |
+| Reviewer pedir cross-dataset (RFW) | Submeter solicitação de RFW no Mês 1; se não chegar a tempo, posicionar como trabalho futuro |
+| Reviewer pedir comparação com TransFace++ | Já mapeado no estado da arte (Parte I); fora do escopo deste paper, mas justificar com hardware local |
 
 ---
 
@@ -285,104 +368,127 @@ A sugestão de Grad-CAM e ativações intermediárias do Cap. 5 do MBA é exatam
 
 ## Parte V — Plano de Trabalho (6 Meses)
 
-Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês tem **um entregável principal e um secundário**.
+Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês foi recalibrado em torno do **paper como deliverable principal** e do **hardware local (RTX 4070 SUPER, 12 GB)** como única infraestrutura de cálculo. Não há dependência de cloud.
 
-### Mês 1 · `2026-05-06 → 2026-06-05` · Consolidação e reprodutibilidade
+### Mês 1 · `2026-05-06 → 2026-06-05` · Diagnóstico empírico (em curso)
 
-**Objetivo:** estabelecer baseline reprodutível e formalizar a proposta acadêmica.
+**Objetivo:** consolidar o achado central do paper (balanceamento ≠ equidade) com evidência rigorosa.
 
 **Atividades:**
-- Refatorar `pipelines/training_pipeline.py` e `models/` para reprodutibilidade total (seeds fixas, logging estruturado, MLflow ou Weights & Biases).
-- Adquirir e integrar **RFW** e **BUPT-Balancedface** ao pipeline.
-- Implementar `utils/fairness_metrics.py` com **IR, FDR, GARBE, CEI**.
-- Recalcular fairness sobre as matrizes de confusão dos 11 experimentos do MBA (não exige re-treino).
 
-**Entregável principal:** **proposta formal de mestrado** (15–20 páginas) — pergunta, hipóteses, métodos, cronograma, bibliografia anotada.
-**Entregável secundário:** tabela comparativa de fairness sobre o MBA, evidenciando o gap real.
+- ✅ Pipeline `face_bias` refatorado, instalável, testado (81 testes). [Commit 70100ab]
+- ✅ Smoke run dos 11 experimentos do MBA com pipeline corrigido em 5 épocas — [docs/smoke_results.md](docs/smoke_results.md).
+- 🟡 Rodada limpa dos 11 experimentos com 25 épocas + early-stopping + gradient clipping (em execução, ETA 7–13h).
+- ⏳ Geração de gráficos (`scripts/plot_experiment.py`) para os 11 experimentos.
+- ⏳ Tabela consolidada `MBA reportado × MBA replicado × Mestrado` para cada experimento.
+- ⏳ **Draft do Ato 1 do paper** (introdução + diagnóstico).
+
+**Entregável principal:** **rascunho da seção "Diagnostic" do paper** (~3 páginas + figuras), demonstrando empiricamente que IR ≥ 1,7 em todas as 11 configurações balanceadas.
+**Entregável secundário:** apresentação para o coordenador com a recalibração da pergunta de pesquisa.
 
 ---
 
-### Mês 2 · `2026-06-06 → 2026-07-05` · Modernização do pipeline base
+### Mês 2 · `2026-06-06 → 2026-07-05` · Intervenção em loss — AdaFace + MagFace
 
-**Objetivo:** substituir componentes legados sem trocar arquitetura.
+**Objetivo:** medir quanto do gap residual é fechado por funções de perda quality-adaptive.
 
 **Atividades:**
-- Substituir **MTCNN por RetinaFace** (preferencialmente) ou YuNet (se houver restrição computacional).
-- Implementar **AdaFace** e **MagFace** em `models/losses.py`.
-- Re-rodar Exp. 1, 3, 7 e 9 do MBA com (i) detector novo, (ii) AdaFace, (iii) MagFace.
 
-**Entregável principal:** tabela comparativa **baseline (MBA) vs. modernized (M2)** com fairness metrics.
-**Entregável secundário:** análise de quanto do gap em *Latino Hispanic* é atribuível ao detector vs. à loss.
+- Implementar **AdaFace** em `face_bias/models/losses.py` (referência: Kim et al., CVPR 2022).
+- Implementar **MagFace** (referência: Meng et al., CVPR 2021).
+- Configs `exp12_adaface_*.yaml` e `exp13_magface_*.yaml` gerados via `scripts/generate_experiment_configs.py`.
+- Treinar 3 seeds × 2 condições (AdaFace, MagFace) × 25 épocas no setup balanceado.
+- Comparar IR/F1/gap pré e pós-intervenção sobre os mesmos splits.
+
+**Entregável principal:** **tabela "Loss intervention" do paper** com média ± desvio sobre 3 seeds.
+**Entregável secundário:** análise de t-SNE pré/pós para Latino_Hispanic, mostrando se houve melhora representacional.
+
+**Tempo estimado de GPU**: 2 condições × 3 seeds × ~1h por run = **~6h GPU** + análise.
 
 ---
 
-### Mês 3 · `2026-07-06 → 2026-08-05` · Síntese de dados balanceados
+### Mês 3 · `2026-07-06 → 2026-08-05` · Intervenção em dados — DCFace augmentation
 
-**Objetivo:** gerar e validar augmentação sintética para classes minoritárias.
+**Objetivo:** medir quanto do gap específico Latino_Hispanic ↔ Black é fechado por augmentação sintética.
 
 **Atividades:**
-- Setup do **DCFace** pré-treinado e geração controlada de imagens para *Latino Hispanic*, *Middle Eastern* e *Southeast Asian*.
-- Avaliação de qualidade (FID, identidade preservada).
-- Composição de novo dataset híbrido (real + sintético) e re-treino dos melhores modelos do M2.
-- Comparação direta vs. *undersampling* (técnica do MBA).
 
-**Entregável principal:** **estudo controlado de síntese** mostrando ganho em fairness por classe alvo.
-**Entregável secundário:** dataset híbrido versionado (DVC ou similar).
+- Setup do **DCFace pré-treinado** local (modelo público, ~800MB, roda em 12GB) — apenas inferência, sem retreinar o gerador.
+- Gerar 5.000 e 10.000 imagens sintéticas para Latino_Hispanic, condicionadas em sub-amostras reais como referência.
+- Avaliação de qualidade básica (visual + FID se viável local).
+- Compor dataset híbrido (real_balanced + sintético_Latino_Hispanic) e re-treinar com a melhor loss do Mês 2.
+- Comparar baseline balanceado vs. balanceado + augmentação sintética.
+
+**Entregável principal:** **tabela "Data intervention"** com 3 condições (no aug, +5k sintéticos, +10k sintéticos).
+**Entregável secundário:** análise qualitativa Grad-CAM sobre amostras Latino_Hispanic — modelo passou a focar em features faciais diferentes pós-augmentação?
+
+**Tempo estimado**: geração ~3h + treino 3 seeds × 2 condições × ~1h = **~9h GPU** total.
 
 ---
 
-### Mês 4 · `2026-08-06 → 2026-09-05` · Vision Transformers
+### Mês 4 · `2026-08-06 → 2026-09-05` · Combinação + análise representacional
 
-**Objetivo:** avaliar substituição de backbone.
+**Objetivo:** validar H3 (interação loss-adaptive × augmentation) e produzir o capítulo qualitativo.
 
 **Atividades:**
-- Integrar **ViT-B/16** pré-treinado e **TransFace++** (se houver pesos públicos; caso contrário, ViT-B + DPAP/EHSM reimplementados).
-- Treinar com a melhor combinação loss/dataset do M3.
-- Comparar **LResNet50E-IR vs. ViT-B vs. TransFace++** sob fairness metrics.
 
-**Entregável principal:** **estudo de ablação backbone**.
-**Entregável secundário:** rascunho da seção *Resultados* do mestrado.
+- Treinar combinação **AdaFace + DCFace augmentation** (a mais promissora do M2 + a mais promissora do M3).
+- Decompor contribuições: tabela 2x2 `(AdaFace=sim/não) × (DCFace=sim/não)`.
+- Análise interseccional **raça × gênero × idade** sobre o melhor modelo (labels já existentes em FairFace).
+- t-SNE final pré/pós em alta-resolução para o paper.
+- Grad-CAM grids comparativos para o paper.
+
+**Entregável principal:** **tabela 2x2 + figuras de t-SNE/Grad-CAM** prontas para o paper.
+**Entregável secundário:** ablação de épocas de treino — hyperparam recommendation.
+
+**Tempo estimado**: ~6h GPU.
 
 ---
 
-### Mês 5 · `2026-09-06 → 2026-10-05` · Análise interseccional e explicabilidade
+### Mês 5 · `2026-09-06 → 2026-10-05` · Escrita e submissão
 
-**Objetivo:** aprofundamento qualitativo.
+**Objetivo:** finalizar o paper e submeter ao primeiro veículo-alvo.
 
 **Atividades:**
-- Análise interseccional **raça × gênero × idade** (FairFace tem todas as labels — pivot tables, heatmaps).
-- Implementar **Grad-CAM** e gerar mapas para o melhor e pior modelo, por subgrupo.
-- Identificar **failure modes** sistemáticos (ex.: classe Black + faixa idosa, mulher Latino Hispanic).
 
-**Entregável principal:** **capítulo de discussão qualitativa** com Grad-CAM e análise interseccional.
-**Entregável secundário:** submissão de **artigo curto** para workshop (target: workshop de fairness em CVPR/ECCV/IJCB 2027).
+- Escrita das 4 seções restantes do paper (Methods, Results, Discussion, Conclusion).
+- Iteração com orientador sobre 3 versões.
+- Refinamento de figuras (alta-resolução, fontes consistentes, paleta CB-friendly).
+- Submissão à WACV Workshop on Fair-CV (ou IJCB 2027 dependendo do calendário).
+- Início da escrita do exame de qualificação USP (capítulos Introdução + Metodologia).
+
+**Entregável principal:** **paper submetido**.
+**Entregável secundário:** capítulos 1–2 do exame de qualificação (~30 páginas).
 
 ---
 
-### Mês 6 · `2026-10-06 → 2026-11-05` · Escrita e fechamento da fase 1
+### Mês 6 · `2026-10-06 → 2026-11-05` · Qualificação interna
 
-**Objetivo:** consolidar a fase experimental e estruturar o restante do mestrado.
+**Objetivo:** finalizar o exame de qualificação USP.
 
 **Atividades:**
-- Escrita dos capítulos 1–4 do mestrado (introdução, fundamentação, metodologia, resultados parciais).
-- Reunião de qualificação com orientador.
-- Definição do escopo da fase 2 (próximos 6–12 meses): federated learning + DP, aprofundamento em interseccionalidade, ou avaliação cross-cultural.
 
-**Entregável principal:** **rascunho do exame de qualificação** (60–80 páginas).
+- Escrita dos capítulos 3–5 (Resultados, Discussão, Conclusões).
+- Apresentação interna ao orientador.
+- Definição do escopo da fase 2 do mestrado (12+ meses pós-qualificação): cross-dataset (RFW/BUPT), interseccionalidade aprofundada, ou nova arquitetura (TransFace++).
+
+**Entregável principal:** **rascunho do exame de qualificação** (60–80 páginas) entregue.
 **Entregável secundário:** roadmap fase 2 aprovado pelo orientador.
 
 ---
 
 ### 5.7 Resumo visual do cronograma
 
-| Mês | Período | Foco | Entregável principal |
-|---|---|---|---|
-| 1 | mai/2026 | Reprodutibilidade + métricas | Proposta formal + fairness retroativo do MBA |
-| 2 | jun/2026 | Detector novo + losses modernas | Comparativo baseline vs. modernized |
-| 3 | jul/2026 | Dados sintéticos | Estudo controlado de síntese |
-| 4 | ago/2026 | Vision Transformers | Ablação backbone |
-| 5 | set/2026 | Interseccionalidade + Grad-CAM | Discussão qualitativa + submissão artigo |
-| 6 | out/2026 | Escrita | Rascunho de qualificação |
+| Mês | Período | Foco | Entregável principal | GPU estimada |
+|---|---|---|---|---:|
+| 1 | mai/2026 | Diagnóstico empírico (em curso) | Seção "Diagnostic" do paper | ~13h (rodada limpa, em execução) |
+| 2 | jun/2026 | AdaFace + MagFace | Tabela "Loss intervention" | ~6h |
+| 3 | jul/2026 | DCFace augmentation | Tabela "Data intervention" | ~9h |
+| 4 | ago/2026 | Combinação + análise representacional | Tabela 2x2 + figuras finais | ~6h |
+| 5 | set/2026 | Escrita + submissão do paper | **Paper submetido** | mínima |
+| 6 | out/2026 | Qualificação interna | Rascunho 60-80 pgs | mínima |
+
+**GPU total estimada para 6 meses:** ~34 horas — totalmente factível em RTX 4070 SUPER local, sem cloud.
 
 ---
 
@@ -392,26 +498,37 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 
 | Risco | Probabilidade | Mitigação |
 |---|---|---|
-| RFW exigir aplicação formal e demorar | Alta | Submeter solicitação no Mês 1; ter BUPT-Balancedface como plano B |
-| DCFace/VariFace exigirem GPU além da V100 do MBA | Média | Solicitar crédito Azure acadêmico; usar amostragem reduzida; alternativa Vec2Face (mais leve) |
-| TransFace++ não ter pesos pré-treinados públicos | Média | Cair para ViT-B padrão + perdas modernas; documentar como limitação |
-| Resultados não confirmarem hipóteses | Baixa-Média | Falsificação tem valor científico; reportar honestamente fortalece a tese |
-| Sobrecarga de escopo (6 meses, 4 dimensões) | Alta | Priorizar em ordem: fairness metrics → AdaFace → synthetic data → ViT. Cortar ViT se necessário |
-| EU AI Act mudar interpretação durante a pesquisa | Baixa | Acompanhar atualizações da Comissão Europeia; usar versão estável como referência |
+| AdaFace/MagFace não reduzir IR significativamente (H1 falsa) | Média | **Null result é publicável**; reframe do paper passa a ser "limites das duas abordagens" + diagnóstico via t-SNE |
+| DCFace pré-treinado não couber em 12 GB | Baixa-Média | Rodar inferência em mini-batches; reduzir para Vec2Face (mais leve); pior caso, gerar offline |
+| RTX 4070 SUPER ficar inadequada para alguma combinação | Média | Reduzir batch_size de 128 para 64 ou 32; usar gradient accumulation; usar mixed-precision (`torch.cuda.amp`) |
+| Resultados não convergirem para 3 seeds (variância alta) | Média | Documentar como limitação; rodar 5 seeds se houver tempo |
+| Workshop alvo (WACV) ter deadline em janeiro/26 (após o paper estar pronto) | Baixa | Plano B: IJCB 2027 (deadline tipicamente abr); Plano C: arXiv preprint imediato |
+| Sobrecarga de escopo | Média | Cortar Mês 4 (combinação) se necessário; submeter paper apenas com loss + dataset interventions |
 
 ### 6.2 Recursos necessários
 
-- **Computacional:** Azure Standard_NC6s_v3 (V100) já validado no MBA; estimar 200–400h adicionais. Considerar upgrade para A100 no M4 (TransFace++).
-- **Datasets:** FairFace (já tem), RFW (solicitar), BUPT-Balancedface (público), DCFace pré-treinado (público).
-- **Software novo:** MLflow ou Weights & Biases (logging), DVC (versionamento de dados), `insightface` (detectores modernos), `pytorch-grad-cam`.
-- **Bibliografia:** ~25–30 referências novas (já mapeadas).
-- **Acesso institucional:** ICCV/CVPR/TPAMI via USP.
+| Recurso | Detalhes |
+|---|---|
+| **Computacional** | **RTX 4070 SUPER (12 GB) local — único equipamento de treinamento.** Sem cloud, sem cluster acadêmico. |
+| **Storage** | Disco local + DVC com remote opcional para backup do dataset processado |
+| **Datasets reais** | FairFace (já adquirido + pré-processado em `data/processed/fairface_aligned`). RFW se conseguir aprovação institucional, mas **não é dependência crítica** — pode ficar para fase 2 |
+| **Modelo gerador** | DCFace pré-treinado (público, ~800MB) — apenas inferência, não treinamento |
+| **Software** | Stack atual do `face_bias` é suficiente; adicionar `torch.cuda.amp` e `pytorch-grad-cam` (já em deps) |
+| **Bibliografia** | ~25–30 referências mapeadas (Parte IV) |
+| **Acesso institucional** | USP/CAPES para download de papers (CVPR/ICCV/TPAMI/TBIOM) |
+| **Pré-treinamento** | LResNet50 ImageNet (já incluso em torchvision) |
 
 ### 6.3 Decisões em aberto para o coordenador
 
-1. **Foco do mestrado:** manter os **3 eixos (loss + backbone + synthetic)** com profundidade média, ou **focar em apenas 1** com profundidade alta? Mestrado bem feito em 1 eixo > superficial em 3.
-2. **Output acadêmico:** mirar **artigo + dissertação** ou **dissertação apenas**? Isso muda o cronograma do Mês 5.
-3. **Programa/orientação:** definição de programa, linha de pesquisa e orientador adequados ao tema (preferência por viés algorítmico / arquiteturas / aplicações).
+1. **Foco do paper**: as **3 sub-perguntas (PQ1, PQ2, PQ3)** caem todas em um único paper, ou separadas em paper-de-loss + paper-de-dados? Recomendação: um único paper de 8 páginas é a forma típica para os veículos-alvo.
+
+2. **Veículo prioritário**: **WACV Workshop Fair-CV** (deadline ~set/26, evento jan/27) ou **IJCB 2027** (deadline ~abr/27)? Recomendo WACV pelo prazo alinhado com o Mês 5.
+
+3. **Cross-dataset (RFW)**: incluir como condição obrigatória do paper ou marcar como trabalho futuro? Recomendo **trabalho futuro** dadas as restrições de hardware local e janela de 6 meses.
+
+4. **Múltiplas seeds**: 3 seeds × 6 condições é o mínimo defensável. Se houver tempo, esticar para 5 seeds × 6 condições. Decisão depende de calendário.
+
+5. **Coautoria do paper**: orientador como coautor padrão. Discussão em aberto sobre incluir o autor do bug §2.2 descoberto (citação ou agradecimento).
 
 ---
 
