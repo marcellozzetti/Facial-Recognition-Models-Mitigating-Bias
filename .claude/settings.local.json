@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/Scripts/python.exe -m ruff check src/face_bias/utils/ src/face_bias/cli/preprocess.py tests/unit/)",
+      "Bash(.venv/Scripts/python.exe -m ruff format --check src/face_bias/utils/ tests/unit/)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/unit/test_reproducibility.py -v)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}

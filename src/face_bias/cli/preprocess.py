@@ -8,6 +8,7 @@ from facenet_pytorch import MTCNN
 from face_bias.config import load_config
 from face_bias.preprocessing.pipeline import process_preprocessing
 from face_bias.utils.logging import setup_logging
+from face_bias.utils.reproducibility import seed_from_config
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -17,6 +18,7 @@ def main(argv: list[str] | None = None) -> int:
 
     config = load_config(args.config)
     setup_logging(config, "log_preprocessing_file")
+    seed_from_config(config)
 
     logging.info(f"Starting preprocessing with config: {args.config}")
 
