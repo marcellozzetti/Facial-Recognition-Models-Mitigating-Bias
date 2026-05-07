@@ -36,6 +36,10 @@ class TrainingConfig(BaseModel):
     val_size: Optional[float] = Field(default=0.1, gt=0, lt=1)
     num_workers: int = Field(default=4, ge=0)
     random_state: int = 42
+    # Gradient-norm clipping; None disables it.
+    grad_clip_norm: Optional[float] = Field(default=5.0, gt=0)
+    # Early stopping on val_loss; null disables it.
+    early_stopping_patience: Optional[int] = Field(default=5, ge=1)
 
 
 class ImageConfig(BaseModel):

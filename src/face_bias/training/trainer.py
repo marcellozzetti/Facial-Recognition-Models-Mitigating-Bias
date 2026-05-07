@@ -70,6 +70,7 @@ class Trainer:
         checkpoint_dir: str | Path,
         early_stopping: EarlyStopping | None = None,
         mlflow_run=None,
+        grad_clip_norm: float | None = 5.0,
     ):
         self.model = model.to(device)
         self.loss_fn = loss_fn
@@ -82,6 +83,10 @@ class Trainer:
         self.last_checkpoint_path = self.checkpoint_dir / "last.pt"
         self.early_stopping = early_stopping
         self.mlflow_run = mlflow_run
+        # Global gradient-norm clipping. None disables it. Default 5.0 keeps
+        # ArcFace + AdamW + dropout=0.5 (Exp 10 in the smoke run) from
+        # diverging on the first batch.
+        self.grad_clip_norm = grad_clip_norm
 
     # ---- one epoch ----
 
@@ -104,6 +109,8 @@ class Trainer:
             logits = self._forward(images, labels)
             loss = self.loss_fn(logits, labels)
             loss.backward()
+            if self.grad_clip_norm is not None:
+                nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip_norm)
             self.optimizer.step()
             if is_step_per_batch(self.scheduler):
                 self.scheduler.step()

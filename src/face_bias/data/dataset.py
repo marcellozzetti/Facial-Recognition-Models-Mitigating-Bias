@@ -109,9 +109,9 @@ def _undersample_to_minority(
 ) -> pd.DataFrame:
     """Random undersample so every class has the same count as the minority.
 
-    Reproduces the MBA's ``Contagem de Amostras Após o Balanceamento`` from
-    Cap. 4: each ``race`` class is downsampled to the size of the smallest
-    class. Returns a new dataframe in shuffled order.
+    Reproduces the MBA Cap. 4 "Sample count after balancing" table: each
+    ``race`` class is downsampled to the size of the smallest class.
+    Returns a new dataframe in shuffled order.
     """
     counts = csv_pd[label_column].value_counts()
     minority = int(counts.min())

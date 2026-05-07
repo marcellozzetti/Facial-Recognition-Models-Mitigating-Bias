@@ -12,6 +12,7 @@ import torch
 from face_bias.config import load_config
 from face_bias.data.dataset import setup_dataset
 from face_bias.models.resnet import LResNet50E_IR
+from face_bias.training.callbacks import EarlyStopping
 from face_bias.training.optimizers import build_optimizer
 from face_bias.training.schedulers import build_scheduler
 from face_bias.training.trainer import Trainer, build_loss
@@ -119,6 +120,11 @@ def main(argv: list[str] | None = None) -> int:
 
     mlflow_run = _maybe_start_mlflow(run_id, config, output_root / "mlruns")
 
+    patience = config["training"].get("early_stopping_patience")
+    early_stopping = EarlyStopping(patience=patience, mode="min") if patience else None
+    if early_stopping is not None:
+        logging.info(f"EarlyStopping enabled (mode=min, patience={patience} epochs on val_loss)")
+
     trainer = Trainer(
         model=model,
         loss_fn=loss_fn,
@@ -128,6 +134,8 @@ def main(argv: list[str] | None = None) -> int:
         class_names=class_names,
         checkpoint_dir=output_dir / "checkpoints",
         mlflow_run=mlflow_run,
+        early_stopping=early_stopping,
+        grad_clip_norm=config["training"].get("grad_clip_norm"),
     )
 
     result = trainer.fit(

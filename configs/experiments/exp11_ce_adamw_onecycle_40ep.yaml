@@ -27,6 +27,8 @@ training:
   val_size: 0.1                   # final val fraction (-> 80/10/10 split)
   num_workers: 4
   random_state: 42
+  grad_clip_norm: 5.0             # global L2 norm clipping; null disables
+  early_stopping_patience: 5      # epochs of val_loss stagnation; null disables
 
 image:
   image_size: [224, 224]

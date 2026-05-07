@@ -124,7 +124,9 @@ def test_train_then_evaluate(tmp_path: Path) -> None:
     )
     assert rc == 0
 
-    run_dirs = list(train_outputs.iterdir())
+    # mlruns/ now lives alongside the per-run dir to dodge Windows MAX_PATH;
+    # filter it out before counting run dirs.
+    run_dirs = [p for p in train_outputs.iterdir() if p.is_dir() and p.name != "mlruns"]
     assert len(run_dirs) == 1
     history = json.loads((run_dirs[0] / "history.json").read_text(encoding="utf-8"))
     assert len(history) == 1
