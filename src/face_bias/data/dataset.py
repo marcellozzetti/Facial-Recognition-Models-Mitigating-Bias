@@ -72,6 +72,22 @@ def _build_transforms(config: dict[str, Any]) -> dict[str, transforms.Compose]:
     return {"train": train_pipeline, "val": eval_pipeline, "test": eval_pipeline}
 
 
+def _filter_existing_images(csv_pd: pd.DataFrame, image_dir: str) -> pd.DataFrame:
+    """Drop rows whose image file is missing on disk.
+
+    Some FairFace photos failed MTCNN detection during preprocessing and
+    therefore have no aligned counterpart on disk. The trainer/evaluator
+    would crash mid-epoch when a worker tried to read them; filter once
+    upfront instead.
+    """
+    paths = csv_pd["file"].apply(lambda f: os.path.join(image_dir, f))
+    exists_mask = paths.apply(os.path.isfile)
+    missing = (~exists_mask).sum()
+    if missing:
+        logging.warning(f"Dropping {missing} rows whose image file is missing under {image_dir}")
+    return csv_pd.loc[exists_mask].reset_index(drop=True)
+
+
 def setup_dataset(config: dict[str, Any]):
     """Build train/val/test DataLoaders.
 
@@ -82,12 +98,15 @@ def setup_dataset(config: dict[str, Any]):
     """
     data_transforms = _build_transforms(config)
 
+    image_dir = config["data"]["dataset_image_output_path"]
     csv_pd = pd.read_csv(config["data"]["dataset_file"])
+    csv_pd = _filter_existing_images(csv_pd, image_dir)
 
     label_encoder = LabelEncoder()
     label_encoder.fit(csv_pd["race"])
     num_classes = len(label_encoder.classes_)
     logging.info(f"{num_classes} classes: {list(label_encoder.classes_)}")
+    logging.info(f"{len(csv_pd)} images after filtering missing files")
 
     X = csv_pd["file"]
     y = csv_pd["race"]
@@ -105,8 +124,6 @@ def setup_dataset(config: dict[str, Any]):
         stratify=y_train,
         random_state=random_state,
     )
-
-    image_dir = config["data"]["dataset_image_output_path"]
 
     datasets = {
         split: FaceDataset(

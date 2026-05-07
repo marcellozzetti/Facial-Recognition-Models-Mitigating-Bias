@@ -15,7 +15,7 @@ model:
 training:
   batch_size: 128
   learning_rate: 0.001
-  num_epochs: 25
+  num_epochs: 1                    # 1-epoch smoke run; bump to 25 for the real experiment
   optimizer: "adamw"               # one of: sgd, adamw
   scheduler: "onecyclelr"          # one of: onecyclelr, cosineannealingwarmrestarts
   loss_function: "cross_entropy"   # one of: cross_entropy, arcface
@@ -38,7 +38,9 @@ preprocessing:
 data:
   dataset_file: "data/raw/fairface/fairface_labels.csv"
   dataset_image_input_path:  "data/processed/fairface_aligned"
-  dataset_image_output_path: "data/processed/fairface_aligned/output"
+  # The label CSV's `file` column already includes "train/" or "val/", so the
+  # image dir is the parent of those split folders.
+  dataset_image_output_path: "data/processed/fairface_aligned"
 
 bucket:
   function: "download"             # one of: download, upload
