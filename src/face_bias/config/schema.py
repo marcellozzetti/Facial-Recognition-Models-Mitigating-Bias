@@ -62,6 +62,9 @@ class DataConfig(BaseModel):
     dataset_image_input_path: Optional[str] = None
     dataset_image_output_path: Optional[str] = None
     balance: Literal["none", "undersample"] = "none"
+    # When set, restrict the dataset to rows whose `race` is in this list
+    # (used to reproduce MBA Exp. 7 and 8 — Black + White only).
+    class_filter: Optional[list[str]] = None
 
 
 class BucketConfig(BaseModel):

@@ -88,6 +88,22 @@ def _filter_existing_images(csv_pd: pd.DataFrame, image_dir: str) -> pd.DataFram
     return csv_pd.loc[exists_mask].reset_index(drop=True)
 
 
+def _filter_by_class(
+    csv_pd: pd.DataFrame, label_column: str, allowed: list[str] | None
+) -> pd.DataFrame:
+    """Restrict the dataframe to rows whose label is in ``allowed``.
+
+    Reproduces the MBA's Exp. 7/8 setup ("classes alvo: White e Black").
+    Returns the dataframe unchanged when ``allowed`` is None or empty.
+    """
+    if not allowed:
+        return csv_pd
+    before = len(csv_pd)
+    out = csv_pd.loc[csv_pd[label_column].isin(allowed)].reset_index(drop=True)
+    logging.info(f"Class filter {sorted(allowed)}: kept {len(out)}/{before} rows")
+    return out
+
+
 def _undersample_to_minority(
     csv_pd: pd.DataFrame, label_column: str, random_state: int
 ) -> pd.DataFrame:
@@ -124,6 +140,7 @@ def setup_dataset(config: dict[str, Any]):
     image_dir = config["data"]["dataset_image_output_path"]
     csv_pd = pd.read_csv(config["data"]["dataset_file"])
     csv_pd = _filter_existing_images(csv_pd, image_dir)
+    csv_pd = _filter_by_class(csv_pd, "race", config["data"].get("class_filter"))
 
     if config["data"].get("balance", "none") == "undersample":
         csv_pd = _undersample_to_minority(
