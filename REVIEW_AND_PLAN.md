@@ -57,6 +57,10 @@ O projeto tem **um pipeline de pré-processamento funcional + esqueletos de mode
 
 ## 2. Achados Críticos e Bugs
 
+> **Status do Sprint B (2026-05-06):**
+> §2.1 (credencial), §2.3-§2.6 (dataset), §2.7 (sys.path), §2.11 (pyproject), §2.12 (crop), §2.14 (alinhamento) — ✅ corrigidos.
+> §2.2 (ArcFace), §2.10 (reprodutibilidade), §2.13 (logging) — ⏳ em andamento.
+
 ### 2.1 🔴 Crítico — Credencial AWS exposta no repositório
 
 **Arquivo:** [configs/default.yaml:40](configs/default.yaml#L40)
@@ -172,6 +176,48 @@ Se `y1 - border < 0`, NumPy aceita índice negativo e retorna fatia errada (do f
 ### 2.13 🟢 Baixo — Logging não estruturado
 
 Cada módulo escreve em arquivo próprio (`bucket.log`, `preprocessing.log`, etc.) sem timestamp de correlação ou ID de experimento. Difícil depurar runs longos.
+
+### 2.14 🔴 Crítico — Alinhamento facial usava landmarks absolutos em imagem cropped
+
+**Descoberto durante o Sprint B (2026-05-06).**
+
+**Arquivo (pré-correção):** `preprocessing/pre_processing_images.py` — sequência `detect_and_adjust_faces` → `cropping_procedure` → `alignment_procedure`.
+
+**Fluxo defeituoso:**
+
+1. MTCNN detecta `bbox` e `landmarks` em coordenadas **absolutas** (em pixels, na imagem original).
+2. `cropping_procedure` recorta a região da face (com borda).
+3. `alignment_procedure` recebia a imagem **cropped** + landmarks **absolutos** e calculava:
+   ```python
+   eyes_center = ((left_eye_x + right_eye_x) // 2, (left_eye_y + right_eye_y) // 2)
+   M = cv2.getRotationMatrix2D(eyes_center, angle, 1.0)
+   cv2.warpAffine(img, M, (img.shape[1], img.shape[0]))
+   ```
+
+Como `eyes_center` ficava em coordenadas da imagem original, o pivô da rotação caía **fora** da imagem cropped (especialmente quando o rosto estava longe do canto superior-esquerdo da imagem). O `warpAffine` então rotaciona em torno desse ponto externo, resultando em uma imagem severamente deslocada/cortada.
+
+**Por que passou despercebido no MBA:** o ângulo de rotação `arctan2(Δy, Δx)` é invariante à translação, então o ângulo aplicado estava correto. Apenas o **centro** estava errado. Para faces frontais com baixa rotação (a maioria do FairFace), o efeito visual é discreto, mas a face fica deslocada o suficiente para introduzir ruído no treino.
+
+**Impacto na narrativa do MBA:**
+- Todas as imagens dos 11 experimentos foram alinhadas com pivô incorreto.
+- Combinado com o bug §2.3 (normalização errada), explica parte da estagnação em ~0,68 de acurácia mesmo com setups bem ajustados.
+- É um **resultado a reportar** na qualificação do mestrado: a re-execução dos experimentos chave do MBA com o pipeline corrigido é uma contribuição experimental concreta.
+
+**Correção (commit do Sprint A pelo usuário):** ajustar landmarks ao sistema de coordenadas da imagem cropped antes do alinhamento:
+
+```python
+crop_x1 = max(0, x1 - border)
+crop_y1 = max(0, y1 - border)
+adjusted_landmarks = {
+    "left_eye":  (landmark[0][0] - crop_x1, landmark[0][1] - crop_y1),
+    "right_eye": (landmark[1][0] - crop_x1, landmark[1][1] - crop_y1),
+}
+aligned_face = alignment_procedure(cropped_face, adjusted_landmarks)
+```
+
+Adicionalmente, `alignment_procedure` agora retorna `None` explicitamente quando faltam landmarks (antes apenas logava warning e seguia executando).
+
+**Ação remanescente:** documentar o achado no Cap. 4 da dissertação como "Limitações da execução do MBA identificadas em revisão" e na introdução do mestrado como motivador para o eixo "rigor de pré-processamento".
 
 ---
 
