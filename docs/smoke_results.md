@@ -83,14 +83,26 @@ Em todos os Exp 1, 3, 5, 9, 11 (CE), Latino_Hispanic é a pior classe:
 
 Gap de ~35pp e F1 de Latino_Hispanic preso em ~0.47-0.50 independentemente de optimizer/scheduler/dropout. **Esse é o gargalo central** que o mestrado deve atacar via dados sintéticos / loss adaptativa / arquiteturas com melhor representação.
 
-### 8. Exp 10 falhou de forma esporádica (CUDA access violation)
+### 8. Exp 10 não foi crash — foi divergência catastrófica
 
-Crash em 19 segundos, antes do primeiro batch, com `rc=0xC0000005` (Windows ACCESS_VIOLATION). Provavelmente é um problema transitório:
-- Driver CUDA acionado errado
-- Conflito com outra inicialização de GPU
-- NaN inicial em algum gradiente de ArcFace + AdamW + dropout=0.5
+Após o primeiro `rc=0xC0000005` na corrida em batch, um retry isolado **completou** sem crash, mas com resultados degenerados:
 
-Exp 4 (ArcFace + AdamW + OneCycleLR + dropout=0.2) rodou OK — mesma arquitetura, só diferindo no dropout. Suspeito de transiente; um retry em rodada solo deve resolver.
+| Época | train_loss | val_acc | val_f1 | val_IR |
+|---:|---:|---:|---:|---:|
+| 1 | 10.76 | **0.143** | 0.037 | inf |
+| 2 | 9.40 | 0.143 | 0.036 | inf |
+| 3 | 9.38 | 0.143 | 0.036 | inf |
+| 4 | 9.37 | 0.143 | 0.036 | inf |
+| 5 | 9.37 | 0.143 | 0.036 | inf |
+
+`val_acc=0.1429 ≈ 1/7` = **predição aleatória**. O modelo aprendeu a mapear todas as entradas para uma única classe (= recall=0 para as outras 6, daí IR infinito). A primeira tentativa provavelmente atingiu um NaN em algum gradiente que disparou o ACCESS_VIOLATION; o retry chegou em um basin estável-mas-degenerado.
+
+**O MBA reportou Exp 10 com acc=0.59**. Isso só foi possível porque o bug §2.2 transformava o ArcFaceLoss em cross-entropy puro — então o "Exp 10" do MBA era na prática Exp 9 (CE+AdamW+dropout=0.5). A combinação **ArcFace real + AdamW + OneCycleLR + dropout=0.5** com 5 épocas e `m=0.5` é numericamente instável, e nem 25 épocas devem salvar — o equilíbrio degenerado é estável.
+
+**Implicações para a tese**:
+- Validação experimental do bug §2.2 — sem o bug o resultado seria muito diferente do reportado.
+- Reforça a hipótese H1 (PROPOSTA_MESTRADO): margem fixa `m=0.5` é frágil; AdaFace ou MagFace com margem adaptativa deveriam evitar esse modo de falha.
+- Adicionar **gradient clipping** + **warmup** no trainer mitiga divergências similares para outros experimentos com ArcFace.
 
 ## Tempos por experimento (5 épocas)
 
@@ -121,11 +133,13 @@ Antes da rodada de 25 épocas (~20h):
 
 | Prioridade | Ação | Tempo |
 |---|---|---|
-| 🔴 Alta | Re-rodar Exp 10 sozinho para confirmar/diagnosticar | ~25 min |
-| 🟠 Média | Rodada limpa dos 11 com num_epochs do config (25/40), early-stop | ~15-20h |
-| 🟢 Baixa | Variação ArcFace com `m=0.3` para validar hipótese | ~25 min |
+| ✅ Feito | Re-rodar Exp 10 — confirmou divergência (não crash) | 25 min |
+| 🟠 Alta | Adicionar **gradient clipping** (e.g. `clip_grad_norm_=5.0`) ao trainer para estabilizar ArcFace | 30 min |
+| 🟠 Alta | Decidir destino do Exp 10: (a) aceitar como "divergência conhecida" ou (b) ajustar `m=0.3` na config | 5 min |
+| 🟠 Média | Rodada limpa dos 11 com num_epochs do config (25/40), early-stop com patience=5 | ~15-20h |
+| 🟢 Baixa | Variação ArcFace com `m=0.3` para validar hipótese H1 | ~24 min/exp |
 | 🟢 Baixa | Plots automáticos para os 11 experimentos | rodar `scripts/plot_experiment.py` em loop |
 
 ---
 
-*Gerado a partir de `outputs/smoke/results.json` (10 OK + 1 falha) e da matriz `tab:resultados_experimentos` da dissertação de MBA.*
+*Gerado a partir de `outputs/smoke/results.json` (10 OK + 1 divergência) e da matriz `tab:resultados_experimentos` da dissertação de MBA.*
