@@ -17,10 +17,10 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
-    setup_logging(config, "log_preprocessing_file")
+    run_id = setup_logging(config, "log_preprocessing_file")
     seed_from_config(config)
 
-    logging.info(f"Starting preprocessing with config: {args.config}")
+    logging.info(f"Starting preprocessing run_id={run_id} config={args.config}")
 
     face_detector = MTCNN()
     process_preprocessing(

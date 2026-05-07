@@ -1,6 +1,7 @@
 """CLI: print system + library + GPU report."""
 
 import argparse
+import logging
 
 from face_bias.config import load_config
 from face_bias.utils.logging import setup_logging
@@ -13,9 +14,10 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
-    setup_logging(config, "log_version_file")
+    run_id = setup_logging(config, "log_version_file")
 
     system_info_report(["numpy", "pandas", "cv2", "torch", "torchvision", "sklearn"])
+    logging.info(f"version report finished run_id={run_id}")
     return 0
 
 

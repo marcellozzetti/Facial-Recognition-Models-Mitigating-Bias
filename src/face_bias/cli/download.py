@@ -14,9 +14,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
-    setup_logging(config, "log_bucket_file")
+    run_id = setup_logging(config, "log_bucket_file")
 
-    logging.info("Start of bucket processing")
+    logging.info(f"Start of bucket processing run_id={run_id}")
     function = config["bucket"]["function"]
 
     if function == "download":

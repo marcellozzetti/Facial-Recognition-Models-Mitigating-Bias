@@ -3,7 +3,6 @@
 import logging
 import os
 import random
-from typing import Optional
 
 import numpy as np
 import torch
@@ -50,7 +49,7 @@ def seed_everything(seed: int, *, deterministic: bool = True, warn_only: bool = 
     return seed
 
 
-def seed_from_config(config: dict, key: str = "random_state") -> Optional[int]:
+def seed_from_config(config: dict, key: str = "random_state") -> int | None:
     """Read the seed from ``config['training'][key]`` and apply it."""
     seed = config.get("training", {}).get(key)
     if seed is None:
