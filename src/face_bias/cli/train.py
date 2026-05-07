@@ -45,7 +45,7 @@ def _maybe_start_mlflow(run_id: str, config: dict, output_dir: Path):
         logging.info("mlflow not installed - skipping experiment tracking")
         return None
 
-    mlflow.set_tracking_uri((output_dir / "mlruns").as_uri())
+    mlflow.set_tracking_uri((output_dir / "mlruns").resolve().as_uri())
     mlflow.set_experiment(config["model"]["name"])
     run = mlflow.start_run(run_name=run_id)
     mlflow.log_params(

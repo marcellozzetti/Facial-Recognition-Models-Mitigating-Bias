@@ -1,6 +1,4 @@
 # Default configuration.
-# Secrets and presigned URLs MUST come from configs/credentials.json (gitignored)
-# or environment variables. Never commit credentials to this file.
 
 model:
   name: "LResNet50E_IR"
@@ -38,8 +36,6 @@ preprocessing:
 data:
   dataset_file: "data/raw/fairface/fairface_labels.csv"
   dataset_image_input_path:  "data/processed/fairface_aligned"
-  # The label CSV's `file` column already includes "train/" or "val/", so the
-  # image dir is the parent of those split folders.
   dataset_image_output_path: "data/processed/fairface_aligned"
 
 bucket:
