@@ -3,7 +3,8 @@
 **Tema:** Por que balancear a distribuição de classes não basta para reconhecimento facial equitativo — e o que de fato ajuda. Auditoria empírica e intervenções em loss e dados sintéticos sobre o pipeline LResNet50E_IR/FairFace.
 
 **Autor:** Marcello Ozzetti
-**Trabalho de origem:** Dissertação de MBA em IA / USP — *Facial Recognition Models Mitigating Bias*
+**Programa-alvo:** Mestrado em Computação Aplicada — Unifesp / ICT (Instituto de Ciência e Tecnologia, São José dos Campos)
+**Trabalho de origem:** Dissertação de MBA em IA / USP — *Facial Recognition Models Mitigating Bias* (out/2024)
 **Data desta proposta:** 06 de maio de 2026
 **Última revisão:** 07 de maio de 2026 — recalibração após smoke run dos 11 experimentos
 **Janela de planejamento:** 6 meses (mai/2026 → nov/2026)
@@ -237,7 +238,7 @@ Hipóteses ativas:
 
 ### 3.5.1 Objetivo
 
-A tese é projetada para gerar **pelo menos um artigo científico submetido a workshop tier-A**, como deliverable principal acadêmico de externalização do mestrado, em paralelo com o exame de qualificação interno (USP).
+A tese é projetada para gerar **pelo menos um artigo científico submetido a workshop tier-A**, como deliverable principal acadêmico de externalização do mestrado, em paralelo com o exame de qualificação interno do programa de Computação Aplicada da **Unifesp / ICT — São José dos Campos**.
 
 ### 3.5.2 Título de trabalho proposto
 
@@ -455,7 +456,7 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 - Iteração com orientador sobre 3 versões.
 - Refinamento de figuras (alta-resolução, fontes consistentes, paleta CB-friendly).
 - Submissão à WACV Workshop on Fair-CV (ou IJCB 2027 dependendo do calendário).
-- Início da escrita do exame de qualificação USP (capítulos Introdução + Metodologia).
+- Início da escrita do exame de qualificação do programa Unifesp / ICT (capítulos Introdução + Metodologia).
 
 **Entregável principal:** **paper submetido**.
 **Entregável secundário:** capítulos 1–2 do exame de qualificação (~30 páginas).
@@ -464,7 +465,7 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 
 ### Mês 6 · `2026-10-06 → 2026-11-05` · Qualificação interna
 
-**Objetivo:** finalizar o exame de qualificação USP.
+**Objetivo:** finalizar o exame de qualificação do programa Unifesp / ICT.
 
 **Atividades:**
 
@@ -515,7 +516,7 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 | **Modelo gerador** | DCFace pré-treinado (público, ~800MB) — apenas inferência, não treinamento |
 | **Software** | Stack atual do `face_bias` é suficiente; adicionar `torch.cuda.amp` e `pytorch-grad-cam` (já em deps) |
 | **Bibliografia** | ~25–30 referências mapeadas (Parte IV) |
-| **Acesso institucional** | USP/CAPES para download de papers (CVPR/ICCV/TPAMI/TBIOM) |
+| **Acesso institucional** | Unifesp / Portal de Periódicos CAPES para download de papers (CVPR/ICCV/TPAMI/TBIOM) |
 | **Pré-treinamento** | LResNet50 ImageNet (já incluso em torchvision) |
 
 ### 6.3 Decisões em aberto para o coordenador
