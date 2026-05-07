@@ -17,7 +17,8 @@ training:
   optimizer: "adamw"               # one of: sgd, adamw
   scheduler: "onecyclelr"          # one of: onecyclelr, cosineannealingwarmrestarts
   loss_function: "cross_entropy"   # one of: cross_entropy, arcface
-  test_size: 0.2
+  test_size: 0.1                   # final test fraction
+  val_size: 0.1                    # final val fraction (-> 80/10/10)
   num_workers: 4
   random_state: 42
 

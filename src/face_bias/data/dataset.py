@@ -159,16 +159,37 @@ def setup_dataset(config: dict[str, Any]):
     y = csv_pd["race"]
 
     test_size = config["training"]["test_size"]
+    val_size = config["training"].get("val_size")
     random_state = config["training"]["random_state"]
 
-    X_train, X_test, y_train, y_test = train_test_split(
+    # Stage 1: peel off the test set as `test_size` of the whole dataset.
+    X_train_val, X_test, y_train_val, y_test = train_test_split(
         X, y, test_size=test_size, stratify=y, random_state=random_state
     )
+
+    # Stage 2: peel off the validation set from the remaining train+val pool.
+    # When val_size is set, it is the *final* validation fraction of the whole
+    # dataset (so test_size=0.1 + val_size=0.1 -> 80/10/10). When omitted,
+    # we keep the legacy MBA cascade: train_test_split called twice with the
+    # same `test_size`, which yields ~64/16/20 for test_size=0.2.
+    if val_size is None:
+        stage2_test_size = test_size
+        logging.info(
+            f"Split (legacy cascade): test={test_size:.0%}, "
+            f"val~{test_size * (1 - test_size):.0%}, "
+            f"train~{(1 - test_size) ** 2:.0%}"
+        )
+    else:
+        stage2_test_size = val_size / (1 - test_size)
+        logging.info(
+            f"Split: train={1 - val_size - test_size:.0%}, val={val_size:.0%}, test={test_size:.0%}"
+        )
+
     X_train, X_val, y_train, y_val = train_test_split(
-        X_train,
-        y_train,
-        test_size=test_size,
-        stratify=y_train,
+        X_train_val,
+        y_train_val,
+        test_size=stage2_test_size,
+        stratify=y_train_val,
         random_state=random_state,
     )
 

@@ -103,7 +103,8 @@ training:
   optimizer: "{optimizer}"
   scheduler: "{scheduler}"
   loss_function: "{loss}"
-  test_size: 0.2
+  test_size: 0.1                  # final test fraction of the whole dataset
+  val_size: 0.1                   # final val fraction (-> 80/10/10 split)
   num_workers: 4
   random_state: 42
 

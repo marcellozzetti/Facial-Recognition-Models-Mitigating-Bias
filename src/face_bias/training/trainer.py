@@ -24,6 +24,25 @@ from face_bias.training.callbacks import EarlyStopping, ModelCheckpoint
 from face_bias.training.schedulers import is_step_per_batch
 
 
+def _save_last_checkpoint(
+    path: Path,
+    model: nn.Module,
+    *,
+    epoch: int,
+    metrics: dict[str, Any],
+    class_names: list[str],
+) -> None:
+    """Persist the latest model state regardless of whether it is the best."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "model_state_dict": model.state_dict(),
+        "epoch": epoch,
+        "metrics": metrics,
+        "class_names": class_names,
+    }
+    torch.save(payload, path)
+
+
 def build_loss(config: dict[str, Any]) -> nn.Module:
     name = config["training"]["loss_function"].lower()
     if name == "cross_entropy":
@@ -58,7 +77,9 @@ class Trainer:
         self.scheduler = scheduler
         self.device = device
         self.class_names = class_names
-        self.checkpoint = ModelCheckpoint(checkpoint_dir, mode="min", filename="best.pt")
+        self.checkpoint_dir = Path(checkpoint_dir)
+        self.checkpoint = ModelCheckpoint(self.checkpoint_dir, mode="min", filename="best.pt")
+        self.last_checkpoint_path = self.checkpoint_dir / "last.pt"
         self.early_stopping = early_stopping
         self.mlflow_run = mlflow_run
 
@@ -155,12 +176,23 @@ class Trainer:
                 self.model,
                 extra={"epoch": epoch, "metrics": entry, "class_names": self.class_names},
             )
+            _save_last_checkpoint(
+                self.last_checkpoint_path,
+                self.model,
+                epoch=epoch,
+                metrics=entry,
+                class_names=self.class_names,
+            )
 
             if self.early_stopping is not None and self.early_stopping.step(val_metrics["loss"]):
                 logging.info(f"Early stopping triggered at epoch {epoch}")
                 break
 
-        return {"history": history, "best_checkpoint": str(self.checkpoint.path)}
+        return {
+            "history": history,
+            "best_checkpoint": str(self.checkpoint.path),
+            "last_checkpoint": str(self.last_checkpoint_path),
+        }
 
     def _mlflow_log(self, entry: dict[str, Any]) -> None:
         if self.mlflow_run is None:

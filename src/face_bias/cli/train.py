@@ -78,9 +78,18 @@ def main(argv: list[str] | None = None) -> int:
         default="auto",
         help="auto | cpu | cuda | cuda:0 (default: auto)",
     )
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=None,
+        help="Override training.num_epochs from the config (useful for smoke runs).",
+    )
     args = parser.parse_args(argv)
 
     config = load_config(args.config)
+    if args.epochs is not None:
+        logging.info(f"Overriding num_epochs: {config['training']['num_epochs']} -> {args.epochs}")
+        config["training"]["num_epochs"] = args.epochs
     run_id = setup_logging(config, "log_training_file")
     seed_from_config(config)
     device = _resolve_device(args.device)

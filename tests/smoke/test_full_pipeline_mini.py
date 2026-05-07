@@ -19,7 +19,7 @@ from face_bias.cli import evaluate as eval_cli
 from face_bias.cli import train as train_cli
 
 CLASSES = ["A", "B", "C"]
-N_PER_CLASS = 6
+N_PER_CLASS = 12
 IMAGE_SIZE = (32, 32)
 
 
@@ -59,7 +59,8 @@ def _write_config(root: Path, csv_path: Path, images_dir: Path) -> Path:
             "optimizer": "adamw",
             "scheduler": "onecyclelr",
             "loss_function": "cross_entropy",
-            "test_size": 0.34,
+            "test_size": 0.25,
+            "val_size": 0.25,
             "num_workers": 0,
             "random_state": 42,
         },

@@ -32,7 +32,8 @@ class TrainingConfig(BaseModel):
     optimizer: Literal["sgd", "adamw"] = "adamw"
     scheduler: Literal["onecyclelr", "cosineannealingwarmrestarts"] = "onecyclelr"
     loss_function: Literal["cross_entropy", "arcface"] = "cross_entropy"
-    test_size: float = Field(default=0.2, gt=0, lt=1)
+    test_size: float = Field(default=0.1, gt=0, lt=1)
+    val_size: Optional[float] = Field(default=0.1, gt=0, lt=1)
     num_workers: int = Field(default=4, ge=0)
     random_state: int = 42
 
