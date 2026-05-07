@@ -1,84 +1,91 @@
-# Revisão de Código e Plano de Refatoração
+# Code Review and Refactor Plan
 
-**Repositório:** `Facial-Recognition-Models-Mitigating-Bias`
-**Autor da revisão:** consolidada para evolução MBA → Mestrado
-**Data:** 06 de maio de 2026
-**Stack a preservar:** Python 3.9, PyTorch 2.4.1, MTCNN (facenet-pytorch), OpenCV, pandas, scikit-learn, boto3, PyYAML
+**Repository:** `Facial-Recognition-Models-Mitigating-Bias`
+**Review author:** consolidated for the MBA → master's-thesis evolution
+**Date:** 6 May 2026
+**Stack to preserve:** Python 3.9, PyTorch 2.4.1, MTCNN (facenet-pytorch), OpenCV, pandas, scikit-learn, boto3, PyYAML
 
----
-
-## Sumário
-
-1. [Estado Atual do Projeto](#1-estado-atual-do-projeto)
-2. [Achados Críticos e Bugs](#2-achados-críticos-e-bugs)
-3. [Avaliação por Boas Práticas](#3-avaliação-por-boas-práticas)
-4. [Estrutura Proposta](#4-estrutura-proposta)
-5. [Plano de Refatoração Faseado](#5-plano-de-refatoração-faseado)
-6. [Pipeline de Testes por Etapa](#6-pipeline-de-testes-por-etapa)
-7. [Próximos Passos Práticos](#7-próximos-passos-práticos)
+> **Status (2026-05-07):** all four sprints (A/B/C/D) below have landed — the
+> repository now matches the proposed structure, the bug list in §2 is fully
+> resolved, and the smoke run in [docs/smoke_results.md](docs/smoke_results.md)
+> validated all 11 MBA experiments end-to-end. This document is preserved as
+> the historical baseline that justifies each architectural decision.
 
 ---
 
-## 1. Estado Atual do Projeto
+## Table of contents
 
-### 1.1 Mapa de arquivos (excluindo `.venv`, `.git`, `old/`, `__pycache__/`)
+1. [Current state of the project](#1-current-state-of-the-project)
+2. [Critical findings and bugs](#2-critical-findings-and-bugs)
+3. [Best-practices assessment](#3-best-practices-assessment)
+4. [Proposed structure](#4-proposed-structure)
+5. [Phased refactor plan](#5-phased-refactor-plan)
+6. [Per-stage test pipeline](#6-per-stage-test-pipeline)
+7. [Practical next steps](#7-practical-next-steps)
 
-| Arquivo | Linhas | Estado |
+---
+
+## 1. Current state of the project
+
+### 1.1 File map (excluding `.venv`, `.git`, `old/`, `__pycache__/`)
+
+| File | Lines | State |
 |---|---:|---|
-| `configs/default.yaml` | 48 | **Funcional, com leak de credencial** |
-| `data/bucket_dataset.py` | 106 | Funcional |
-| `data/face_dataset.py` | 109 | **Funcional com bugs** |
-| `models/arc_layers.py` | 47 | Funcional (correto) |
-| `models/base_model.py` | 7 | Esqueleto, **não utilizado** |
-| `models/losses.py` | 22 | **Implementação incorreta** |
-| `models/resnet_model.py` | 43 | Funcional |
-| `pipelines/pre_processing_pipeline.py` | 112 | Funcional |
-| `pipelines/training_pipeline.py` | 0 | **Vazio** |
-| `pipelines/evaluation_pipeline.py` | 0 | **Vazio** |
-| `preprocessing/pre_processing_images.py` | 150 | Funcional |
-| `tests/test_data_loading.py` | 0 | **Vazio** |
-| `tests/test_data_rotation.py` | 0 | **Vazio** |
-| `tests/test_draw_bounding.py` | 36 | **Quebrado** (assinatura incompatível) |
-| `tests/test_models.py` | 0 | **Vazio** |
-| `utils/config.py` | 9 | Funcional |
-| `utils/custom_logging.py` | 19 | Funcional |
-| `utils/metrics.py` | 0 | **Vazio** |
-| `utils/versions.py` | 72 | Funcional |
-| `notebooks/MBA_IA_USP_marcello_ozzetti.ipynb` | — | Legado MBA |
-| `pyproject.toml` / `requirements.txt` | — | **Inexistente** |
+| `configs/default.yaml` | 48 | **Functional, but with credential leak** |
+| `data/bucket_dataset.py` | 106 | Functional |
+| `data/face_dataset.py` | 109 | **Functional with bugs** |
+| `models/arc_layers.py` | 47 | Functional (correct) |
+| `models/base_model.py` | 7 | Skeleton, **unused** |
+| `models/losses.py` | 22 | **Incorrect implementation** |
+| `models/resnet_model.py` | 43 | Functional |
+| `pipelines/pre_processing_pipeline.py` | 112 | Functional |
+| `pipelines/training_pipeline.py` | 0 | **Empty** |
+| `pipelines/evaluation_pipeline.py` | 0 | **Empty** |
+| `preprocessing/pre_processing_images.py` | 150 | Functional |
+| `tests/test_data_loading.py` | 0 | **Empty** |
+| `tests/test_data_rotation.py` | 0 | **Empty** |
+| `tests/test_draw_bounding.py` | 36 | **Broken** (incompatible signature) |
+| `tests/test_models.py` | 0 | **Empty** |
+| `utils/config.py` | 9 | Functional |
+| `utils/custom_logging.py` | 19 | Functional |
+| `utils/metrics.py` | 0 | **Empty** |
+| `utils/versions.py` | 72 | Functional |
+| `notebooks/MBA_IA_USP_marcello_ozzetti.ipynb` | — | MBA legacy |
+| `pyproject.toml` / `requirements.txt` | — | **Missing** |
 | `README.md` | 2 | Placeholder |
 | `ROADMAP.md` | 10 | Placeholder |
 
-### 1.2 Diagnóstico em uma frase
+### 1.2 One-sentence diagnosis
 
-O projeto tem **um pipeline de pré-processamento funcional + esqueletos de modelos**, mas **as etapas de treinamento, avaliação e teste estão vazias**, com **bugs silenciosos no carregamento de dados** e **uma falha crítica na implementação de ArcFace**.
+The project has **a functional preprocessing pipeline plus model skeletons**, but **the training, evaluation and test stages are empty**, with **silent bugs in the data loader** and **a critical defect in the ArcFace implementation**.
 
 ---
 
-## 2. Achados Críticos e Bugs
+## 2. Critical findings and bugs
 
-> **Status do Sprint B (2026-05-06):**
-> §2.1 (credencial), §2.3-§2.6 (dataset), §2.7 (sys.path), §2.11 (pyproject), §2.12 (crop), §2.14 (alinhamento) — ✅ corrigidos.
-> §2.2 (ArcFace), §2.10 (reprodutibilidade), §2.13 (logging) — ⏳ em andamento.
+> **Sprint B status (2026-05-06):**
+> §2.1 (credential), §2.3-§2.6 (dataset), §2.7 (sys.path), §2.11 (pyproject), §2.12 (crop), §2.14 (alignment) — ✅ fixed.
+> §2.2 (ArcFace), §2.10 (reproducibility), §2.13 (logging) — ⏳ in progress.
 
-### 2.1 🔴 Crítico — Credencial AWS exposta no repositório
+### 2.1 🔴 Critical — AWS credential exposed in the repository
 
-**Arquivo:** [configs/default.yaml:40](configs/default.yaml#L40)
+**File:** [configs/default.yaml:40](configs/default.yaml#L40)
 
 ```yaml
 bucket_download_url: 'https://...&X-Amz-Credential=ASIAS74TL4TIRAUMFFFM%2F20250202...'
 ```
 
-A URL pré-assinada da S3 inclui `AKID` (`ASIAS74TL4TIRAUMFFFM`), assinatura, e está versionada no Git. URLs pré-assinadas expiram (12h aqui), mas:
-- O AKID temporário está exposto.
-- Se a chave for de longo prazo, é leak permanente.
-- Padrão errado para o mestrado (auditoria regulatória).
+The S3 presigned URL contains an `AKID` (`ASIAS74TL4TIRAUMFFFM`), the signature, and is committed to Git. Presigned URLs do expire (12h here), but:
 
-**Ação:** rotacionar a credencial; mover URL para variável de ambiente ou `configs/credentials.json` (já no `.gitignore`); reescrever histórico se for credencial não-rotativa.
+- The temporary AKID is exposed.
+- If the key is long-lived, this is a permanent leak.
+- Wrong pattern for a master's project (regulatory auditing).
 
-### 2.2 🔴 Crítico — `ArcFaceLoss` não implementa ArcFace
+**Action:** rotate the credential; move the URL into an env var or `configs/credentials.json` (already in `.gitignore`); rewrite history if the credential was non-rotating.
 
-**Arquivo:** [models/losses.py:6-22](models/losses.py#L6-L22)
+### 2.2 🔴 Critical — `ArcFaceLoss` does not implement ArcFace
+
+**File:** [models/losses.py:6-22](models/losses.py#L6-L22)
 
 ```python
 class ArcFaceLoss(nn.Module):
@@ -89,81 +96,82 @@ class ArcFaceLoss(nn.Module):
         ...
 
     def forward(self, logits, labels):
-        return F.cross_entropy(logits, labels)  # ← apenas cross-entropy!
+        return F.cross_entropy(logits, labels)  # ← plain cross-entropy!
 ```
 
-O construtor calcula constantes da margem angular, mas `forward` ignora tudo e retorna `cross_entropy`. **Resultado: todos os "experimentos com ArcFaceLoss" do MBA, na verdade, rodaram cross-entropy puro.**
+The constructor computes the angular-margin constants, but `forward` ignores everything and returns `cross_entropy`. **Result: every "ArcFaceLoss experiment" in the MBA actually ran plain cross-entropy.**
 
-Isso explica por que ArcFaceLoss teve performance similar ou pior que CrossEntropyLoss no MBA. A lógica angular existe em [models/arc_layers.py](models/arc_layers.py) (`ArcMarginProduct`), mas **não é integrada ao modelo** ([models/resnet_model.py](models/resnet_model.py) usa `nn.Linear` direto).
+This explains why ArcFaceLoss matched or even slightly underperformed CrossEntropyLoss in the MBA. The angular logic *does* live in [models/arc_layers.py](models/arc_layers.py) (`ArcMarginProduct`), but it **is never wired into the model** ([models/resnet_model.py](models/resnet_model.py) uses `nn.Linear` directly).
 
-**Ação:** discutir explicitamente na qualificação do mestrado. Reportar como descoberta do processo de revisão. Em seguida, integrar `ArcMarginProduct` ao modelo e re-rodar os experimentos chave do MBA — esse experimento isolado já é uma contribuição válida.
+**Action:** discuss explicitly at the master's qualification. Report it as a finding from the review process. Then wire `ArcMarginProduct` into the model and re-run the MBA's key experiments — that single experiment alone is a valid contribution.
 
-### 2.3 🟠 Alto — Bug de normalização: `image_std` é igual a `image_mean`
+### 2.3 🟠 High — Normalization bug: `image_std` equals `image_mean`
 
-**Arquivo:** [data/face_dataset.py:56,61,66](data/face_dataset.py#L56)
+**File:** [data/face_dataset.py:56,61,66](data/face_dataset.py#L56)
 
 ```python
 transforms.Normalize(config['image']['image_mean'], config['image']['image_mean'])
 #                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#                                                   deveria ser image_std
+#                                                   should be image_std
 ```
 
-Todas as imagens foram normalizadas com `mean=std=[0.485, 0.456, 0.406]`, em vez de usar `std=[0.229, 0.224, 0.225]` definido no YAML. Isso afeta diretamente os resultados experimentais, pois a entrada da rede pré-treinada (ImageNet) ficou fora da escala esperada.
+Every image was normalised with `mean=std=[0.485, 0.456, 0.406]` instead of using the `std=[0.229, 0.224, 0.225]` defined in the YAML. This directly affects the experimental results because the input to the pretrained network (ImageNet) was outside the expected scale.
 
-### 2.4 🟠 Alto — Chave do YAML inconsistente: `image_size` vs `input_size`
+### 2.4 🟠 High — Inconsistent YAML key: `image_size` vs. `input_size`
 
-**Arquivo:** [data/face_dataset.py:53,59,64](data/face_dataset.py#L53)
+**File:** [data/face_dataset.py:53,59,64](data/face_dataset.py#L53)
 
 ```python
 transforms.Resize((config['image']['input_size'], config['image']['input_size']))
 ```
 
-[configs/default.yaml:18](configs/default.yaml#L18) define `image_size`, não `input_size`. Esse código falha com `KeyError` ao executar.
+[configs/default.yaml:18](configs/default.yaml#L18) defines `image_size`, not `input_size`. This code throws `KeyError` at runtime.
 
-### 2.5 🟠 Alto — `class_to_idx` não existe em `FaceDataset`
+### 2.5 🟠 High — `class_to_idx` does not exist on `FaceDataset`
 
-**Arquivo:** [data/face_dataset.py:100](data/face_dataset.py#L100)
+**File:** [data/face_dataset.py:100](data/face_dataset.py#L100)
 
 ```python
 return dataloaders, datasets['train'].class_to_idx
 ```
 
-`FaceDataset` (linhas 15-43) não define `class_to_idx`. Esse `setup_dataset` falha em runtime. Deveria retornar `label_encoder.classes_` ou similar.
+`FaceDataset` (lines 15–43) does not define `class_to_idx`. `setup_dataset` therefore fails at runtime. It should return `label_encoder.classes_` or similar.
 
-### 2.6 🟠 Alto — `setup_dataset` não retorna `num_classes` nem `label_encoder`
+### 2.6 🟠 High — `setup_dataset` does not return `num_classes` or `label_encoder`
 
-Sem isso, o pipeline de treinamento não consegue:
-- Saber o número de classes para construir o modelo;
-- Decodificar predições para nomes de raça nas matrizes de confusão.
+Without these, the training pipeline cannot:
 
-### 2.7 🟡 Médio — `sys.path.append` em todos os arquivos
+- Know the number of classes to build the model.
+- Decode predictions back to race names for the confusion matrix.
+
+### 2.7 🟡 Medium — `sys.path.append` everywhere
 
 ```python
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 ```
 
-Anti-padrão Python. Quebra quando o projeto é instalado, importado por testes ou empacotado. Solução: tornar o projeto um pacote instalável via `pyproject.toml`.
+Python anti-pattern. Breaks when the project is installed, imported by tests or packaged. Solution: turn the project into an installable package via `pyproject.toml`.
 
-### 2.8 🟡 Médio — `BaseModel` definido mas não usado
+### 2.8 🟡 Medium — `BaseModel` defined but unused
 
-[models/base_model.py](models/base_model.py) declara `BaseModel(nn.Module)` mas `LResNet50E_IR` herda de `nn.Module` direto. Ou usa, ou remove.
+[models/base_model.py](models/base_model.py) declares `BaseModel(nn.Module)`, but `LResNet50E_IR` inherits directly from `nn.Module`. Either use it or remove it.
 
-### 2.9 🟡 Médio — `tests/test_draw_bounding.py` tem assinatura incompatível
+### 2.9 🟡 Medium — `tests/test_draw_bounding.py` has an incompatible signature
 
-[tests/test_draw_bounding.py:24](tests/test_draw_bounding.py#L24) chama `draw_bounding_procedure(image, bbox)` com 2 args. A função real ([preprocessing/pre_processing_images.py:53](preprocessing/pre_processing_images.py#L53)) requer 3: `(img, bbox, landmark)`. O teste falha. E não é um teste — é um script com `__main__`.
+[tests/test_draw_bounding.py:24](tests/test_draw_bounding.py#L24) calls `draw_bounding_procedure(image, bbox)` with 2 args. The actual function ([preprocessing/pre_processing_images.py:53](preprocessing/pre_processing_images.py#L53)) requires 3: `(img, bbox, landmark)`. The test fails. Also it isn't really a test — it is a script with a `__main__`.
 
-### 2.10 🟡 Médio — Sem reprodutibilidade
+### 2.10 🟡 Medium — No reproducibility
 
-- Sem `seed_everything()` em PyTorch + numpy + Python.
-- Sem `torch.backends.cudnn.deterministic = True`.
-- Sem versionamento de dataset (DVC ou hash de checksum).
-- Sem registro de hiperparâmetros por experimento.
+- No `seed_everything()` for PyTorch + numpy + Python.
+- No `torch.backends.cudnn.deterministic = True`.
+- No dataset versioning (DVC or checksum hashes).
+- No per-experiment hyperparameter tracking.
 
-### 2.11 🟡 Médio — Sem `requirements.txt` / `pyproject.toml`
+### 2.11 🟡 Medium — Missing `requirements.txt` / `pyproject.toml`
 
-Não há como reproduzir o ambiente. Versões só estão documentadas no Cap. 4 do `.tex` da dissertação.
+There is no way to reproduce the environment. Versions are only documented in Cap. 4 of the dissertation's `.tex`.
 
-### 2.12 🟢 Baixo — `cropping_procedure` pode estourar índices negativos
+### 2.12 🟢 Low — `cropping_procedure` may overflow into negative indices
 
 [preprocessing/pre_processing_images.py:96](preprocessing/pre_processing_images.py#L96):
 
@@ -171,39 +179,40 @@ Não há como reproduzir o ambiente. Versões só estão documentadas no Cap. 4 
 return img[y1-border:y1+height+border, x1-border:x1+width+border]
 ```
 
-Se `y1 - border < 0`, NumPy aceita índice negativo e retorna fatia errada (do final da imagem). Função-irmã comentada (linhas 98-125) já tem o `max(0, ...)` correto — está comentada mas é a versão certa.
+If `y1 - border < 0`, NumPy accepts the negative index and returns the wrong slice (from the end of the image). The commented-out sibling function (lines 98–125) already has the correct `max(0, ...)` clamping — it is commented out but is the right version.
 
-### 2.13 🟢 Baixo — Logging não estruturado
+### 2.13 🟢 Low — Unstructured logging
 
-Cada módulo escreve em arquivo próprio (`bucket.log`, `preprocessing.log`, etc.) sem timestamp de correlação ou ID de experimento. Difícil depurar runs longos.
+Each module writes to its own file (`bucket.log`, `preprocessing.log`, etc.) with no correlation timestamp or experiment ID. Hard to debug long-running runs.
 
-### 2.14 🔴 Crítico — Alinhamento facial usava landmarks absolutos em imagem cropped
+### 2.14 🔴 Critical — Face alignment used absolute landmarks against the cropped image
 
-**Descoberto durante o Sprint B (2026-05-06).**
+**Discovered during Sprint B (2026-05-06).**
 
-**Arquivo (pré-correção):** `preprocessing/pre_processing_images.py` — sequência `detect_and_adjust_faces` → `cropping_procedure` → `alignment_procedure`.
+**File (pre-fix):** `preprocessing/pre_processing_images.py` — sequence `detect_and_adjust_faces` → `cropping_procedure` → `alignment_procedure`.
 
-**Fluxo defeituoso:**
+**Defective flow:**
 
-1. MTCNN detecta `bbox` e `landmarks` em coordenadas **absolutas** (em pixels, na imagem original).
-2. `cropping_procedure` recorta a região da face (com borda).
-3. `alignment_procedure` recebia a imagem **cropped** + landmarks **absolutos** e calculava:
+1. MTCNN detects `bbox` and `landmarks` in **absolute** coordinates (pixels in the original image).
+2. `cropping_procedure` crops the face region (with a border).
+3. `alignment_procedure` was given the **cropped** image plus the **absolute** landmarks and computed:
    ```python
    eyes_center = ((left_eye_x + right_eye_x) // 2, (left_eye_y + right_eye_y) // 2)
    M = cv2.getRotationMatrix2D(eyes_center, angle, 1.0)
    cv2.warpAffine(img, M, (img.shape[1], img.shape[0]))
    ```
 
-Como `eyes_center` ficava em coordenadas da imagem original, o pivô da rotação caía **fora** da imagem cropped (especialmente quando o rosto estava longe do canto superior-esquerdo da imagem). O `warpAffine` então rotaciona em torno desse ponto externo, resultando em uma imagem severamente deslocada/cortada.
+Because `eyes_center` was in original-image coordinates, the rotation pivot fell **outside** the cropped image (especially when the face was far from the top-left of the original frame). `warpAffine` then rotates around that external point, producing a severely shifted/cut output.
 
-**Por que passou despercebido no MBA:** o ângulo de rotação `arctan2(Δy, Δx)` é invariante à translação, então o ângulo aplicado estava correto. Apenas o **centro** estava errado. Para faces frontais com baixa rotação (a maioria do FairFace), o efeito visual é discreto, mas a face fica deslocada o suficiente para introduzir ruído no treino.
+**Why the MBA missed it:** the rotation angle `arctan2(Δy, Δx)` is invariant to translation, so the angle being applied was correct. Only the **centre** was wrong. For mostly-frontal faces with small rotation (the bulk of FairFace) the visual effect is subtle, but the face is shifted enough to inject noise into training.
 
-**Impacto na narrativa do MBA:**
-- Todas as imagens dos 11 experimentos foram alinhadas com pivô incorreto.
-- Combinado com o bug §2.3 (normalização errada), explica parte da estagnação em ~0,68 de acurácia mesmo com setups bem ajustados.
-- É um **resultado a reportar** na qualificação do mestrado: a re-execução dos experimentos chave do MBA com o pipeline corrigido é uma contribuição experimental concreta.
+**Impact on the MBA narrative:**
 
-**Correção (commit do Sprint A pelo usuário):** ajustar landmarks ao sistema de coordenadas da imagem cropped antes do alinhamento:
+- Every image across the 11 experiments was aligned with the wrong pivot.
+- Combined with bug §2.3 (wrong normalisation), this explains part of the ~0.68 accuracy ceiling even with carefully tuned setups.
+- This is a **finding to report** at the master's qualification: re-running the MBA's key experiments with the fixed pipeline is a concrete experimental contribution.
+
+**Fix (user's Sprint A commit):** translate the landmarks into the cropped-image coordinate system before alignment:
 
 ```python
 crop_x1 = max(0, x1 - border)
@@ -215,104 +224,104 @@ adjusted_landmarks = {
 aligned_face = alignment_procedure(cropped_face, adjusted_landmarks)
 ```
 
-Adicionalmente, `alignment_procedure` agora retorna `None` explicitamente quando faltam landmarks (antes apenas logava warning e seguia executando).
+In addition, `alignment_procedure` now explicitly returns `None` when landmarks are missing (it previously logged a warning and silently continued).
 
-**Ação remanescente:** documentar o achado no Cap. 4 da dissertação como "Limitações da execução do MBA identificadas em revisão" e na introdução do mestrado como motivador para o eixo "rigor de pré-processamento".
+**Open follow-up:** document the finding in Cap. 4 of the dissertation as "Limitations of the MBA execution identified during review" and in the master's introduction as a motivator for the "preprocessing rigour" axis.
 
 ---
 
-## 3. Avaliação por Boas Práticas
+## 3. Best-practices assessment
 
-### 3.1 Boas práticas Python científico (checklist)
+### 3.1 Scientific-Python checklist
 
-| Categoria | Item | Estado |
+| Category | Item | State |
 |---|---|---|
-| **Empacotamento** | `pyproject.toml` com dependências fixadas | ❌ |
-| **Empacotamento** | Pacote instalável via `pip install -e .` | ❌ |
-| **Empacotamento** | Sem `sys.path` hacks | ❌ |
-| **Reprodutibilidade** | Seeds determinísticas | ❌ |
-| **Reprodutibilidade** | Versionamento de dataset | ❌ |
-| **Reprodutibilidade** | Tracking de experimentos | ❌ |
-| **Configuração** | YAML por experimento | ⚠️ Parcial (1 só) |
-| **Configuração** | Validação de schema (Pydantic / `jsonschema`) | ❌ |
-| **Configuração** | Secrets fora do repo | ⚠️ Parcial (URL leak) |
-| **Estrutura** | Separação clara `data/`, `models/`, `pipelines/`, `utils/` | ✅ |
-| **Estrutura** | `__init__.py` com APIs públicas | ❌ (vazios) |
-| **Qualidade** | Type hints | ❌ |
-| **Qualidade** | Docstrings consistentes | ⚠️ Parcial |
-| **Qualidade** | Linter configurado (ruff / black / isort) | ❌ |
-| **Qualidade** | Pre-commit hooks | ❌ |
-| **Testes** | `pytest` com fixtures | ❌ (placeholders) |
-| **Testes** | Cobertura mínima | ❌ |
-| **Testes** | Smoke tests do pipeline ponta-a-ponta | ❌ |
-| **CI/CD** | GitHub Actions ou similar | ❌ |
-| **Documentação** | README útil | ❌ (2 linhas) |
-| **Documentação** | CHANGELOG | ❌ |
+| **Packaging** | `pyproject.toml` with pinned dependencies | ❌ |
+| **Packaging** | Installable via `pip install -e .` | ❌ |
+| **Packaging** | No `sys.path` hacks | ❌ |
+| **Reproducibility** | Deterministic seeds | ❌ |
+| **Reproducibility** | Dataset versioning | ❌ |
+| **Reproducibility** | Experiment tracking | ❌ |
+| **Configuration** | One YAML per experiment | ⚠️ Partial (only one) |
+| **Configuration** | Schema validation (Pydantic / `jsonschema`) | ❌ |
+| **Configuration** | Secrets outside the repo | ⚠️ Partial (URL leaked) |
+| **Structure** | Clean separation `data/`, `models/`, `pipelines/`, `utils/` | ✅ |
+| **Structure** | `__init__.py` exporting public APIs | ❌ (empty) |
+| **Quality** | Type hints | ❌ |
+| **Quality** | Consistent docstrings | ⚠️ Partial |
+| **Quality** | Linter configured (ruff / black / isort) | ❌ |
+| **Quality** | Pre-commit hooks | ❌ |
+| **Tests** | `pytest` with fixtures | ❌ (placeholders) |
+| **Tests** | Minimum coverage | ❌ |
+| **Tests** | End-to-end smoke tests | ❌ |
+| **CI/CD** | GitHub Actions or similar | ❌ |
+| **Documentation** | Useful README | ❌ (2 lines) |
+| **Documentation** | CHANGELOG | ❌ |
 
-### 3.2 Boas práticas específicas de redes neurais / treinamento
+### 3.2 Neural-network / training specifics
 
-| Categoria | Item | Estado |
+| Category | Item | State |
 |---|---|---|
-| **Modelo** | `model.train()` / `model.eval()` separados | ❌ (sem código) |
-| **Modelo** | `torch.no_grad()` em validação/teste | ❌ |
-| **Modelo** | Mixed precision (`torch.cuda.amp`) | ❌ |
-| **Modelo** | Checkpoints salvos por época | ❌ |
-| **Modelo** | Early stopping com patience | ❌ |
-| **Modelo** | Resume from checkpoint | ❌ |
-| **Dados** | Augmentação real (não só `RandomHorizontalFlip`) | ⚠️ Mínima |
-| **Dados** | `pin_memory=True` | ✅ |
-| **Dados** | `num_workers > 0` | ✅ |
-| **Dados** | DataLoader com seed para reprodutibilidade | ❌ |
-| **Métricas** | Métricas por época logadas | ❌ |
-| **Métricas** | Métricas por subgrupo demográfico | ❌ |
-| **Métricas** | Métricas de fairness (IR/FDR/CEI) | ❌ |
+| **Model** | `model.train()` / `model.eval()` switched explicitly | ❌ (no code) |
+| **Model** | `torch.no_grad()` for validation/test | ❌ |
+| **Model** | Mixed precision (`torch.cuda.amp`) | ❌ |
+| **Model** | Per-epoch checkpoint saving | ❌ |
+| **Model** | Early stopping with patience | ❌ |
+| **Model** | Resume from checkpoint | ❌ |
+| **Data** | Real augmentation (more than `RandomHorizontalFlip`) | ⚠️ Minimal |
+| **Data** | `pin_memory=True` | ✅ |
+| **Data** | `num_workers > 0` | ✅ |
+| **Data** | DataLoader seeded for reproducibility | ❌ |
+| **Metrics** | Per-epoch metrics logged | ❌ |
+| **Metrics** | Per-demographic-subgroup metrics | ❌ |
+| **Metrics** | Fairness metrics (IR/FDR/CEI) | ❌ |
 | **Tracking** | TensorBoard / MLflow / W&B | ❌ |
-| **Hardware** | Verificação de GPU disponível | ✅ (em `versions.py`) |
-| **Hardware** | Mover modelo/dados para `device` | ❌ |
+| **Hardware** | GPU availability check | ✅ (in `versions.py`) |
+| **Hardware** | Move model/data to `device` | ❌ |
 
 ---
 
-## 4. Estrutura Proposta
+## 4. Proposed structure
 
-### 4.1 Princípios
+### 4.1 Principles
 
-1. **Preservar a stack do MBA** (PyTorch + MTCNN + ResNet50 + ArcFace + S3 + YAML).
-2. **Cada etapa testável isoladamente** — espelha os "experimentos" do MBA mas como código reproduzível.
-3. **Sem `sys.path` hacks** — pacote Python instalável.
-4. **Configuração por arquivo + override por CLI** — um YAML por experimento.
-5. **Tracking nativo** — MLflow embutido (mais leve que W&B, sem login externo).
+1. **Preserve the MBA stack** (PyTorch + MTCNN + ResNet50 + ArcFace + S3 + YAML).
+2. **Each stage testable in isolation** — mirrors the MBA "experiments" but as reproducible code.
+3. **No `sys.path` hacks** — installable Python package.
+4. **File-based configuration + CLI overrides** — one YAML per experiment.
+5. **Native tracking** — embedded MLflow (lighter than W&B, no external login).
 
-### 4.2 Árvore de diretórios proposta
+### 4.2 Proposed directory tree
 
 ```
 Facial-Recognition-Models-Mitigating-Bias/
-├── pyproject.toml                       # 🆕 Empacotamento e dependências
-├── README.md                            # 🔄 Reescrever
-├── PROPOSTA_MESTRADO.md                  # ✅ Já criado
-├── REVIEW_AND_PLAN.md                    # ✅ Este documento
-├── .gitignore                           # ✅ OK (manter)
-├── .pre-commit-config.yaml              # 🆕 Linters automáticos
+├── pyproject.toml                       # 🆕 Packaging and dependencies
+├── README.md                            # 🔄 Rewrite
+├── PROPOSTA_MESTRADO.md                 # ✅ Already created
+├── REVIEW_AND_PLAN.md                   # ✅ This document
+├── .gitignore                           # ✅ OK (keep)
+├── .pre-commit-config.yaml              # 🆕 Automatic linters
 │
 ├── configs/
-│   ├── default.yaml                     # 🔄 Sanitizar credenciais
+│   ├── default.yaml                     # 🔄 Sanitise credentials
 │   ├── experiments/                     # 🆕
-│   │   ├── exp01_crossentropy_sgd.yaml  #     1 YAML por experimento
+│   │   ├── exp01_crossentropy_sgd.yaml  #     One YAML per experiment
 │   │   ├── exp02_arcface_sgd.yaml
 │   │   └── ...
-│   └── credentials.json.example         # 🆕 Template (sem segredos)
+│   └── credentials.json.example         # 🆕 Template (no secrets)
 │
-├── src/                                 # 🆕 Pacote principal (instalável)
+├── src/                                 # 🆕 Main installable package
 │   └── face_bias/
 │       ├── __init__.py
 │       ├── config/
 │       │   ├── __init__.py
-│       │   ├── loader.py                # 🔄 Antigo utils/config.py
-│       │   └── schema.py                # 🆕 Validação Pydantic
+│       │   ├── loader.py                # 🔄 Was utils/config.py
+│       │   └── schema.py                # 🆕 Pydantic validation
 │       ├── data/
 │       │   ├── __init__.py
-│       │   ├── bucket.py                # 🔄 Antigo data/bucket_dataset.py
-│       │   ├── dataset.py               # 🔄 Antigo data/face_dataset.py (fix bugs)
-│       │   └── transforms.py            # 🆕 Pipelines de augmentação
+│       │   ├── bucket.py                # 🔄 Was data/bucket_dataset.py
+│       │   ├── dataset.py               # 🔄 Was data/face_dataset.py (bug fixes)
+│       │   └── transforms.py            # 🆕 Augmentation pipelines
 │       ├── preprocessing/
 │       │   ├── __init__.py
 │       │   ├── detection.py             # 🔄 detect_and_adjust_faces, etc.
@@ -322,73 +331,73 @@ Facial-Recognition-Models-Mitigating-Bias/
 │       │   ├── __init__.py
 │       │   ├── base.py
 │       │   ├── resnet.py                # 🔄 LResNet50E_IR
-│       │   ├── arc_margin.py            # 🔄 ArcMarginProduct (sem mudança)
-│       │   └── losses.py                # 🔧 Corrigir ArcFaceLoss
+│       │   ├── arc_margin.py            # 🔄 ArcMarginProduct (unchanged)
+│       │   └── losses.py                # 🔧 Fix ArcFaceLoss
 │       ├── training/
 │       │   ├── __init__.py
-│       │   ├── trainer.py               # 🆕 Loop de treino
-│       │   ├── callbacks.py             # 🆕 Early stop, checkpoint
+│       │   ├── trainer.py               # 🆕 Training loop
+│       │   ├── callbacks.py             # 🆕 Early-stopping, checkpoint
 │       │   └── schedulers.py            # 🆕 OneCycleLR, CosineAnnealing
 │       ├── evaluation/
 │       │   ├── __init__.py
-│       │   ├── evaluator.py             # 🆕 Loop de avaliação
+│       │   ├── evaluator.py             # 🆕 Evaluation loop
 │       │   ├── metrics.py               # 🆕 Acc, F1, log-loss + IR/FDR/CEI
-│       │   └── reports.py               # 🆕 Matriz de confusão, relatório
+│       │   └── reports.py               # 🆕 Confusion matrix, report
 │       └── utils/
 │           ├── __init__.py
-│           ├── logging.py               # 🔄 Antigo custom_logging
+│           ├── logging.py               # 🔄 Was custom_logging
 │           ├── reproducibility.py       # 🆕 seed_everything()
-│           └── system.py                # 🔄 Antigo versions.py
+│           └── system.py                # 🔄 Was versions.py
 │
-├── pipelines/                           # 🔄 Scripts entrypoint (CLI)
-│   ├── 01_download_dataset.py           # 🔄 Wrapper de bucket
-│   ├── 02_preprocess.py                 # 🔄 Wrapper de pre_processing_pipeline
-│   ├── 03_train.py                      # 🆕 Treino orquestrado
-│   ├── 04_evaluate.py                   # 🆕 Avaliação
-│   └── 05_fairness_audit.py             # 🆕 IR/FDR/CEI sobre runs salvos
+├── pipelines/                           # 🔄 Entry-point scripts (CLI)
+│   ├── 01_download_dataset.py           # 🔄 Bucket wrapper
+│   ├── 02_preprocess.py                 # 🔄 pre_processing_pipeline wrapper
+│   ├── 03_train.py                      # 🆕 Orchestrated training
+│   ├── 04_evaluate.py                   # 🆕 Evaluation
+│   └── 05_fairness_audit.py             # 🆕 IR/FDR/CEI on saved runs
 │
-├── tests/                               # 🆕 Estrutura completa pytest
+├── tests/                               # 🆕 Full pytest tree
 │   ├── __init__.py
-│   ├── conftest.py                      # 🆕 Fixtures compartilhadas
-│   ├── unit/                            #     Testes rápidos, sem GPU
+│   ├── conftest.py                      # 🆕 Shared fixtures
+│   ├── unit/                            #     Fast, no GPU
 │   │   ├── test_config.py
 │   │   ├── test_dataset.py
 │   │   ├── test_preprocessing.py
 │   │   ├── test_models.py
 │   │   ├── test_losses.py
 │   │   └── test_metrics.py
-│   ├── integration/                     #     Testes médios, lê arquivos
+│   ├── integration/                     #     Touch the filesystem
 │   │   ├── test_bucket_download.py
 │   │   ├── test_preprocessing_pipeline.py
 │   │   └── test_dataset_pipeline.py
-│   └── smoke/                           #     Smoke tests ponta-a-ponta
+│   └── smoke/                           #     End-to-end with mini data
 │       ├── test_train_one_step.py
 │       ├── test_evaluate_one_batch.py
 │       └── test_full_pipeline_mini.py
 │
 ├── notebooks/
-│   ├── MBA_IA_USP_marcello_ozzetti.ipynb   # ✅ Manter como referência histórica
-│   └── exploratory/                       # 🆕 Notebooks de análise
+│   ├── MBA_IA_USP_marcello_ozzetti.ipynb   # ✅ Keep as historical reference
+│   └── exploratory/                       # 🆕 Analysis notebooks
 │
-├── scripts/                             # 🆕 Utilitários
+├── scripts/                             # 🆕 Utilities
 │   ├── fix_arcface_bug_demo.py
 │   └── compare_experiments.py
 │
-├── data/                                # ⚠️ Apenas paths, dados via DVC
+├── data/                                # ⚠️ Paths only, data via DVC
 │   ├── raw/                             # 🆕 (gitignored)
 │   ├── processed/                       # 🆕 (gitignored)
-│   └── synthetic/                       # 🆕 (gitignored, futuro)
+│   └── synthetic/                       # 🆕 (gitignored, future)
 │
 ├── outputs/                             # 🆕 (gitignored)
 │   ├── checkpoints/
 │   ├── logs/
 │   └── mlruns/                          #     MLflow tracking
 │
-└── docs/                                # 🆕 (futuro)
+└── docs/                                # 🆕 (future)
     └── architecture.md
 ```
 
-### 4.3 `pyproject.toml` proposto (esqueleto)
+### 4.3 Proposed `pyproject.toml` (skeleton)
 
 ```toml
 [build-system]
@@ -398,7 +407,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "face-bias"
 version = "0.2.0-mestrado"
-description = "Facial recognition bias mitigation - MBA → Mestrado"
+description = "Facial recognition bias mitigation - MBA → master's"
 requires-python = ">=3.9,<3.12"
 authors = [{name = "Marcello Ozzetti"}]
 dependencies = [
@@ -442,225 +451,225 @@ target-version = "py39"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
-    "unit: testes unitários rápidos",
-    "integration: testes que tocam arquivos",
-    "smoke: testes ponta-a-ponta com dados mínimos",
-    "gpu: testes que requerem CUDA",
+    "unit: fast unit tests",
+    "integration: tests that touch files",
+    "smoke: end-to-end tests with minimal data",
+    "gpu: tests that require CUDA",
 ]
 ```
 
 ---
 
-## 5. Plano de Refatoração Faseado
+## 5. Phased refactor plan
 
-Faseado em 4 sprints de ~1 semana, alinhados ao **Mês 1** do plano de mestrado em [PROPOSTA_MESTRADO.md](PROPOSTA_MESTRADO.md).
+Four ~1-week sprints, aligned with **Month 1** of the master's plan in [PROPOSTA_MESTRADO.md](PROPOSTA_MESTRADO.md).
 
-### Sprint A — Higienização e empacotamento (semana 1)
+### Sprint A — Hygiene and packaging (week 1)
 
-| # | Item | Prioridade |
+| # | Item | Priority |
 |---|---|---|
-| A1 | Criar `pyproject.toml` e instalar pacote (`pip install -e .`) | 🔴 |
-| A2 | Mover código para `src/face_bias/` e remover todos os `sys.path.append` | 🔴 |
-| A3 | Sanitizar `configs/default.yaml` — remover URL com credencial | 🔴 |
-| A4 | Rotacionar credencial AWS exposta | 🔴 |
-| A5 | Adicionar `requirements.txt` gerado a partir do ambiente atual (lock) | 🟠 |
-| A6 | Configurar `ruff` + `black` + pre-commit | 🟠 |
-| A7 | Reescrever `README.md` com setup instructions | 🟠 |
+| A1 | Create `pyproject.toml` and install package (`pip install -e .`) | 🔴 |
+| A2 | Move code to `src/face_bias/` and remove every `sys.path.append` | 🔴 |
+| A3 | Sanitise `configs/default.yaml` — strip the URL with credential | 🔴 |
+| A4 | Rotate the exposed AWS credential | 🔴 |
+| A5 | Add `requirements.txt` generated from the current env (lock) | 🟠 |
+| A6 | Configure `ruff` + `black` + pre-commit | 🟠 |
+| A7 | Rewrite `README.md` with setup instructions | 🟠 |
 
-### Sprint B — Correção de bugs e reprodutibilidade (semana 2)
+### Sprint B — Bug fixes and reproducibility (week 2)
 
-| # | Item | Prioridade |
+| # | Item | Priority |
 |---|---|---|
-| B1 | Corrigir `image_std` em `face_dataset.py` | 🔴 |
-| B2 | Corrigir `image_size` (não `input_size`) em `face_dataset.py` | 🔴 |
-| B3 | Corrigir retorno de `setup_dataset` (num_classes + label_encoder) | 🔴 |
-| B4 | **Corrigir `ArcFaceLoss`** — integrar `ArcMarginProduct` ao modelo | 🔴 |
-| B5 | Implementar `utils/reproducibility.py` com `seed_everything()` | 🟠 |
-| B6 | Adicionar validação Pydantic ao YAML | 🟠 |
-| B7 | Migrar logging para padrão estruturado com run_id | 🟢 |
+| B1 | Fix `image_std` in `face_dataset.py` | 🔴 |
+| B2 | Fix `image_size` (not `input_size`) in `face_dataset.py` | 🔴 |
+| B3 | Fix `setup_dataset` return signature (num_classes + label_encoder) | 🔴 |
+| B4 | **Fix `ArcFaceLoss`** — wire `ArcMarginProduct` into the model | 🔴 |
+| B5 | Implement `utils/reproducibility.py` with `seed_everything()` | 🟠 |
+| B6 | Add Pydantic validation for the YAML | 🟠 |
+| B7 | Move logging to a structured format with run_id | 🟢 |
 
-### Sprint C — Treino e avaliação (semana 3)
+### Sprint C — Training and evaluation (week 3)
 
-| # | Item | Prioridade |
+| # | Item | Priority |
 |---|---|---|
-| C1 | Implementar `training/trainer.py` com loop completo | 🔴 |
-| C2 | Implementar `evaluation/evaluator.py` | 🔴 |
-| C3 | Implementar `evaluation/metrics.py` com Acc, F1, log-loss + **fairness (IR, FDR, CEI)** | 🔴 |
-| C4 | Implementar callbacks: ModelCheckpoint, EarlyStopping | 🟠 |
-| C5 | Integrar MLflow tracking | 🟠 |
-| C6 | Implementar schedulers (OneCycleLR, CosineAnnealingWarmRestarts) | 🟠 |
-| C7 | Pipeline CLI `pipelines/03_train.py` com `--config` arg | 🟠 |
+| C1 | Implement `training/trainer.py` with the full loop | 🔴 |
+| C2 | Implement `evaluation/evaluator.py` | 🔴 |
+| C3 | Implement `evaluation/metrics.py` with Acc, F1, log-loss + **fairness (IR, FDR, CEI)** | 🔴 |
+| C4 | Implement callbacks: ModelCheckpoint, EarlyStopping | 🟠 |
+| C5 | Integrate MLflow tracking | 🟠 |
+| C6 | Implement schedulers (OneCycleLR, CosineAnnealingWarmRestarts) | 🟠 |
+| C7 | CLI pipeline `pipelines/03_train.py` with `--config` arg | 🟠 |
 
-### Sprint D — Testes e CI (semana 4)
+### Sprint D — Tests and CI (week 4)
 
-| # | Item | Prioridade |
+| # | Item | Priority |
 |---|---|---|
-| D1 | Implementar fixtures em `tests/conftest.py` | 🔴 |
-| D2 | Implementar testes unitários (ver §6) | 🔴 |
-| D3 | Implementar testes de integração (ver §6) | 🟠 |
-| D4 | Implementar smoke tests (ver §6) | 🟠 |
-| D5 | Configurar GitHub Actions: lint + tests | 🟠 |
-| D6 | Adicionar badge de cobertura ao README | 🟢 |
+| D1 | Implement fixtures in `tests/conftest.py` | 🔴 |
+| D2 | Implement unit tests (see §6) | 🔴 |
+| D3 | Implement integration tests (see §6) | 🟠 |
+| D4 | Implement smoke tests (see §6) | 🟠 |
+| D5 | Configure GitHub Actions: lint + tests | 🟠 |
+| D6 | Add coverage badge to the README | 🟢 |
 
 ---
 
-## 6. Pipeline de Testes por Etapa
+## 6. Per-stage test pipeline
 
-Espelha as **etapas experimentais do MBA** ([Cap. 4 da dissertação](USPSC-Cap4-Avaliacao_Experimental.tex)):
+Mirrors the **experimental stages of the MBA** ([Cap. 4 of the dissertation](USPSC-Cap4-Avaliacao_Experimental.tex)):
 
-> 1. Seleção e análise do conjunto de dados
-> 2. Pré-processamento (Experimento I rotação, Experimento II MTCNN)
-> 3. Treinamento do modelo (11 experimentos)
-> 4. Análise de desempenho
+> 1. Selection and analysis of the dataset
+> 2. Preprocessing (Experiment I rotation, Experiment II MTCNN)
+> 3. Model training (11 experiments)
+> 4. Performance analysis
 
-Cada etapa terá **testes em três níveis**: unit (rápido), integration (lê arquivos), smoke (ponta-a-ponta com mini-dataset).
+Each stage gets **three test levels**: unit (fast), integration (touches files), smoke (end-to-end with mini data).
 
-### 6.1 Etapa 0 — Configuração e ambiente
+### 6.1 Stage 0 — Configuration and environment
 
-**Objetivo:** garantir que o projeto carrega config, valida schema e detecta GPU.
+**Goal:** make sure the project loads config, validates the schema and detects the GPU.
 
-| Teste | Tipo | O que valida |
+| Test | Type | What it validates |
 |---|---|---|
-| `test_config_loads_default_yaml` | unit | YAML carrega sem erro |
-| `test_config_schema_valid` | unit | Pydantic aceita campos esperados |
-| `test_config_rejects_missing_fields` | unit | Erro claro se faltar campo obrigatório |
-| `test_seed_everything_deterministic` | unit | 2 chamadas produzem mesmos números aleatórios |
-| `test_system_report_includes_torch` | unit | `system_info_report()` retorna versão de torch |
+| `test_config_loads_default_yaml` | unit | YAML loads without error |
+| `test_config_schema_valid` | unit | Pydantic accepts the expected fields |
+| `test_config_rejects_missing_fields` | unit | Clear error if a required field is missing |
+| `test_seed_everything_deterministic` | unit | Two calls produce the same random numbers |
+| `test_system_report_includes_torch` | unit | `system_info_report()` returns the torch version |
 
-### 6.2 Etapa 1 — Aquisição de dados (`bucket`)
+### 6.2 Stage 1 — Data acquisition (`bucket`)
 
-**Objetivo:** download/upload S3 funcionam, sem expor credenciais.
+**Goal:** S3 download/upload work without leaking credentials.
 
-| Teste | Tipo | O que valida |
+| Test | Type | What it validates |
 |---|---|---|
-| `test_credentials_loaded_from_env` | unit | Função aceita credencial via `os.environ` |
-| `test_credentials_not_in_yaml` | unit | YAML não contém `X-Amz-Credential` |
-| `test_bucket_client_initialized` | integration | `boto3.client('s3', ...)` retorna objeto válido (mock) |
-| `test_download_zip_extracts` | integration | Mock S3 com `moto` → download e unzip |
-| `test_download_handles_404` | integration | URL inválida → log de erro, sem crash |
+| `test_credentials_loaded_from_env` | unit | Function accepts a credential via `os.environ` |
+| `test_credentials_not_in_yaml` | unit | YAML does not contain `X-Amz-Credential` |
+| `test_bucket_client_initialized` | integration | `boto3.client('s3', ...)` returns a valid object (mock) |
+| `test_download_zip_extracts` | integration | Mock S3 with `moto` → download and unzip |
+| `test_download_handles_404` | integration | Invalid URL → log error, no crash |
 
-### 6.3 Etapa 2 — Pré-processamento (MTCNN + alinhamento)
+### 6.3 Stage 2 — Preprocessing (MTCNN + alignment)
 
-**Objetivo:** detecção, recorte e alinhamento corretos. **Espelho direto dos Experimentos I e II do MBA.**
+**Goal:** correct detection, cropping and alignment. **Direct mirror of the MBA's Experiments I and II.**
 
-| Teste | Tipo | O que valida |
+| Test | Type | What it validates |
 |---|---|---|
-| `test_detect_faces_returns_boxes` | unit | MTCNN com imagem dummy retorna lista (não None) |
-| `test_alignment_procedure_rotates_correctly` | unit | Olhos alinhados horizontalmente após `alignment_procedure` |
-| `test_cropping_handles_negative_indices` | unit | Bbox próximo a borda → não retorna fatia errada (bug §2.12) |
-| `test_rotate_procedure_45deg` | unit | Imagem rotacionada 45° tem mesma shape, não-nula |
-| `test_resize_to_224x224` | unit | Saída tem shape (224, 224, 3) |
-| `test_pipeline_processes_directory` | integration | Pipeline em `tests/fixtures/sample_images/` produz arquivos esperados |
-| `test_mtcnn_detection_rate_baseline` | integration | **Reproduz Experimento I do MBA**: detecta ≥60% das faces em fixtures rotacionadas |
-| `test_no_quality_loss_after_pipeline` | integration | **Reproduz Experimento II do MBA**: MTCNN re-detecta faces após processamento |
+| `test_detect_faces_returns_boxes` | unit | MTCNN on a dummy image returns a list (not None) |
+| `test_alignment_procedure_rotates_correctly` | unit | Eyes are horizontally aligned after `alignment_procedure` |
+| `test_cropping_handles_negative_indices` | unit | Bbox near the edge → no wrong slice (regression for §2.12) |
+| `test_rotate_procedure_45deg` | unit | A 45° rotated image keeps the same shape and is non-empty |
+| `test_resize_to_224x224` | unit | Output has shape (224, 224, 3) |
+| `test_pipeline_processes_directory` | integration | Pipeline on `tests/fixtures/sample_images/` produces the expected files |
+| `test_mtcnn_detection_rate_baseline` | integration | **Reproduces MBA Experiment I:** detects ≥60% of the faces in rotated fixtures |
+| `test_no_quality_loss_after_pipeline` | integration | **Reproduces MBA Experiment II:** MTCNN re-detects faces after the pipeline |
 
-### 6.4 Etapa 3 — Dataset PyTorch
+### 6.4 Stage 3 — PyTorch dataset
 
-**Objetivo:** `FaceDataset` carrega corretamente, normaliza, encoda labels.
+**Goal:** `FaceDataset` loads correctly, normalises and encodes labels.
 
-| Teste | Tipo | O que valida |
+| Test | Type | What it validates |
 |---|---|---|
 | `test_dataset_len_matches_csv` | unit | `len(dataset) == len(csv)` |
-| `test_dataset_returns_tensor_and_label` | unit | `__getitem__` retorna `(Tensor, int)` |
-| `test_dataset_normalization_uses_imagenet_stats` | unit | Tensor médio ≈ 0, desvio ≈ 1 (regressão para bug §2.3) |
-| `test_dataset_image_shape_3x224x224` | unit | Tensor tem shape `[3, 224, 224]` |
+| `test_dataset_returns_tensor_and_label` | unit | `__getitem__` returns `(Tensor, int)` |
+| `test_dataset_normalization_uses_imagenet_stats` | unit | Tensor mean ≈ 0, std ≈ 1 (regression for §2.3) |
+| `test_dataset_image_shape_3x224x224` | unit | Tensor has shape `[3, 224, 224]` |
 | `test_label_encoder_round_trip` | unit | `encode → decode == original` |
-| `test_train_val_test_split_stratified` | integration | Distribuição de raça preservada nos 3 splits (chi² test) |
-| `test_class_balance_after_undersampling` | integration | **Reproduz tabela `tab:raceCountBalanceado` do MBA** |
-| `test_dataloader_iterates_one_batch` | smoke | `next(iter(dataloader))` funciona |
+| `test_train_val_test_split_stratified` | integration | Race distribution preserved across the 3 splits (chi² test) |
+| `test_class_balance_after_undersampling` | integration | **Reproduces the `tab:raceCountBalanceado` MBA table** |
+| `test_dataloader_iterates_one_batch` | smoke | `next(iter(dataloader))` works |
 
-### 6.5 Etapa 4 — Modelos e Loss
+### 6.5 Stage 4 — Models and loss
 
-**Objetivo:** modelo constrói, faz forward pass, ArcFace funciona de verdade (bug §2.2).
+**Goal:** the model builds, the forward pass runs, ArcFace actually applies the margin (bug §2.2).
 
-| Teste | Tipo | O que valida |
+| Test | Type | What it validates |
 |---|---|---|
-| `test_resnet50_constructs_with_7_classes` | unit | Modelo é instanciável |
+| `test_resnet50_constructs_with_7_classes` | unit | The model is instantiable |
 | `test_resnet50_forward_returns_correct_shape` | unit | Input `[B,3,224,224]` → output `[B, 7]` |
-| `test_resnet50_pretrained_weights_loaded` | unit | Camadas conv têm pesos não-aleatórios |
-| `test_resnet50_dropout_is_active_in_train_mode` | unit | `model.train()` ativa dropout, `model.eval()` desativa |
-| `test_arcmarginproduct_forward_shape` | unit | `ArcMarginProduct` retorna logits no shape esperado |
-| `test_arcfaceloss_differs_from_crossentropy` | unit | **Regressão para bug §2.2**: loss com margin > 0 difere de cross-entropy |
-| `test_loss_gradient_flows_to_input` | unit | `loss.backward()` produz gradientes não-nulos |
-| `test_arcface_decreases_intra_class_distance` | integration | Sanity: pares mesma classe → embeddings mais próximos após 1 update |
+| `test_resnet50_pretrained_weights_loaded` | unit | Conv layers have non-random weights |
+| `test_resnet50_dropout_is_active_in_train_mode` | unit | `model.train()` enables dropout, `model.eval()` disables |
+| `test_arcmarginproduct_forward_shape` | unit | `ArcMarginProduct` returns logits of the expected shape |
+| `test_arcfaceloss_differs_from_crossentropy` | unit | **Regression for §2.2**: loss with margin > 0 differs from cross-entropy |
+| `test_loss_gradient_flows_to_input` | unit | `loss.backward()` produces non-zero gradients |
+| `test_arcface_decreases_intra_class_distance` | integration | Sanity: same-class pairs → embeddings closer after one update |
 
-### 6.6 Etapa 5 — Loop de treinamento
+### 6.6 Stage 5 — Training loop
 
-**Objetivo:** treinar 1 batch, 1 época mini, validar persistência.
+**Goal:** train one batch, one mini epoch, validate persistence.
 
-| Teste | Tipo | O que valida |
+| Test | Type | What it validates |
 |---|---|---|
-| `test_trainer_one_step_decreases_loss` | smoke | Loss em t1 < loss em t0 (com lr alto, 1 batch repetido) |
-| `test_trainer_saves_checkpoint` | smoke | Após 1 época, arquivo `.pt` existe |
-| `test_trainer_resumes_from_checkpoint` | smoke | Carregar checkpoint reproduz pesos |
-| `test_early_stopping_halts_training` | unit | Após N épocas sem melhora, treino para |
-| `test_scheduler_onecyclelr_warmup` | unit | LR aumenta nos primeiros steps |
-| `test_mlflow_logs_metrics` | smoke | Após 1 época, `mlruns/` contém run com `train_loss` |
-| `test_full_pipeline_mini_dataset` | smoke | **Reproduz Experimento 1 do MBA em escala mini** (10 imagens, 1 época) |
+| `test_trainer_one_step_decreases_loss` | smoke | Loss at t1 < loss at t0 (high lr, one batch repeated) |
+| `test_trainer_saves_checkpoint` | smoke | After 1 epoch the `.pt` file exists |
+| `test_trainer_resumes_from_checkpoint` | smoke | Loading the checkpoint reproduces the weights |
+| `test_early_stopping_halts_training` | unit | After N epochs without improvement, training stops |
+| `test_scheduler_onecyclelr_warmup` | unit | LR rises in the first steps |
+| `test_mlflow_logs_metrics` | smoke | After 1 epoch `mlruns/` contains a run with `train_loss` |
+| `test_full_pipeline_mini_dataset` | smoke | **Reproduces MBA Experiment 1 at mini scale** (10 images, 1 epoch) |
 
-### 6.7 Etapa 6 — Avaliação e métricas
+### 6.7 Stage 6 — Evaluation and metrics
 
-**Objetivo:** confusion matrix, classification report, **fairness metrics** (lacuna do MBA).
+**Goal:** confusion matrix, classification report, **fairness metrics** (the MBA's gap).
 
-| Teste | Tipo | O que valida |
+| Test | Type | What it validates |
 |---|---|---|
-| `test_confusion_matrix_shape_7x7` | unit | Para 7 classes, matriz 7×7 |
-| `test_classification_report_keys` | unit | Retorna precision, recall, F1 por classe |
-| `test_log_loss_is_positive` | unit | Sempre > 0 |
-| `test_inequity_rate_known_input` | unit | Para FMR `[0.01, 0.05]` → IR = 5.0 |
-| `test_fdr_known_input` | unit | Caso clássico do paper de Pereira & Marcel |
-| `test_garbe_zero_when_perfectly_balanced` | unit | Grupos iguais → GARBE = 0 |
-| `test_cei_combines_disparities` | unit | Validação contra implementação de referência |
-| `test_full_evaluation_on_fixture_predictions` | integration | Pipeline lê CSV de predições e gera relatório completo |
-| `test_audit_recomputes_mba_baseline` | smoke | **Recalcula fairness sobre matrizes do MBA — entregável Mês 1** |
+| `test_confusion_matrix_shape_7x7` | unit | For 7 classes the matrix is 7×7 |
+| `test_classification_report_keys` | unit | Returns precision, recall, F1 per class |
+| `test_log_loss_is_positive` | unit | Always > 0 |
+| `test_inequity_rate_known_input` | unit | For FMR `[0.01, 0.05]` → IR = 5.0 |
+| `test_fdr_known_input` | unit | Classic case from Pereira & Marcel |
+| `test_garbe_zero_when_perfectly_balanced` | unit | Equal groups → GARBE = 0 |
+| `test_cei_combines_disparities` | unit | Validation against a reference implementation |
+| `test_full_evaluation_on_fixture_predictions` | integration | Pipeline reads a CSV of predictions and produces the full report |
+| `test_audit_recomputes_mba_baseline` | smoke | **Recomputes fairness over the MBA matrices — Month-1 deliverable** |
 
-### 6.8 Resumo: cobertura por etapa
+### 6.8 Coverage summary by stage
 
-| Etapa | Unit | Integration | Smoke | Total |
+| Stage | Unit | Integration | Smoke | Total |
 |---|---:|---:|---:|---:|
 | 0 — Config | 5 | 0 | 0 | 5 |
 | 1 — Bucket | 2 | 3 | 0 | 5 |
-| 2 — Pré-processamento | 5 | 3 | 0 | 8 |
+| 2 — Preprocessing | 5 | 3 | 0 | 8 |
 | 3 — Dataset | 5 | 2 | 1 | 8 |
-| 4 — Modelos | 7 | 1 | 0 | 8 |
-| 5 — Treinamento | 2 | 0 | 5 | 7 |
-| 6 — Avaliação | 7 | 1 | 1 | 9 |
+| 4 — Models | 7 | 1 | 0 | 8 |
+| 5 — Training | 2 | 0 | 5 | 7 |
+| 6 — Evaluation | 7 | 1 | 1 | 9 |
 | **Total** | **33** | **10** | **7** | **50** |
 
-50 testes é uma meta agressiva mas factível para o Mês 1. Em 4 sprints de ~12 testes/sprint.
+50 tests is an aggressive but achievable target for Month 1 — four sprints of ~12 tests each.
 
 ---
 
-## 7. Próximos Passos Práticos
+## 7. Practical next steps
 
-### 7.1 Decisões em aberto (precisam de aprovação antes da implementação)
+### 7.1 Open decisions (need approval before implementation)
 
-1. **Reescrita histórica do Git para remover credencial?** Se a credencial AWS é de longo prazo, a URL antiga continua acessível no histórico mesmo após `git rm`. Há duas opções:
-   - **Opção A** — rotacionar credencial e seguir; histórico fica com leak de credencial inválida (preferida se credencial era temporária `ASIA*` que já expirou).
-   - **Opção B** — `git filter-repo` para reescrever histórico (mais agressivo, exige force-push).
+1. **Rewrite Git history to remove the credential?** If the AWS credential is long-lived, the old URL is still reachable in history even after `git rm`. Two options:
+   - **Option A** — rotate the credential and move on; history keeps an invalid leak (preferred if the credential was a temporary `ASIA*` that already expired).
+   - **Option B** — `git filter-repo` to rewrite history (more aggressive, requires force-push).
 
-2. **Criar branch separado para refactor?** Recomendo `feat/mestrado-refactor` para preservar `main` enquanto a refatoração avança.
+2. **Create a separate refactor branch?** Recommended `feat/mestrado-refactor` to preserve `main` while the refactor lands.
 
-3. **Migrar para `src/face_bias/` agora ou depois?** Migrar agora gera commit grande mas evita retrabalho. Se preferir incremental, pode-se manter estrutura plana.
+3. **Migrate to `src/face_bias/` now or later?** Migrating now produces a large commit but avoids rework. If you prefer incremental, the flat layout can stay.
 
-4. **Tracking — MLflow ou TensorBoard?** MLflow é mais robusto (compara experimentos, salva artefatos), TensorBoard é mais leve.
+4. **Tracking — MLflow or TensorBoard?** MLflow is more robust (compares experiments, stores artefacts), TensorBoard is lighter.
 
-5. **DVC para versionar dataset?** Recomendado para mestrado mas adiciona complexidade. Alternativa: hash SHA256 + manifesto JSON.
+5. **DVC for dataset versioning?** Recommended for the master's but adds complexity. Alternative: SHA256 + JSON manifest.
 
-### 7.2 Ordem sugerida de execução
+### 7.2 Suggested execution order
 
-Imediata (< 1 dia):
-- A3 + A4 — sanitizar credencial e rotacionar.
-- B1 + B2 + B3 — corrigir bugs silenciosos do dataset (impacto no MBA).
-- B4 — corrigir ArcFaceLoss (descoberta com impacto na narrativa do mestrado).
+Immediate (< 1 day):
 
-Sprint 1 (semana atual):
-- A1 + A2 — pyproject.toml + reorganização para `src/`.
+- A3 + A4 — sanitise the credential and rotate.
+- B1 + B2 + B3 — fix the silent dataset bugs (impact on the MBA).
+- B4 — fix ArcFaceLoss (a finding with master's-narrative impact).
+
+Sprint 1 (current week):
+
+- A1 + A2 — pyproject.toml + reorganise to `src/`.
 - B5 — `seed_everything()`.
-- D1 — fixtures de teste.
+- D1 — test fixtures.
 
-A partir daí, seguir o plano de §5.
+From there, follow the §5 plan.
 
 ---
-
-*Documento elaborado em revisão completa do código-fonte do repositório, em 2026-05-06, alinhado à proposta de mestrado em [PROPOSTA_MESTRADO.md](PROPOSTA_MESTRADO.md).*
