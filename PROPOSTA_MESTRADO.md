@@ -3,7 +3,7 @@
 **Tema:** Por que balancear a distribuição de classes não basta para reconhecimento facial equitativo — e o que de fato ajuda. Auditoria empírica e intervenções em loss e dados sintéticos sobre o pipeline LResNet50E_IR/FairFace.
 
 **Autor:** Marcello Ozzetti
-**Programa-alvo:** Mestrado em Computação Aplicada — Unifesp / ICT (Instituto de Ciência e Tecnologia, São José dos Campos)
+**Programa-alvo:** Mestrado em Ciência da Computação — Unifesp / ICT (Instituto de Ciência e Tecnologia, São José dos Campos)
 **Trabalho de origem:** Dissertação de MBA em IA / USP — *Facial Recognition Models Mitigating Bias* (out/2024)
 **Data desta proposta:** 06 de maio de 2026
 **Última revisão:** 07 de maio de 2026 — recalibração após smoke run dos 11 experimentos
@@ -238,7 +238,7 @@ Hipóteses ativas:
 
 ### 3.5.1 Objetivo
 
-A tese é projetada para gerar **pelo menos um artigo científico submetido a workshop tier-A**, como deliverable principal acadêmico de externalização do mestrado, em paralelo com o exame de qualificação interno do programa de Computação Aplicada da **Unifesp / ICT — São José dos Campos**.
+A tese é projetada para gerar **pelo menos um artigo científico submetido a workshop tier-A**, como deliverable principal acadêmico de externalização do mestrado, em paralelo com o exame de qualificação interno do programa de Ciência da Computação da **Unifesp / ICT — São José dos Campos**.
 
 ### 3.5.2 Título de trabalho proposto
 

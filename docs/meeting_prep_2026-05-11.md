@@ -1,6 +1,6 @@
 # Preparação para a Reunião com o Coordenador — 2026-05-11 (segunda-feira)
 
-**Programa-alvo:** Computação Aplicada — Unifesp / ICT (São José dos Campos)
+**Programa-alvo:** Ciência da Computação — Unifesp / ICT (São José dos Campos)
 **Objetivo da reunião:** apresentar a proposta de mestrado e demonstrar prontidão e domínio técnico do tema.
 **Duração estimada:** 1 dia produtivo (~8h, divididos em 4 blocos).
 
