@@ -37,8 +37,8 @@ preprocessing:
 
 data:
   dataset_file: "data/raw/fairface/fairface_labels.csv"
-  dataset_image_input_path:  "data/raw/bucket/train"
-  dataset_image_output_path: "data/processed/fairface_aligned/train"
+  dataset_image_input_path:  "data/processed/fairface_aligned"
+  dataset_image_output_path: "data/processed/fairface_aligned/output"
 
 bucket:
   function: "download"             # one of: download, upload
