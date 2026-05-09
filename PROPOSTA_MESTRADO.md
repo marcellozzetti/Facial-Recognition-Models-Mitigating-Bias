@@ -28,18 +28,20 @@
 
 ## 1. Sumário Executivo
 
-A dissertação de MBA estabeleceu uma base experimental funcional — pipeline `LResNet50E-IR` sobre **FairFace** com 11 experimentos comparativos. A re-execução desses 11 experimentos em maio/2026 (rodada smoke documentada em [docs/smoke_results.md](docs/smoke_results.md)) com o pipeline corrigido revelou **um achado central que define o tema do mestrado**:
+A dissertação de MBA estabeleceu uma base experimental funcional — pipeline `LResNet50E-IR` sobre **FairFace** com 11 experimentos comparativos. A re-execução completa desses 11 experimentos em maio/2026 (smoke de 5 épocas em [docs/smoke_results.md](docs/smoke_results.md) + rodada limpa de 25 épocas com `EarlyStopping` em [docs/clean_results.md](docs/clean_results.md), 9h38min de wall-clock, 11/11 OK) com o pipeline corrigido revelou **um achado central que define o tema do mestrado**:
 
-> **O undersampling para classes balanceadas não produz reconhecimento facial equitativo.** Mesmo com 10.374 imagens por classe (todas as 7 classes idênticas em tamanho), o modelo treinado mantém **Inequity Rate (F1) = 1,73 e gap max-min = 0,34** entre a melhor classe (Black, F1=0,81) e a pior (Latino_Hispanic, F1=0,47). O fenômeno é estrutural: independente de optimizer (SGD/AdamW), scheduler (OneCycleLR/CosineAnnealing), épocas (5/25/40) ou dropout (0,2/0,5) — nenhuma combinação fechou esse gap.
+> **O undersampling para classes balanceadas não produz reconhecimento facial equitativo.** Mesmo com 10.374 imagens por classe (todas as 7 classes idênticas em tamanho), todas as 5 configurações CE 7-class testadas mantêm **Inequity Rate (F1) entre 1,76 e 1,86** e **gap max-min entre 0,34 e 0,36** entre a melhor classe (Black, F1=0,78–0,84) e a pior (**Latino_Hispanic, F1=0,42–0,47**). O fenômeno é estrutural: independente de optimizer (SGD/AdamW), scheduler (OneCycleLR/CosineAnnealing), épocas (até 40) ou dropout (0,2/0,5) — nenhuma combinação fechou esse gap.
 
-Esta evidência **falsifica empiricamente a hipótese intuitiva** que o trabalho de MBA assumia (balancear → equidade) e abre a pergunta que organiza a tese: **se balancear o dataset não basta, o que basta?**
+Como bônus metodológico, a rodada limpa também **expôs em escala completa** o bug §2.2 (`ArcFaceLoss` que silenciosamente caía em `cross_entropy`): com a margem angular agora realmente aplicada, os experimentos de ArcFace caem de 0,58–0,61 reportados pelo MBA para **0,17–0,46 de acurácia, IR=∞** — a margem fixa `m=0,5` colapsa pelo menos uma classe demográfica para F1=0.
+
+Estas evidências **falsificam empiricamente a hipótese intuitiva** que o trabalho de MBA assumia (balancear → equidade) e abrem a pergunta que organiza a tese: **se balancear o dataset não basta, o que basta?**
 
 A proposta de mestrado responde essa pergunta investigando duas frentes documentadas como SOTA na literatura 2024–2026:
 
 1. **Funções de perda quality-adaptive** (AdaFace, MagFace, KP-RPE) — atacam o problema no espaço de loss.
 2. **Augmentação por dados sintéticos** (DCFace pré-treinado) das classes piores — ataca o problema no espaço de dados.
 
-Cada frente é investigada isoladamente e em combinação, com auditoria de fairness padronizada (IR/FDR/Gini) sobre os mesmos splits, alinhada a requisitos regulatórios do **EU AI Act** (vigência plena 02/08/2026) e ao **NIST FRTE/FATE**.
+Cada frente é investigada isoladamente e em combinação, com auditoria de fairness padronizada (IR/FDR/Gini) sobre os mesmos splits, alinhada a requisitos regulatórios do **EU AI Act** (vigência plena 02/08/2026) e ao **NIST FRTE/FATE**. O **baseline a bater** é o Exp 5 (CE+AdamW+CosineAnnealingWarmRestarts) com acc=0,665, IR=1,76 e F1 Latino_Hispanic=0,47.
 
 **Outputs esperados em 6 meses:**
 1. **Submissão de artigo científico** em workshop tier-A (target: WACV Workshop on Fair Computer Vision, IJCB 2027, ou ACM FAccT 2027).
@@ -202,7 +204,7 @@ Não é uma ruptura — é uma extensão alinhada às evoluções da literatura 
 
 ### 3.2 Pergunta de pesquisa (revisada)
 
-> **A rodada de smoke (mai/2026) demonstrou que balancear o conjunto de treinamento via undersampling — a abordagem dominante na dissertação de MBA e em boa parte da literatura aplicada — produz Inequity Rate ≥ 1,73 e gap max-min ≥ 0,32 em F1 entre grupos demográficos, mesmo com 10.374 amostras por classe. *Que intervenções no espaço de loss e/ou no espaço de dados de fato fecham esse gap residual, e em que magnitude?***
+> **A rodada limpa (mai/2026, 11/11 experimentos, 9h38min) demonstrou que balancear o conjunto de treinamento via undersampling — a abordagem dominante na dissertação de MBA e em boa parte da literatura aplicada — produz Inequity Rate (F1) entre 1,76 e 1,86 e gap max-min entre 0,34 e 0,36 em todas as 5 configurações CE 7-class testadas, mesmo com 10.374 amostras por classe. *Que intervenções no espaço de loss e/ou no espaço de dados de fato fecham esse gap residual, e em que magnitude?***
 
 A pergunta tem três sub-perguntas:
 
@@ -212,25 +214,31 @@ A pergunta tem três sub-perguntas:
 
 ### 3.3 Hipóteses
 
-> **H0 (FALSIFICADA empiricamente nos 11 experimentos do smoke run, mai/2026):**
+> **H0 (FALSIFICADA empiricamente — 11 experimentos do clean run, mai/2026):**
 > "Balancear o conjunto de treinamento por undersampling produz reconhecimento facial equitativo (IR ≈ 1,0)."
-> **Resultado observado**: IR = 1,73 em todas as 5 configurações CE 7-class testadas. Esta hipótese, central no trabalho de MBA, é rejeitada e organiza a investigação subsequente.
+> **Resultado observado**: IR ∈ [1,76; 1,86] em todas as 5 configurações CE 7-class testadas com 25 épocas. A hipótese, central no trabalho de MBA, é rejeitada e organiza a investigação subsequente.
+
+**Baseline empírico** (a ser superado pelas intervenções):
+- **Melhor 7-class:** Exp 5 (CE + AdamW + CosineAnnealingWarmRestarts), acc=0,665, **IR=1,76, gap=0,36**.
+- **F1 da pior classe (Latino_Hispanic):** 0,42 a 0,47 dependendo da configuração.
+- **F1 da melhor classe (Black):** 0,78 a 0,84.
 
 Hipóteses ativas:
 
-- **H1 (PQ1)** — Substituir CrossEntropy/ArcFace por **AdaFace** sobre o conjunto balanceado reduz o IR (F1) em pelo menos 20% (de 1,73 para ≤ 1,38), mantendo ou melhorando a acurácia agregada.
-- **H2 (PQ2)** — **Augmentar a classe Latino_Hispanic** com 5.000–10.000 imagens sintéticas geradas por DCFace pré-treinado (sem retreinar o gerador) reduz o gap específico Latino_Hispanic ↔ Black em pelo menos 30% (de 0,34 para ≤ 0,24).
+- **H1 (PQ1)** — Substituir CrossEntropy por **AdaFace** sobre o conjunto balanceado reduz o IR (F1) em pelo menos 20% (de **1,76** para **≤ 1,41**), mantendo ou melhorando a acurácia agregada (≥ 0,665).
+- **H2 (PQ2)** — **Augmentar a classe Latino_Hispanic** com 5.000–10.000 imagens sintéticas geradas por DCFace pré-treinado (sem retreinar o gerador) reduz o gap específico Latino_Hispanic ↔ Black em pelo menos 30% (de **0,36** para **≤ 0,25**) e eleva F1 Latino_Hispanic para **≥ 0,55**.
 - **H3 (PQ3)** — A combinação **AdaFace + DCFace augmentation** produz redução de gap maior que a soma das reduções individuais (interação positiva).
-- **H4** — O ranking de modelos por acurácia agregada difere significativamente do ranking por IR — implicação direta para auditoria regulatória sob o EU AI Act (já corroborada parcialmente no smoke: o melhor IR foi do Exp. 9, com dropout=0,5, que tem acurácia agregada igual aos melhores).
+- **H4** — O ranking de modelos por acurácia agregada difere significativamente do ranking por IR — implicação direta para auditoria regulatória sob o EU AI Act. **Corroborada parcialmente pelo clean run**: Exp 5 lidera em ambos, mas Exp 1 (acc=0,629) e Exp 9 (acc=0,629) empatam em acc enquanto Exp 9 tem IR=1,84 vs Exp 1 IR=1,85 — confirmando que pequenas variações em acc não predizem variações em IR.
 - **H5 (qualitativa via t-SNE/Grad-CAM)** — A redução de gap correlaciona-se com **maior compactação intra-classe e separação inter-classe** no espaço de embeddings da classe pior (Latino_Hispanic), observável em t-SNE pré/pós-intervenção.
 
 ### 3.4 Contribuições esperadas
 
-1. **Auditoria empírica do mito do balanceamento**: tabela publicável mostrando que 11 configurações balanceadas via undersampling produzem todos IR > 1,5 sobre FairFace, contradizendo a intuição comum em pipelines aplicados.
+1. **Auditoria empírica do mito do balanceamento**: tabela publicável mostrando que 11 configurações balanceadas via undersampling produzem **todas** IR ≥ 1,76 sobre FairFace 7-classes (e IR=∞ nas variantes ArcFace), contradizendo a intuição comum em pipelines aplicados. Já entregue em [docs/clean_results.md](docs/clean_results.md) com 9h38min de wall-clock auditável.
 2. **Estudo controlado de duas intervenções** (loss-adaptive + augmentation sintética), com decomposição da contribuição de cada uma e da interação entre elas.
 3. **Análise representacional via t-SNE** correlacionando geometria de embeddings com gap de F1 — abre caminho para entender *por quê* o gap persiste.
-4. **Pipeline reproduzível open-source** ([github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias](https://github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias)) — cada experimento do paper roda com `python scripts/run_all_experiments.py --config X`.
-5. **Submissão de artigo científico em workshop tier-A** — ver Parte III.5.
+4. **Pipeline reproduzível open-source** ([github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias](https://github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias)) — cada experimento do paper roda com `python scripts/run_all_experiments.py --output-dir <X>`.
+5. **Achado bônus de reprodutibilidade**: a documentação do bug §2.2 (`ArcFaceLoss → cross_entropy`) é ela mesma uma contribuição — exemplo concreto de como um defeito silencioso em loss invalida retroativamente uma matriz inteira de experimentos publicados localmente. Material para uma seção curta no paper sobre rigor em fairness ML.
+6. **Submissão de artigo científico em workshop tier-A** — ver Parte III.5.
 
 ---
 
@@ -253,9 +261,9 @@ Variantes alternativas a discutir com o orientador:
 
 | Ato | Conteúdo | Origem dos dados |
 |---|---|---|
-| **1. Diagnóstico** | 11 configurações balanceadas produzem IR ≥ 1,73 em FairFace 7-classes. Mostrar as tabelas de F1 por classe, t-SNE da classe pior. | Rodada smoke (mai/2026) + rodada limpa (em curso) |
-| **2. Intervenção em loss** | AdaFace, MagFace e (opcional) KP-RPE como substitutos de CrossEntropy/ArcFace sobre o mesmo dataset balanceado. Reportar IR antes/depois. | Mês 2-3 |
-| **3. Intervenção em dados** | DCFace pré-treinado para gerar 5-10k faces de Latino_Hispanic. Treinar com mix real+sintético. Combinação com (2). t-SNE pós-intervenção. | Mês 4-5 |
+| **1. Diagnóstico** ✅ pronto | 11 configurações balanceadas produzem IR ∈ [1,76; 1,86] em FairFace 7-classes (clean run, 25 épocas, 9h38min). ArcFace falha catastroficamente (IR=∞) quando aplicado de verdade. Tabelas de F1 por classe, matrizes de confusão e gráficos disponíveis em `outputs/figures/clean/`. | [docs/clean_results.md](docs/clean_results.md) |
+| **2. Intervenção em loss** | AdaFace, MagFace e (opcional) KP-RPE como substitutos de CrossEntropy/ArcFace sobre o mesmo dataset balanceado. Baseline a bater: Exp 5 (acc=0,665, IR=1,76). | Mês 2-3 |
+| **3. Intervenção em dados** | DCFace pré-treinado para gerar 5-10k faces de Latino_Hispanic. Treinar com mix real+sintético sobre a melhor loss do Ato 2. Combinação com loss-adaptive. t-SNE pós-intervenção. | Mês 4-5 |
 
 ### 3.5.4 Veículos-alvo (em ordem de preferência)
 
@@ -371,7 +379,7 @@ A sugestão de Grad-CAM e ativações intermediárias do Cap. 5 do MBA é exatam
 
 Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês foi recalibrado em torno do **paper como deliverable principal** e do **hardware local (RTX 4070 SUPER, 12 GB)** como única infraestrutura de cálculo. Não há dependência de cloud.
 
-### Mês 1 · `2026-05-06 → 2026-06-05` · Diagnóstico empírico (em curso)
+### Mês 1 · `2026-05-06 → 2026-06-05` · Diagnóstico empírico ✅ concluído (08/05/2026)
 
 **Objetivo:** consolidar o achado central do paper (balanceamento ≠ equidade) com evidência rigorosa.
 
@@ -379,13 +387,13 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 
 - ✅ Pipeline `face_bias` refatorado, instalável, testado (81 testes). [Commit 70100ab]
 - ✅ Smoke run dos 11 experimentos do MBA com pipeline corrigido em 5 épocas — [docs/smoke_results.md](docs/smoke_results.md).
-- 🟡 Rodada limpa dos 11 experimentos com 25 épocas + early-stopping + gradient clipping (em execução, ETA 7–13h).
-- ⏳ Geração de gráficos (`scripts/plot_experiment.py`) para os 11 experimentos.
-- ⏳ Tabela consolidada `MBA reportado × MBA replicado × Mestrado` para cada experimento.
-- ⏳ **Draft do Ato 1 do paper** (introdução + diagnóstico).
+- ✅ **Rodada limpa dos 11 experimentos com 25 épocas + EarlyStopping(patience=5) + grad_clip_norm=5.0** — 11/11 OK em 9h38min wall-clock. [Commit 8321568]
+- ✅ Geração de gráficos para os 11 experimentos via `scripts/plot_all_experiments.py` (44 PNG/PDF em `outputs/figures/clean/`).
+- ✅ Tabela consolidada `MBA reportado × Smoke × Clean run` em [docs/clean_results.md](docs/clean_results.md), com 7 findings prontos para o paper.
+- 🟡 **Draft do Ato 1 do paper** (introdução + diagnóstico) — começa após reunião com coordenador (11/05).
 
-**Entregável principal:** **rascunho da seção "Diagnostic" do paper** (~3 páginas + figuras), demonstrando empiricamente que IR ≥ 1,7 em todas as 11 configurações balanceadas.
-**Entregável secundário:** apresentação para o coordenador com a recalibração da pergunta de pesquisa.
+**Entregável principal:** ✅ **diagnóstico consolidado** em `docs/clean_results.md` — IR ∈ [1,76; 1,86] em 5/5 CE 7-class; ArcFace catastrófico em 3/3 configurações (IR=∞).
+**Entregável secundário:** ✅ guia de preparação para reunião com coordenador em [docs/meeting_prep_2026-05-11.md](docs/meeting_prep_2026-05-11.md).
 
 ---
 
@@ -480,16 +488,18 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 
 ### 5.7 Resumo visual do cronograma
 
-| Mês | Período | Foco | Entregável principal | GPU estimada |
+| Mês | Período | Foco | Entregável principal | GPU |
 |---|---|---|---|---:|
-| 1 | mai/2026 | Diagnóstico empírico (em curso) | Seção "Diagnostic" do paper | ~13h (rodada limpa, em execução) |
-| 2 | jun/2026 | AdaFace + MagFace | Tabela "Loss intervention" | ~6h |
-| 3 | jul/2026 | DCFace augmentation | Tabela "Data intervention" | ~9h |
-| 4 | ago/2026 | Combinação + análise representacional | Tabela 2x2 + figuras finais | ~6h |
+| 1 | mai/2026 | Diagnóstico empírico ✅ | [docs/clean_results.md](docs/clean_results.md) — 11/11 experimentos | **9h38min real** |
+| 2 | jun/2026 | AdaFace + MagFace | Tabela "Loss intervention" | ~6h estimada |
+| 3 | jul/2026 | DCFace augmentation | Tabela "Data intervention" | ~9h estimada |
+| 4 | ago/2026 | Combinação + análise representacional | Tabela 2x2 + figuras finais | ~6h estimada |
 | 5 | set/2026 | Escrita + submissão do paper | **Paper submetido** | mínima |
 | 6 | out/2026 | Qualificação interna | Rascunho 60-80 pgs | mínima |
 
-**GPU total estimada para 6 meses:** ~34 horas — totalmente factível em RTX 4070 SUPER local, sem cloud.
+**GPU consumida no Mês 1:** 9h38min real (vs ~13h estimadas — early-stopping economizou ~25%).
+**GPU restante estimada (Meses 2-4):** ~21 horas para os experimentos de intervenção.
+**Total previsto para 6 meses:** ~31 horas em RTX 4070 SUPER local, sem cloud.
 
 ---
 
