@@ -3,12 +3,16 @@
 **Tema:** Por que balancear a distribuição de classes não basta para reconhecimento facial equitativo — e o que de fato ajuda. Auditoria empírica e intervenções em loss e dados sintéticos sobre o pipeline LResNet50E_IR/FairFace.
 
 **Autor:** Marcello Ozzetti
-**Programa-alvo:** Mestrado em Ciência da Computação — Unifesp / ICT (Instituto de Ciência e Tecnologia, São José dos Campos)
-**Trabalho de origem:** Dissertação de MBA em IA / USP — *Facial Recognition Models Mitigating Bias* (out/2024)
-**Data desta proposta:** 06 de maio de 2026
-**Última revisão:** 07 de maio de 2026 — recalibração após smoke run dos 11 experimentos
-**Janela de planejamento:** 6 meses (mai/2026 → nov/2026)
-**Hardware:** **RTX 4070 SUPER (12 GB) local — sem dependência de cloud**
+
+**Programa-alvo:** Mestrado em Ciência da Computação — Unifesp / ICT (Instituto de Ciência e Tecnologia, São José dos Campos).
+
+**Trabalho de origem:** Dissertação de MBA em IA / USP — *Facial Recognition Models Mitigating Bias* (out/2024).
+
+**Data desta proposta:** 06 de maio de 2026.
+
+**Última revisão:** 07 de maio de 2026 — recalibração após re-execução dos 11 experimentos
+
+**Janela de planejamento:** 6 meses (mai/2026 → nov/2026).
 
 ---
 
@@ -28,11 +32,11 @@
 
 ## 1. Sumário Executivo
 
-A dissertação de MBA estabeleceu uma base experimental funcional — pipeline `LResNet50E-IR` sobre **FairFace** com 11 experimentos comparativos. A re-execução completa desses 11 experimentos em maio/2026 (smoke de 5 épocas em [docs/smoke_results.md](docs/smoke_results.md) + rodada limpa de 25 épocas com `EarlyStopping` em [docs/clean_results.md](docs/clean_results.md), 9h38min de wall-clock, 11/11 OK) com o pipeline corrigido revelou **um achado central que define o tema do mestrado**:
+A dissertação de MBA estabeleceu uma base experimental funcional — pipeline `LResNet50E-IR` sobre **FairFace** com 11 experimentos comparativos. A re-execução completa desses 11 experimentos em maio/2026 (smoke de 5 épocas + rodada limpa de 25 épocas com `EarlyStopping`, 9h38min de wall-clock, 11/11 OK) com o pipeline corrigido revelou **um achado central que define o tema do mestrado**:
 
 > **O undersampling para classes balanceadas não produz reconhecimento facial equitativo.** Mesmo com 10.374 imagens por classe (todas as 7 classes idênticas em tamanho), todas as 5 configurações CE 7-class testadas mantêm **Inequity Rate (F1) entre 1,76 e 1,86** e **gap max-min entre 0,34 e 0,36** entre a melhor classe (Black, F1=0,78–0,84) e a pior (**Latino_Hispanic, F1=0,42–0,47**). O fenômeno é estrutural: independente de optimizer (SGD/AdamW), scheduler (OneCycleLR/CosineAnnealing), épocas (até 40) ou dropout (0,2/0,5) — nenhuma combinação fechou esse gap.
 
-Como bônus metodológico, a rodada limpa também **expôs em escala completa** o bug §2.2 (`ArcFaceLoss` que silenciosamente caía em `cross_entropy`): com a margem angular agora realmente aplicada, os experimentos de ArcFace caem de 0,58–0,61 reportados pelo MBA para **0,17–0,46 de acurácia, IR=∞** — a margem fixa `m=0,5` colapsa pelo menos uma classe demográfica para F1=0.
+Como bônus metodológico, a rodada limpa também **expôs em escala completa** o bug §1 (`ArcFaceLoss` que silenciosamente caía em `cross_entropy`): com a margem angular agora realmente aplicada, os experimentos de ArcFace caem de 0,58–0,61 reportados pelo MBA para **0,17–0,46 de acurácia, IR=∞** — a margem fixa `m=0,5` colapsa pelo menos uma classe demográfica para F1=0.
 
 Estas evidências **falsificam empiricamente a hipótese intuitiva** que o trabalho de MBA assumia (balancear → equidade) e abrem a pergunta que organiza a tese: **se balancear o dataset não basta, o que basta?**
 
@@ -45,8 +49,8 @@ Cada frente é investigada isoladamente e em combinação, com auditoria de fair
 
 **Outputs esperados em 6 meses:**
 1. **Submissão de artigo científico** em workshop tier-A (target: WACV Workshop on Fair Computer Vision, IJCB 2027, ou ACM FAccT 2027).
-2. **Rascunho de qualificação** (60–80 páginas) com a pergunta empírica e as duas linhas de resposta.
-3. **Repositório open-source** (este, já público) como artefato de reprodutibilidade do paper.
+2. **Rascunho de qualificação** com a pergunta empírica e as duas linhas de resposta.
+3. **Repositório open-source** como artefato de reprodutibilidade do paper.
 
 ---
 
@@ -198,7 +202,7 @@ Pipeline funcional e reproduzível com:
 
 ### 3.1 Visão evolutiva
 
-A tese parte do repositório `face_bias` já refatorado (Sprints A/B/C/D do código) e o eleva a um nível de rigor científico publicável: **uma pergunta empírica clara, hipóteses falsificáveis, intervenções controladas e auditoria de fairness padronizada**.
+A tese parte do repositório `face_bias` e o eleva a um nível de rigor científico publicável: **uma pergunta empírica clara, hipóteses falsificáveis, intervenções controladas e auditoria de fairness padronizada**.
 
 Não é uma ruptura — é uma extensão alinhada às evoluções da literatura 2024–2026 (AdaFace, DCFace, métricas IR/FDR/Gini) e ao contexto regulatório do EU AI Act.
 
@@ -228,17 +232,16 @@ Hipóteses ativas:
 - **H1 (PQ1)** — Substituir CrossEntropy por **AdaFace** sobre o conjunto balanceado reduz o IR (F1) em pelo menos 20% (de **1,76** para **≤ 1,41**), mantendo ou melhorando a acurácia agregada (≥ 0,665).
 - **H2 (PQ2)** — **Augmentar a classe Latino_Hispanic** com 5.000–10.000 imagens sintéticas geradas por DCFace pré-treinado (sem retreinar o gerador) reduz o gap específico Latino_Hispanic ↔ Black em pelo menos 30% (de **0,36** para **≤ 0,25**) e eleva F1 Latino_Hispanic para **≥ 0,55**.
 - **H3 (PQ3)** — A combinação **AdaFace + DCFace augmentation** produz redução de gap maior que a soma das reduções individuais (interação positiva).
-- **H4** — O ranking de modelos por acurácia agregada difere significativamente do ranking por IR — implicação direta para auditoria regulatória sob o EU AI Act. **Corroborada parcialmente pelo clean run**: Exp 5 lidera em ambos, mas Exp 1 (acc=0,629) e Exp 9 (acc=0,629) empatam em acc enquanto Exp 9 tem IR=1,84 vs Exp 1 IR=1,85 — confirmando que pequenas variações em acc não predizem variações em IR.
+- **H4** — O ranking de modelos por acurácia difere do ranking por IR. Implicação direta para auditoria regulatória sob o EU AI Act.
 - **H5 (qualitativa via t-SNE/Grad-CAM)** — A redução de gap correlaciona-se com **maior compactação intra-classe e separação inter-classe** no espaço de embeddings da classe pior (Latino_Hispanic), observável em t-SNE pré/pós-intervenção.
 
 ### 3.4 Contribuições esperadas
 
-1. **Auditoria empírica do mito do balanceamento**: tabela publicável mostrando que 11 configurações balanceadas via undersampling produzem **todas** IR ≥ 1,76 sobre FairFace 7-classes (e IR=∞ nas variantes ArcFace), contradizendo a intuição comum em pipelines aplicados. Já entregue em [docs/clean_results.md](docs/clean_results.md) com 9h38min de wall-clock auditável.
+1. **Auditoria empírica do mito do balanceamento**: tabela publicável mostrando que 11 configurações balanceadas via undersampling produzem todas IR ≥ 1,76 sobre FairFace 7-classes, contradizendo a intuição comum em pipelines aplicados.
 2. **Estudo controlado de duas intervenções** (loss-adaptive + augmentation sintética), com decomposição da contribuição de cada uma e da interação entre elas.
 3. **Análise representacional via t-SNE** correlacionando geometria de embeddings com gap de F1 — abre caminho para entender *por quê* o gap persiste.
 4. **Pipeline reproduzível open-source** ([github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias](https://github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias)) — cada experimento do paper roda com `python scripts/run_all_experiments.py --output-dir <X>`.
-5. **Achado bônus de reprodutibilidade**: a documentação do bug §2.2 (`ArcFaceLoss → cross_entropy`) é ela mesma uma contribuição — exemplo concreto de como um defeito silencioso em loss invalida retroativamente uma matriz inteira de experimentos publicados localmente. Material para uma seção curta no paper sobre rigor em fairness ML.
-6. **Submissão de artigo científico em workshop tier-A** — ver Parte III.5.
+5. **Submissão de artigo científico em workshop tier-A** — ver Parte III.5.
 
 ---
 
@@ -261,7 +264,7 @@ Variantes alternativas a discutir com o orientador:
 
 | Ato | Conteúdo | Origem dos dados |
 |---|---|---|
-| **1. Diagnóstico** ✅ pronto | 11 configurações balanceadas produzem IR ∈ [1,76; 1,86] em FairFace 7-classes (clean run, 25 épocas, 9h38min). ArcFace falha catastroficamente (IR=∞) quando aplicado de verdade. Tabelas de F1 por classe, matrizes de confusão e gráficos disponíveis em `outputs/figures/clean/`. | [docs/clean_results.md](docs/clean_results.md) |
+| **1. Diagnóstico** ✅ pronto | 11 configurações balanceadas produzem IR ∈ [1,76; 1,86] em FairFace 7-classes (clean run, 25 épocas, 9h38min). Tabelas de F1 por classe, matrizes de confusão e gráficos disponíveis em `outputs/figures/clean/`. | [docs/clean_results.md](docs/clean_results.md) |
 | **2. Intervenção em loss** | AdaFace, MagFace e (opcional) KP-RPE como substitutos de CrossEntropy/ArcFace sobre o mesmo dataset balanceado. Baseline a bater: Exp 5 (acc=0,665, IR=1,76). | Mês 2-3 |
 | **3. Intervenção em dados** | DCFace pré-treinado para gerar 5-10k faces de Latino_Hispanic. Treinar com mix real+sintético sobre a melhor loss do Ato 2. Combinação com loss-adaptive. t-SNE pós-intervenção. | Mês 4-5 |
 
@@ -390,7 +393,6 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 - ✅ **Rodada limpa dos 11 experimentos com 25 épocas + EarlyStopping(patience=5) + grad_clip_norm=5.0** — 11/11 OK em 9h38min wall-clock. [Commit 8321568]
 - ✅ Geração de gráficos para os 11 experimentos via `scripts/plot_all_experiments.py` (44 PNG/PDF em `outputs/figures/clean/`).
 - ✅ Tabela consolidada `MBA reportado × Smoke × Clean run` em [docs/clean_results.md](docs/clean_results.md), com 7 findings prontos para o paper.
-- 🟡 **Draft do Ato 1 do paper** (introdução + diagnóstico) — começa após reunião com coordenador (11/05).
 
 **Entregável principal:** ✅ **diagnóstico consolidado** em `docs/clean_results.md` — IR ∈ [1,76; 1,86] em 5/5 CE 7-class; ArcFace catastrófico em 3/3 configurações (IR=∞).
 **Entregável secundário:** ✅ guia de preparação para reunião com coordenador em [docs/meeting_prep_2026-05-11.md](docs/meeting_prep_2026-05-11.md).
@@ -538,8 +540,6 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 3. **Cross-dataset (RFW)**: incluir como condição obrigatória do paper ou marcar como trabalho futuro? Recomendo **trabalho futuro** dadas as restrições de hardware local e janela de 6 meses.
 
 4. **Múltiplas seeds**: 3 seeds × 6 condições é o mínimo defensável. Se houver tempo, esticar para 5 seeds × 6 condições. Decisão depende de calendário.
-
-5. **Coautoria do paper**: orientador como coautor padrão. Discussão em aberto sobre incluir o autor do bug §2.2 descoberto (citação ou agradecimento).
 
 ---
 
