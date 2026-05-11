@@ -541,6 +541,14 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 
 4. **Múltiplas seeds**: 3 seeds × 6 condições é o mínimo defensável. Se houver tempo, esticar para 5 seeds × 6 condições. Decisão depende de calendário.
 
+5. **Eixo de backbone (ViT / TransFace++) — incluir ou marcar como trabalho futuro?**
+   A proposta atual escopa as intervenções (loss-space e data-space) **sobre o mesmo backbone** (LResNet50E_IR), justamente para isolar o efeito das intervenções. Comparar backbones (LResNet50 vs ViT-B vs TransFace++) é uma frente complementar valiosa, mas:
+   - **Cabe na hipótese H6 (nova) se decidirmos adicionar**: "ViT-B/TransFace++ produz menor IR que LResNet50E_IR sob a mesma loss e mesmo dataset balanceado".
+   - **Custo computacional**: ViT-B/16 treina apertado em 12 GB (batch ≤ 64 com `torch.cuda.amp`); TransFace++ provavelmente **não cabe** na RTX 4070 SUPER. Uma rodada do experimento matrix com ViT seria ~3× o custo do clean run atual (~30h GPU).
+   - **Infra alternativa**: posso provisionar crédito Azure (Standard_NC6s_v3 ou similar com V100/A100) para a frente de backbone, sem prejuízo da frente local. Estimativa ~200–400h GPU para a ablação completa.
+   - **Trade-off**: agregar mais um eixo experimental enriquece o paper mas dilui o foco. **Recomendação default**: manter backbone fixo no escopo do paper de qualificação e abrir a frente ViT/TransFace++ como **paper-2** (fase 2 do mestrado, pós-qualificação).
+   - **Pergunta direta ao coordenador**: o senhor considera esse eixo de backbone necessário para a contribuição do mestrado (mesmo com infra Azure), ou suficiente como trabalho futuro?
+
 ---
 
 ## Referências
