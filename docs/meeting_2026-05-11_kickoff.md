@@ -153,6 +153,67 @@ Três paradigmas a estudar:
 
 Esse era o PQ1 da proposta atual (AdaFace, MagFace, KP-RPE). **Mantém-se inalterado** — orientador OK.
 
+### Diretriz 7: convenção organizacional — `docs/` para tudo
+
+> "Todo o material que formos gerando precisa ficar na pasta `docs`."
+
+**Tradução prática:** todo artefato textual produzido durante o mestrado (relatórios, revisões de literatura, atas de reunião, análises, rascunhos de capítulo) **vive em `docs/`**, não na raiz do repositório.
+
+**Estado atual:**
+- ✅ `docs/clean_results.md`, `docs/smoke_results.md`, `docs/exp01_vs_mba.md`, `docs/meeting_prep_2026-05-11.md`, `docs/meeting_2026-05-11_kickoff.md` — já estão em `docs/`.
+- ⚠️ `PROPOSTA_MESTRADO.md` e `REVIEW_AND_PLAN.md` — estão na raiz por convenção GitHub (são metadocumentos do projeto). Esclarecer com orientador em 18/05 se devo mover para `docs/proposta_mestrado.md` e `docs/review_and_plan.md`.
+
+**Convenção a partir de hoje:**
+- Novos relatórios técnicos → `docs/<nome>.md`
+- Atas de reunião → `docs/meeting_<YYYY-MM-DD>_<tag>.md`
+- Revisões de literatura → `docs/literature_<tema>.md`
+- Análises de experimento → `docs/exp_<id>_<tema>.md`
+
+### Diretriz 8: busca semântica sobre ~900 referências de FairFace
+
+> "Fazer uma pesquisa semântica sobre todas as ~900 referências de artigos sobre o FairFace que utilizei como base, para certificar que não estou fazendo nada repetitivo e vai ter valor para a comunidade."
+
+**Tradução prática:** posicionar este trabalho na literatura existente sobre FairFace. Garantir que:
+
+1. Nenhum trabalho publicado já fez exatamente a combinação proposta (MLP head + Optuna + contrastivo + losses).
+2. Os achados positivos esperados (ex.: "SupCon reduz IR em FairFace") não estão publicados em forma idêntica.
+3. Existem **lacunas reais** que esta tese preenche.
+
+**Por que isso é decisivo para a qualificação:**
+- Banca pode questionar novidade. Sem busca semântica documentada, defesa é frágil.
+- Reforça o argumento de "tese positiva" — uma vez que se mostra que ninguém combinou os 3 eixos antes, a contribuição fica clara.
+- A própria busca é entregável **publicável** como tabela de literatura adjacente no capítulo de fundamentação.
+
+**Pendência crítica para destravar essa frente:**
+Onde estão as ~900 referências? Possíveis fontes:
+- Export do Zotero / Mendeley
+- Resultado de busca no Google Scholar / Semantic Scholar com filtro "FairFace"
+- BibTeX consolidado da revisão de literatura do MBA
+- Lista do próprio orientador (perguntar em 18/05)
+
+**Fluxo proposto para a busca semântica** (a implementar quando o corpus chegar):
+
+```
+1. Input: arquivo com 900 refs (BibTeX, CSV, ou planilha com título + abstract)
+2. Enriquecimento: usar API do Semantic Scholar (gratuita) para puxar abstracts faltantes
+3. Embeddings: sentence-transformers (modelo all-MiniLM-L6-v2 ou BAAI/bge-base-en-v1.5)
+4. Indexação: FAISS local (~5 MB para 900 papers, roda em segundos)
+5. Queries semânticas alinhadas com a proposta:
+     Q1. "MLP head architecture for race classification"
+     Q2. "Optuna HPO face recognition fairness"
+     Q3. "Supervised contrastive learning FairFace"
+     Q4. "AdaFace MagFace demographic equity FairFace"
+     Q5. "Combined loss adaptive + contrastive + architecture optimization"
+     Q6. "Multi-face filtering label noise FairFace"
+6. Output: docs/literature_semantic_audit.md com:
+     - Top-20 papers mais similares por query
+     - Cluster analysis (papers que se agrupam por tema)
+     - Tabela de lacunas confirmadas vs trabalhos sobrepostos
+     - Citação direta dos papers que precisam ser referenciados na tese
+```
+
+**Estimativa de esforço:** 3-5 dias úteis após receber o corpus.
+
 ---
 
 ## O que sai do escopo
