@@ -264,7 +264,7 @@ Variantes alternativas a discutir com o orientador:
 
 | Ato | Conteúdo | Origem dos dados |
 |---|---|---|
-| **1. Diagnóstico** ✅ pronto | 11 configurações balanceadas produzem IR ∈ [1,76; 1,86] em FairFace 7-classes (clean run, 25 épocas, 9h38min). Tabelas de F1 por classe, matrizes de confusão e gráficos disponíveis em `outputs/figures/clean/`. | [docs/clean_results.md](docs/clean_results.md) |
+| **1. Diagnóstico** ✅ pronto | 11 configurações balanceadas produzem IR ∈ [1,76; 1,86] em FairFace 7-classes (clean run, 25 épocas, 9h38min). Tabelas de F1 por classe, matrizes de confusão e gráficos disponíveis em `outputs/figures/clean/`. | [clean_results.md](clean_results.md) |
 | **2. Intervenção em loss** | AdaFace, MagFace e (opcional) KP-RPE como substitutos de CrossEntropy/ArcFace sobre o mesmo dataset balanceado. Baseline a bater: Exp 5 (acc=0,665, IR=1,76). | Mês 2-3 |
 | **3. Intervenção em dados** | DCFace pré-treinado para gerar 5-10k faces de Latino_Hispanic. Treinar com mix real+sintético sobre a melhor loss do Ato 2. Combinação com loss-adaptive. t-SNE pós-intervenção. | Mês 4-5 |
 
@@ -389,13 +389,13 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 **Atividades:**
 
 - ✅ Pipeline `face_bias` refatorado, instalável, testado (81 testes). [Commit 70100ab]
-- ✅ Smoke run dos 11 experimentos do MBA com pipeline corrigido em 5 épocas — [docs/smoke_results.md](docs/smoke_results.md).
+- ✅ Smoke run dos 11 experimentos do MBA com pipeline corrigido em 5 épocas — [smoke_results.md](smoke_results.md).
 - ✅ **Rodada limpa dos 11 experimentos com 25 épocas + EarlyStopping(patience=5) + grad_clip_norm=5.0** — 11/11 OK em 9h38min wall-clock. [Commit 8321568]
 - ✅ Geração de gráficos para os 11 experimentos via `scripts/plot_all_experiments.py` (44 PNG/PDF em `outputs/figures/clean/`).
-- ✅ Tabela consolidada `MBA reportado × Smoke × Clean run` em [docs/clean_results.md](docs/clean_results.md), com 7 findings prontos para o paper.
+- ✅ Tabela consolidada `MBA reportado × Smoke × Clean run` em [clean_results.md](clean_results.md), com 7 findings prontos para o paper.
 
 **Entregável principal:** ✅ **diagnóstico consolidado** em `docs/clean_results.md` — IR ∈ [1,76; 1,86] em 5/5 CE 7-class; ArcFace catastrófico em 3/3 configurações (IR=∞).
-**Entregável secundário:** ✅ guia de preparação para reunião com coordenador em [docs/meeting_prep_2026-05-11.md](docs/meeting_prep_2026-05-11.md).
+**Entregável secundário:** ✅ guia de preparação para reunião com coordenador em [meeting_prep_2026-05-11.md](meeting_prep_2026-05-11.md).
 
 ---
 
@@ -492,7 +492,7 @@ Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês 
 
 | Mês | Período | Foco | Entregável principal | GPU |
 |---|---|---|---|---:|
-| 1 | mai/2026 | Diagnóstico empírico ✅ | [docs/clean_results.md](docs/clean_results.md) — 11/11 experimentos | **9h38min real** |
+| 1 | mai/2026 | Diagnóstico empírico ✅ | [clean_results.md](clean_results.md) — 11/11 experimentos | **9h38min real** |
 | 2 | jun/2026 | AdaFace + MagFace | Tabela "Loss intervention" | ~6h estimada |
 | 3 | jul/2026 | DCFace augmentation | Tabela "Data intervention" | ~9h estimada |
 | 4 | ago/2026 | Combinação + análise representacional | Tabela 2x2 + figuras finais | ~6h estimada |
