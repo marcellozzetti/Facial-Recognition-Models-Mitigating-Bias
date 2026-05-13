@@ -160,8 +160,9 @@ Esse era o PQ1 da proposta atual (AdaFace, MagFace, KP-RPE). **Mantém-se inalte
 **Tradução prática:** todo artefato textual produzido durante o mestrado (relatórios, revisões de literatura, atas de reunião, análises, rascunhos de capítulo) **vive em `docs/`**, não na raiz do repositório.
 
 **Estado atual:**
+- ✅ `docs/PROPOSTA_MESTRADO.md` movido para `docs/` em 11/05/2026 (commit 5f8c1be).
 - ✅ `docs/clean_results.md`, `docs/smoke_results.md`, `docs/exp01_vs_mba.md`, `docs/meeting_prep_2026-05-11.md`, `docs/meeting_2026-05-11_kickoff.md` — já estão em `docs/`.
-- ⚠️ `PROPOSTA_MESTRADO.md` e `REVIEW_AND_PLAN.md` — estão na raiz por convenção GitHub (são metadocumentos do projeto). Esclarecer com orientador em 18/05 se devo mover para `docs/proposta_mestrado.md` e `docs/review_and_plan.md`.
+- ⚠️ `REVIEW_AND_PLAN.md` — permanece na raiz por enquanto. Pode ser movido para `docs/` em commit separado por consistência (a decidir).
 
 **Convenção a partir de hoje:**
 - Novos relatórios técnicos → `docs/<nome>.md`

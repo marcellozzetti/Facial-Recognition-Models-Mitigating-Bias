@@ -74,7 +74,7 @@ Estas são as **referências de fundo** que sustentam todos os argumentos da pro
 Releia a sua proposta **com olhar crítico**, simulando que você é o coordenador. Marque pontos vulneráveis. Em seguida, releia os 2 docs técnicos para ter os números na ponta da língua.
 
 #### 2.1 Sua própria proposta (~30 min)
-- [PROPOSTA_MESTRADO.md](../PROPOSTA_MESTRADO.md)
+- [PROPOSTA_MESTRADO.md](PROPOSTA_MESTRADO.md)
 - Marque com lápis o que você **não conseguiria explicar oralmente** sem hesitar. Esses são seus pontos de estudo extra.
 
 #### 2.2 Smoke results (~30 min)
