@@ -34,9 +34,17 @@ dependencies = [
   "boto3>=1.28",
   "tqdm>=4.65",
   "matplotlib>=3.7",
-  "Pillow>=10.0",
+  "Pillow>=12.2.0",          # security: CVE-2024-28219, CVE-2026-42308, CVE-2026-42310
   "requests>=2.31",
   "mlflow>=2.10",
+  # Transitive deps pinned to security-patched minima so a fresh
+  # install (without the requirements.txt lock) still picks safe versions.
+  "urllib3>=2.7.0",          # security: CVE-2026-44431, CVE-2026-44432
+  "idna>=3.7",               # security: PYSEC-2024-60
+  "Jinja2>=3.1.6",           # security: CVE-2025-27516
+  "fonttools>=4.60.2",       # security: CVE-2025-66034
+  "filelock>=3.20.3",        # security: CVE-2025-68146, CVE-2026-22701
+  "setuptools>=78.1.1",      # security: PYSEC-2025-49, CVE-2024-6345
 ]
 
 [project.optional-dependencies]
