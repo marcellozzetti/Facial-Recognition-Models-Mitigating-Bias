@@ -36,6 +36,10 @@ def _build_model(config: dict, num_classes: int) -> torch.nn.Module:
         arcface_s=model_cfg["arcface_s"],
         arcface_m=model_cfg["arcface_m"],
         arcface_easy_margin=model_cfg["arcface_easy_margin"],
+        mlp_hidden_dims=model_cfg.get("mlp_hidden_dims", [512]),
+        mlp_activation=model_cfg.get("mlp_activation", "relu"),
+        mlp_dropout=model_cfg.get("mlp_dropout", 0.3),
+        mlp_norm=model_cfg.get("mlp_norm", "none"),
     )
 
 
@@ -54,20 +58,28 @@ def _maybe_start_mlflow(run_id: str, config: dict, mlruns_root: Path):
     mlflow.set_tracking_uri(mlruns_root.resolve().as_uri())
     mlflow.set_experiment(config["model"]["name"])
     run = mlflow.start_run(run_name=run_id)
-    mlflow.log_params(
-        {
-            "model.head": config["model"]["head"],
-            "model.dropout": config["model"]["dropout"],
-            "training.optimizer": config["training"]["optimizer"],
-            "training.scheduler": config["training"]["scheduler"],
-            "training.loss_function": config["training"]["loss_function"],
-            "training.learning_rate": config["training"]["learning_rate"],
-            "training.batch_size": config["training"]["batch_size"],
-            "training.num_epochs": config["training"]["num_epochs"],
-            "seed": config["training"]["random_state"],
-            "run_id": run_id,
-        }
-    )
+    params = {
+        "model.head": config["model"]["head"],
+        "model.dropout": config["model"]["dropout"],
+        "training.optimizer": config["training"]["optimizer"],
+        "training.scheduler": config["training"]["scheduler"],
+        "training.loss_function": config["training"]["loss_function"],
+        "training.learning_rate": config["training"]["learning_rate"],
+        "training.batch_size": config["training"]["batch_size"],
+        "training.num_epochs": config["training"]["num_epochs"],
+        "seed": config["training"]["random_state"],
+        "run_id": run_id,
+    }
+    if config["model"]["head"] == "mlp":
+        params.update(
+            {
+                "model.mlp_hidden_dims": str(config["model"].get("mlp_hidden_dims", [512])),
+                "model.mlp_activation": config["model"].get("mlp_activation", "relu"),
+                "model.mlp_dropout": config["model"].get("mlp_dropout", 0.3),
+                "model.mlp_norm": config["model"].get("mlp_norm", "none"),
+            }
+        )
+    mlflow.log_params(params)
     return run
 
 

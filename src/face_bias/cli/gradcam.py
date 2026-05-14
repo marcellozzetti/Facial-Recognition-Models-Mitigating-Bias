@@ -38,6 +38,10 @@ def _build_model(config: dict, num_classes: int) -> torch.nn.Module:
         arcface_s=model_cfg["arcface_s"],
         arcface_m=model_cfg["arcface_m"],
         arcface_easy_margin=model_cfg["arcface_easy_margin"],
+        mlp_hidden_dims=model_cfg.get("mlp_hidden_dims", [512]),
+        mlp_activation=model_cfg.get("mlp_activation", "relu"),
+        mlp_dropout=model_cfg.get("mlp_dropout", 0.3),
+        mlp_norm=model_cfg.get("mlp_norm", "none"),
     )
 
 

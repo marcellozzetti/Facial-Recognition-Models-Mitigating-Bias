@@ -17,10 +17,22 @@ class ModelConfig(BaseModel):
     pretrained: bool = True
     num_classes: int = Field(default=7, ge=2)
     dropout: float = Field(default=0.5, ge=0.0, le=1.0)
-    head: Literal["linear", "arcface"] = "linear"
+    head: Literal["linear", "arcface", "mlp"] = "linear"
     arcface_s: float = Field(default=30.0, gt=0)
     arcface_m: float = Field(default=0.5, ge=0.0, lt=1.5)
     arcface_easy_margin: bool = False
+    # MLP head (only used when head="mlp"). Search space driven by Optuna.
+    mlp_hidden_dims: list[int] = Field(default_factory=lambda: [512])
+    mlp_activation: Literal["relu", "gelu", "silu", "tanh"] = "relu"
+    mlp_dropout: float = Field(default=0.3, ge=0.0, lt=1.0)
+    mlp_norm: Literal["none", "batchnorm", "layernorm"] = "none"
+
+    @field_validator("mlp_hidden_dims")
+    @classmethod
+    def _hidden_dims_positive(cls, v: list[int]) -> list[int]:
+        if any(h <= 0 for h in v):
+            raise ValueError(f"mlp_hidden_dims must all be > 0; got {v}")
+        return v
 
 
 class TrainingConfig(BaseModel):
