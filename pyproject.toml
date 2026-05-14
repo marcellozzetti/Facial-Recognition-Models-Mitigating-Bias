@@ -22,8 +22,12 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
-  "torch>=2.4,<2.6",
-  "torchvision>=0.19,<0.21",
+  # torch bumped to 2.11 to close CVE-2025-32434 (Critical, weights_only RCE),
+  # CVE-2026-24747 (High, weights_only RCE #2) and GHSA-2rj9-7h5r-q4h8
+  # (Moderate, libuv tensorpipe Improper Resource Shutdown).
+  # See docs/security_audit.md for the full audit trail.
+  "torch>=2.11,<3.0",
+  "torchvision>=0.26,<1.0",
   "facenet-pytorch>=2.5.3",
   "opencv-python-headless>=4.8",
   "numpy>=1.23,<2.0",
