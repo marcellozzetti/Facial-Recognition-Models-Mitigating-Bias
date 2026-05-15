@@ -130,25 +130,50 @@ Trilho A nunca bloqueia Trilho B e vice-versa, exceto no **gate da Fase 0**
   definitivo** + priorizar eixos do Trilho B conforme o delta identificado.
 - **Entrega:** capítulo de revisão de literatura (rascunho) + objetivo travado.
 
-### Semanas 5–6 (9–22 jun) — Piloto contrastivo (Diretriz 5)
-- **B:** Implementar SupCon (Supervised Contrastive) sobre o backbone
-  ResNet50 fixo, dataset limpo. 1 piloto end-to-end. [~6–8h GPU]
-- **B:** Sanity: SimCLR (self-supervised) como comparação. [~4h GPU]
-- **A:** Documentar `docs/contrastive_pilot_results.md`.
-- **Entrega:** prova de viabilidade do eixo contrastivo + números preliminares.
+> **Protocolo comum a todos os fatores (3–5):** cada fator é medido
+> isoladamente — varia-se **apenas o fator**, tudo o mais fixo no
+> melhor ponto consolidado dos fatores já medidos. **3 seeds (42,1,2)
+> sempre**, base de comparação casada, resultado em média ± dp; ganho
+> dentro de 1 dp é declarado não-significativo. Mesmo rigor do Fator 1
+> (dataset, 12-config batch) e Fator 2 (topologia, Fase 4). Regra
+> registrada em memória do projeto.
 
-### Semanas 7–8 (23 jun – 6 jul) — Piloto famílias de loss (Diretriz 6)
-- **B:** Implementar AdaFace e MagFace como heads/losses plugáveis
-  (mesma interface do `MLPHead`/`ArcMarginProduct`). [~implementação]
-- **B:** 1 piloto de cada no recipe vencedor R2 + dataset limpo. [~6h GPU]
-- **A:** Documentar `docs/loss_families_pilot_results.md`.
-- **Entrega:** prova de viabilidade do eixo de losses + números preliminares.
+### Semanas 5–6 (9–22 jun) — Fator 4: Paradigma de aprendizado (Diretriz 5)
+- **Pergunta:** qual a contribuição marginal do aprendizado contrastivo
+  para a disparidade, isolado dos demais fatores?
+- **B:** SupCon (Supervised Contrastive) sobre backbone ResNet50 fixo +
+  melhor head/dataset dos fatores 1–2. **3 seeds.** [~impl + ~9h GPU]
+- **B:** SimCLR (self-supervised) como segundo ponto do fator. **3 seeds.**
+- **Controle:** braço "sem contrastivo" (normal) com **3 seeds**, base
+  casada → Δ atribuível só ao paradigma.
+- **A:** `docs/factor4_contrastive_results.md` (média ± dp, Δ vs controle).
+- **G1 (fim Sem. 6):** contrastivo viável? Senão → só SupCon, documentar.
 
-### Semanas 9–10 (7–20 jul) — Piloto backbones
-- **B:** Trocar ResNet50 por ViT-B/16 e ConvNeXt-T mantendo o melhor
-  head do R2. 1 piloto de cada. [~6h GPU]
-- **A:** Documentar `docs/backbone_pilot_results.md`.
-- **Entrega:** prova de viabilidade do eixo de backbones + números.
+### Semanas 7–8 (23 jun – 6 jul) — Fator 3: Função de perda (Diretriz 6)
+- **Pergunta:** qual a contribuição marginal de losses quality-adaptive
+  vs a loss-base, isolada da topologia e do dataset?
+- **B:** AdaFace e MagFace como losses plugáveis (mesma interface de
+  `ArcMarginProduct`). [~impl]
+- **B:** Cada loss × **3 seeds** no melhor ponto dos fatores 1–2;
+  braço-controle = loss-base (CE) **3 seeds**, base casada.
+- **A:** `docs/factor3_loss_results.md` (média ± dp, Δ vs controle).
+- **G2 (fim Sem. 8):** AdaFace/MagFace estáveis? Senão → documentar
+  instabilidade como achado (coerente com o achado ArcFace do Fator 1).
+
+### Semanas 9–10 (7–20 jul) — Fator 5: Backbone
+- **Pergunta:** qual a contribuição marginal do backbone (capacidade /
+  indutive bias) para a disparidade, mantido o melhor head?
+- **B:** ResNet-50 (controle) vs ViT-B/16 vs ConvNeXt-T, cada um ×
+  **3 seeds**, base casada, melhor head/loss/dataset dos fatores 1–4.
+- **A:** `docs/factor5_backbone_results.md` (média ± dp, Δ vs ResNet-50).
+- **G3 (fim Sem. 10):** ViT/ConvNeXt cabem em 12GB? Senão → batch 64 +
+  grad-accum, ou só ConvNeXt-T; documentar a restrição.
+
+> **Saída da decomposição:** uma tabela única "contribuição marginal de
+> cada fator (Δ F1, Δ IR, ± dp, significância)" — Fatores 1 (dataset) e
+> 2 (topologia) já medidos; 3–5 nas Semanas 5–10. É o **resultado
+> central da tese** (mapa de *onde intervir*). Mais um experimento de
+> **interação** (par de fatores com maior |Δ|) se houver orçamento.
 
 ### Semanas 11–13 (21 jul – 10 ago) — Escrita da qualificação
 - **A:** Consolidar todos os capítulos:
