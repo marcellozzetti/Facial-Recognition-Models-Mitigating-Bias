@@ -1,0 +1,231 @@
+# Plano de Trabalho — Mestrado (até qualificação e defesa)
+
+**Aluno:** Marcello Ozzetti · **Orientador:** Prof. `[nome do orientador]`
+**Programa:** Mestrado em Ciência da Computação — Unifesp/ICT
+**Kickoff:** 2026-05-11 · **Qualificação alvo:** 2026-08-24 · **Defesa final:** ~2027 (a definir)
+**Última atualização deste plano:** 2026-05-14
+
+> Este documento substitui a Parte V da [PROPOSTA_MESTRADO.md](PROPOSTA_MESTRADO.md).
+> O objetivo do trabalho é **provisório até o SOTA review** (ver §1) — esta é
+> uma decisão metodológica, não indecisão.
+
+---
+
+## 1. Premissa central — o SOTA é o gate do objetivo
+
+O objetivo definitivo da dissertação **não pode ser travado antes da
+revisão do estado da arte**, porque o objetivo precisa ser um **delta
+publicável** sobre o que já existe na literatura 2024–2026. A cadeia de
+dependência é:
+
+```
+SOTA review  →  mapa do que já existe  →  identificação do delta  →  OBJETIVO TRAVADO  →  programa experimental restante
+   (Fase 0)                                  (gate de decisão)
+```
+
+**Objetivo provisório de trabalho** (a ser confirmado/refinado pós-SOTA):
+
+> "Demonstrar empiricamente que a integração de (i) auditoria do dataset
+> por integridade de rotulação e (ii) busca multi-objetivo de topologia
+> de classificador via HPO Pareto-aware produz um classificador racial
+> que domina o baseline em F1 macro e Inequity Rate, e quantificar a
+> contribuição marginal de cada componente — estendendo a análise a
+> aprendizado contrastivo, famílias de loss quality-adaptive e múltiplos
+> backbones para estabelecer a generalidade do achado."
+
+Critérios de decisão pós-SOTA (gate da Fase 0):
+
+- **Se** o SOTA já cobre "limpeza por multi-face + HPO topologia" → pivotar
+  o delta para o eixo menos explorado (provavelmente o critério
+  Pareto-aware, ou a combinação com contrastivo).
+- **Se** o SOTA não cobre → confirmar o objetivo provisório como definitivo.
+- **Em qualquer caso:** o SOTA define quais dos eixos experimentais
+  (contrastivo / losses / backbones) são *diferenciais* vs *replicação*.
+
+---
+
+## 2. Escopo — o que ENTRA na dissertação
+
+Diferente da versão anterior do plano, **todos os eixos abaixo entram**
+(qualificação = subconjunto + plano; defesa final = tudo):
+
+| Eixo experimental | Diretriz | Qualificação (24/08) | Defesa final |
+|---|---|---|---|
+| Pipeline auditável (refatoração + correção MBA) | — | ✅ feito | ✅ |
+| Auditoria multi-face + R2 (efeito limpeza) | 4 | ✅ feito | ✅ |
+| HPO topologia de head (R1/R2) + Pareto-aware | 2,3 | ✅ feito | ✅ |
+| Refit Pareto winners 25 epochs (Fase 4) | — | ✅ a fazer (curto) | ✅ |
+| **SOTA review 2024–2026** | 1 | ✅ **obrigatório** | ✅ expandido |
+| **Aprendizado contrastivo** (SimCLR, SupCon, CLIP) | 5 | 🟡 1 piloto + plano | ✅ completo |
+| **Famílias de loss** (AdaFace, MagFace, KP-RPE) | 6 | 🟡 1 piloto + plano | ✅ completo |
+| **Múltiplos backbones** (ViT, ConvNeXt, IR-SE) | — | 🟡 1 piloto + plano | ✅ completo |
+| Pesquisa semântica ~900 refs | 8 | 🟡 se corpus chegar | ✅ |
+
+**Legenda:** ✅ obrigatório/feito · 🟡 parcial/piloto.
+
+A lógica: a qualificação apresenta **problema + SOTA + resultados
+preliminares fortes + plano completo + pilotos que provam viabilidade**.
+A defesa final tem o programa experimental completo.
+
+---
+
+## 3. Trilhos paralelos
+
+O trabalho roda em **2 trilhos simultâneos** para caber no calendário:
+
+- **Trilho A — Escrita & Literatura** (contínuo, baixo uso de GPU):
+  SOTA review, escrita da qualificação, organização de documentação.
+- **Trilho B — Experimentos** (intensivo em GPU, RTX 4070 SUPER):
+  pilotos e rodadas completas dos eixos experimentais.
+
+Trilho A nunca bloqueia Trilho B e vice-versa, exceto no **gate da Fase 0**
+(SOTA trava o objetivo, que orienta a priorização do Trilho B).
+
+---
+
+## 4. Cronograma até a qualificação (2026-05-14 → 2026-08-24, ~15 semanas)
+
+### Semana 1 (14–18 mai) — Fechamento da fundação
+- **B:** Fase 4 — refit dos 2 vencedores Pareto R2 em 25 epochs (3 seeds). [~3h GPU]
+- **A:** Commit + organização de toda a documentação (HISTORICO, GLOSSARIO, slides).
+- **A:** Início do SOTA review — montar protocolo de busca (queries, venues, anos).
+- **Entrega:** evidência empírica fechada para os 3 movimentos atuais.
+
+### Semanas 2–4 (19 mai – 8 jun) — SOTA review (Fase 0, gate)
+- **A:** Revisão sistemática 2024–2026. Venues alvo: CVPR/ICCV/ECCV/WACV
+  workshops on fairness, IJCB, BMVC, ACM FAccT, IEEE TBIOM, TPAMI.
+- **A:** Eixos a mapear no SOTA:
+  1. Fairness em face recognition (métricas, datasets, mitigação)
+  2. Dataset cleaning / label noise em fairness
+  3. HPO multi-objetivo para fairness (existe critério Pareto-aware?)
+  4. Contrastive learning para fairness facial
+  5. Quality-adaptive losses (AdaFace/MagFace/KP-RPE) em contexto de bias
+  6. Backbones modernos (ViT/ConvNeXt) em fairness facial
+- **A:** Se o corpus de ~900 refs do MBA chegar → rodar
+  `scripts/semantic_search_corpus.py` (Diretriz 8).
+- **GATE (fim da Semana 4):** reunião com orientador → **travar objetivo
+  definitivo** + priorizar eixos do Trilho B conforme o delta identificado.
+- **Entrega:** capítulo de revisão de literatura (rascunho) + objetivo travado.
+
+### Semanas 5–6 (9–22 jun) — Piloto contrastivo (Diretriz 5)
+- **B:** Implementar SupCon (Supervised Contrastive) sobre o backbone
+  ResNet50 fixo, dataset limpo. 1 piloto end-to-end. [~6–8h GPU]
+- **B:** Sanity: SimCLR (self-supervised) como comparação. [~4h GPU]
+- **A:** Documentar `docs/contrastive_pilot_results.md`.
+- **Entrega:** prova de viabilidade do eixo contrastivo + números preliminares.
+
+### Semanas 7–8 (23 jun – 6 jul) — Piloto famílias de loss (Diretriz 6)
+- **B:** Implementar AdaFace e MagFace como heads/losses plugáveis
+  (mesma interface do `MLPHead`/`ArcMarginProduct`). [~implementação]
+- **B:** 1 piloto de cada no recipe vencedor R2 + dataset limpo. [~6h GPU]
+- **A:** Documentar `docs/loss_families_pilot_results.md`.
+- **Entrega:** prova de viabilidade do eixo de losses + números preliminares.
+
+### Semanas 9–10 (7–20 jul) — Piloto backbones
+- **B:** Trocar ResNet50 por ViT-B/16 e ConvNeXt-T mantendo o melhor
+  head do R2. 1 piloto de cada. [~6h GPU]
+- **A:** Documentar `docs/backbone_pilot_results.md`.
+- **Entrega:** prova de viabilidade do eixo de backbones + números.
+
+### Semanas 11–13 (21 jul – 10 ago) — Escrita da qualificação
+- **A:** Consolidar todos os capítulos:
+  1. Introdução + motivação regulatória
+  2. Revisão de literatura (SOTA da Fase 0)
+  3. Pipeline auditável
+  4. Movimento 1: auditoria do dataset (R2)
+  5. Movimento 2: HPO de topologia (R1/R2)
+  6. Movimento 3: critério Pareto-aware
+  7. Pipeline integrado + decomposição
+  8. Resultados preliminares dos 3 pilotos (contrastivo/loss/backbone)
+  9. Plano de trabalho para a defesa final
+- **A:** Preparar slide deck final (a partir de
+  [slides_qualificacao.md](slides_qualificacao.md)).
+- **Entrega:** documento de qualificação completo + apresentação.
+
+### Semanas 14–15 (11–24 ago) — Revisão e ensaio
+- **A:** Revisão com orientador (sessões semanais de segunda).
+- **A:** Ensaio da apresentação, ajustes finais.
+- **24/08:** **Qualificação.**
+
+---
+
+## 5. Cronograma pós-qualificação (defesa final, ~2027)
+
+Após a qualificação, o programa experimental completo é executado:
+
+| Bloco | Conteúdo | Estimativa |
+|---|---|---|
+| Contrastivo completo | SupCon + SimCLR + CLIP × dataset limpo, com HPO | ~4 semanas |
+| Losses completo | AdaFace + MagFace + KP-RPE × HPO, com auditoria de fairness | ~4 semanas |
+| Backbones completo | ViT + ConvNeXt + IR-SE × melhor recipe, com HPO | ~3 semanas |
+| Matriz cruzada | Melhores combinações (backbone × loss × head × contrastivo) | ~3 semanas |
+| Generalização cross-dataset | Validar em RFW / BUPT-Balancedface | ~3 semanas |
+| Escrita da dissertação final + paper | Consolidação + submissão | ~6 semanas |
+
+Os achados de cada bloco entram no paper alvo (ver §7).
+
+---
+
+## 6. Gates de decisão e contingência
+
+| Gate | Quando | Critério | Se falhar |
+|---|---|---|---|
+| **G0 — Objetivo travado** | fim Semana 4 (pós-SOTA) | Delta publicável identificado vs SOTA | Pivotar para o eixo menos explorado (provável: Pareto-aware + contrastivo) |
+| **G1 — Contrastivo viável** | fim Semana 6 | Piloto roda e produz números coerentes | Reduzir a SupCon apenas; SimCLR/CLIP só na defesa |
+| **G2 — Losses viável** | fim Semana 8 | AdaFace/MagFace plugam sem instabilidade catastrófica | Documentar instabilidade como achado; manter ArcFace baseline |
+| **G3 — Backbones viável** | fim Semana 10 | ViT/ConvNeXt treinam na 4070 12GB | Reduzir batch / usar gradient accumulation; ou só ConvNeXt-T |
+| **G4 — Escrita no prazo** | fim Semana 13 | Rascunho completo de qualificação | Cortar pilotos mais fracos da apresentação, manter no plano |
+
+**Risco principal:** GPU única (RTX 4070 SUPER 12GB) é gargalo. Mitigação:
+AMP sempre ligado em experimentos novos (3× speedup já comprovado), HPO
+com orçamento curto (8 epochs) + refit só dos vencedores, early stopping
+agressivo (patience=5).
+
+**Risco secundário:** ViT-B/16 pode não caber em 12GB com batch 128.
+Mitigação: batch 64 + gradient accumulation, ou ViT-S/16.
+
+---
+
+## 7. Objetivo de publicação
+
+| Foro | Tipo | Conteúdo | Janela |
+|---|---|---|---|
+| Qualificação Unifesp | Marco acadêmico | Problema + SOTA + prelim + plano | 2026-08-24 |
+| TDC SP 2026 | Palestra | Pipeline de auditoria de fairness (já preparada) | CFP aberto |
+| Workshop tier-A (WACV/ICCV/ECCV Fair CV; ou IJCB 2027; ou ACM FAccT 2027) | Paper | Delta confirmado pós-SOTA (provável: "Pareto-aware HPO para fairness demográfica + decomposição limpeza/topologia/contrastivo") | 2027 H1 |
+| Defesa final | Dissertação | Programa completo | ~2027 |
+
+**O paper só será submetido após o SOTA confirmar o delta.** Se o SOTA
+mostrar que o delta principal já existe, o paper pivota para a
+contribuição metodológica (critério Pareto-aware) ou para a decomposição
+empírica multi-eixo, que são menos prováveis de já estarem publicadas.
+
+---
+
+## 8. Ações imediatas (esta semana)
+
+1. **[B]** Fase 4 — refit Pareto winners R2 em 25 epochs (pode disparar já).
+2. **[A]** Iniciar o SOTA review — montar o protocolo de busca e começar
+   a coleta. **Este é o item de caminho crítico** (gate G0).
+3. **[A]** Commit da documentação de organização (HISTORICO/GLOSSARIO/
+   slides/este plano).
+
+A definição **definitiva** do objetivo sai no **gate G0 (fim da Semana 4)**,
+após o SOTA. Até lá, o objetivo provisório (§1) orienta o trabalho sem
+travá-lo.
+
+---
+
+## Apêndice — mapeamento diretrizes do orientador → fases deste plano
+
+| Diretriz (kickoff 2026-05-11) | Onde é endereçada |
+|---|---|
+| 0 — Tese positiva | Objetivo provisório §1 (claim positivo) |
+| 1 — TOP Line / SOTA | **Fase 0, Semanas 2–4 (gate G0)** |
+| 2 — MLP head | ✅ feito (HPO R1/R2) |
+| 3 — Optuna | ✅ feito (HPO R1/R2) |
+| 4 — Limpeza multi-face | ✅ feito (auditoria + R2) |
+| 5 — Aprendizado contrastivo | Semanas 5–6 (piloto) + defesa final (completo) |
+| 6 — Famílias de loss | Semanas 7–8 (piloto) + defesa final (completo) |
+| 7 — Docs em `docs/` | ✅ contínuo |
+| 8 — Pesquisa semântica ~900 refs | Fase 0 (se corpus disponível) |
