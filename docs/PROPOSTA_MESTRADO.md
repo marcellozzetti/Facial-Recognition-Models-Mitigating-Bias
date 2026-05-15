@@ -32,25 +32,73 @@
 
 ## 1. Sumário Executivo
 
-A dissertação de MBA estabeleceu uma base experimental funcional — pipeline `LResNet50E-IR` sobre **FairFace** com 11 experimentos comparativos. A re-execução completa desses 11 experimentos em maio/2026 (smoke de 5 épocas + rodada limpa de 25 épocas com `EarlyStopping`, 9h38min de wall-clock, 11/11 OK) com o pipeline corrigido revelou **um achado central que define o tema do mestrado**:
+> **Objetivo (travado no gate G0, 2026-05-15 — ver [PLANO_TRABALHO.md](PLANO_TRABALHO.md) §1):**
+> Propor uma metodologia de **atribuição causal de disparidade
+> demográfica** em reconhecimento facial, baseada em decomposição
+> experimental controlada e em otimização multi-objetivo Pareto-aware,
+> que quantifica a contribuição marginal de cada fator — integridade do
+> dataset, topologia do classificador, função de perda, paradigma de
+> aprendizado e backbone — para a (in)justiça do sistema, respondendo
+> não *se* a IA pode ser mais justa, mas **onde intervir** para
+> torná-la justa.
 
-> **O undersampling para classes balanceadas não produz reconhecimento facial equitativo.** Mesmo com 10.374 imagens por classe (todas as 7 classes idênticas em tamanho), todas as 5 configurações CE 7-class testadas mantêm **Inequity Rate (F1) entre 1,76 e 1,86** e **gap max-min entre 0,34 e 0,36** entre a melhor classe (Black, F1=0,78–0,84) e a pior (**Latino_Hispanic, F1=0,42–0,47**). O fenômeno é estrutural: independente de optimizer (SGD/AdamW), scheduler (OneCycleLR/CosineAnnealing), épocas (até 40) ou dropout (0,2/0,5) — nenhuma combinação fechou esse gap.
+A dissertação de MBA estabeleceu uma base experimental funcional —
+pipeline `LResNet50E-IR` sobre **FairFace** com 11 experimentos. A
+re-execução limpa desses experimentos (mai/2026, 25 épocas,
+`EarlyStopping`, 9h38min, pipeline com 14 bugs corrigidos) confirmou
+empiricamente um fato que é **consenso de survey 2025** (arXiv
+2502.02309): *balancear o dataset por undersampling não produz
+reconhecimento facial equitativo* — IR(F1) ∈ [1,76; 1,86] em todas as
+5 configurações CE 7-class, independente de optimizer, scheduler,
+épocas ou dropout.
 
-Como bônus metodológico, a rodada limpa também **expôs em escala completa** o bug §1 (`ArcFaceLoss` que silenciosamente caía em `cross_entropy`): com a margem angular agora realmente aplicada, os experimentos de ArcFace caem de 0,58–0,61 reportados pelo MBA para **0,17–0,46 de acurácia, IR=∞** — a margem fixa `m=0,5` colapsa pelo menos uma classe demográfica para F1=0.
+**O reframing que define a tese.** A literatura de fairness está
+saturada de "método X melhora métrica Y" — e a revisão sistemática +
+auditoria semântica de 555 papers ([sota_review.md](sota_review.md),
+[literature_semantic_audit.md](literature_semantic_audit.md))
+demonstrou que mesmo "busca multi-objetivo de arquitetura para
+fairness" **já existe** (NeurIPS 2023, FairGRAPE 2022, FineFACE 2024).
+A lacuna real — explicitamente apontada pelo survey 2025 como o
+problema aberto nº 1 — é a **ausência de controle experimental para
+isolar a contribuição de fatores algorítmicos vs de dados**. A tese
+não pergunta *se* a IA pode ser mais justa (saturado); pergunta
+**onde intervir**, decompondo causalmente a disparidade.
 
-Estas evidências **falsificam empiricamente a hipótese intuitiva** que o trabalho de MBA assumia (balancear → equidade) e abrem a pergunta que organiza a tese: **se balancear o dataset não basta, o que basta?**
+**Achados preliminares já obtidos** (decomposição parcial, 2 dos 5
+fatores medidos com protocolo controlado — mesma seed, mesmo split,
+um fator por vez):
 
-A proposta de mestrado responde essa pergunta investigando duas frentes documentadas como SOTA na literatura 2024–2026:
+- **Fator "integridade do dataset"** (limpeza multi-face via MTCNN,
+  Diretriz 4): efeito *recipe-dependent* — quase nulo em CE (F1
+  +0,3pp) mas grande em ArcFace (F1 +5,8pp, IR −54%). A taxa de
+  imagens multi-face é **correlacionada com raça** (spread 9,3pp
+  entre Black 30,0% e East Asian 20,7%) — viés de cena, não só de
+  rótulo. (Ver [r2_clean_dataset_results.md](r2_clean_dataset_results.md).)
+- **Fator "topologia do classificador"** (HPO multi-objetivo
+  Pareto-aware, Diretrizes 2-3): a frente de Pareto domina o head
+  linear baseline; mas o refit em budget completo (Fase 4) mostrou que
+  topologias profundas com dropout baixo eram **artefato de budget
+  curto** — achado que valida *por que* o critério Pareto-aware +
+  confirmação são metodologicamente necessários. (Ver
+  [hpo_round2_results.md](hpo_round2_results.md).)
 
-1. **Funções de perda quality-adaptive** (AdaFace, MagFace, KP-RPE) — atacam o problema no espaço de loss.
-2. **Augmentação por dados sintéticos** (DCFace pré-treinado) das classes piores — ataca o problema no espaço de dados.
+**Contribuição metodológica nuclear** (delta validado contra 555
+papers, sem método igual): o **critério Pareto-aware best-epoch** para
+HPO multi-objetivo de fairness, que evita a escalarização de métricas
+— problema também listado como lacuna aberta no survey 2025.
 
-Cada frente é investigada isoladamente e em combinação, com auditoria de fairness padronizada (IR/FDR/Gini) sobre os mesmos splits, alinhada a requisitos regulatórios do **EU AI Act** (vigência plena 02/08/2026) e ao **NIST FRTE/FATE**. O **baseline a bater** é o Exp 5 (CE+AdamW+CosineAnnealingWarmRestarts) com acc=0,665, IR=1,76 e F1 Latino_Hispanic=0,47.
+Alinhamento regulatório: o **EU AI Act** exige evidência do *porquê*
+um sistema é justo, não só *que* é. Atribuição causal é exatamente
+isso — a tese tem ressonância direta com auditoria de sistemas de alto
+risco (Annex III).
 
-**Outputs esperados em 6 meses:**
-1. **Submissão de artigo científico** em workshop tier-A (target: WACV Workshop on Fair Computer Vision, IJCB 2027, ou ACM FAccT 2027).
-2. **Rascunho de qualificação** com a pergunta empírica e as duas linhas de resposta.
-3. **Repositório open-source** como artefato de reprodutibilidade do paper.
+**Outputs planejados:**
+1. **Dissertação** (Linha A): a metodologia de atribuição causal completa.
+2. **Paper de métodos** (Linha B): o critério Pareto-aware isolado —
+   target AutoML Conf / NeurIPS workshop.
+3. **Paper curto / capítulo** (Linha C): viés de cena correlacionado a
+   raça (achado dos 9,3pp de spread multi-face).
+4. **Repositório open-source** como artefato de reprodutibilidade.
 
 ---
 
@@ -202,46 +250,101 @@ Pipeline funcional e reproduzível com:
 
 ### 3.1 Visão evolutiva
 
-A tese parte do repositório `face_bias` e o eleva a um nível de rigor científico publicável: **uma pergunta empírica clara, hipóteses falsificáveis, intervenções controladas e auditoria de fairness padronizada**.
+A tese eleva o repositório `face_bias` a rigor científico publicável,
+mas com um reposicionamento decidido no **gate G0** (2026-05-15, após
+revisão sistemática + auditoria semântica de 555 papers): de *"mais uma
+mitigação de viés"* (espaço saturado) para **uma metodologia de
+atribuição causal** — a pergunta deixa de ser "esta técnica funciona?"
+e passa a ser "**de quanto cada fator é responsável pela disparidade, e
+onde intervir é mais eficiente?**".
 
-Não é uma ruptura — é uma extensão alinhada às evoluções da literatura 2024–2026 (AdaFace, DCFace, métricas IR/FDR/Gini) e ao contexto regulatório do EU AI Act.
+Não é ruptura com o MBA — é a maturação do motivador original ("como
+tornar a IA mais justa") para a forma defensável: não se torna a IA
+justa sem saber *de onde vem* a injustiça.
 
-### 3.2 Pergunta de pesquisa (revisada)
+### 3.2 Pergunta de pesquisa
 
-> **A rodada limpa (mai/2026, 11/11 experimentos, 9h38min) demonstrou que balancear o conjunto de treinamento via undersampling — a abordagem dominante na dissertação de MBA e em boa parte da literatura aplicada — produz Inequity Rate (F1) entre 1,76 e 1,86 e gap max-min entre 0,34 e 0,36 em todas as 5 configurações CE 7-class testadas, mesmo com 10.374 amostras por classe. *Que intervenções no espaço de loss e/ou no espaço de dados de fato fecham esse gap residual, e em que magnitude?***
+> **Dado um sistema de classificação facial demográfica, qual a
+> contribuição marginal causal de cada fator do pipeline —
+> (i) integridade de rotulação do dataset, (ii) topologia do
+> classificador, (iii) função de perda, (iv) paradigma de aprendizado,
+> (v) backbone — para a disparidade demográfica observada (Inequity
+> Rate), e como uma metodologia controlada + Pareto-aware permite
+> atribuí-la sem incorrer na escalarização de métricas?**
 
-A pergunta tem três sub-perguntas:
+Sub-perguntas (uma por fator + a metodológica):
 
-- **PQ1** — Funções de perda quality-adaptive (AdaFace, MagFace, KP-RPE) reduzem o gap demográfico residual quando aplicadas sobre o conjunto já balanceado?
-- **PQ2** — Augmentação por geração sintética da classe pior (DCFace pré-treinado para Latino_Hispanic) reduz o gap residual? Em que magnitude?
-- **PQ3** — A combinação loss-adaptive + augmentation sintética é meramente aditiva, ou há efeito de interação?
+- **PQ-M (metodológica, nuclear)** — Um critério **Pareto-aware
+  best-epoch** em HPO multi-objetivo recupera o trade-off F1×IR sem a
+  perda de informação da escalarização? Qual o impacto empírico de
+  usá-lo vs o critério ingênuo "best-by-F1"?
+- **PQ1 (dataset)** — Qual a contribuição da integridade de rotulação
+  (limpeza multi-face) para a disparidade, e ela é *recipe-dependent*?
+- **PQ2 (topologia)** — Qual a contribuição da topologia do
+  classificador, isolada do backbone (congelado)?
+- **PQ3 (loss)** — Qual a contribuição marginal de losses
+  quality-adaptive (AdaFace, MagFace) sobre o melhor ponto de PQ2?
+- **PQ4 (paradigma)** — Qual a contribuição do aprendizado contrastivo
+  (SupCon/SimCLR) como fator independente?
+- **PQ5 (backbone)** — Qual a contribuição do backbone (ResNet-50 vs
+  ViT-B/16 vs ConvNeXt-T), mantido o melhor head?
+- **PQ-I (interação)** — As contribuições são aditivas ou há interação
+  entre fatores?
 
-### 3.3 Hipóteses
+### 3.3 Hipóteses (reformuladas como atribuição)
 
-> **H0 (FALSIFICADA empiricamente — 11 experimentos do clean run, mai/2026):**
-> "Balancear o conjunto de treinamento por undersampling produz reconhecimento facial equitativo (IR ≈ 1,0)."
-> **Resultado observado**: IR ∈ [1,76; 1,86] em todas as 5 configurações CE 7-class testadas com 25 épocas. A hipótese, central no trabalho de MBA, é rejeitada e organiza a investigação subsequente.
+> **H0 (consenso de survey 2025, confirmado no clean run):** balancear
+> o dataset por undersampling não produz equidade — IR ∈ [1,76; 1,86].
+> Não é mais a tese (não-novidade); é o **ponto de partida** que
+> motiva a pergunta de atribuição.
 
-**Baseline empírico** (a ser superado pelas intervenções):
-- **Melhor 7-class:** Exp 5 (CE + AdamW + CosineAnnealingWarmRestarts), acc=0,665, **IR=1,76, gap=0,36**.
-- **F1 da pior classe (Latino_Hispanic):** 0,42 a 0,47 dependendo da configuração.
-- **F1 da melhor classe (Black):** 0,78 a 0,84.
+Baseline de referência: Exp 5 (CE+AdamW+Cosine), acc=0,665, **IR=1,76**.
 
-Hipóteses ativas:
+Hipóteses de atribuição (cada uma testável pelo protocolo controlado —
+mesma seed, mesmo split, um fator por vez, frente de Pareto F1×IR):
 
-- **H1 (PQ1)** — Substituir CrossEntropy por **AdaFace** sobre o conjunto balanceado reduz o IR (F1) em pelo menos 20% (de **1,76** para **≤ 1,41**), mantendo ou melhorando a acurácia agregada (≥ 0,665).
-- **H2 (PQ2)** — **Augmentar a classe Latino_Hispanic** com 5.000–10.000 imagens sintéticas geradas por DCFace pré-treinado (sem retreinar o gerador) reduz o gap específico Latino_Hispanic ↔ Black em pelo menos 30% (de **0,36** para **≤ 0,25**) e eleva F1 Latino_Hispanic para **≥ 0,55**.
-- **H3 (PQ3)** — A combinação **AdaFace + DCFace augmentation** produz redução de gap maior que a soma das reduções individuais (interação positiva).
-- **H4** — O ranking de modelos por acurácia difere do ranking por IR. Implicação direta para auditoria regulatória sob o EU AI Act.
-- **H5 (qualitativa via t-SNE/Grad-CAM)** — A redução de gap correlaciona-se com **maior compactação intra-classe e separação inter-classe** no espaço de embeddings da classe pior (Latino_Hispanic), observável em t-SNE pré/pós-intervenção.
+- **H-M (metodológica)** — O critério "best-by-F1" descarta
+  sistematicamente epochs Pareto-ótimas; o critério **Pareto-aware
+  best-epoch** recupera trials não-dominados adicionais.
+  *Status: corroborada* — Round 1 perdeu 4 trials Pareto-elegíveis ao
+  critério ingênuo (ver [hpo_round1_results.md](hpo_round1_results.md)).
+- **H1 (dataset)** — A contribuição da limpeza multi-face para a
+  redução de IR é *recipe-dependent*: significativa em margin-based
+  loss, marginal em softmax-based. *Status: corroborada* — R2: ArcFace
+  IR −54%, CE −1,3% ([r2_clean_dataset_results.md](r2_clean_dataset_results.md)).
+- **H2 (topologia)** — Existe topologia de head que domina o linear
+  baseline em F1 **e** IR sob budget de confirmação (25 épocas, 3
+  seeds), e o ganho de topologias profundas em budget curto é artefato.
+  *Status: em teste — Fase 4 em execução.*
+- **H3 (loss)** — Losses quality-adaptive (AdaFace/MagFace) têm
+  contribuição marginal positiva e *não-redundante* com a da topologia.
+- **H4 (paradigma)** — O aprendizado contrastivo supervisionado
+  contribui para a redução de IR independentemente da topologia.
+- **H5 (backbone)** — A contribuição do backbone (ViT/ConvNeXt vs
+  ResNet-50) para a disparidade é mensurável e não-trivial.
+- **H-I (interação)** — As contribuições dos fatores **não são
+  puramente aditivas**; há ao menos um par com interação significativa.
+- **H-reg** — O ranking de modelos por acurácia difere do ranking por
+  IR — implicação direta para auditoria sob o EU AI Act (Annex III).
 
 ### 3.4 Contribuições esperadas
 
-1. **Auditoria empírica do mito do balanceamento**: tabela publicável mostrando que 11 configurações balanceadas via undersampling produzem todas IR ≥ 1,76 sobre FairFace 7-classes, contradizendo a intuição comum em pipelines aplicados.
-2. **Estudo controlado de duas intervenções** (loss-adaptive + augmentation sintética), com decomposição da contribuição de cada uma e da interação entre elas.
-3. **Análise representacional via t-SNE** correlacionando geometria de embeddings com gap de F1 — abre caminho para entender *por quê* o gap persiste.
-4. **Pipeline reproduzível open-source** ([github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias](https://github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias)) — cada experimento do paper roda com `python scripts/run_all_experiments.py --output-dir <X>`.
-5. **Submissão de artigo científico em workshop tier-A** — ver Parte III.5.
+1. **Metodologia de atribuição causal de disparidade demográfica** —
+   protocolo controlado de decomposição fator-a-fator + critério
+   Pareto-aware. **Contribuição nuclear**, validada como inédita
+   contra 555 papers.
+2. **Critério Pareto-aware best-epoch** para HPO multi-objetivo de
+   fairness — micro-contribuição metodológica isolável (Linha B,
+   paper de métodos), endereça a lacuna de escalarização do survey 2025.
+3. **Decomposição quantitativa** da contribuição de ≥5 fatores para a
+   disparidade no FairFace, com intervalo de confiança (3 seeds).
+4. **Achado empírico do viés de cena correlacionado a raça** —
+   distribuição multi-face não-uniforme entre raças (spread 9,3pp);
+   datasets carregam viés de contexto além do desbalanceamento de
+   rótulo (Linha C, paper curto).
+5. **Pipeline auditável open-source** alinhado ao EU AI Act —
+   reprodutível via `scripts/run_all_experiments.py` + estudos Optuna
+   SQLite-resumíveis.
 
 ---
 
@@ -253,20 +356,24 @@ A tese é projetada para gerar **pelo menos um artigo científico submetido a wo
 
 ### 3.5.2 Título de trabalho proposto
 
-> **"Beyond Class Balancing: An Empirical Study of Loss-Adaptive and Synthetic-Data Interventions for Demographic Equity in Race Classification"**
+> **"Where Does the Bias Come From? A Pareto-Aware Causal Attribution
+> Methodology for Demographic Disparity in Face Classification"**
 
-Variantes alternativas a discutir com o orientador:
+Variantes a discutir com o orientador:
 
-- "Why Undersampling Isn't Enough: A Diagnostic of Residual Bias in Balanced Face Classification"
-- "Adaptive Margin Losses Meet Synthetic Augmentation: Closing the Race Gap on FairFace"
+- "Attributing Demographic Disparity: A Controlled Factor Decomposition
+  for Fair Face Classification"
+- "Beyond Mitigation: Pareto-Aware Multi-Objective Attribution of
+  Fairness Gains in Face Recognition"
 
-### 3.5.3 Estrutura narrativa (3 atos)
+### 3.5.3 Estrutura narrativa (atribuição em 4 atos)
 
 | Ato | Conteúdo | Origem dos dados |
 |---|---|---|
-| **1. Diagnóstico** ✅ pronto | 11 configurações balanceadas produzem IR ∈ [1,76; 1,86] em FairFace 7-classes (clean run, 25 épocas, 9h38min). Tabelas de F1 por classe, matrizes de confusão e gráficos disponíveis em `outputs/figures/clean/`. | [clean_results.md](clean_results.md) |
-| **2. Intervenção em loss** | AdaFace, MagFace e (opcional) KP-RPE como substitutos de CrossEntropy/ArcFace sobre o mesmo dataset balanceado. Baseline a bater: Exp 5 (acc=0,665, IR=1,76). | Mês 2-3 |
-| **3. Intervenção em dados** | DCFace pré-treinado para gerar 5-10k faces de Latino_Hispanic. Treinar com mix real+sintético sobre a melhor loss do Ato 2. Combinação com loss-adaptive. t-SNE pós-intervenção. | Mês 4-5 |
+| **1. Ponto de partida** ✅ pronto | Balancear não basta (consenso survey 2025, confirmado: IR ∈ [1,76; 1,86]). Não é a tese — é o motivador. | [clean_results.md](clean_results.md) |
+| **2. Metodologia** ✅ pronto | Protocolo de atribuição controlada + critério Pareto-aware best-epoch. Prova empírica de que "best-by-F1" descarta Pareto-ótimas (Round 1). **Contribuição nuclear.** | [hpo_round1_results.md](hpo_round1_results.md), [sota_review.md](sota_review.md) §5.3 |
+| **3. Decomposição fator-a-fator** 🟡 parcial | Contribuição marginal de cada fator: dataset ✅, topologia 🟡 (Fase 4), loss/contrastivo/backbone (Semanas 5-10). Cada fator isolado pelo mesmo protocolo. | [r2_clean_dataset_results.md](r2_clean_dataset_results.md), [hpo_round2_results.md](hpo_round2_results.md), PLANO §4 |
+| **4. Síntese + regulação** | Mapa de atribuição (onde intervir) + leitura sob EU AI Act. Achado do viés de cena (Linha C). | escrita Semanas 11-13 |
 
 ### 3.5.4 Veículos-alvo (em ordem de preferência)
 
@@ -378,7 +485,15 @@ A sugestão de Grad-CAM e ativações intermediárias do Cap. 5 do MBA é exatam
 
 ---
 
-## Parte V — Plano de Trabalho (6 Meses)
+## Parte V — Plano de Trabalho
+
+> ⚠️ **Esta Parte V foi SUPERSEDIDA por
+> [PLANO_TRABALHO.md](PLANO_TRABALHO.md)** (atualizado pós-kickoff e
+> pós-gate G0, com o cronograma semana-a-semana até 2026-08-24, os 5
+> gates de decisão, e os eixos reenquadrados como fatores da
+> decomposição causal). O conteúdo mensal abaixo é mantido apenas como
+> registro histórico da proposta original (07/05/2026) — **consultar o
+> PLANO_TRABALHO.md para o plano vigente.**
 
 Cronograma realista assumindo dedicação parcial (~15–20h/semana). Cada mês foi recalibrado em torno do **paper como deliverable principal** e do **hardware local (RTX 4070 SUPER, 12 GB)** como única infraestrutura de cálculo. Não há dependência de cloud.
 
