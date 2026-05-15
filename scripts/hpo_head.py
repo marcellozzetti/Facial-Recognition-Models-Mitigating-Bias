@@ -135,13 +135,21 @@ def _evaluate(model, loader, loss_fn, device, class_names: list[str]) -> dict[st
     import numpy as np
 
     model.eval()
+    use_amp = device.type == "cuda"
     preds, targets, probas = [], [], []
     running, seen = 0.0, 0
     for images, labels in loader:
         images = images.to(device, non_blocking=True)
         labels = labels.to(device, non_blocking=True)
-        logits = model(images)
-        loss = loss_fn(logits, labels)
+        if use_amp:
+            with torch.amp.autocast("cuda", dtype=torch.float16):
+                logits = model(images)
+                loss = loss_fn(logits, labels)
+        else:
+            logits = model(images)
+            loss = loss_fn(logits, labels)
+        # softmax in fp32 for numerical stability of the probability table
+        logits = logits.float()
         running += loss.item() * images.size(0)
         seen += images.size(0)
         proba = torch.softmax(logits, dim=1)
@@ -192,7 +200,13 @@ def _train_trial(
     device: torch.device,
     trial=None,
 ) -> dict[str, Any]:
-    """Run a single Optuna trial end-to-end and return its Pareto-aware best."""
+    """Run a single Optuna trial end-to-end and return its Pareto-aware best.
+
+    Mixed precision (fp16 autocast + GradScaler) is on by default for HPO.
+    Each trial only runs for a few epochs and we want maximum throughput;
+    if a head topology breaks under fp16 it will surface as a collapsed
+    trial (F1 ~ 0.05, IR ~ 1e6 finite penalty) and be dominated.
+    """
     num_classes = len(class_names)
     model = _build_model(cfg, num_classes, device)
     loss_fn = build_loss(cfg).to(device)
@@ -200,6 +214,8 @@ def _train_trial(
     scheduler = build_scheduler(optimizer, cfg, steps_per_epoch=len(dataloaders["train"]))
 
     grad_clip = cfg["training"].get("grad_clip_norm")
+    use_amp = device.type == "cuda"
+    scaler = torch.amp.GradScaler("cuda") if use_amp else None
     history: list[dict] = []
 
     for epoch in range(1, epochs + 1):
@@ -207,13 +223,26 @@ def _train_trial(
         for images, labels in dataloaders["train"]:
             images = images.to(device, non_blocking=True)
             labels = labels.to(device, non_blocking=True)
-            optimizer.zero_grad()
-            logits = model(images)
-            loss = loss_fn(logits, labels)
-            loss.backward()
-            if grad_clip is not None:
-                torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
-            optimizer.step()
+            optimizer.zero_grad(set_to_none=True)
+
+            if use_amp:
+                with torch.amp.autocast("cuda", dtype=torch.float16):
+                    logits = model(images)
+                    loss = loss_fn(logits, labels)
+                scaler.scale(loss).backward()
+                if grad_clip is not None:
+                    scaler.unscale_(optimizer)
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                logits = model(images)
+                loss = loss_fn(logits, labels)
+                loss.backward()
+                if grad_clip is not None:
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+                optimizer.step()
+
             if is_step_per_batch(scheduler):
                 scheduler.step()
         if not is_step_per_batch(scheduler):

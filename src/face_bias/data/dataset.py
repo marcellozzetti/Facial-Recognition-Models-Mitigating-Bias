@@ -4,7 +4,6 @@ import logging
 import os
 from typing import Any
 
-import cv2
 import pandas as pd
 from PIL import Image
 from sklearn.model_selection import train_test_split
@@ -14,38 +13,35 @@ from torchvision import transforms
 
 
 class FaceDataset(Dataset):
-    """Dataset that yields (CHW float tensor, encoded label) pairs."""
+    """Dataset that yields (CHW float tensor, encoded int label) pairs.
 
-    def __init__(self, img_paths, labels, img_dir, transform=None, label_encoder=None):
-        if label_encoder is None:
-            raise ValueError("label_encoder is required so labels can be transformed.")
+    Labels are pre-encoded once in ``setup_dataset`` and passed in as a
+    list of ints — calling ``LabelEncoder.transform`` per ``__getitem__``
+    was a significant overhead with 4 workers under Windows.
+
+    Image decoding uses ``PIL.Image.open(...).convert("RGB")`` directly
+    rather than ``cv2.imread`` + ``cv2.cvtColor`` + ``PIL.fromarray``:
+    one syscall, one decode, no intermediate numpy array.
+    """
+
+    def __init__(self, img_paths, encoded_labels, img_dir, transform=None):
+        if len(img_paths) != len(encoded_labels):
+            raise ValueError("img_paths and encoded_labels must have the same length")
         self.img_paths = img_paths
-        self.labels = labels
+        self.encoded_labels = encoded_labels
         self.img_dir = img_dir
         self.transform = transform
-        self.label_encoder = label_encoder
 
     def __len__(self):
         return len(self.img_paths)
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.img_dir, self.img_paths[idx])
-        label = self.labels[idx]
-
-        # cv2 returns BGR uint8 ndarray; convert to RGB and wrap in PIL so
-        # torchvision transforms (Resize, RandomHorizontalFlip, ToTensor) work
-        # on a PIL.Image as they expect.
-        img_bgr = cv2.imread(img_name)
-        if img_bgr is None:
-            raise FileNotFoundError(f"Image {img_name} not found or unreadable")
-        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(img_rgb)
-
+        with Image.open(img_name) as raw:
+            img = raw.convert("RGB")
         if self.transform:
             img = self.transform(img)
-
-        label_index = int(self.label_encoder.transform([label])[0])
-        return img, label_index
+        return img, int(self.encoded_labels[idx])
 
 
 def _build_transforms(config: dict[str, Any]) -> dict[str, transforms.Compose]:
@@ -193,46 +189,49 @@ def setup_dataset(config: dict[str, Any]):
         random_state=random_state,
     )
 
+    # Encode the string labels once up-front so __getitem__ doesn't have
+    # to call LabelEncoder.transform per sample in every worker.
+    encoded = {
+        "train": label_encoder.transform(y_train).tolist(),
+        "val": label_encoder.transform(y_val).tolist(),
+        "test": label_encoder.transform(y_test).tolist(),
+    }
+
+    splits = {"train": (X_train, encoded["train"]), "val": (X_val, encoded["val"]), "test": (X_test, encoded["test"])}
     datasets = {
         split: FaceDataset(
             X_split.tolist(),
-            y_split.tolist(),
+            encoded_labels,
             image_dir,
             transform=data_transforms[split],
-            label_encoder=label_encoder,
         )
-        for split, (X_split, y_split) in {
-            "train": (X_train, y_train),
-            "val": (X_val, y_val),
-            "test": (X_test, y_test),
-        }.items()
+        for split, (X_split, encoded_labels) in splits.items()
     }
 
     batch_size = config["training"]["batch_size"]
     num_workers = config["training"]["num_workers"]
+    prefetch_factor = config["training"].get("prefetch_factor", 4)
+    # persistent_workers requires num_workers > 0, and saves the per-epoch
+    # worker re-spawn cost (3-5 s on Windows). DataLoader rejects the
+    # combination silently in some versions, so guard explicitly.
+    persistent = num_workers > 0
+
+    def _loader(ds, *, shuffle: bool) -> DataLoader:
+        kwargs: dict[str, Any] = dict(
+            batch_size=batch_size,
+            shuffle=shuffle,
+            num_workers=num_workers,
+            pin_memory=True,
+        )
+        if num_workers > 0:
+            kwargs["persistent_workers"] = persistent
+            kwargs["prefetch_factor"] = prefetch_factor
+        return DataLoader(ds, **kwargs)
 
     dataloaders = {
-        "train": DataLoader(
-            datasets["train"],
-            batch_size=batch_size,
-            shuffle=True,
-            num_workers=num_workers,
-            pin_memory=True,
-        ),
-        "val": DataLoader(
-            datasets["val"],
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=num_workers,
-            pin_memory=True,
-        ),
-        "test": DataLoader(
-            datasets["test"],
-            batch_size=batch_size,
-            shuffle=False,
-            num_workers=num_workers,
-            pin_memory=True,
-        ),
+        "train": _loader(datasets["train"], shuffle=True),
+        "val": _loader(datasets["val"], shuffle=False),
+        "test": _loader(datasets["test"], shuffle=False),
     }
 
     return dataloaders, label_encoder, num_classes

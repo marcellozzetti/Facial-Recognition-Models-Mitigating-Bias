@@ -52,6 +52,12 @@ class TrainingConfig(BaseModel):
     grad_clip_norm: Optional[float] = Field(default=5.0, gt=0)
     # Early stopping on val_loss; null disables it.
     early_stopping_patience: Optional[int] = Field(default=5, ge=1)
+    # DataLoader prefetch_factor (only used when num_workers > 0).
+    prefetch_factor: int = Field(default=4, ge=1)
+    # When True, train with torch.amp.autocast(fp16) + GradScaler. Default
+    # off so the 11-experiment replication remains numerically reproducible;
+    # HPO and any new training recipes can opt in via the config.
+    use_amp: bool = False
 
 
 class ImageConfig(BaseModel):

@@ -187,6 +187,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--device", default="cuda", help="auto | cpu | cuda | cuda:0")
     parser.add_argument("--output-dir", default="outputs/runs", type=Path)
+    parser.add_argument(
+        "--configs-dir",
+        default=CONFIGS_DIR,
+        type=Path,
+        help="Directory holding exp*.yaml configs to run (default: configs/experiments)",
+    )
     parser.add_argument("--only", nargs="*", default=None, help="Only run these label stems")
     parser.add_argument("--skip", nargs="*", default=[], help="Skip these label stems")
     args = parser.parse_args(argv)
@@ -203,9 +209,9 @@ def main(argv: list[str] | None = None) -> int:
         results = []
         completed_labels = set()
 
-    configs = find_exp_configs()
+    configs = sorted(args.configs_dir.glob("exp*.yaml"))
     if not configs:
-        print(f"No configs under {CONFIGS_DIR} matching exp*.yaml", file=sys.stderr)
+        print(f"No configs under {args.configs_dir} matching exp*.yaml", file=sys.stderr)
         return 1
 
     for config in configs:

@@ -71,6 +71,7 @@ class Trainer:
         early_stopping: EarlyStopping | None = None,
         mlflow_run=None,
         grad_clip_norm: float | None = 5.0,
+        use_amp: bool = False,
     ):
         self.model = model.to(device)
         self.loss_fn = loss_fn
@@ -87,6 +88,11 @@ class Trainer:
         # ArcFace + AdamW + dropout=0.5 (Exp 10 in the smoke run) from
         # diverging on the first batch.
         self.grad_clip_norm = grad_clip_norm
+        # Mixed precision: opt-in so the 11-experiment replication stays
+        # numerically reproducible. New training recipes (e.g. the Pareto
+        # refit at 25 epochs) flip ``training.use_amp: true`` in their YAML.
+        self.use_amp = use_amp and device.type == "cuda"
+        self.scaler = torch.amp.GradScaler("cuda") if self.use_amp else None
 
     # ---- one epoch ----
 
@@ -105,13 +111,24 @@ class Trainer:
             images = images.to(self.device, non_blocking=True)
             labels = labels.to(self.device, non_blocking=True)
 
-            self.optimizer.zero_grad()
-            logits = self._forward(images, labels)
-            loss = self.loss_fn(logits, labels)
-            loss.backward()
-            if self.grad_clip_norm is not None:
-                nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip_norm)
-            self.optimizer.step()
+            self.optimizer.zero_grad(set_to_none=True)
+            if self.use_amp:
+                with torch.amp.autocast("cuda", dtype=torch.float16):
+                    logits = self._forward(images, labels)
+                    loss = self.loss_fn(logits, labels)
+                self.scaler.scale(loss).backward()
+                if self.grad_clip_norm is not None:
+                    self.scaler.unscale_(self.optimizer)
+                    nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip_norm)
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
+            else:
+                logits = self._forward(images, labels)
+                loss = self.loss_fn(logits, labels)
+                loss.backward()
+                if self.grad_clip_norm is not None:
+                    nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip_norm)
+                self.optimizer.step()
             if is_step_per_batch(self.scheduler):
                 self.scheduler.step()
 
@@ -132,8 +149,16 @@ class Trainer:
         for images, labels in dataloader:
             images = images.to(self.device, non_blocking=True)
             labels = labels.to(self.device, non_blocking=True)
-            logits = self._forward(images, labels)
-            loss = self.loss_fn(logits, labels)
+            if self.use_amp:
+                with torch.amp.autocast("cuda", dtype=torch.float16):
+                    logits = self._forward(images, labels)
+                    loss = self.loss_fn(logits, labels)
+            else:
+                logits = self._forward(images, labels)
+                loss = self.loss_fn(logits, labels)
+            # Cast logits back to fp32 so the softmax/argmax/numpy chain
+            # stays numerically stable regardless of the train-time dtype.
+            logits = logits.float()
 
             running += loss.item() * images.size(0)
             seen += images.size(0)

@@ -148,6 +148,7 @@ def main(argv: list[str] | None = None) -> int:
         mlflow_run=mlflow_run,
         early_stopping=early_stopping,
         grad_clip_norm=config["training"].get("grad_clip_norm"),
+        use_amp=config["training"].get("use_amp", False),
     )
 
     result = trainer.fit(

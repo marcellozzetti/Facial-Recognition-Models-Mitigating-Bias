@@ -66,6 +66,9 @@ dvc = [
 hpo = [
   "optuna>=3.6",
 ]
+literature = [
+  "sentence-transformers>=3.0",
+]
 
 [project.scripts]
 face-bias-download   = "face_bias.cli.download:main"
