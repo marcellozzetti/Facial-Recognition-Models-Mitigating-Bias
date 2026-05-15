@@ -13,6 +13,26 @@ permitindo navegar do panorama → detalhe sem perder contexto.
 
 ---
 
+## Objetivo do trabalho (TRAVADO em 2026-05-15 — gate G0)
+
+> Propor uma metodologia de **atribuição causal de disparidade
+> demográfica** em reconhecimento facial, baseada em decomposição
+> experimental controlada e em otimização multi-objetivo Pareto-aware,
+> que quantifica a contribuição marginal de cada fator — integridade do
+> dataset, topologia do classificador, função de perda, paradigma de
+> aprendizado e backbone — para a (in)justiça do sistema, respondendo
+> não *se* a IA pode ser mais justa, mas **onde intervir** para
+> torná-la justa.
+
+Motivador (herdado do MBA): *como tornar a IA mais justa*. O reframing
+para **atribuição causal** (em vez de "mais uma mitigação") é o
+diferencial validado contra 555 papers (ver
+[sota_review.md](sota_review.md) §5.3 e
+[literature_semantic_audit.md](literature_semantic_audit.md) §5).
+Decisão registrada como Linha A em [PLANO_TRABALHO.md](PLANO_TRABALHO.md) §1.
+
+---
+
 ## Linha do tempo resumida
 
 | Período | Marco | Documentação |

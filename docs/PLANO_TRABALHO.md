@@ -23,24 +23,47 @@ SOTA review  →  mapa do que já existe  →  identificação do delta  →  OB
    (Fase 0)                                  (gate de decisão)
 ```
 
-**Objetivo provisório de trabalho** (a ser confirmado/refinado pós-SOTA):
+### Gate G0 — RESOLVIDO em 2026-05-15 (objetivo TRAVADO)
 
-> "Demonstrar empiricamente que a integração de (i) auditoria do dataset
-> por integridade de rotulação e (ii) busca multi-objetivo de topologia
-> de classificador via HPO Pareto-aware produz um classificador racial
-> que domina o baseline em F1 macro e Inequity Rate, e quantificar a
-> contribuição marginal de cada componente — estendendo a análise a
-> aprendizado contrastivo, famílias de loss quality-adaptive e múltiplos
-> backbones para estabelecer a generalidade do achado."
+O SOTA review + auditoria semântica de 555 papers
+([sota_review.md](sota_review.md) §5.0, §5.0-crosscheck;
+[literature_semantic_audit.md](literature_semantic_audit.md) §5)
+estabeleceram que:
 
-Critérios de decisão pós-SOTA (gate da Fase 0):
+- ❌ "HPO/NAS multi-objetivo para fairness facial" **já existe**
+  (NeurIPS 2023, FairGRAPE 2022, FineFACE 2024) → não é contribuição.
+- ✅ Deltas defensáveis: **critério Pareto-aware best-epoch** (zero
+  método igual em 555 docs) + **decomposição experimental controlada**
+  (lacuna explícita do survey 2025).
 
-- **Se** o SOTA já cobre "limpeza por multi-face + HPO topologia" → pivotar
-  o delta para o eixo menos explorado (provavelmente o critério
-  Pareto-aware, ou a combinação com contrastivo).
-- **Se** o SOTA não cobre → confirmar o objetivo provisório como definitivo.
-- **Em qualquer caso:** o SOTA define quais dos eixos experimentais
-  (contrastivo / losses / backbones) são *diferenciais* vs *replicação*.
+**Decisão (Linha A — Atribuição Causal de Viés):** a tese deixa de ser
+"mais uma mitigação" e passa a ser uma **metodologia de atribuição
+causal de disparidade demográfica**. Reframe central: não responder
+*se* a IA pode ser mais justa, mas **onde intervir** para torná-la
+justa, quantificando a contribuição marginal de cada fator.
+
+### Objetivo DEFINITIVO (travado, gate G0)
+
+> "Propor uma metodologia de **atribuição causal de disparidade
+> demográfica** em reconhecimento facial, baseada em decomposição
+> experimental controlada e em otimização multi-objetivo Pareto-aware,
+> que quantifica a contribuição marginal de cada fator — integridade do
+> dataset, topologia do classificador, função de perda, paradigma de
+> aprendizado e backbone — para a (in)justiça do sistema, respondendo
+> não *se* a IA pode ser mais justa, mas *onde intervir* para
+> torná-la justa."
+
+**Reenquadramento conceitual dos eixos experimentais:** o que antes era
+"testar contrastivo / losses / backbones" agora são **fatores da
+decomposição causal**. Cada eixo do programa experimental deixa de ser
+"mais um experimento" e passa a ser "um fator cuja contribuição
+marginal para a disparidade é isolada e quantificada via o protocolo
+controlado (mesma seed, mesmo split, um fator por vez) + frente de
+Pareto F1×IR".
+
+**Outputs de publicação derivados (Linha A como espinha):**
+- Linha B (critério Pareto-aware) → paper de métodos (AutoML/NeurIPS-W).
+- Linha C (viés de cena correlacionado a raça) → capítulo + paper curto.
 
 ---
 

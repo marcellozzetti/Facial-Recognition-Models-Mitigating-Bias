@@ -338,6 +338,22 @@ Pareto-aware vira o núcleo da contribuição** (não apenas um meio),
 porque é o que tem maior probabilidade de ser delta publicável segundo
 esta revisão.
 
+### 5.3 GATE G0 RESOLVIDO (2026-05-15) — objetivo definitivo travado
+
+Decisão tomada: **Linha A — Atribuição Causal de Viés**. O objetivo §5.2
+foi refinado para o framing de *atribuição* (não *mitigação*),
+explicitamente diferenciado do SOTA saturado de "método X melhora
+métrica Y". Texto definitivo travado em
+[PLANO_TRABALHO.md](PLANO_TRABALHO.md) §1 ("Objetivo DEFINITIVO").
+Resumo do delta defendido na qualificação:
+
+> Não responder *se* a IA pode ser mais justa (saturado), mas **onde
+> intervir** — quantificando a contribuição marginal causal de cada
+> fator (dataset, topologia, loss, contrastivo, backbone) via
+> decomposição controlada + Pareto-aware. Linha B (critério
+> Pareto-aware isolado) e Linha C (viés de cena correlacionado a raça)
+> tornam-se papers/capítulos derivados.
+
 ---
 
 ## 6. Referências-âncora desta passada
