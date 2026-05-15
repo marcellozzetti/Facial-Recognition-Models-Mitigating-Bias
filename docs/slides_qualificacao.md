@@ -13,7 +13,7 @@ footer: 'Qualificação 2026-08-24 · github.com/marcellozzetti/Facial-Recogniti
 
 **Marcello Ozzetti** · marcello.ozzetti@gmail.com
 Mestrado em Ciência da Computação · Unifesp/ICT
-Orientador: Prof. `[nome do orientador]`
+Orientador: Prof. Marcos Quiles
 
 Qualificação · 24 de agosto de 2026
 

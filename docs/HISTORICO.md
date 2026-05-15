@@ -6,7 +6,7 @@ referencia o(s) documento(s) técnico(s) detalhado(s) correspondente(s),
 permitindo navegar do panorama → detalhe sem perder contexto.
 
 **Aluno:** Marcello Ozzetti
-**Orientador (mestrado):** Prof. (a definir no documento — `[nome do orientador]`)
+**Orientador (mestrado):** Prof. Marcos Quiles
 **Programa:** Mestrado em Ciência da Computação, Unifesp/ICT
 **Origem:** Dissertação de MBA em IA, USP (2024)
 **Repositório:** https://github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias

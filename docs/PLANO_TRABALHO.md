@@ -1,6 +1,6 @@
 # Plano de Trabalho — Mestrado (até qualificação e defesa)
 
-**Aluno:** Marcello Ozzetti · **Orientador:** Prof. `[nome do orientador]`
+**Aluno:** Marcello Ozzetti · **Orientador:** Prof. Marcos Quiles
 **Programa:** Mestrado em Ciência da Computação — Unifesp/ICT
 **Kickoff:** 2026-05-11 · **Qualificação alvo:** 2026-08-24 · **Defesa final:** ~2027 (a definir)
 **Última atualização deste plano:** 2026-05-14
