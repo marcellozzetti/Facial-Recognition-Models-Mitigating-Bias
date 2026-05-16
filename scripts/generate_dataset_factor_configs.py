@@ -64,7 +64,7 @@ def _cfg(head: str, loss: str, dataset_file: str, seed: int) -> dict:
             "loss_function": loss,
             "test_size": 0.1,
             "val_size": 0.1,
-            "num_workers": 4,
+            "num_workers": 0,  # Windows deadlock-proof: persistent_workers
             "random_state": seed,
             "grad_clip_norm": 5.0,
             "early_stopping_patience": 5,
@@ -77,7 +77,7 @@ def _cfg(head: str, loss: str, dataset_file: str, seed: int) -> dict:
         },
         "preprocessing": {
             "processing_type": "detect_adjust_image",
-            "num_workers": 4,
+            "num_workers": 4,  # preprocess step not run here; schema requires >=1
             "rotate_angle": 45,
             "num_rotations": 8,
             "max_faces_per_image": 1,

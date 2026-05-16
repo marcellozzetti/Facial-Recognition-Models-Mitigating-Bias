@@ -21,7 +21,7 @@ training:
   loss_function: arcface
   test_size: 0.1
   val_size: 0.1
-  num_workers: 4
+  num_workers: 0
   random_state: 2
   grad_clip_norm: 5.0
   early_stopping_patience: 5
