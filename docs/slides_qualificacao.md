@@ -217,22 +217,23 @@ MTCNN aplicado sobre as 97 698 imagens originais. Distribuição:
 
 ---
 
-## 11. Resultado 1 — Efeito isolado da limpeza (R1 → R2)
+## 11. Resultado 1 — Fator Dataset (3-seed, ambiente único)
 
-2 experimentos (Exp 5 e Exp 6 no dataset limpo) para responder:
-**"A limpeza muda os recipes que vamos usar?"**
+Batch casado de 12 runs (r1ctrl orig × r2base clean × CE/ArcFace × 3
+seeds), ambiente idêntico — confound corrigido.
 
-| Recipe | R1 (97k orig) | R2 (72k clean) | Δ F1 | Δ IR |
-|---|---|---|---:|---:|
-| **CE** (Exp 5) | F1=0.665, IR=1.76 | F1=0.668, IR=1.737 | +0.3 pp | **−1.3%** |
-| **ArcFace** (Exp 6) | F1=0.529, IR=4.60 | F1=0.587, IR=2.114 | **+5.8 pp** | **−54%** |
+| Recipe | Δ F1 (clean−orig) | Δ IR (clean−orig) |
+|---|---|---|
+| **CE** | **+1,35 pp** (signif., |Δ|>σ) | +0,05 (dentro de 1σ → **nulo**) |
+| **ArcFace** | −3,2 pp (não-signif.) | −0,006 (não-signif.; σ_IR=±1,24) |
 
-**Interpretação científica:** efeito **recipe-dependente**.
+**Interpretação:** a limpeza melhora **acurácia no CE**; **não tem
+efeito significativo sobre a disparidade (IR)** em nenhum recipe.
 
-- CE robusto a ruído de label → quase nulo.
-- ArcFace sensível a label → grande ganho.
-
-→ Limpeza é segura para CE, **claim positivo: melhora ArcFace**.
+⚠️ **Honestidade científica:** uma análise anterior (1-seed,
+ambientes diferentes) reportava "ArcFace −54% IR". Sob rigor isso é
+**artefato de confound** — não se confirma. Detectar e corrigir o
+próprio artefato é a tese de atribuição funcionando.
 
 ---
 
@@ -308,18 +309,21 @@ Pareto-ótimo.
 
 ---
 
-## 16. Resultado 3 — Pipeline integrado vs MBA
+## 16. Resultado 3 — Mapa de atribuição (defensável, 3-seed)
 
-Decomposição do ganho total **R2 HPO Pareto vs MBA Exp 5 baseline**:
+Contribuição marginal por fator (2 de 5 medidos, protocolo controlado):
 
-| Contribuinte | Δ F1 macro | Δ IR |
-|---|---:|---:|
-| Limpeza sozinha (R1→R2 baseline) | +0.3 pp | −1.3% |
-| Topologia sozinha (R1 base → R1 HPO) | +1.7 pp | −11.1% |
-| **Combinação (R1 base → R2 HPO #4)** | **+2.85 pp** | **−6.9%** |
-| **Combinação (R1 base → R2 HPO #10)** | +2.36 pp | **−9.6%** |
+| Fator | → Acurácia (F1) | → **Fairness (IR)** |
+|---|---|---|
+| **1. Dataset** (limpeza multi-face) | +1,35pp CE (signif.) | **nula** (não-signif.) |
+| **2. Topologia** (linear→MLP `[256] GELU`) | +0,8pp (n.s.) | **−0,11 (SIGNIF.)** |
+| 3-5 (loss/contrastivo/backbone) | a medir | a medir |
 
-→ **Tese: pipeline integrado domina o baseline MBA em ambos os eixos.**
+→ **Tese: a alavanca de fairness defensável é a TOPOLOGIA, não a
+limpeza do dataset.** O método de atribuição matou um efeito falso
+(dataset −54% IR, artefato de confound) e revelou um real (topologia
+−0,11 IR) que a análise de 1-seed havia descartado — o próprio método
+sendo validado.
 
 ---
 
@@ -401,13 +405,17 @@ SimCLR, Sup-SimCLR, CLIP como axis alternativo ao classification head.
    **Pareto-aware best epoch** em HPO multi-objetivo de fairness —
    descoberta empírica do problema "best by F1" durante o Round 1.
 
-2. **Empírica (limpeza):** demonstração de que a limpeza de imagens
-   multi-face **estabiliza margin-based losses** (ArcFace IR 4.60 →
-   2.11) sem custo em softmax-based losses.
+2. **Empírica (atribuição corrigida):** o método de decomposição
+   controlada **detecta e mata um efeito falso** — o "ArcFace −54% IR
+   via limpeza" era artefato de confound (torch/decode + 1-seed); sob
+   rigor (3-seed, ambiente único) a limpeza contribui para **acurácia
+   (+1,35pp CE)**, **não para fairness**.
 
-3. **Empírica (topologia):** demonstração de que existe uma frente de
-   Pareto de topologias MLP que **domina o head linear baseline** nos
-   dois eixos (F1 +2.85 pp, IR −9.6%).
+3. **Empírica (topologia):** vs o baseline linear de 3 seeds, a
+   topologia MLP `[256] GELU drop=0,52` **reduz o IR em −0,11 de forma
+   estatisticamente significativa** — a **alavanca de fairness
+   defensável** é a topologia, não o dataset. (Efeito que a análise
+   de 1-seed havia erroneamente descartado.)
 
 4. **Engenharia:** pipeline auditável, reproduzível, instrumentado com
    testes — material para um paper de "ML systems for fairness audit".

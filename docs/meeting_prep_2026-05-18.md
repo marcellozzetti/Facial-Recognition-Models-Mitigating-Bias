@@ -75,18 +75,26 @@ semântica de 555 papers. **Precisa do endosso do orientador.**
 
 ---
 
-## 4. Reportar — resultados parciais da decomposição
+## 4. Reportar — resultados defensáveis (2/5 fatores) + 3 reversões
 
-- **Fator 2 (topologia head linear vs MLP):** contribuição **pequena e
-  estatisticamente não-significativa** (ΔIR ≈ −0.07 ± 0.07). O HPO de
-  budget curto superestimou — achado que reforça a Linha B.
-- **Fator 1 (dataset original vs limpo):** batch 12-config 3-seed em
-  execução; resultado parcial mostra que a troca de ambiente sozinha
-  moveu F1 −1.4pp (confirma por que o confound importava). Δ final do
-  fator sai quando o braço clean terminar.
-- **Achado lateral (Linha C):** taxa de imagens multi-face é
-  correlacionada com raça (spread 9,3pp) — viés de cena, não só de
-  rótulo.
+Batch casado 12-config 3-seed (ambiente único) **concluído**. Reportar
+as 3 reversões — é o ponto mais forte da sessão (mostra o método
+funcionando):
+
+- **Fator 1 (Dataset):** limpeza melhora **acurácia no CE (+1,35pp,
+  signif.)**, **efeito nulo sobre IR** em ambos os recipes. O
+  "ArcFace −54% IR" reportado antes era **artefato de confound**
+  (torch/decode + 1-seed) — **não se confirma**.
+- **Fator 2 (Topologia):** vs baseline linear de **3 seeds**, MLP
+  `[256] GELU drop=0,52` **reduz IR −0,11 (estatisticamente
+  significativo)**. A conclusão anterior "não-significativo" usava
+  baseline de 1-seed (pessimista). **A topologia é a alavanca de
+  fairness defensável, não a limpeza.**
+- **Mensagem-chave para o orientador:** a metodologia de atribuição
+  **matou um efeito falso e revelou um real** — isso *é* a tese (Linha
+  A) se provando. Vira a subseção "ameaças à validade e correções".
+- **Achado lateral (Linha C):** taxa multi-face correlacionada com raça
+  (spread 9,3pp) — viés de cena, robusto.
 
 ---
 
@@ -107,8 +115,10 @@ semântica de 555 papers. **Precisa do endosso do orientador.**
 
 > "Desde o kickoff: travei o objetivo como **atribuição causal** (não
 > mitigação) — validado contra 555 papers. Decompondo a disparidade
-> fator a fator com 3 seeds e base casada. Fator topologia já medido
-> (contribui pouco). Fator dataset rodando. O senhor levantou **função
-> de pesos** — quero confirmar se é weighted-loss e, se for, adicionar
-> 'estratégia de balanceamento' como fator, porque é uma alavanca que
-> não testamos e encaixa direto na decomposição."
+> fator a fator com 3 seeds e base casada. **2 fatores já medidos e
+> defensáveis: a topologia do classificador reduz IR de forma
+> significativa (−0,11); a limpeza do dataset NÃO afeta fairness (só
+> acurácia).** O método derrubou um efeito falso (ArcFace −54%, que era
+> confound) e revelou um real — isso é a tese se provando. O senhor
+> levantou **função de pesos** — quero confirmar se é weighted-loss e,
+> se for, adicionar 'estratégia de balanceamento' como fator novo."

@@ -64,23 +64,33 @@ isolar a contribuição de fatores algorítmicos vs de dados**. A tese
 não pergunta *se* a IA pode ser mais justa (saturado); pergunta
 **onde intervir**, decompondo causalmente a disparidade.
 
-**Achados preliminares já obtidos** (decomposição parcial, 2 dos 5
-fatores medidos com protocolo controlado — mesma seed, mesmo split,
-um fator por vez):
+**Achados preliminares defensáveis** (decomposição parcial, 2 dos 5
+fatores medidos com protocolo controlado: braços casados, **3 seeds**,
+ambiente único — ver [dataset_factor_results.md](dataset_factor_results.md)):
 
 - **Fator "integridade do dataset"** (limpeza multi-face via MTCNN,
-  Diretriz 4): efeito *recipe-dependent* — quase nulo em CE (F1
-  +0,3pp) mas grande em ArcFace (F1 +5,8pp, IR −54%). A taxa de
-  imagens multi-face é **correlacionada com raça** (spread 9,3pp
-  entre Black 30,0% e East Asian 20,7%) — viés de cena, não só de
-  rótulo. (Ver [r2_clean_dataset_results.md](r2_clean_dataset_results.md).)
-- **Fator "topologia do classificador"** (HPO multi-objetivo
-  Pareto-aware, Diretrizes 2-3): a frente de Pareto domina o head
-  linear baseline; mas o refit em budget completo (Fase 4) mostrou que
-  topologias profundas com dropout baixo eram **artefato de budget
-  curto** — achado que valida *por que* o critério Pareto-aware +
-  confirmação são metodologicamente necessários. (Ver
-  [hpo_round2_results.md](hpo_round2_results.md).)
+  Diretriz 4): a limpeza **melhora acurácia no recipe CE (F1 +1,35pp,
+  significativo)** mas **não tem efeito significativo sobre a
+  disparidade (IR) em nenhum recipe**. ⚠️ O "efeito recipe-dependent
+  grande no ArcFace (−54% IR)" reportado em análise anterior era
+  **artefato de confound** (torch/decode misturado com dataset) +
+  1 seed — **não se confirma** sob rigor. Achado lateral robusto: a
+  taxa de imagens multi-face é **correlacionada com raça** (spread
+  9,3pp; Black 30,0% vs East Asian 20,7%) — viés de cena, não só de
+  rótulo.
+- **Fator "topologia do classificador"** (HPO Pareto-aware, Diretrizes
+  2-3): contra o baseline linear de **3 seeds**, a topologia MLP
+  vencedora (`[256] GELU drop=0,52`) **reduz o IR em −0,11 de forma
+  estatisticamente significativa** (F1 inalterado dentro do ruído). É
+  a **única alavanca de fairness defensável** medida até agora — o
+  efeito está na topologia, **não** na limpeza do dataset.
+
+> **Nota metodológica (vira subseção "ameaças à validade"):** estes
+> dois achados *inverteram* conclusões de análises confundidas
+> anteriores. A metodologia de decomposição controlada + 3 seeds
+> **matou um efeito falso** (dataset −54% IR) e **revelou um efeito
+> real** (topologia −0,11 IR) que a análise de 1 seed havia descartado.
+> Isto é evidência empírica do valor do próprio método (Linha A).
 
 **Contribuição metodológica nuclear** (delta validado contra 555
 papers, sem método igual): o **critério Pareto-aware best-epoch** para
@@ -308,14 +318,22 @@ mesma seed, mesmo split, um fator por vez, frente de Pareto F1×IR):
   best-epoch** recupera trials não-dominados adicionais.
   *Status: corroborada* — Round 1 perdeu 4 trials Pareto-elegíveis ao
   critério ingênuo (ver [hpo_round1_results.md](hpo_round1_results.md)).
-- **H1 (dataset)** — A contribuição da limpeza multi-face para a
-  redução de IR é *recipe-dependent*: significativa em margin-based
-  loss, marginal em softmax-based. *Status: corroborada* — R2: ArcFace
-  IR −54%, CE −1,3% ([r2_clean_dataset_results.md](r2_clean_dataset_results.md)).
-- **H2 (topologia)** — Existe topologia de head que domina o linear
-  baseline em F1 **e** IR sob budget de confirmação (25 épocas, 3
-  seeds), e o ganho de topologias profundas em budget curto é artefato.
-  *Status: em teste — Fase 4 em execução.*
+- **H1 (dataset)** — A limpeza multi-face contribui para a redução de
+  IR. *Status: **REFUTADA** sob rigor (3-seed, ambiente único)* — a
+  limpeza melhora **acurácia** no CE (F1 +1,35pp, signif.) mas tem
+  contribuição **nula e não-significativa para o IR** em ambos os
+  recipes. O "−54% IR no ArcFace" da análise de 1 seed era artefato de
+  confound ([dataset_factor_results.md](dataset_factor_results.md) §2).
+  Reformulada → **H1' (dataset→acurácia):** a limpeza contribui para
+  acurácia, não para fairness.
+- **H2 (topologia)** — Existe topologia de head que reduz o IR vs o
+  linear baseline sob budget de confirmação (25 épocas, 3 seeds).
+  *Status: **CORROBORADA*** — vs baseline linear de 3 seeds, MLP
+  `[256] GELU drop=0,52` reduz IR em −0,11 (estatisticamente
+  significativo), F1 inalterado dentro do ruído
+  ([dataset_factor_results.md](dataset_factor_results.md) §3). A
+  topologia é a alavanca de fairness defensável; topologias profundas
+  em budget curto eram artefato (confirma a necessidade do Pareto-aware).
 - **H3 (loss)** — Losses quality-adaptive (AdaFace/MagFace) têm
   contribuição marginal positiva e *não-redundante* com a da topologia.
 - **H4 (paradigma)** — O aprendizado contrastivo supervisionado
