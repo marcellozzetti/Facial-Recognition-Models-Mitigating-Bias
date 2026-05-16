@@ -1,3 +1,11 @@
+> ⚠️ **SUPERSEDIDO em parte (2026-05-16):** a comparação do §2 usava o
+> baseline linear de **1 seed**. Recomputado vs o baseline linear de
+> **3 seeds** em [dataset_factor_results.md](dataset_factor_results.md)
+> §3, a contribuição da topologia (MLP trial 4) ao IR passa a ser
+> **estatisticamente significativa** (−0,11). A leitura "não-significativo"
+> abaixo era pessimista por causa do baseline de 1 seed. O resto do
+> documento (variância de seed, HPO-curto superestima) permanece válido.
+
 # Fase 4 — Refit dos Vencedores do Pareto (Fator Topologia)
 
 **Data:** 2026-05-15

@@ -1,3 +1,11 @@
+> ⚠️ **SUPERSEDIDO (2026-05-16) — confound confirmado.** Os números
+> deste doc comparam R1 (torch 2.5+cv2, 1 seed) vs R2 (torch 2.12+PIL,
+> 1 seed) — limpeza confundida com mudança de ambiente. A comparação
+> defensável (3-seed, ambiente único) está em
+> [dataset_factor_results.md](dataset_factor_results.md). **O achado
+> "ArcFace −54% IR" daqui é artefato do confound e NÃO se confirma.**
+> Manter este doc apenas como registro do confound detectado.
+
 # R2 — Effect of Dataset Cleaning on the Baseline Recipes
 
 **Date:** 2026-05-14
