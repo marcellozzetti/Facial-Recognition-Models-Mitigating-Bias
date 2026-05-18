@@ -49,13 +49,21 @@ def _cfg(head: str, loss: str, seed: int) -> dict:
             # AdaFace (paper defaults)
             "adaface_m": 0.4,
             "adaface_h": 0.333,
-            # MagFace (paper defaults; regulariser off so the loss stays
-            # CE-on-margin-logits, matched with ArcFace in the factor study)
+            # MagFace — CANONICAL form. Magnitude regulariser ON:
+            # MagFace's mechanism is inseparable from it (with lambda_g=0
+            # and this backbone's sub-l_a norms the representation
+            # collapses — see scripts/diag_magface_* and
+            # docs/magface_diagnosis.md). Factor 3 evaluates each loss in
+            # its intended configuration (ArcFace/AdaFace/MagFace
+            # canonical). lambda_g calibrated to this backbone's norm
+            # regime: raw norms ~6-14 -> mean g(a)~0.13, so lambda_g=5
+            # makes the pull ~10-30% of CE (the paper's 35 assumes the
+            # paper's magnitude scale).
             "magface_l_a": 10.0,
             "magface_u_a": 110.0,
             "magface_l_m": 0.45,
             "magface_u_m": 0.8,
-            "magface_lambda_g": 0.0,
+            "magface_lambda_g": 5.0,
         },
         "training": {
             "batch_size": 128,

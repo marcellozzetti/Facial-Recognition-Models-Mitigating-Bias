@@ -115,6 +115,21 @@ class Trainer:
             return self.model(images, labels=labels)
         return self.model(images)
 
+    def _magface_reg(self) -> torch.Tensor | float:
+        """Canonical-MagFace magnitude regulariser term, training-only.
+
+        The MagFace head stashes a differentiable ``last_g_reg`` each
+        training forward; canonical MagFace adds ``lambda_g * g`` to the
+        loss (it is what pins ``||f||`` and prevents the collapse — see
+        scripts/diag_magface_*). Zero for every other head, and when
+        ``lambda_g == 0`` (no-op, keeps the ArcFace-matched config valid).
+        """
+        head = getattr(self.model, "head", None)
+        lam = getattr(head, "lambda_g", 0.0)
+        if head is None or lam <= 0.0:
+            return 0.0
+        return lam * head.last_g_reg
+
     def _train_one_epoch(self, dataloader: DataLoader) -> float:
         self.model.train()
         running = 0.0
@@ -128,6 +143,7 @@ class Trainer:
                 with torch.amp.autocast("cuda", dtype=torch.float16):
                     logits = self._forward(images, labels)
                     loss = self.loss_fn(logits, labels)
+                loss = loss + self._magface_reg()
                 self.scaler.scale(loss).backward()
                 if self.grad_clip_norm is not None:
                     self.scaler.unscale_(self.optimizer)
@@ -137,6 +153,7 @@ class Trainer:
             else:
                 logits = self._forward(images, labels)
                 loss = self.loss_fn(logits, labels)
+                loss = loss + self._magface_reg()
                 loss.backward()
                 if self.grad_clip_norm is not None:
                     nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip_norm)

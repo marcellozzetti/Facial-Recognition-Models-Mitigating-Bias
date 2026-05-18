@@ -10,13 +10,19 @@ logits and the head plugs into ``LResNet50E_IR`` unchanged.
 Reference: Meng et al., "MagFace: A Universal Representation for Face
 Recognition and Quality Assessment", CVPR 2021. We implement the
 magnitude→margin schedule ``m(a)`` (linear between ``[l_a,u_a]`` →
-``[l_m,u_m]``). The paper's magnitude regulariser ``g(a)`` is exposed
-as ``last_g_reg`` (mean over the batch) and gated by ``lambda_g``;
-``lambda_g`` defaults to 0.0 so the loss interface stays identical to
-ArcFace. Enabling the regulariser (lambda_g>0) is a documented optional
-extension and requires a loss that reads ``last_g_reg`` — see
-``docs`` / future work. The magnitude-aware margin (the core MagFace
-mechanism being attributed in the loss-factor study) is fully active.
+``[l_m,u_m]``) AND the magnitude regulariser ``g(a)``, exposed
+differentiably as ``last_g_reg`` (mean over the batch) and weighted by
+``lambda_g``; the trainer adds ``lambda_g * last_g_reg`` to the loss.
+
+The regulariser is NOT optional in practice: MagFace's mechanism is
+inseparable from it. Empirically (see ``scripts/diag_magface_*``), with
+``lambda_g=0`` and an ImageNet-pretrained ResNet-50 whose feature norms
+fall below ``l_a``, nothing pins ``||f||`` — the norm and representation
+collapse and the eval head degenerates to a uniform output. ``g(a)`` is
+therefore computed on the *raw, unclamped* norm so its gradient stays
+alive below ``l_a`` (the regime that collapsed); the clamped ``a`` is
+used only for the margin-schedule domain. Canonical MagFace runs set
+``lambda_g>0``.
 """
 
 import torch
@@ -55,9 +61,12 @@ class MagMarginProduct(nn.Module):
         self.weight = nn.Parameter(torch.Tensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
 
-        # Mean magnitude regulariser over the last training batch; a loss
-        # may read this when lambda_g > 0 (optional, default off).
-        self.register_buffer("last_g_reg", torch.tensor(0.0))
+        # Mean magnitude regulariser over the last training batch,
+        # DIFFERENTIABLE. The trainer adds ``lambda_g * last_g_reg`` to
+        # the loss (canonical MagFace). Plain attribute, not a buffer:
+        # it must carry the autograd graph, and it is recomputed every
+        # training forward, so it is never persisted nor moved by .to().
+        self.last_g_reg: torch.Tensor = torch.tensor(0.0)
 
     def _cosine(self, features: torch.Tensor) -> torch.Tensor:
         return F.linear(F.normalize(features), F.normalize(self.weight))
@@ -82,17 +91,46 @@ class MagMarginProduct(nn.Module):
         if label is None:
             return cosine * self.s
 
-        a = torch.norm(features, dim=1, keepdim=True).clamp(self.l_a, self.u_a)
+        raw_norm = torch.norm(features, dim=1, keepdim=True)
+        # The MARGIN treats the magnitude as a *statistic*: detach so it
+        # does not backprop through the norm. Leaving it attached gives
+        # the optimiser a degenerate escape — game ||f|| to shrink the
+        # margin instead of learning angles — which collapses the
+        # representation (real diagnosis; AdaFace detaches for exactly
+        # this reason, and it is the only norm-handling difference
+        # between the head that works and this one). The *intended*
+        # differentiable magnitude objective is solely lambda_g * g(a),
+        # computed below on the un-detached norm — the paper's design.
+        a = raw_norm.detach().clamp(self.l_a, self.u_a)  # margin domain
         m_a = self._m_of_a(a)  # (B, 1) per-sample margin
 
         if self.training:
-            with torch.no_grad():
-                self.last_g_reg = self._g_of_a(a).mean()
+            # MagFace magnitude regulariser, on the RAW (unclamped) norm
+            # and DIFFERENTIABLE. g(a)=1/u_a^2*a + 1/a is convex with
+            # minimum at a=u_a, so -grad pulls ||f|| up. Computing it on
+            # the unclamped norm keeps the gradient alive *below* l_a —
+            # exactly the regime where the norm/representation collapsed
+            # when this term was disabled (lambda_g=0). The trainer adds
+            # lambda_g * last_g_reg to the loss.
+            self.last_g_reg = self._g_of_a(raw_norm.clamp_min(self.eps)).mean()
 
         cos_m = torch.cos(m_a)
         sin_m = torch.sin(m_a)
         sine = torch.sqrt((1.0 - cosine ** 2).clamp_min(self.eps))
         phi = cosine * cos_m - sine * sin_m  # cos(theta + m(a))
+
+        # Monotonicity guard (ArcFace boundary correction), applied
+        # per-sample because the MagFace margin m(a) varies per sample.
+        # When theta + m(a) > pi the raw cos(theta+m) stops decreasing
+        # and turns back up, so a worse angle would yield a *higher*
+        # target logit — inverting the gradient and collapsing the
+        # embedding. Replace that region with the monotone linear
+        # extension cosine - mm. Using cos(pi-x)=-cos(x),
+        # sin(pi-x)=sin(x). Matches the official MagFace/ArcFace
+        # reference (easy_margin=False branch).
+        th = -cos_m  # cos(pi - m(a))
+        mm = sin_m * m_a  # sin(pi - m(a)) * m(a)
+        phi = torch.where(cosine > th, phi, cosine - mm)
 
         one_hot = torch.zeros_like(cosine)
         one_hot.scatter_(1, label.view(-1, 1).long(), 1)

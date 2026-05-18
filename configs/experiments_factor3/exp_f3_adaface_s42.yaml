@@ -20,7 +20,7 @@ model:
   magface_u_a: 110.0
   magface_l_m: 0.45
   magface_u_m: 0.8
-  magface_lambda_g: 0.0
+  magface_lambda_g: 5.0
 training:
   batch_size: 128
   learning_rate: 0.001
