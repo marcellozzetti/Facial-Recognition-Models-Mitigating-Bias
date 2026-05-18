@@ -54,7 +54,7 @@ Decisão registrada como Linha A em [PLANO_TRABALHO.md](PLANO_TRABALHO.md) §1.
 | 2026-05-13/14 | **HPO Round 1** rodado (20 trials × 8 epochs, dataset original, fp32) | [hpo_round1_results.md](hpo_round1_results.md) |
 | 2026-05-14 | Wave 2 de patches: torch 2.5→2.12 (4 CVEs PyTorch fechadas) | [security_audit.md](security_audit.md) |
 | 2026-05-14 | Wins de eficiência aplicados (AMP, persistent_workers, PIL, pre-encode) | — |
-| 2026-05-14 | Auditoria multi-face (MTCNN sobre 97k imagens) | `outputs/audit/multi_face_audit_summary.md` |
+| 2026-05-14 | Auditoria multi-face (MTCNN sobre 97k imagens) | [dataset_audit_findings.md](dataset_audit_findings.md) |
 | 2026-05-14 | Decisão: Opção A (excluir todas as imagens com >1 face) | [r2_clean_dataset_results.md](r2_clean_dataset_results.md) |
 | 2026-05-14 | **R2: Exp 5 + Exp 6 rodados no dataset limpo** (2h) | [r2_clean_dataset_results.md](r2_clean_dataset_results.md) |
 | 2026-05-14 | **HPO Round 2** rodado (20 trials × 8 epochs, dataset limpo, AMP) | [hpo_round2_results.md](hpo_round2_results.md) |
@@ -263,7 +263,9 @@ originais (não as alinhadas) e conta quantas faces cada uma tem.
 
 Custo: ~45 min na 4070 SUPER.
 
-Resultado em `outputs/audit/multi_face_audit_summary.md`:
+Resultado consolidado e committado em
+[dataset_audit_findings.md](dataset_audit_findings.md) (números brutos
+em `outputs/audit/`):
 
 | n_faces | count | % do total |
 |---|---|---|
