@@ -17,7 +17,7 @@ class ModelConfig(BaseModel):
     pretrained: bool = True
     num_classes: int = Field(default=7, ge=2)
     dropout: float = Field(default=0.5, ge=0.0, le=1.0)
-    head: Literal["linear", "arcface", "mlp"] = "linear"
+    head: Literal["linear", "arcface", "mlp", "adaface", "magface"] = "linear"
     arcface_s: float = Field(default=30.0, gt=0)
     arcface_m: float = Field(default=0.5, ge=0.0, lt=1.5)
     arcface_easy_margin: bool = False
@@ -26,6 +26,23 @@ class ModelConfig(BaseModel):
     mlp_activation: Literal["relu", "gelu", "silu", "tanh"] = "relu"
     mlp_dropout: float = Field(default=0.3, ge=0.0, lt=1.0)
     mlp_norm: Literal["none", "batchnorm", "layernorm"] = "none"
+    # AdaFace head (only used when head="adaface"). Defaults from the paper.
+    adaface_m: float = Field(default=0.4, ge=0.0, lt=1.5)
+    adaface_h: float = Field(default=0.333, gt=0)
+    # MagFace head (only used when head="magface"). Defaults from the paper.
+    magface_l_a: float = Field(default=10.0, gt=0)
+    magface_u_a: float = Field(default=110.0, gt=0)
+    magface_l_m: float = Field(default=0.45, ge=0.0, lt=1.5)
+    magface_u_m: float = Field(default=0.8, ge=0.0, lt=1.5)
+    magface_lambda_g: float = Field(default=0.0, ge=0.0)
+
+    @field_validator("magface_u_a")
+    @classmethod
+    def _mag_u_a_gt_l_a(cls, v: float, info) -> float:
+        l_a = info.data.get("magface_l_a", 10.0)
+        if v <= l_a:
+            raise ValueError(f"magface_u_a must be > magface_l_a; got {l_a}, {v}")
+        return v
 
     @field_validator("mlp_hidden_dims")
     @classmethod
@@ -43,7 +60,9 @@ class TrainingConfig(BaseModel):
     num_epochs: int = Field(default=25, ge=1)
     optimizer: Literal["sgd", "adamw"] = "adamw"
     scheduler: Literal["onecyclelr", "cosineannealingwarmrestarts"] = "onecyclelr"
-    loss_function: Literal["cross_entropy", "arcface"] = "cross_entropy"
+    loss_function: Literal[
+        "cross_entropy", "arcface", "adaface", "magface"
+    ] = "cross_entropy"
     test_size: float = Field(default=0.1, gt=0, lt=1)
     val_size: Optional[float] = Field(default=0.1, gt=0, lt=1)
     num_workers: int = Field(default=4, ge=0)

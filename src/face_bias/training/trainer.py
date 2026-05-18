@@ -19,7 +19,12 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from face_bias.evaluation.metrics import classification_metrics, fairness_audit
-from face_bias.models.losses import ArcFaceLoss, CrossEntropyLoss
+from face_bias.models.losses import (
+    AdaFaceLoss,
+    ArcFaceLoss,
+    CrossEntropyLoss,
+    MagFaceLoss,
+)
 from face_bias.training.callbacks import EarlyStopping, ModelCheckpoint
 from face_bias.training.schedulers import is_step_per_batch
 
@@ -52,6 +57,13 @@ def build_loss(config: dict[str, Any]) -> nn.Module:
             margin=config["model"].get("arcface_m", 0.5),
             scale=config["model"].get("arcface_s", 30.0),
         )
+    if name == "adaface":
+        return AdaFaceLoss(
+            margin=config["model"].get("adaface_m", 0.4),
+            scale=config["model"].get("arcface_s", 30.0),
+        )
+    if name == "magface":
+        return MagFaceLoss(scale=config["model"].get("arcface_s", 30.0))
     raise ValueError(f"Unknown loss_function {name!r}")
 
 

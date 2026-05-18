@@ -40,6 +40,13 @@ def _build_model(config: dict, num_classes: int) -> torch.nn.Module:
         mlp_activation=model_cfg.get("mlp_activation", "relu"),
         mlp_dropout=model_cfg.get("mlp_dropout", 0.3),
         mlp_norm=model_cfg.get("mlp_norm", "none"),
+        adaface_m=model_cfg.get("adaface_m", 0.4),
+        adaface_h=model_cfg.get("adaface_h", 0.333),
+        magface_l_a=model_cfg.get("magface_l_a", 10.0),
+        magface_u_a=model_cfg.get("magface_u_a", 110.0),
+        magface_l_m=model_cfg.get("magface_l_m", 0.45),
+        magface_u_m=model_cfg.get("magface_u_m", 0.8),
+        magface_lambda_g=model_cfg.get("magface_lambda_g", 0.0),
     )
 
 
