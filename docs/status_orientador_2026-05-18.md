@@ -2,14 +2,15 @@
 
 **Para:** Prof. Marcos Quiles
 **De:** Marcello Ozzetti
-**Assunto:** Atualização semanal (sessão de 18/05 remarcada) — objetivo, testes de MLP, achados e próximos passos
+**Assunto:** Atualização semanal (sessão de 18/05 remarcada) — objetivo, MLP, auditoria do dataset, achados e próximos passos
 
 ---
 
 Prof. Marcos, segue um resumo objetivo do que avancei nesta semana, já
-que nossa sessão foi remarcada. Organizei em quatro blocos: **objetivo,
-testes de MLP, achados defensáveis e próximos passos**, e deixo **uma
-pergunta** que destrava trabalho enquanto não nos falamos.
+que nossa sessão foi remarcada. Organizei em: **objetivo, testes de
+MLP, auditoria de integridade do dataset, decomposição de fatores e
+próximos passos**, e deixo **uma pergunta** que destrava trabalho
+enquanto não nos falamos.
 
 ## 1. Objetivo do trabalho — travado e validado
 
@@ -59,7 +60,30 @@ completo — exatamente o que justifica a necessidade do critério
 Pareto-aware + etapa de confirmação obrigatória (busca curta de fairness
 é não-confiável; isso vira contribuição metodológica, não só um detalhe).
 
-## 3. Decomposição de fatores — resultados defensáveis
+## 3. Auditoria de integridade do dataset (Diretriz 4)
+
+Rodei o MTCNN sobre as **97 698 imagens originais** do FairFace,
+contando faces por imagem. Esclareço que o problema **não** é
+multi-rótulo (o FairFace tem 1 rótulo por imagem) — é **multi-face**:
+quando há mais de uma pessoa, o rótulo único fica ambíguo.
+
+- **74,5%** das imagens têm 1 face (rótulo unívoco); **25,1%** têm
+  ≥ 2 faces (rótulo ambíguo); **0,4%** não têm face detectável.
+  Há casos extremos de até **20 faces** numa imagem rotulada como
+  retrato individual. **1 em cada 4 imagens do dataset completo carrega
+  rotulação ambígua.**
+- **Achado próprio (independente de modelo):** a taxa de imagens
+  multi-face é **correlacionada com raça** — spread de **9,3 pp**
+  (Black 30,0% vs East Asian 20,7%). A falha de detecção do MTCNN
+  (zero-face) também é racialmente assimétrica, em direção oposta. Ou
+  seja, **o FairFace corrige o desbalanceamento de rótulo mas não o
+  viés de cena/contexto** — fotos de certos grupos vêm mais de
+  contextos coletivos. É um resultado de dataset com valor próprio
+  (candidato a publicação curta).
+- **Decisão:** dataset limpo = apenas `n_faces == 1` → 72 749 imagens
+  (−25,5%); usado como um dos fatores da decomposição (próxima seção).
+
+## 4. Decomposição de fatores — resultados defensáveis
 
 Protocolo adotado para **todos** os experimentos: **3 seeds (42,1,2),
 base de comparação casada, ambiente único, média ± desvio**; ganho
@@ -81,7 +105,7 @@ Achado lateral robusto: a taxa de imagens com múltiplas faces no
 FairFace é **correlacionada com raça** (spread de 9,3 pp entre grupos)
 — viés de cena, além do desbalanceamento de rótulo.
 
-## 4. Próximos passos
+## 5. Próximos passos
 
 - **Fatores 3-5** (função de perda quality-adaptive, aprendizado
   contrastivo, backbone) — medidos um a um no mesmo protocolo
@@ -92,7 +116,7 @@ FairFace é **correlacionada com raça** (spread de 9,3 pp entre grupos)
 - Consolidação do mapa de atribuição (5 fatores) → núcleo da
   qualificação (alvo 24/08).
 
-## 5. Pergunta que destrava trabalho
+## 6. Pergunta que destrava trabalho
 
 Na última conversa o senhor mencionou **"função de pesos"**. Quero
 confirmar a interpretação: o senhor se referia a **loss ponderada por
