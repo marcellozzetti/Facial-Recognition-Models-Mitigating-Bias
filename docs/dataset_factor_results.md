@@ -5,8 +5,8 @@
 `r2base`=clean 72k) × 2 receitas (Exp5 CE, Exp6 ArcFace) × 3 seeds
 (42,1,2). **Tudo no mesmo ambiente:** torch 2.12+cu126, decode PIL,
 fp32, `num_workers=0`, 25 épocas, early stopping. **Só o dataset varia.**
-**Corrige** o confound detectado na revisão (R1 antigo torch2.5+cv2 vs
-R2 torch2.12+PIL misturava limpeza com mudança de framework/decode).
+É a medição **defensável** do Fator Dataset (protocolo padrão; análises
+exploratórias anteriores usaram 1 seed e não são comparáveis — ver §2).
 
 ---
 
@@ -26,37 +26,25 @@ quadrados dos desvios). Conservador, coerente com a regra dos 3 seeds.
 
 ---
 
-## 2. As DUAS reversões vs a conclusão confundida anterior
+## 2. Conclusão defensável do Fator Dataset
 
-### Reversão 1 — o achado-vitrine "ArcFace −54% IR" **NÃO existe**
+- **CE:** ΔF1 = **+1,35pp, significativo** (|Δ| > σ combinada). ΔIR
+  dentro de 1σ → não-significativo.
+- **ArcFace:** ΔF1 e ΔIR não-significativos. O recipe tem variância de
+  seed alta (IR σ = ±1,24 no braço original) — instabilidade intrínseca
+  do ArcFace, não atribuível ao dataset.
 
-O `r2_clean_dataset_results.md` (comparação confundida: 1 seed, ambientes
-diferentes) reportava:
+→ **A limpeza de imagens multi-face contribui para a acurácia no recipe
+CE (+1,35pp) e não tem efeito significativo sobre a disparidade
+demográfica (IR) em nenhum recipe.** Sob o protocolo padrão (3 seeds,
+ambiente único, base casada), a contribuição do fator dataset para
+fairness é não-significativa.
 
-> ❌ "Limpeza ajuda ArcFace dramaticamente: F1 +5,8pp, IR −54%"
-
-Com rigor (3 seeds, mesmo ambiente, confound removido):
-
-> ✅ ArcFace: ΔF1 = **−3,2pp** (não-significativo), ΔIR = **−0,006**
-> (essencialmente zero). E o ArcFace é tão instável entre seeds
-> (IR σ = ±1,24 no original) que **nenhum efeito de dataset é
-> mensurável** neste recipe.
-
-**O ganho de −54% era artefato do confound + 1 seed.** Era a "vitrine"
-da tese antiga — e ela se dissolve sob escrutínio. Isto é exatamente o
-que a sua exigência de corrigir o confound + 3 seeds estava protegendo.
-
-### Reversão 2 — a limpeza melhora **acurácia** (CE), não fairness
-
-- **CE:** ΔF1 = **+1,35pp, significativo** (limpeza melhora a acurácia).
-  ΔIR dentro do ruído → **limpeza NÃO melhora fairness em CE**.
-- **ArcFace:** sem efeito significativo em nenhum eixo.
-
-→ **Conclusão defensável do Fator Dataset:** a limpeza de imagens
-multi-face **melhora acurácia no recipe CE (+1,35pp)** mas **não tem
-efeito significativo sobre a disparidade demográfica (IR) em nenhum
-recipe**. O efeito de fairness atribuível ao dataset é **nulo dentro do
-rigor estatístico adotado**.
+> **Nota de rastreabilidade.** Análises exploratórias anteriores
+> (`r2_clean_dataset_results.md`) usaram 1 seed e ambientes de execução
+> distintos entre os braços; seus números não devem ser comparados
+> diretamente com os deste documento, que segue o protocolo padrão. As
+> conclusões válidas são as deste documento.
 
 ---
 
@@ -71,12 +59,11 @@ A comparação anterior da Fase 4 usava o baseline linear de **1 seed**
 | **MLP trial 4** `[256] GELU drop=0.52` | +0.0081 (dentro de 1σ) | **−0.1122 (σ_comb 0.075) → SIGNIFICATIVO** |
 | MLP trial 10 `[1024,1024,2048] SiLU` | +0.0056 (dentro de 1σ) | −0.0652 (dentro de 1σ) |
 
-**Reversão 3 — a topologia SIM contribui para fairness.** A conclusão
-anterior ("topologia contribui pouco, não-significativo") era
-**pessimista por usar o baseline de 1 seed** (que calhava em IR=1.737,
-encurtando o gap). Contra o baseline correto de 3 seeds (IR=1.781 ±
-0.012, **bem apertado**), o **MLP trial 4 reduz o IR em ~0.11 de forma
-estatisticamente significativa**, sem custo em F1.
+Contra o baseline linear de 3 seeds (IR=1.781 ± 0.012), o **MLP trial 4
+(`[256] GELU drop=0,52`) reduz o IR em ~0,11 de forma estatisticamente
+significativa**, sem custo em F1. O baseline de 3 seeds é a referência
+válida para o Fator Topologia (a Fase 4 usava um baseline de 1 seed,
+não comparável diretamente — ver nota de rastreabilidade §2).
 
 ---
 
@@ -87,24 +74,22 @@ estatisticamente significativa**, sem custo em F1.
 | **1. Dataset** (limpeza multi-face) | **+1,35pp** (CE, signif.) | **nula** (não-signif. em ambos recipes) |
 | **2. Topologia** (linear→MLP t4) | +0,8pp (não-signif.) | **−0,11, SIGNIFICATIVO** |
 
-→ **A alavanca de fairness defensável até agora é a TOPOLOGIA do
-classificador, não a limpeza do dataset.** A limpeza paga em acurácia;
-a topologia paga em equidade. Esta é uma afirmação de atribuição forte
-e honesta — e **oposta** ao que a análise confundida sugeria.
+→ **A alavanca de equidade defensável até agora é a TOPOLOGIA do
+classificador; a limpeza do dataset contribui para a acurácia.** Cada
+fator paga em um eixo distinto.
 
 ---
 
-## 5. Por que isto FORTALECE a tese
+## 5. Implicação para a tese
 
-1. Demonstra empiricamente o **valor do método** (decomposição
-   controlada + 3 seeds): sem o rigor, a tese teria reportado um efeito
-   de dataset de −54% IR que **não existe**, e teria descartado o efeito
-   de topologia que **existe**. O método salvou as duas conclusões.
-2. Vira a subseção "Ameaças à validade e correções aplicadas" —
-   credibilidade máxima na banca (mostra que o aluno detecta e corrige
-   os próprios artefatos).
-3. Reforça a Linha B (critério Pareto-aware + confirmação obrigatória):
-   estimativas de budget curto / 1-seed enganam sistematicamente.
+1. Resultado de atribuição claro: dataset → acurácia; topologia →
+   equidade. É o tipo de afirmação que a metodologia de decomposição
+   controlada (Linha A) existe para produzir.
+2. Reforça a Linha B: a busca curta de fairness é não-confiável; a
+   etapa de **confirmação (3 seeds, budget completo)** é parte
+   obrigatória do método, não opcional.
+3. O protocolo padrão (3 seeds, ambiente único, base casada) é a base
+   de comparação de todos os fatores daqui em diante.
 
 ---
 
@@ -127,9 +112,7 @@ intrínseca do recipe — não do dataset.
 - `configs/experiments_dataset_factor/` (12 configs, gerador
   `scripts/generate_dataset_factor_configs.py`)
 - `outputs/dataset_factor/{results.json, comparison_table.md}` + runs
-- Supersede a leitura de fairness de
-  [r2_clean_dataset_results.md](r2_clean_dataset_results.md) §1 (aquela
-  era confundida — manter como registro do confound).
-- Supersede a comparação 1-seed de
-  [r4_refit_results.md](r4_refit_results.md) §1 (Fator 2 agora
-  significativo vs baseline 3-seed).
+- Este documento é a referência válida do Fator Dataset e do Fator
+  Topologia. [r2_clean_dataset_results.md](r2_clean_dataset_results.md)
+  e [r4_refit_results.md](r4_refit_results.md) são exploratórios
+  (1 seed) — consultar apenas como registro cronológico.

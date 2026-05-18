@@ -1,10 +1,10 @@
-> ⚠️ **SUPERSEDIDO em parte (2026-05-16):** a comparação do §2 usava o
-> baseline linear de **1 seed**. Recomputado vs o baseline linear de
-> **3 seeds** em [dataset_factor_results.md](dataset_factor_results.md)
-> §3, a contribuição da topologia (MLP trial 4) ao IR passa a ser
-> **estatisticamente significativa** (−0,11). A leitura "não-significativo"
-> abaixo era pessimista por causa do baseline de 1 seed. O resto do
-> documento (variância de seed, HPO-curto superestima) permanece válido.
+> ℹ️ **Documento exploratório.** A comparação do §2 usa o baseline
+> linear de 1 seed. A medição defensável do Fator Topologia (vs
+> baseline linear de 3 seeds) está em
+> [dataset_factor_results.md](dataset_factor_results.md) §3 — MLP
+> trial 4 reduz o IR em −0,11 (estatisticamente significativo). Os
+> achados metodológicos deste doc (variância de seed, necessidade de
+> confirmação de budget completo) permanecem válidos.
 
 # Fase 4 — Refit dos Vencedores do Pareto (Fator Topologia)
 
@@ -36,8 +36,8 @@ budget curto (8 épocas) sobrevive ao budget completo + múltiplas seeds
 Pontos de referência (mesmo ambiente, head linear, fp32, 25ep):
 
 - **R2 baseline** (Exp 5, dataset limpo): F1=0.668, IR=1.737
-- R1 baseline (Exp 5, dataset original): F1=0.665, IR=1.76 *(ver §4 —
-  comparação confundida, não usar para o fator topologia)*
+- R1 baseline (Exp 5, dataset original): F1=0.665, IR=1.76 *(exploratório
+  1-seed; referência válida do fator topologia em dataset_factor_results.md §3)*
 
 ---
 

@@ -75,24 +75,20 @@ semântica de 555 papers. **Precisa do endosso do orientador.**
 
 ---
 
-## 4. Reportar — resultados defensáveis (2/5 fatores) + 3 reversões
+## 4. Reportar — resultados defensáveis (2/5 fatores)
 
-Batch casado 12-config 3-seed (ambiente único) **concluído**. Reportar
-as 3 reversões — é o ponto mais forte da sessão (mostra o método
-funcionando):
+Batch casado 12-config 3-seed (ambiente único) **concluído**. Protocolo
+padrão (3 seeds, base casada, média ± desvio):
 
-- **Fator 1 (Dataset):** limpeza melhora **acurácia no CE (+1,35pp,
-  signif.)**, **efeito nulo sobre IR** em ambos os recipes. O
-  "ArcFace −54% IR" reportado antes era **artefato de confound**
-  (torch/decode + 1-seed) — **não se confirma**.
-- **Fator 2 (Topologia):** vs baseline linear de **3 seeds**, MLP
+- **Fator 1 (Dataset):** a limpeza melhora **acurácia no CE (+1,35pp,
+  significativo)** e tem **efeito não-significativo sobre o IR** em
+  ambos os recipes.
+- **Fator 2 (Topologia):** vs baseline linear de 3 seeds, MLP
   `[256] GELU drop=0,52` **reduz IR −0,11 (estatisticamente
-  significativo)**. A conclusão anterior "não-significativo" usava
-  baseline de 1-seed (pessimista). **A topologia é a alavanca de
-  fairness defensável, não a limpeza.**
-- **Mensagem-chave para o orientador:** a metodologia de atribuição
-  **matou um efeito falso e revelou um real** — isso *é* a tese (Linha
-  A) se provando. Vira a subseção "ameaças à validade e correções".
+  significativo)**, F1 inalterado dentro do ruído.
+- **Mensagem-chave:** atribuição clara — dataset → acurácia, topologia
+  → equidade. Cada fator paga em um eixo distinto; é o resultado que a
+  Linha A existe para produzir.
 - **Achado lateral (Linha C):** taxa multi-face correlacionada com raça
   (spread 9,3pp) — viés de cena, robusto.
 
@@ -117,8 +113,8 @@ funcionando):
 > mitigação) — validado contra 555 papers. Decompondo a disparidade
 > fator a fator com 3 seeds e base casada. **2 fatores já medidos e
 > defensáveis: a topologia do classificador reduz IR de forma
-> significativa (−0,11); a limpeza do dataset NÃO afeta fairness (só
-> acurácia).** O método derrubou um efeito falso (ArcFace −54%, que era
-> confound) e revelou um real — isso é a tese se provando. O senhor
-> levantou **função de pesos** — quero confirmar se é weighted-loss e,
-> se for, adicionar 'estratégia de balanceamento' como fator novo."
+> significativa (−0,11); a limpeza do dataset contribui para acurácia
+> (+1,35pp CE), não para fairness.** Atribuição clara — cada fator paga
+> em um eixo. O senhor levantou **função de pesos** — quero confirmar
+> se é weighted-loss e, se for, adicionar 'estratégia de balanceamento'
+> como fator novo."

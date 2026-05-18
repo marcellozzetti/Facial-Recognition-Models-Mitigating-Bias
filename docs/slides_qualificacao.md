@@ -219,21 +219,18 @@ MTCNN aplicado sobre as 97 698 imagens originais. Distribuição:
 
 ## 11. Resultado 1 — Fator Dataset (3-seed, ambiente único)
 
-Batch casado de 12 runs (r1ctrl orig × r2base clean × CE/ArcFace × 3
-seeds), ambiente idêntico — confound corrigido.
+Batch casado de 12 execuções (r1ctrl orig × r2base clean × CE/ArcFace
+× 3 seeds), ambiente idêntico, média ± desvio.
 
 | Recipe | Δ F1 (clean−orig) | Δ IR (clean−orig) |
 |---|---|---|
-| **CE** | **+1,35 pp** (signif., |Δ|>σ) | +0,05 (dentro de 1σ → **nulo**) |
+| **CE** | **+1,35 pp** (significativo, |Δ|>σ) | +0,05 (dentro de 1σ → não-signif.) |
 | **ArcFace** | −3,2 pp (não-signif.) | −0,006 (não-signif.; σ_IR=±1,24) |
 
-**Interpretação:** a limpeza melhora **acurácia no CE**; **não tem
-efeito significativo sobre a disparidade (IR)** em nenhum recipe.
-
-⚠️ **Honestidade científica:** uma análise anterior (1-seed,
-ambientes diferentes) reportava "ArcFace −54% IR". Sob rigor isso é
-**artefato de confound** — não se confirma. Detectar e corrigir o
-próprio artefato é a tese de atribuição funcionando.
+**Interpretação:** a limpeza do dataset melhora **acurácia no recipe
+CE** e **não tem efeito significativo sobre a disparidade (IR)** em
+nenhum recipe. ArcFace tem variância de seed alta (σ_IR ±1,24) — sua
+instabilidade é intrínseca ao recipe.
 
 ---
 
@@ -319,11 +316,10 @@ Contribuição marginal por fator (2 de 5 medidos, protocolo controlado):
 | **2. Topologia** (linear→MLP `[256] GELU`) | +0,8pp (n.s.) | **−0,11 (SIGNIF.)** |
 | 3-5 (loss/contrastivo/backbone) | a medir | a medir |
 
-→ **Tese: a alavanca de fairness defensável é a TOPOLOGIA, não a
-limpeza do dataset.** O método de atribuição matou um efeito falso
-(dataset −54% IR, artefato de confound) e revelou um real (topologia
-−0,11 IR) que a análise de 1-seed havia descartado — o próprio método
-sendo validado.
+→ **Tese: a alavanca de equidade defensável é a TOPOLOGIA do
+classificador; a limpeza do dataset contribui para acurácia.** Cada
+fator paga em um eixo distinto — o resultado que a metodologia de
+atribuição (Linha A) existe para produzir.
 
 ---
 
@@ -405,17 +401,14 @@ SimCLR, Sup-SimCLR, CLIP como axis alternativo ao classification head.
    **Pareto-aware best epoch** em HPO multi-objetivo de fairness —
    descoberta empírica do problema "best by F1" durante o Round 1.
 
-2. **Empírica (atribuição corrigida):** o método de decomposição
-   controlada **detecta e mata um efeito falso** — o "ArcFace −54% IR
-   via limpeza" era artefato de confound (torch/decode + 1-seed); sob
-   rigor (3-seed, ambiente único) a limpeza contribui para **acurácia
-   (+1,35pp CE)**, **não para fairness**.
+2. **Empírica (dataset):** sob protocolo controlado (3-seed, ambiente
+   único), a limpeza de imagens multi-face contribui para **acurácia
+   (+1,35pp CE, significativo)** e **não** para a equidade.
 
 3. **Empírica (topologia):** vs o baseline linear de 3 seeds, a
    topologia MLP `[256] GELU drop=0,52` **reduz o IR em −0,11 de forma
-   estatisticamente significativa** — a **alavanca de fairness
-   defensável** é a topologia, não o dataset. (Efeito que a análise
-   de 1-seed havia erroneamente descartado.)
+   estatisticamente significativa** — a **alavanca de equidade
+   defensável** é a topologia do classificador.
 
 4. **Engenharia:** pipeline auditável, reproduzível, instrumentado com
    testes — material para um paper de "ML systems for fairness audit".

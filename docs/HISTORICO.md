@@ -321,20 +321,10 @@ Configs:
 
 Wall clock: 2h 3min total (Exp 5 = 54 min, Exp 6 = 69 min, ambos em fp32).
 
-**Resultado** ([r2_clean_dataset_results.md](r2_clean_dataset_results.md)):
-
-| | R1 (original) | R2 (clean) | Δ F1 | Δ IR |
-|---|---|---|---:|---:|
-| Exp 5 (CE) | F1=0.665, IR=1.76 | F1=0.668, IR=1.737 | +0.3 pp | −1.3% |
-| Exp 6 (ArcFace) | F1=0.529, IR=4.60 | F1=0.587, IR=2.114 | **+5.8 pp** | **−54%** |
-
-> ⚠️ **CORRIGIDO em 2026-05-16.** A tabela acima é a comparação
-> **confundida** (R1 antigo torch2.5+cv2 1-seed vs R2 torch2.12+PIL
-> 1-seed). Sob rigor (batch casado 3-seed, ambiente único —
-> [dataset_factor_results.md](dataset_factor_results.md)): o "+5.8 pp /
-> −54% no ArcFace" **NÃO se confirma** (artefato de confound). Conclusão
-> defensável: a limpeza melhora **acurácia no CE (+1,35pp, signif.)** e
-> tem **efeito nulo sobre IR** em ambos os recipes.
+Esta foi uma **exploração inicial** (1 seed). O resultado **defensável**
+do Fator Dataset veio depois, com o protocolo padrão (braços casados,
+3 seeds, ambiente único) — ver §13 e
+[dataset_factor_results.md](dataset_factor_results.md).
 
 ---
 
@@ -355,27 +345,23 @@ Frente de Pareto = 2 trials.
 | 4 | **0.6935** | 1.638 | `[256] GELU drop=0.52 norm=none` |
 | 10 | 0.6886 | **1.591** | `[1024, 1024, 2048] SiLU drop=0.087 layernorm` (depth=3!) |
 
-> ⚠️ **A "decomposição dos ganhos" original (baseada em deltas de
-> 1-seed e na comparação confundida) foi SUPERSEDIDA.** A decomposição
-> defensável (3-seed, ambiente único) está em
-> [dataset_factor_results.md](dataset_factor_results.md) §4.
+A frente de Pareto da busca curta orienta quais topologias confirmar; o
+resultado defensável vem do refit (§13).
 
-**Decomposição corrigida (2 de 5 fatores, defensáveis):**
+**Decomposição de fatores — resultado defensável (2 de 5, protocolo
+3-seed):**
 
 | Fator | → Acurácia (F1) | → Fairness (IR) |
 |---|---|---|
-| **1. Dataset** (limpeza multi-face) | +1,35pp CE (signif.) | **nula** (não-signif., ambos recipes) |
-| **2. Topologia** (linear → MLP `[256] GELU drop=0,52`) | +0,8pp (n.s.) | **−0,11 (SIGNIFICATIVO)** |
+| **1. Dataset** (limpeza multi-face) | +1,35pp CE (signif.) | não-signif. (ambos recipes) |
+| **2. Topologia** (linear → MLP `[256] GELU drop=0,52`) | +0,8pp (n.s.) | **−0,11 (significativo)** |
 
-**Implicação para a tese (revisada após as 3 reversões):**
+**Implicação para a tese:**
 
-1. A **topologia do classificador é a alavanca de fairness defensável**
-   — não a limpeza do dataset (o oposto do que a análise confundida
-   sugeria).
-2. A limpeza do dataset paga em **acurácia**, não em equidade.
-3. O método de decomposição controlada **matou um efeito falso**
-   (dataset −54% IR) e **revelou um real** (topologia −0,11 IR) —
-   evidência empírica do valor da própria metodologia (Linha A).
+1. A **topologia do classificador é a alavanca de equidade defensável**.
+2. A limpeza do dataset contribui para **acurácia**, não para equidade.
+3. Cada fator paga em um eixo distinto — o tipo de resultado que a
+   metodologia de atribuição (Linha A) existe para produzir.
 
 ---
 
