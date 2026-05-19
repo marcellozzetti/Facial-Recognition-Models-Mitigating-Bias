@@ -81,18 +81,25 @@ def _to_array(values: Iterable[float]) -> np.ndarray:
     return arr
 
 
-def inequity_rate(per_group_score: Iterable[float]) -> float:
+def disparity_ratio(per_group_score: Iterable[float]) -> float:
     """max(score) / min(score) over groups — 1.0 means perfectly fair.
 
-    Follows Pereira & Marcel's framing for biometric verification, adapted
-    here to per-class classification scores. Returns +inf if any group has
-    a score of zero.
+    Honest name (desk-check decision ii): this is a per-class
+    **disparity ratio**, NOT the canonical Inequity Rate of Pereira &
+    Marcel — that one is verification-specific (product of FMR and FNMR
+    ratios) and undefined for multi-class attribute classification (no
+    FMR/FNMR here). ``inequity_rate`` is kept as a backward-compatible
+    alias. Returns +inf if any group has a score of zero.
     """
     arr = _to_array(per_group_score)
     lo, hi = float(arr.min()), float(arr.max())
     if lo <= 0:
         return float("inf") if hi > 0 else 0.0
     return hi / lo
+
+
+# Backward-compatible alias (old code/history/scripts use this name).
+inequity_rate = disparity_ratio
 
 
 def max_min_disparity(per_group_score: Iterable[float]) -> float:
@@ -139,7 +146,8 @@ def fairness_audit(
             "max": float(scores.max()),
             "mean": float(scores.mean()),
             "std": float(scores.std(ddof=0)),
-            "inequity_rate": inequity_rate(scores),
+            "disparity_ratio": disparity_ratio(scores),
+            "inequity_rate": disparity_ratio(scores),  # legacy mirror
             "max_min_disparity": max_min_disparity(scores),
             "coefficient_of_variation": coefficient_of_variation(scores),
             "gini": gini_coefficient(scores),

@@ -69,7 +69,13 @@ class TrainingConfig(BaseModel):
     random_state: int = 42
     # Gradient-norm clipping; None disables it.
     grad_clip_norm: Optional[float] = Field(default=5.0, gt=0)
-    # Early stopping on val_loss; null disables it.
+    # Model-selection / early-stopping metric. Default is the task
+    # metric (macro-F1): val_loss is anti-correlated with F1 for margin
+    # heads (plain-cosine eval logits) and biases the loss-factor study.
+    checkpoint_metric: Literal[
+        "val_loss", "val_f1_macro", "val_accuracy"
+    ] = "val_f1_macro"
+    # Early stopping on the checkpoint_metric; null disables it.
     early_stopping_patience: Optional[int] = Field(default=5, ge=1)
     # DataLoader prefetch_factor (only used when num_workers > 0).
     prefetch_factor: int = Field(default=4, ge=1)

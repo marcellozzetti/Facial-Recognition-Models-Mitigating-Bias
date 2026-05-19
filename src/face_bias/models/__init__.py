@@ -9,7 +9,7 @@ from face_bias.models.losses import (
 )
 from face_bias.models.magface import MagMarginProduct
 from face_bias.models.mlp_head import MLPHead
-from face_bias.models.resnet import LResNet50E_IR
+from face_bias.models.resnet import LResNet50E_IR, ResNet50ImageNet
 
 __all__ = [
     "AdaFaceLoss",
@@ -19,6 +19,7 @@ __all__ = [
     "BaseModel",
     "CrossEntropyLoss",
     "LResNet50E_IR",
+    "ResNet50ImageNet",
     "MagFaceLoss",
     "MagMarginProduct",
     "MLPHead",

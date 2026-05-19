@@ -84,6 +84,7 @@ class Trainer:
         mlflow_run=None,
         grad_clip_norm: float | None = 5.0,
         use_amp: bool = False,
+        monitor: str = "val_f1_macro",
     ):
         self.model = model.to(device)
         self.loss_fn = loss_fn
@@ -92,7 +93,17 @@ class Trainer:
         self.device = device
         self.class_names = class_names
         self.checkpoint_dir = Path(checkpoint_dir)
-        self.checkpoint = ModelCheckpoint(self.checkpoint_dir, mode="min", filename="best.pt")
+        # Model-selection metric. ``val_loss`` is WRONG for margin heads:
+        # their eval logits are plain scaled cosine (no margin), so the
+        # eval CE is anti-correlated with F1/accuracy — best-by-min-val-loss
+        # picks an early, bad epoch and the bias is loss-family-dependent
+        # (corrupts ArcFace/AdaFace/MagFace, not softmax+CE). Default is
+        # the task metric. See docs/checkpoint_criterion_audit.md.
+        self._monitor = monitor
+        self._monitor_mode = "min" if monitor == "val_loss" else "max"
+        self.checkpoint = ModelCheckpoint(
+            self.checkpoint_dir, mode=self._monitor_mode, filename="best.pt"
+        )
         self.last_checkpoint_path = self.checkpoint_dir / "last.pt"
         self.early_stopping = early_stopping
         self.mlflow_run = mlflow_run
@@ -221,7 +232,13 @@ class Trainer:
                 "val_loss": val_metrics["loss"],
                 "val_accuracy": val_metrics["accuracy"],
                 "val_f1_macro": val_metrics["f1_macro"],
-                "val_f1_inequity_rate": val_metrics["fairness"]["f1"]["inequity_rate"],
+                "val_f1_disparity_ratio": val_metrics["fairness"]["f1"][
+                    "disparity_ratio"
+                ],
+                # legacy mirror so old analysis scripts/history stay valid
+                "val_f1_inequity_rate": val_metrics["fairness"]["f1"][
+                    "inequity_rate"
+                ],
                 "elapsed_s": elapsed,
             }
             history.append(entry)
@@ -231,9 +248,15 @@ class Trainer:
                 "val_IR={val_f1_inequity_rate:.3f} t={elapsed_s:.1f}s".format(**entry)
             )
 
+            monitored = {
+                "val_loss": val_metrics["loss"],
+                "val_f1_macro": val_metrics["f1_macro"],
+                "val_accuracy": val_metrics["accuracy"],
+            }[self._monitor]
+
             self._mlflow_log(entry)
             self.checkpoint.step(
-                val_metrics["loss"],
+                monitored,
                 self.model,
                 extra={"epoch": epoch, "metrics": entry, "class_names": self.class_names},
             )
@@ -245,7 +268,7 @@ class Trainer:
                 class_names=self.class_names,
             )
 
-            if self.early_stopping is not None and self.early_stopping.step(val_metrics["loss"]):
+            if self.early_stopping is not None and self.early_stopping.step(monitored):
                 logging.info(f"Early stopping triggered at epoch {epoch}")
                 break
 

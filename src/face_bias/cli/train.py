@@ -139,10 +139,17 @@ def main(argv: list[str] | None = None) -> int:
 
     mlflow_run = _maybe_start_mlflow(run_id, config, output_root / "mlruns")
 
+    monitor = config["training"].get("checkpoint_metric", "val_f1_macro")
+    monitor_mode = "min" if monitor == "val_loss" else "max"
     patience = config["training"].get("early_stopping_patience")
-    early_stopping = EarlyStopping(patience=patience, mode="min") if patience else None
+    early_stopping = (
+        EarlyStopping(patience=patience, mode=monitor_mode) if patience else None
+    )
     if early_stopping is not None:
-        logging.info(f"EarlyStopping enabled (mode=min, patience={patience} epochs on val_loss)")
+        logging.info(
+            f"EarlyStopping enabled (mode={monitor_mode}, patience={patience} "
+            f"epochs on {monitor})"
+        )
 
     trainer = Trainer(
         model=model,
@@ -156,6 +163,7 @@ def main(argv: list[str] | None = None) -> int:
         early_stopping=early_stopping,
         grad_clip_norm=config["training"].get("grad_clip_norm"),
         use_amp=config["training"].get("use_amp", False),
+        monitor=monitor,
     )
 
     result = trainer.fit(

@@ -47,9 +47,15 @@ class AdaMarginProduct(nn.Module):
         self.weight = nn.Parameter(torch.Tensor(out_features, in_features))
         nn.init.xavier_uniform_(self.weight)
 
-        # Running batch statistics of the feature norm (EMA, like the paper).
-        self.register_buffer("batch_mean", torch.tensor(20.0))
-        self.register_buffer("batch_std", torch.tensor(100.0))
+        # Running batch statistics of the feature norm (EMA, like the
+        # paper). Init near THIS backbone's measured regime (probe:
+        # ||f|| ~ 9 ± 2 for ImageNet ResNet-50 @224 on FairFace) instead
+        # of the paper's scratch-IR-scale defaults (20/100). With
+        # momentum 0.99 a far-off init keeps ẑ≈0 (margin ≈ constant) for
+        # hundreds of batches, delaying AdaFace's adaptive behaviour —
+        # see docs/formula_desk_check.md §2.2.
+        self.register_buffer("batch_mean", torch.tensor(9.0))
+        self.register_buffer("batch_std", torch.tensor(2.0))
 
     def _cosine(self, features: torch.Tensor) -> torch.Tensor:
         return F.linear(F.normalize(features), F.normalize(self.weight))

@@ -33,8 +33,19 @@ HeadType = Literal["linear", "arcface", "mlp", "adaface", "magface"]
 _MARGIN_HEADS = ("arcface", "adaface", "magface")
 
 
-class LResNet50E_IR(nn.Module):
-    """ResNet50-based model tailored for facial recognition tasks."""
+class ResNet50ImageNet(nn.Module):
+    """ImageNet-pretrained torchvision ResNet-50 + configurable head.
+
+    NOTE (honesty / literature fidelity): this is **torchvision
+    ``resnet50(weights=ImageNet)``** with ``fc=Identity`` (2048-d
+    embedding, 224x224 input, transfer learning) — it is NOT
+    insightface's ``LResNet50E-IR`` (IR blocks, 112px, 512-d,
+    scratch-trained). The legacy name ``LResNet50E_IR`` is kept below as
+    a backward-compat alias (configs/MBA used that misnomer
+    consistently — same architecture, so no MBA↔thesis confound). The
+    real IR/ViT backbone is the Factor-5 axis. See
+    docs/formula_desk_check.md §3.
+    """
 
     def __init__(
         self,
@@ -130,3 +141,10 @@ class LResNet50E_IR(nn.Module):
 
         # linear / mlp: plain logits, labels ignored.
         return self.head(features)
+
+
+# Backward-compatible alias: the project (MBA + thesis) historically
+# named this class ``LResNet50E_IR`` (a misnomer — see class docstring).
+# Kept so existing imports, configs and checkpoints keep working
+# unchanged while the honest name ``ResNet50ImageNet`` is canonical.
+LResNet50E_IR = ResNet50ImageNet
