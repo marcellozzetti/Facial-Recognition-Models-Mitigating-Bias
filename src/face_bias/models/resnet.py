@@ -23,6 +23,7 @@ from torchvision.models import ResNet50_Weights
 
 from face_bias.models.adaface import AdaMarginProduct
 from face_bias.models.arc_margin import ArcMarginProduct
+from face_bias.models.contrastive import ProjectionHead
 from face_bias.models.magface import MagMarginProduct
 from face_bias.models.mlp_head import Activation, MLPHead, Norm
 
@@ -67,6 +68,8 @@ class ResNet50ImageNet(nn.Module):
         magface_l_m: float = 0.45,
         magface_u_m: float = 0.8,
         magface_lambda_g: float = 0.0,
+        contrastive_proj_dim: int | None = None,
+        contrastive_proj_hidden: int = 512,
     ):
         super().__init__()
         if num_classes is None:
@@ -123,10 +126,27 @@ class ResNet50ImageNet(nn.Module):
                 norm=mlp_norm,
             )
 
+        # Optional SupCon projection head (Factor 4 — contrastive
+        # paradigm). None unless contrastive_proj_dim is set, so every
+        # other factor/config/checkpoint is byte-identical. Lives in the
+        # model so its params are optimised (optimizer = model.parameters()).
+        self.projection: nn.Module | None = (
+            ProjectionHead(in_features, contrastive_proj_hidden, contrastive_proj_dim)
+            if contrastive_proj_dim
+            else None
+        )
+
     def extract_features(self, x: torch.Tensor) -> torch.Tensor:
         """Return the embedding (pre-head) for downstream similarity tasks."""
         features = self.backbone(x)
         return self.dropout(features)
+
+    def project(self, features: torch.Tensor) -> torch.Tensor:
+        """L2-normalised contrastive projection of pre-head features.
+        Requires the model to have been built with contrastive_proj_dim."""
+        if self.projection is None:
+            raise RuntimeError("projection head not built (contrastive_proj_dim unset)")
+        return self.projection(features)
 
     def forward(self, x: torch.Tensor, labels: torch.Tensor | None = None) -> torch.Tensor:
         features = self.extract_features(x)

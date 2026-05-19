@@ -25,6 +25,7 @@ from face_bias.models.losses import (
     CrossEntropyLoss,
     MagFaceLoss,
 )
+from face_bias.models.contrastive import SupConLoss
 from face_bias.training.callbacks import EarlyStopping, ModelCheckpoint
 from face_bias.training.schedulers import is_step_per_batch
 
@@ -85,6 +86,7 @@ class Trainer:
         grad_clip_norm: float | None = 5.0,
         use_amp: bool = False,
         monitor: str = "val_f1_macro",
+        contrastive: dict | None = None,
     ):
         self.model = model.to(device)
         self.loss_fn = loss_fn
@@ -116,6 +118,23 @@ class Trainer:
         # refit at 25 epochs) flip ``training.use_amp: true`` in their YAML.
         self.use_amp = use_amp and device.type == "cuda"
         self.scaler = torch.amp.GradScaler("cuda") if self.use_amp else None
+        # Factor 4 — canonical SupCon, one-stage joint. Disabled unless
+        # the config enables it AND the model has a projection head.
+        c = contrastive or {}
+        self._contrastive_on = bool(c.get("enabled")) and getattr(
+            self.model, "projection", None
+        ) is not None
+        self._contrastive_lambda = float(c.get("lambda_weight", 0.5))
+        self._supcon = (
+            SupConLoss(temperature=float(c.get("temperature", 0.07)))
+            if self._contrastive_on
+            else None
+        )
+        if self._contrastive_on:
+            logging.info(
+                f"Contrastive (SupCon) ON: lambda={self._contrastive_lambda} "
+                f"temperature={c.get('temperature', 0.07)}"
+            )
 
     # ---- one epoch ----
 
@@ -141,6 +160,21 @@ class Trainer:
             return 0.0
         return lam * head.last_g_reg
 
+    def _contrastive_term(
+        self, images: torch.Tensor, labels: torch.Tensor
+    ) -> torch.Tensor | float:
+        """Factor-4 SupCon term: lambda * SupCon(projection, labels).
+
+        Training-only; 0.0 for every other factor (disabled). One extra
+        backbone forward (extract_features) — acceptable: only the
+        Factor-4 runs pay it, correctness over speed.
+        """
+        if not self._contrastive_on:
+            return 0.0
+        feats = self.model.extract_features(images)
+        z = self.model.project(feats)
+        return self._contrastive_lambda * self._supcon(z, labels)
+
     def _train_one_epoch(self, dataloader: DataLoader) -> float:
         self.model.train()
         running = 0.0
@@ -154,6 +188,7 @@ class Trainer:
                 with torch.amp.autocast("cuda", dtype=torch.float16):
                     logits = self._forward(images, labels)
                     loss = self.loss_fn(logits, labels)
+                    loss = loss + self._contrastive_term(images, labels)
                 loss = loss + self._magface_reg()
                 self.scaler.scale(loss).backward()
                 if self.grad_clip_norm is not None:
@@ -164,6 +199,7 @@ class Trainer:
             else:
                 logits = self._forward(images, labels)
                 loss = self.loss_fn(logits, labels)
+                loss = loss + self._contrastive_term(images, labels)
                 loss = loss + self._magface_reg()
                 loss.backward()
                 if self.grad_clip_norm is not None:

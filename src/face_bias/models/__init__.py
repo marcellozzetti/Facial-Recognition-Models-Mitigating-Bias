@@ -1,6 +1,7 @@
 from face_bias.models.adaface import AdaMarginProduct
 from face_bias.models.arc_margin import ArcMarginProduct
 from face_bias.models.base import BaseModel
+from face_bias.models.contrastive import ProjectionHead, SupConLoss
 from face_bias.models.losses import (
     AdaFaceLoss,
     ArcFaceLoss,
@@ -23,4 +24,6 @@ __all__ = [
     "MagFaceLoss",
     "MagMarginProduct",
     "MLPHead",
+    "ProjectionHead",
+    "SupConLoss",
 ]

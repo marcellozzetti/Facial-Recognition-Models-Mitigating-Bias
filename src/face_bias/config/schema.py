@@ -52,6 +52,24 @@ class ModelConfig(BaseModel):
         return v
 
 
+class ContrastiveConfig(BaseModel):
+    """Factor 4 — canonical SupCon as a one-stage joint term.
+
+    total loss = CE(head) + lambda * SupCon(projection). Disabled by
+    default (every other factor/config is unaffected). Single-view
+    in-batch SupCon — see docs/sota_pdf_synthesis.md §2.1.
+    """
+
+    model_config = ConfigDict(extra="ignore")
+
+    enabled: bool = False
+    method: Literal["supcon"] = "supcon"
+    temperature: float = Field(default=0.07, gt=0)
+    lambda_weight: float = Field(default=0.5, ge=0)
+    proj_dim: int = Field(default=128, ge=2)
+    proj_hidden: int = Field(default=512, ge=2)
+
+
 class TrainingConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -75,6 +93,9 @@ class TrainingConfig(BaseModel):
     checkpoint_metric: Literal[
         "val_loss", "val_f1_macro", "val_accuracy"
     ] = "val_f1_macro"
+    # Factor 4 — contrastive paradigm (canonical SupCon, one-stage
+    # joint). null/absent => disabled (no effect on other factors).
+    contrastive: Optional[ContrastiveConfig] = None
     # Early stopping on the checkpoint_metric; null disables it.
     early_stopping_patience: Optional[int] = Field(default=5, ge=1)
     # DataLoader prefetch_factor (only used when num_workers > 0).
