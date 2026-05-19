@@ -373,6 +373,13 @@ Resumo do delta defendido na qualificação:
 
 ---
 
+> **Síntese dos 5 PDFs sinalizados (2026-05-19):** extração estruturada
+> + veredito de novidade em
+> [sota_pdf_synthesis.md](sota_pdf_synthesis.md). Resumo: deltas
+> resistem; o adjacente a blindar é **U-FaTE (CVPR'24)** para o delta #2
+> (fronteira utilidade-fairness ≠ critério de seleção); **FineFACE**
+> é concorrente de *mitigação* (não de *atribuição*).
+
 ## 7. Próximos passos da revisão (passada definitiva)
 
 1. **Diretriz 8:** rodar `scripts/semantic_search_corpus.py` sobre as
