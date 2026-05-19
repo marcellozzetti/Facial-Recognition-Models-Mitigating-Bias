@@ -113,8 +113,8 @@ mestrado:** F1=0.665, IR=1.76.
 | 2 | Adicionar **MLP head** ao classificador (sair do linear) | ✓ Feito |
 | 3 | Usar **Optuna** como critério metodológico | ✓ Feito 2× |
 | 4 | **Limpar imagens com mais de 1 face** (MTCNN) | ✓ Feito |
-| 6 | Variação de loss aprovada (ArcFace, AdaFace, MagFace) | Pendente |
-| 5 | Aprendizado contrastivo (SimCLR, Sup-SimCLR, CLIP) | Pendente |
+| 6 | Variação de loss aprovada (ArcFace, AdaFace, MagFace) | ✓ Feito (Fator 3 definitivo, 3 seeds) |
+| 5 | Aprendizado contrastivo (SimCLR, Sup-SimCLR, CLIP) | Pendente (Fator 4 — próximo) |
 
 ---
 
@@ -231,6 +231,43 @@ Batch casado de 12 execuções (r1ctrl orig × r2base clean × CE/ArcFace
 CE** e **não tem efeito significativo sobre a disparidade (IR)** em
 nenhum recipe. ArcFace tem variância de seed alta (σ_IR ±1,24) — sua
 instabilidade é intrínseca ao recipe.
+
+---
+
+## 11.1 Resultado 2 — Fator Loss (definitivo, 3-seed casado)
+
+Re-run definitivo: CE / ArcFace / AdaFace / MagFace × 3 seeds, dataset
+limpo, critério de seleção correto (`val_f1_macro`).
+
+| Loss | F1 macro | disparity_ratio ↓ |
+|---|---|---|
+| **CE + linear** | **0,688 ± 0,002** | **1,70 ± 0,03** |
+| AdaFace | 0,677 ± 0,007 | 1,70 ± 0,06 |
+| MagFace | 0,672 ± 0,003 | 1,80 ± 0,06 |
+| ArcFace | 0,549 ± 0,009 | 3,30 ± 0,37 |
+
+**Atribuição:** trocar softmax+CE por loss de margem **não melhora**
+acurácia nem equidade; **ArcFace piora ambos** (≫1σ). CE ≈ AdaFace ≈
+MagFace. Loss de margem é de *verificação* — não transfere para
+*classificação de atributo*. Resultado negativo-mas-informativo (Linha A).
+
+---
+
+## 11.2 Achado metodológico — critério de checkpoint (delta #2)
+
+Seleção ingênua `best.pt = min val_loss` é **anti-correlacionada com
+F1** nas cabeças de margem (logits de eval = cosseno escalado, sem
+margem). Vies **dependente da família de loss**:
+
+| Loss | F1 (critério ingênuo → correto) |
+|---|---|
+| CE | 0,667 → 0,688 (+0,02) |
+| AdaFace | 0,525 → 0,677 (**+0,15**) |
+
+Sem corrigir, concluir-se-ia (falsamente) "CE esmaga as losses de
+margem". **Ablação ingênua confunde efeito-do-fator com
+efeito-de-critério-quebrado** — prova empírica, no próprio projeto, do
+**critério Pareto-aware best-epoch** (contribuição metodológica nuclear).
 
 ---
 

@@ -64,32 +64,48 @@ isolar a contribuição de fatores algorítmicos vs de dados**. A tese
 não pergunta *se* a IA pode ser mais justa (saturado); pergunta
 **onde intervir**, decompondo causalmente a disparidade.
 
-**Achados preliminares defensáveis** (decomposição parcial, 2 dos 5
-fatores medidos com o protocolo padrão: braços casados, **3 seeds**,
+**Achados preliminares defensáveis** (decomposição parcial, **3 dos 5
+fatores** medidos com o protocolo padrão: braços casados, **3 seeds**,
 ambiente único, média ± desvio — ver
-[dataset_factor_results.md](dataset_factor_results.md)):
+[dataset_factor_results.md](dataset_factor_results.md),
+[factor3_results.md](factor3_results.md)):
 
 - **Fator "integridade do dataset"** (limpeza multi-face via MTCNN,
   Diretriz 4): a limpeza **melhora acurácia no recipe CE (F1 +1,35pp,
   significativo)** e tem **efeito não-significativo sobre a disparidade
-  (IR) em ambos os recipes**. Achado lateral robusto: a taxa de imagens
+  em ambos os recipes**. Achado lateral robusto: a taxa de imagens
   multi-face é **correlacionada com raça** (spread 9,3pp; Black 30,0%
   vs East Asian 20,7%) — viés de cena, não só de rótulo.
 - **Fator "topologia do classificador"** (HPO Pareto-aware, Diretrizes
   2-3): contra o baseline linear de 3 seeds, a topologia MLP vencedora
-  (`[256] GELU drop=0,52`) **reduz o IR em −0,11 de forma
+  (`[256] GELU drop=0,52`) **reduz a disparidade em −0,11 de forma
   estatisticamente significativa** (F1 inalterado dentro do ruído).
+- **Fator "família de loss"** (Diretriz 6; re-run definitivo casado,
+  4 grupos × 3 seeds — [factor3_results.md](factor3_results.md)):
+  trocar softmax+CE por loss de margem **não melhora** acurácia nem
+  equidade; **ArcFace piora ambos** (F1 0,549 vs ~0,69; disparidade
+  3,30 vs ~1,70 — ≫1σ). **CE ≈ AdaFace ≈ MagFace**. Resultado de
+  atribuição negativo-mas-informativo: a loss de margem (desenhada para
+  *verificação*) não transfere para *classificação de atributo*.
 
 **Conclusão central:** a alavanca de equidade defensável é a
 **topologia do classificador**; a limpeza do dataset contribui para
-**acurácia**, não para fairness. Cada fator paga em um eixo distinto —
+**acurácia**; a **família de loss não é alavanca** (e ArcFace é
+contraproducente). Cada fator paga (ou não) em um eixo distinto —
 precisamente o tipo de resultado que a metodologia de atribuição existe
 para produzir.
 
 **Contribuição metodológica nuclear** (delta validado contra 555
 papers, sem método igual): o **critério Pareto-aware best-epoch** para
 HPO multi-objetivo de fairness, que evita a escalarização de métricas
-— problema também listado como lacuna aberta no survey 2025.
+— problema também listado como lacuna aberta no survey 2025. Esta
+contribuição ganhou **prova empírica dentro do próprio projeto**: o
+critério ingênuo (best-epoch por `val_loss` mínimo) enviesa as
+conclusões causais de forma **dependente da família de loss** (corrige
++0,15 F1 no AdaFace mas só +0,02 no CE) — ver
+[checkpoint_criterion_audit.md](checkpoint_criterion_audit.md). Ablação
+ingênua confunde efeito-do-fator com efeito-de-critério-quebrado;
+expor e corrigir isso É a metodologia.
 
 Alinhamento regulatório: o **EU AI Act** exige evidência do *porquê*
 um sistema é justo, não só *que* é. Atribuição causal é exatamente

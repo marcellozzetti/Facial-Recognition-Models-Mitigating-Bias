@@ -131,10 +131,17 @@ zero** em condições idênticas mas **com os bugs corrigidos**.
 Principais achados:
 
 - A família **Cross-Entropy reproduz bem** os números do MBA (deltas ≈ 0).
-- A família **ArcFace colapsa** — agora que a margem é de fato aplicada,
-  com `m=0.5` e LR padrão, pelo menos uma classe demográfica nunca é
-  predita (IR=∞, F1=0). Confirma empiricamente que os "ganhos de ArcFace"
-  reportados no MBA eram artefato do bug §2.2.
+- A família **ArcFace aparentou colapsar** — com a margem aplicada,
+  uma classe nunca predita (IR=∞, F1=0). **⚠️ SUPERSEDED (2026-05-19):**
+  o "colapso" era majoritariamente **artefato do critério de seleção de
+  modelo** (`best.pt` = `min val_loss`, anti-correlacionado com F1 para
+  cabeças de margem) somado a um bug no `MagMarginProduct`. Sob o
+  critério correto (`val_f1_macro`), no re-run definitivo casado, o
+  **ArcFace NÃO colapsa** — atinge F1 0,549 / disparidade 3,30: é a loss
+  **mais fraca e menos justa**, mas treina normalmente. Diagnóstico e
+  números definitivos: [checkpoint_criterion_audit.md](checkpoint_criterion_audit.md),
+  [magface_diagnosis.md](magface_diagnosis.md),
+  [factor3_results.md](factor3_results.md).
 - **Exp 5 (CE + AdamW + Cosine, dropout=0.2)** emerge como o **melhor
   recipe**: F1=0.665, IR=1.76 — o ponto de referência para todo o resto do
   trabalho de mestrado.
@@ -421,6 +428,64 @@ Cronograma proposto:
 - **Semanas 7-10:** experimentos com contrastive learning (diretriz 5).
 - **Semanas 11-13:** experimentos com losses alternativas (diretriz 6).
 - **Semanas 14-15:** consolidação dos resultados + escrita da qualificação.
+
+---
+
+## 5. Fator 3 (loss), auditoria e correção de critério (2026-05-18/19)
+
+Sessão intensiva de implementação + auditoria do Fator 3 (família de loss):
+
+1. **AdaFace + MagFace** implementados e plugados ao pipeline.
+2. **MagFace colapsava** (`val_loss` congelado em `ln 7`, acc = 1/7).
+   Diagnóstico disciplinado: 3 hipóteses falseadas (guard de
+   monotonicidade; faixa `[l_a,u_a]`; ausência de `lambda_g`) até o
+   mecanismo real — **margem diferenciável pela norma** (atalho de
+   gradiente degenerado), isolado pelo controle **AdaFace** (mesmo
+   protocolo, funciona). Fix canônico: margem magnitude-detached +
+   regularizador `lambda_g·g(a)`. [magface_diagnosis.md](magface_diagnosis.md).
+3. **Auditoria do pipeline** (pedida pelo aluno: "não posso ter mais
+   erro"): achado dominante — **seleção de checkpoint por `min
+   val_loss` é anti-correlacionada com F1 nas cabeças de margem** e
+   enviesa as conclusões **de forma dependente da família de loss**
+   (corrige +0,15 F1 no AdaFace, +0,02 no CE). Critério corrigido
+   (`val_f1_macro`, configurável). É a **prova empírica, dentro do
+   projeto, do delta candidato #2** (critério Pareto-aware best-epoch).
+   [checkpoint_criterion_audit.md](checkpoint_criterion_audit.md).
+4. **Teste de mesa das fórmulas** vs papers: **sem erro numérico**
+   (Gini provado à mão). Achados de fidelidade corrigidos: backbone
+   renomeado `ResNet50ImageNet` (era misnomer "LResNet50E-IR" — mas
+   **idêntico ao do MBA**, sem confound); `inequity_rate` →
+   `disparity_ratio` (não é o IR de verificação de Pereira&Marcel);
+   `s=30` mantido com racional científico documentado; init EMA do
+   AdaFace ajustado ao regime real. [formula_desk_check.md](formula_desk_check.md).
+5. **Re-run definitivo casado** (12 runs: CE/ArcFace/AdaFace/MagFace ×
+   3 seeds, critério correto). Resultado final
+   ([factor3_results.md](factor3_results.md)):
+
+   | Loss | F1 macro | disparity_ratio |
+   |---|---|---|
+   | CE+linear | 0,688 ± 0,002 | 1,70 ± 0,03 |
+   | AdaFace | 0,677 ± 0,007 | 1,70 ± 0,06 |
+   | MagFace | 0,672 ± 0,003 | 1,80 ± 0,06 |
+   | ArcFace | 0,549 ± 0,009 | 3,30 ± 0,37 |
+
+   **Atribuição:** o fator "família de loss" não melhora acurácia nem
+   equidade; ArcFace piora ambos; CE ≈ AdaFace ≈ MagFace. Negativo-mas-
+   informativo — exatamente o que a Linha A existe para capturar.
+
+> Resiliência: o batch sobreviveu a um reboot da máquina (retomada
+> determinística bit a bit via `results.json`/`history.json`).
+
+## 6. Trilha mestrado — prazo regimental resolvido (2026-05-19)
+
+Com o Regimento PPG-CC e dados confirmados pela Secretaria: ingresso
+fev/2025 → **qualificação por crédito até ago/2026** (Art. 49; 20/26
+créditos = 77 % ≥ 75 %); Estudos Dirigidos I não cursado em 2026.1 por
+licença-paternidade iminente (28/03/2026) → adiado p/ 2026.2 (ED II
+2027.1); defesa com folga até o limite Art. 30 (**fev/2028**). O Art. 45
+não pune o Art. 34 → **sem risco de desligamento; "atraso jul/2027"
+dissolvido**. [requerimento_estudos_dirigidos.md](requerimento_estudos_dirigidos.md),
+[PLANO_TRABALHO.md](PLANO_TRABALHO.md).
 
 ---
 
