@@ -112,6 +112,36 @@ ponto de atenção é **U-FaTE** (o adjacente mais forte ao delta #2) e
    é o próximo candidato a "o que de fato ajuda" sob o mesmo protocolo
    casado 3-seed + critério correto.
 
+## 2.1 SOTA: fairness + aprendizado contrastivo (p/ desenho do Fator 4)
+
+Consulta direcionada (2026-05-19). Achado central: **contrastivo NÃO é
+naturalmente justo**.
+
+- **FSCL — Fair Supervised Contrastive Learning** (Park et al., CVPR
+  2022, arXiv 2203.16209): seminal na interseção. **Mostra que o SupCon
+  padrão introduz/amplifica injustiça**; propõe loss contrastiva
+  modificada (penaliza atributo sensível + normalização por grupo).
+  Supera SupCon no trade-off acc×fairness. Classif. de atributo facial.
+- **FairCL** (Zhang et al.): contrastivo não-supervisionado justo.
+- **SSL pipeline fair p/ atributo facial** (2024, arXiv 2407.10104):
+  pseudo-rótulos + meta-learning + contrastivo ponderado; FairFace +
+  CelebA; novo benchmark SSL de fairness.
+
+**Implicações:**
+1. **Novidade:** "contrastivo justo p/ atributo facial" é sub-campo
+   **saturado de mitigação** (FSCL canônico). Nosso delta permanece
+   **atribuição**, não "propor contrastivo justo". FSCL/FairCL/SSL-2024
+   = comparação SOTA / related-work (papel análogo ao FineFACE no eixo
+   topologia).
+2. **Desenho Fator 4:** braço = **SupCon canônico** (sem mod. de
+   fairness), forma **one-stage conjunta** (`CE + λ·SupCon`) p/ manter
+   casado com os outros 4 fatores (end-to-end, mesmo eval/critério). A
+   FSCL **prediz** o resultado (SupCon puro tende a não melhorar/ piorar
+   equidade) → achado negativo-mas-informativo ancorado na literatura.
+
+Sources: arXiv 2203.16209 (FSCL/CVPR'22); arXiv 2407.10104 (SSL fair
+2024); arXiv 2502.02309v3 (survey Kotwal&Marcel 2025).
+
 ## 3. Guia de leitura (prioridade até domingo)
 
 | Ordem | PDF | Por que / o que procurar |
