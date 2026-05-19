@@ -131,6 +131,12 @@ class Trainer:
             else None
         )
         if self._contrastive_on:
+            ht = getattr(self.model, "head_type", "linear")
+            if ht != "linear":
+                raise ValueError(
+                    "Factor-4 (contrastive) requires head='linear' (paradigm "
+                    f"is the factor, not the head); got head={ht!r}"
+                )
             logging.info(
                 f"Contrastive (SupCon) ON: lambda={self._contrastive_lambda} "
                 f"temperature={c.get('temperature', 0.07)}"
@@ -160,20 +166,25 @@ class Trainer:
             return 0.0
         return lam * head.last_g_reg
 
-    def _contrastive_term(
+    def _train_loss(
         self, images: torch.Tensor, labels: torch.Tensor
-    ) -> torch.Tensor | float:
-        """Factor-4 SupCon term: lambda * SupCon(projection, labels).
+    ) -> torch.Tensor:
+        """Total training loss.
 
-        Training-only; 0.0 for every other factor (disabled). One extra
-        backbone forward (extract_features) — acceptable: only the
-        Factor-4 runs pay it, correctness over speed.
+        Contrastive (Factor 4): ONE backbone forward — logits and the
+        SupCon projection both derive from the same ``extract_features``
+        (the sanity exposed the double-forward as ~4x slow / near-OOM).
+        Factor-4 uses the linear head by design (paradigm is the factor,
+        not the head), so ``head(feats)`` are the class logits directly.
+        Standard path keeps the magnitude regulariser (MagFace).
         """
-        if not self._contrastive_on:
-            return 0.0
-        feats = self.model.extract_features(images)
-        z = self.model.project(feats)
-        return self._contrastive_lambda * self._supcon(z, labels)
+        if self._contrastive_on:
+            feats = self.model.extract_features(images)
+            loss = self.loss_fn(self.model.head(feats), labels)
+            z = self.model.project(feats)
+            return loss + self._contrastive_lambda * self._supcon(z, labels)
+        logits = self._forward(images, labels)
+        return self.loss_fn(logits, labels) + self._magface_reg()
 
     def _train_one_epoch(self, dataloader: DataLoader) -> float:
         self.model.train()
@@ -186,10 +197,7 @@ class Trainer:
             self.optimizer.zero_grad(set_to_none=True)
             if self.use_amp:
                 with torch.amp.autocast("cuda", dtype=torch.float16):
-                    logits = self._forward(images, labels)
-                    loss = self.loss_fn(logits, labels)
-                    loss = loss + self._contrastive_term(images, labels)
-                loss = loss + self._magface_reg()
+                    loss = self._train_loss(images, labels)
                 self.scaler.scale(loss).backward()
                 if self.grad_clip_norm is not None:
                     self.scaler.unscale_(self.optimizer)
@@ -197,10 +205,7 @@ class Trainer:
                 self.scaler.step(self.optimizer)
                 self.scaler.update()
             else:
-                logits = self._forward(images, labels)
-                loss = self.loss_fn(logits, labels)
-                loss = loss + self._contrastive_term(images, labels)
-                loss = loss + self._magface_reg()
+                loss = self._train_loss(images, labels)
                 loss.backward()
                 if self.grad_clip_norm is not None:
                     nn.utils.clip_grad_norm_(self.model.parameters(), self.grad_clip_norm)
