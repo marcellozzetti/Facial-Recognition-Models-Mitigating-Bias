@@ -2,8 +2,19 @@
 
 **Aluno:** Marcello Ozzetti · **Orientador:** Prof. Marcos Quiles
 **Programa:** Mestrado em Ciência da Computação — Unifesp/ICT
-**Kickoff:** 2026-05-11 · **Qualificação alvo:** 2026-08-24 · **Defesa final:** ~2027 (a definir)
-**Última atualização deste plano:** 2026-05-14
+**Kickoff:** 2026-05-11 · **Qualificação alvo:** 2026-08-24 · **Defesa final:** alvo ~2027; **limite regimental fev/2028**
+**Última atualização deste plano:** 2026-05-19
+
+> ### Âncora regimental (ingresso fev/2025 — fatos confirmados)
+> | Marco (Regimento PPG-CC) | Prazo | Plano |
+> |---|---|---|
+> | Qualificação — 75 % dos créditos (Art. 49) + janela 18 m (Art. 34/49) | **ago/2026** | **Elegível já** (20/26 cr = 77 %, CR 2,30). Agendar com o orientador ≤ ago/2026 — *isto blinda o prazo*, independe de Estudos Dirigidos. |
+> | Estudos Dirigidos I+II (Art. 33 II, 6 cr) | adiado | Não cursado em 2026.1 por licença-paternidade iminente (28/03/2026); requerimento de adiamento (Art. 9 VIII/41 §4/30 §2/60). ED I em **2026.2** (lista até 30/06/2026) → ED II **2027.1**. |
+> | Integralização do curso / defesa (Art. 30; gatilho de desligamento Art. 45 IX) | **fev/2028** | Folgado: ED I (2026.2) + ED II (2027.1) + defesa cabem antes. O Art. 45 **não** lista o Art. 34. |
+>
+> Detalhes e texto do pedido: [requerimento_estudos_dirigidos.md](requerimento_estudos_dirigidos.md).
+> Conclusão: não há "atraso para jul/2027" — qualifica por crédito em ago/2026 e a
+> defesa tem margem confortável até o limite regimental de fev/2028.
 
 > Este documento substitui a Parte V da [PROPOSTA_MESTRADO.md](PROPOSTA_MESTRADO.md).
 > O objetivo do trabalho é **provisório até o SOTA review** (ver §1) — esta é
@@ -197,9 +208,13 @@ Trilho A nunca bloqueia Trilho B e vice-versa, exceto no **gate da Fase 0**
 
 ---
 
-## 5. Cronograma pós-qualificação (defesa final, ~2027)
+## 5. Cronograma pós-qualificação (defesa final — alvo ~2027, limite regimental fev/2028)
 
-Após a qualificação, o programa experimental completo é executado:
+Após a qualificação (ago/2026), em paralelo ao programa experimental completo,
+correm os créditos restantes obrigatórios: **Estudos Dirigidos I em 2026.2**
+(lista de oferta até 30/06/2026) e **Estudos Dirigidos II em 2027.1** — ambos
+concluídos com folga antes do limite de integralização do curso (Art. 30 —
+**fev/2028**). O programa experimental completo:
 
 | Bloco | Conteúdo | Estimativa |
 |---|---|---|
