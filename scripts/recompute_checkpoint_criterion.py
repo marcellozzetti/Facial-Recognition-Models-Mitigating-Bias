@@ -55,14 +55,33 @@ def agg(hist: dict[str, dict], prefix: str, key: str, mode: str):
     return len(labels), ms(accs), ms(f1s), ms(irs)
 
 
-GROUPS = [
-    ("CE+linear (clean)", "dataset_factor", "exp_r2base_exp05_ce_"),
-    ("ArcFace (clean)", "dataset_factor", "exp_r2base_exp06_af_"),
-    ("AdaFace (Fator 3)", "factor3", "exp_f3_adaface_"),
-    ("MagFace (Fator 3)", "factor3", "exp_f3_magface_"),
-]
+import argparse
 
-H = {"dataset_factor": runs("dataset_factor"), "factor3": runs("factor3")}
+_ap = argparse.ArgumentParser()
+_ap.add_argument(
+    "--definitive",
+    action="store_true",
+    help="read the definitive matched re-run (outputs/definitive/{factor3,baseline}) "
+    "instead of the interim batches",
+)
+_args = _ap.parse_args()
+
+if _args.definitive:
+    GROUPS = [
+        ("CE+linear (clean)", "definitive/baseline", "exp_r2base_exp05_ce_"),
+        ("ArcFace (clean)", "definitive/baseline", "exp_r2base_exp06_af_"),
+        ("AdaFace (Fator 3)", "definitive/factor3", "exp_f3_adaface_"),
+        ("MagFace (Fator 3)", "definitive/factor3", "exp_f3_magface_"),
+    ]
+else:
+    GROUPS = [
+        ("CE+linear (clean)", "dataset_factor", "exp_r2base_exp05_ce_"),
+        ("ArcFace (clean)", "dataset_factor", "exp_r2base_exp06_af_"),
+        ("AdaFace (Fator 3)", "factor3", "exp_f3_adaface_"),
+        ("MagFace (Fator 3)", "factor3", "exp_f3_magface_"),
+    ]
+
+H = {root: runs(root) for _, root, _ in GROUPS}
 
 for crit_name, key, mode in [
     ("OLD  — min val_loss (contaminado)", "val_loss", "min"),

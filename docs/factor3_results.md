@@ -5,19 +5,26 @@
 > limpo, ResNet-50 ImageNet, 3 seeds {42,1,2}, mesma base, fp32,
 > num_workers=0). Data: 2026-05-19.
 
-## 1. Tabela principal (critério de seleção CORRETO: max val_f1_macro)
+## 1. Tabela principal — DEFINITIVA (re-run casado, critério correto)
 
-Recompute casado via `history.json` de todos os runs
-(`scripts/recompute_checkpoint_criterion.py`). Controle (CE+linear) e
-referência (ArcFace) reaproveitados do batch `dataset_factor` sob
-protocolo idêntico.
+Re-run definitivo (`outputs/definitive/`, 2026-05-19): **12 runs**
+re-treinados do zero com o critério corrigido (`val_f1_macro`),
+backbone renomeado, init EMA do AdaFace corrigido — todos os 4 grupos
+sob protocolo e critério idênticos (casamento pleno, **sem caveat de
+truncamento**). 3 seeds {42,1,2}. Tabela via
+`scripts/recompute_checkpoint_criterion.py --definitive`.
 
 | Loss (limpo, casado, 3 seeds) | Acc | **F1 macro** | disparity_ratio (f1) ↓ |
 |---|---|---|---|
 | **CE + linear** (controle) | 0.6865 ± 0.0019 | **0.6877 ± 0.0017** | **1.697 ± 0.033** |
 | ArcFace | 0.5717 ± 0.0059 | 0.5486 ± 0.0086 | 3.301 ± 0.365 |
-| AdaFace | 0.6693 ± 0.0088 | 0.6709 ± 0.0079 | 1.709 ± 0.007 |
-| MagFace | 0.6718 ± 0.0041 | 0.6732 ± 0.0060 | 1.756 ± 0.057 |
+| AdaFace | 0.6755 ± 0.0077 | 0.6765 ± 0.0067 | 1.697 ± 0.057 |
+| MagFace | 0.6706 ± 0.0020 | 0.6715 ± 0.0030 | 1.795 ± 0.062 |
+
+> Os números definitivos batem o recompute interino (Ada 0.671→0.677,
+> Mag 0.673→0.672) dentro de <1σ — a correção é **estável e
+> reproduzível**. Determinismo seed-42 confirmado bit a bit (inclusive
+> após reboot da máquina).
 
 ## 2. Veredito (regra do 1σ, comparação casada)
 
@@ -54,17 +61,14 @@ efeito-de-critério-quebrado** — núcleo da contribuição metodológica.
 Ver [checkpoint_criterion_audit.md](checkpoint_criterion_audit.md),
 [magface_diagnosis.md](magface_diagnosis.md).
 
-## 4. Caveat de honestidade (não invalida o ranking)
+## 4. Status: caveat RESOLVIDO
 
-Números **val-best-epoch** (seleção em validação, padrão). Os runs do
-critério antigo (CE, ArcFace, adaface×3, magface_s01) early-stoparam em
-`val_loss` cedo → `history.json` truncado → o melhor-F1 deles é **piso,
-possivelmente subestimado**; magface s02/s42 (critério novo) treinaram
-até convergir (não truncados). Logo:
-
-- O **ranking qualitativo é robusto** (ArcFace perde; CE≈AdaFace≈MagFace).
-- A **tabela definitiva** exige o **re-run casado** com critério
-  correto + early-stop consistente em todos os fatores (em curso).
+O caveat de truncamento da versão interina foi **eliminado**: o re-run
+definitivo (§1) re-treinou os 12 runs do zero com o critério correto e
+early-stop consistente em todos os 4 grupos. Números são val-best-epoch
+sob seleção uniforme (`max val_f1_macro`) — protocolo padrão e casado.
+O ranking qualitativo da versão interina **confirmou-se** sem alteração
+(ArcFace perde; CE ≈ AdaFace ≈ MagFace). Tabela final = §1.
 
 ## 5. Procedência
 
