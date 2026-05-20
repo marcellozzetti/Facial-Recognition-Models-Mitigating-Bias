@@ -72,6 +72,7 @@ if _args.definitive:
         ("ArcFace (clean)", "definitive/baseline", "exp_r2base_exp06_af_"),
         ("AdaFace (Fator 3)", "definitive/factor3", "exp_f3_adaface_"),
         ("MagFace (Fator 3)", "definitive/factor3", "exp_f3_magface_"),
+        ("SupCon (Fator 4)", "definitive/factor4", "exp_f4_supcon_"),
     ]
 else:
     GROUPS = [
