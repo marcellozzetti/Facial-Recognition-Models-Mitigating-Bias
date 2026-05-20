@@ -1,7 +1,7 @@
 # Factor 5 (backbone) — convnext_tiny seed=2
 # clean dataset, linear head, CE, 25ep, fp32, num_workers=0,
 # criterion=val_f1_macro, 3-seed matched protocol.
-# Per-backbone recipe: lr=0.001, batch_size=64
+# Per-backbone recipe: lr=0.0001, batch_size=64
 # (canonical fine-tuning rate per backbone — declared explicitly).
 # Control (NOT re-run): ResNet-50 ImageNet + linear + CE from
 # the definitive baseline (outputs/definitive/baseline/exp_r2base_exp05_ce_*).
@@ -19,7 +19,7 @@ model:
   arcface_easy_margin: false
 training:
   batch_size: 64
-  learning_rate: 0.001
+  learning_rate: 0.0001
   num_epochs: 25
   optimizer: adamw
   scheduler: cosineannealingwarmrestarts

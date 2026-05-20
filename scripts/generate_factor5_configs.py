@@ -37,12 +37,14 @@ CLEAN_CSV = "data/raw/fairface/fairface_labels_clean.csv"
 # fp32 (49 min/epoch). Each backbone gets its canonical recipe — same
 # scientific practice every backbone comparison in the literature uses.
 ARMS = {
-    # ViT lr=1e-4 (canonical fine-tuning rate for ViTs; lr=1e-3
-    # destroys pretrained attention — sanity confirmed).
-    # ConvNeXt-T thrashes at bs=128 fp32 on a 4070 12GB (sanity caught
-    # it the same way as ViT-v1); reduce to bs=64. LR stays 1e-3 (CNN).
+    # Both ViT-B/16 and ConvNeXt-T use LayerNorm (not BatchNorm) and
+    # need a lower fine-tuning LR than ResNet. lr=1e-3 destroys ViT
+    # (sanity caught) and underfits ConvNeXt (sanity caught: f1 0.18→0.23
+    # after 2 ep vs ViT@1e-4 reaching 0.67). Canonical fine-tuning rate
+    # for LayerNorm-based moderns is 1e-4 -- applied to both.
+    # bs=64 for both: bs=128 fp32 thrashes the 4070 12GB on both archs.
     "vit":      {"arch": "vit_b_16",       "lr": 1e-4, "batch_size": 64},
-    "convnext": {"arch": "convnext_tiny",  "lr": 1e-3, "batch_size": 64},
+    "convnext": {"arch": "convnext_tiny",  "lr": 1e-4, "batch_size": 64},
 }
 
 
