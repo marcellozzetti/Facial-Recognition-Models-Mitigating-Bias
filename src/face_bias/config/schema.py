@@ -14,6 +14,9 @@ class ModelConfig(BaseModel):
     model_config = ConfigDict(extra="ignore", protected_namespaces=())
 
     name: str = "LResNet50E_IR"
+    # Factor-5 backbone axis. Default "resnet50" preserves byte-identical
+    # construction of every prior config/checkpoint/baseline.
+    backbone_arch: Literal["resnet50", "vit_b_16", "convnext_tiny"] = "resnet50"
     pretrained: bool = True
     num_classes: int = Field(default=7, ge=2)
     dropout: float = Field(default=0.5, ge=0.0, le=1.0)

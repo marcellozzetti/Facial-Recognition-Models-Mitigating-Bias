@@ -73,6 +73,8 @@ if _args.definitive:
         ("AdaFace (Fator 3)", "definitive/factor3", "exp_f3_adaface_"),
         ("MagFace (Fator 3)", "definitive/factor3", "exp_f3_magface_"),
         ("SupCon (Fator 4)", "definitive/factor4", "exp_f4_supcon_"),
+        ("ViT-B/16 (Fator 5)", "definitive/factor5", "exp_f5_vit_"),
+        ("ConvNeXt-T (Fator 5)", "definitive/factor5", "exp_f5_convnext_"),
     ]
 else:
     GROUPS = [

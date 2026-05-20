@@ -57,6 +57,7 @@ def _build_model(config: dict, num_classes: int) -> torch.nn.Module:
         contrastive_proj_hidden=(
             (config["training"].get("contrastive") or {}).get("proj_hidden", 512)
         ),
+        backbone_arch=model_cfg.get("backbone_arch", "resnet50"),
     )
 
 

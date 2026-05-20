@@ -18,11 +18,10 @@ from typing import Literal
 
 import torch
 import torch.nn as nn
-from torchvision import models
-from torchvision.models import ResNet50_Weights
 
 from face_bias.models.adaface import AdaMarginProduct
 from face_bias.models.arc_margin import ArcMarginProduct
+from face_bias.models.backbones import BackboneArch, build_backbone
 from face_bias.models.contrastive import ProjectionHead
 from face_bias.models.magface import MagMarginProduct
 from face_bias.models.mlp_head import Activation, MLPHead, Norm
@@ -70,6 +69,7 @@ class ResNet50ImageNet(nn.Module):
         magface_lambda_g: float = 0.0,
         contrastive_proj_dim: int | None = None,
         contrastive_proj_hidden: int = 512,
+        backbone_arch: BackboneArch = "resnet50",
     ):
         super().__init__()
         if num_classes is None:
@@ -78,10 +78,11 @@ class ResNet50ImageNet(nn.Module):
         if head not in valid_heads:
             raise ValueError(f"head must be one of {valid_heads}, got {head!r}")
 
-        weights = ResNet50_Weights.DEFAULT if pretrained else None
-        self.backbone = models.resnet50(weights=weights)
-        in_features = self.backbone.fc.in_features
-        self.backbone.fc = nn.Identity()
+        # Backbone factory (Factor 5 axis). Default "resnet50" yields the
+        # exact byte-identical construction of the prior implementation
+        # — all existing configs/checkpoints/baselines unaffected.
+        self.backbone, in_features = build_backbone(backbone_arch, pretrained)
+        self.backbone_arch: BackboneArch = backbone_arch
 
         self.dropout = nn.Dropout(p=dropout)
         self.head_type: HeadType = head
