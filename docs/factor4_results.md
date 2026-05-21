@@ -53,14 +53,14 @@ motivadas** para o programa de defesa (PLANO §5, matriz cruzada) como
 | 2 — Topologia (HPO MLP) | IR −0,11 (≫1σ) | ✅ **modesto** |
 | 3 — Loss family | CE≈Ada≈Mag; ArcFace pior | ❌ |
 | 4 — Paradigma (SupCon) | ≡ CE em IR | ❌ |
-| 5 — Backbone | (não rodado — eixo restante) | ❓ |
+| **5 — Backbone (ConvNeXt-T)** | ✓ **+2,3pp F1 (~7σ)** + IR −0,13 (~3σ) | **forte** |
 
-**Padrão emergente:** nos 4 fatores algoritmicos testados sob protocolo
-casado, apenas **topologia** moveu equidade significativamente. Loss e
-paradigma são **nulls atribuição-grade** (ancorados na literatura).
-**Fator 5 (backbone)** é o único eixo restante com expectativa real de
-mover — FineFACE / LVFace / ViT em FairFace literatura sugerem espaço
-de manobra arquitetural maior que o explorado.
+**Padrão consolidado (5/5 fatores, atualizado pós-Fator-5):** apenas
+o **backbone moderno (ConvNeXt-T LayerNorm-based)** é alavanca real e
+significativa de acurácia + equidade simultaneamente. Topologia move
+equidade modestamente em isolado. Loss e paradigma (este fator) são
+nulls atribuição-grade ancorados na literatura. Resultado completo em
+[factor5_results.md](factor5_results.md).
 
 A **maior alavanca medida no projeto** continua sendo metodológica: o
 **critério Pareto-aware best-epoch** (corrige +0,15 F1 no AdaFace; ver

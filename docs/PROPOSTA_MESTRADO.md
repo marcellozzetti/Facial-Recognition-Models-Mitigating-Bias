@@ -64,36 +64,47 @@ isolar a contribuição de fatores algorítmicos vs de dados**. A tese
 não pergunta *se* a IA pode ser mais justa (saturado); pergunta
 **onde intervir**, decompondo causalmente a disparidade.
 
-**Achados preliminares defensáveis** (decomposição parcial, **3 dos 5
-fatores** medidos com o protocolo padrão: braços casados, **3 seeds**,
+**Achados preliminares defensáveis** (decomposição **completa**, **5 de
+5 fatores** medidos com o protocolo padrão: braços casados, **3 seeds**,
 ambiente único, média ± desvio — ver
 [dataset_factor_results.md](dataset_factor_results.md),
-[factor3_results.md](factor3_results.md)):
+[factor3_results.md](factor3_results.md),
+[factor4_results.md](factor4_results.md),
+[factor5_results.md](factor5_results.md)):
 
-- **Fator "integridade do dataset"** (limpeza multi-face via MTCNN,
-  Diretriz 4): a limpeza **melhora acurácia no recipe CE (F1 +1,35pp,
-  significativo)** e tem **efeito não-significativo sobre a disparidade
-  em ambos os recipes**. Achado lateral robusto: a taxa de imagens
-  multi-face é **correlacionada com raça** (spread 9,3pp; Black 30,0%
-  vs East Asian 20,7%) — viés de cena, não só de rótulo.
-- **Fator "topologia do classificador"** (HPO Pareto-aware, Diretrizes
-  2-3): contra o baseline linear de 3 seeds, a topologia MLP vencedora
-  (`[256] GELU drop=0,52`) **reduz a disparidade em −0,11 de forma
-  estatisticamente significativa** (F1 inalterado dentro do ruído).
-- **Fator "família de loss"** (Diretriz 6; re-run definitivo casado,
-  4 grupos × 3 seeds — [factor3_results.md](factor3_results.md)):
-  trocar softmax+CE por loss de margem **não melhora** acurácia nem
-  equidade; **ArcFace piora ambos** (F1 0,549 vs ~0,69; disparidade
-  3,30 vs ~1,70 — ≫1σ). **CE ≈ AdaFace ≈ MagFace**. Resultado de
-  atribuição negativo-mas-informativo: a loss de margem (desenhada para
-  *verificação*) não transfere para *classificação de atributo*.
+- **Fator 1 — integridade do dataset** (limpeza multi-face via MTCNN):
+  **acurácia +1,35pp CE (significativo)**, disparidade não-significativa.
+  Achado lateral robusto: taxa multi-face **correlacionada com raça**
+  (spread 9,3pp; Black 30 % vs East Asian 21 %) — viés de cena, não só
+  rótulo.
+- **Fator 2 — topologia do classificador** (HPO Pareto-aware): MLP
+  vencedora (`[256] GELU drop=0,52`) **reduz disparidade −0,11 (≫1σ)**,
+  F1 inalterado.
+- **Fator 3 — família de loss** (CE/ArcFace/AdaFace/MagFace 3-seed casado):
+  trocar softmax+CE por loss de margem **não melhora**; **ArcFace piora
+  ambos** (F1 −0,14, IR +1,6); CE ≈ AdaFace ≈ MagFace. Null
+  atribuição-grade ancorado na literatura.
+- **Fator 4 — paradigma contrastivo** (SupCon canônico, joint): F1
+  marginal vs CE, IR **idêntico** ao CE — predição da FSCL (CVPR'22)
+  confirmada. Null atribuição-grade.
+- **🎯 Fator 5 — backbone** (ResNet-50 vs ViT-B/16 vs ConvNeXt-T,
+  3-seed casado, recipe por-backbone declarado): **ConvNeXt-T move
+  simultaneamente acurácia (+2,3pp F1, ~7σ) e disparidade (IR −0,13,
+  ~3σ)** vs ResNet-50 controle, com variância entre seeds excepcional
+  (dp_F1=0,003). **ViT-B/16** move marginalmente equidade (~1σ) sem
+  ganho de acurácia. **Primeira alavanca real positiva e significativa
+  nos 5 fatores** — backbone CNN moderno LayerNorm-based + kernel 7×7
+  é onde mora o lever.
 
-**Conclusão central:** a alavanca de equidade defensável é a
-**topologia do classificador**; a limpeza do dataset contribui para
-**acurácia**; a **família de loss não é alavanca** (e ArcFace é
-contraproducente). Cada fator paga (ou não) em um eixo distinto —
-precisamente o tipo de resultado que a metodologia de atribuição existe
-para produzir.
+**Conclusão central (revisada após F5):** a alavanca arquitetural
+defensável de equidade **+** acurácia é o **backbone moderno
+(ConvNeXt-T)**; a topologia do classificador é alavanca modesta apenas
+em equidade; a limpeza do dataset paga em acurácia; loss e paradigma
+são nulls atribuição-grade. **A descoberta metodológica do critério
+Pareto-aware é a alavanca de impacto sistêmico** — corrige o sinal de
+todos os fatores. Cada dimensão paga em um eixo distinto e quantificado
+— precisamente o output que a metodologia de atribuição existe para
+produzir.
 
 **Contribuição metodológica nuclear** (delta validado contra 555
 papers, sem método igual): o **critério Pareto-aware best-epoch** para
