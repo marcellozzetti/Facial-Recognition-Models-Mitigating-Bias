@@ -139,7 +139,7 @@ def main(argv: list[str] | None = None) -> int:
 
     model = _build_model(config, num_classes=num_classes)
     loss_fn = build_loss(config)
-    optimizer = build_optimizer(model.parameters(), config)
+    optimizer = build_optimizer(model, config)
     scheduler = build_scheduler(
         optimizer,
         config,

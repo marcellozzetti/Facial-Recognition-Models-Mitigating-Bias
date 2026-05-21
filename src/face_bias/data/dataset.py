@@ -48,6 +48,9 @@ def _build_transforms(config: dict[str, Any]) -> dict[str, transforms.Compose]:
     image_size = tuple(config["image"]["image_size"])
     image_mean = config["image"]["image_mean"]
     image_std = config["image"]["image_std"]
+    # Optional FineFACE-recipe-style aug (RandomCrop with padding after
+    # Resize). None preserves the prior project-wide behaviour: HFlip only.
+    rcrop_pad = config["training"].get("train_random_crop_padding")
 
     eval_pipeline = transforms.Compose(
         [
@@ -56,14 +59,17 @@ def _build_transforms(config: dict[str, Any]) -> dict[str, transforms.Compose]:
             transforms.Normalize(image_mean, image_std),
         ]
     )
-    train_pipeline = transforms.Compose(
-        [
-            transforms.Resize(image_size),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize(image_mean, image_std),
-        ]
-    )
+    train_ops: list = [transforms.Resize(image_size)]
+    if rcrop_pad:
+        train_ops.append(
+            transforms.RandomCrop(image_size, padding=int(rcrop_pad))
+        )
+    train_ops += [
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
+        transforms.Normalize(image_mean, image_std),
+    ]
+    train_pipeline = transforms.Compose(train_ops)
 
     return {"train": train_pipeline, "val": eval_pipeline, "test": eval_pipeline}
 

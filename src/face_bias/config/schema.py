@@ -85,6 +85,13 @@ class TrainingConfig(BaseModel):
     # Optional weight-decay override; default depends on optimizer choice
     # (SGD/AdamW=5e-4 MBA default; Adam=0.0 FairFace-paper recipe).
     weight_decay: Optional[float] = Field(default=None, ge=0)
+    # Optional per-group LR: if set, the BACKBONE params use lr_backbone,
+    # everything else (head/projection/etc.) uses learning_rate. Required
+    # by the FineFACE-recipe anchor (backbone 2e-4, head 2e-3).
+    lr_backbone: Optional[float] = Field(default=None, gt=0)
+    # Optional train-time RandomCrop padding (after Resize). 0/None disables
+    # it. FineFACE recipe uses padding=8 (Resize 460 -> Crop 448).
+    train_random_crop_padding: Optional[int] = Field(default=None, ge=0)
     scheduler: Literal["onecyclelr", "cosineannealingwarmrestarts"] = "onecyclelr"
     loss_function: Literal[
         "cross_entropy", "arcface", "adaface", "magface"
