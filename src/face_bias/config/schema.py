@@ -16,7 +16,9 @@ class ModelConfig(BaseModel):
     name: str = "LResNet50E_IR"
     # Factor-5 backbone axis. Default "resnet50" preserves byte-identical
     # construction of every prior config/checkpoint/baseline.
-    backbone_arch: Literal["resnet50", "vit_b_16", "convnext_tiny"] = "resnet50"
+    backbone_arch: Literal[
+        "resnet50", "resnet34", "vit_b_16", "convnext_tiny"
+    ] = "resnet50"
     pretrained: bool = True
     num_classes: int = Field(default=7, ge=2)
     dropout: float = Field(default=0.5, ge=0.0, le=1.0)
@@ -79,7 +81,10 @@ class TrainingConfig(BaseModel):
     batch_size: int = Field(default=128, ge=1)
     learning_rate: float = Field(default=1e-3, gt=0)
     num_epochs: int = Field(default=25, ge=1)
-    optimizer: Literal["sgd", "adamw"] = "adamw"
+    optimizer: Literal["sgd", "adamw", "adam"] = "adamw"
+    # Optional weight-decay override; default depends on optimizer choice
+    # (SGD/AdamW=5e-4 MBA default; Adam=0.0 FairFace-paper recipe).
+    weight_decay: Optional[float] = Field(default=None, ge=0)
     scheduler: Literal["onecyclelr", "cosineannealingwarmrestarts"] = "onecyclelr"
     loss_function: Literal[
         "cross_entropy", "arcface", "adaface", "magface"

@@ -25,7 +25,12 @@ def _seed():
 @pytest.mark.unit
 @pytest.mark.parametrize(
     "arch, expected_dim",
-    [("resnet50", 2048), ("vit_b_16", 768), ("convnext_tiny", 768)],
+    [
+        ("resnet50", 2048),
+        ("resnet34", 512),
+        ("vit_b_16", 768),
+        ("convnext_tiny", 768),
+    ],
 )
 def test_backbone_builds_and_emits_pooled_features(arch, expected_dim) -> None:
     bb, dim = build_backbone(arch, pretrained=False)

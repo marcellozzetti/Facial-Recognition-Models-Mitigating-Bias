@@ -26,11 +26,12 @@ import torch.nn as nn
 from torchvision import models
 from torchvision.models import (
     ConvNeXt_Tiny_Weights,
+    ResNet34_Weights,
     ResNet50_Weights,
     ViT_B_16_Weights,
 )
 
-BackboneArch = Literal["resnet50", "vit_b_16", "convnext_tiny"]
+BackboneArch = Literal["resnet50", "resnet34", "vit_b_16", "convnext_tiny"]
 
 
 def build_backbone(arch: BackboneArch, pretrained: bool) -> tuple[nn.Module, int]:
@@ -45,6 +46,17 @@ def build_backbone(arch: BackboneArch, pretrained: bool) -> tuple[nn.Module, int
         weights = ResNet50_Weights.DEFAULT if pretrained else None
         bb = models.resnet50(weights=weights)
         embed_dim = bb.fc.in_features  # 2048
+        bb.fc = nn.Identity()
+        return bb, embed_dim
+
+    if arch == "resnet34":
+        # FairFace-original recipe anchor (Kärkkäinen & Joo, WACV 2021):
+        # the dataset paper used ResNet-34 + ADAM lr=1e-4. Used here as
+        # baseline-positioning anchor, NOT as one of the 5 attribution
+        # factors. See docs/baseline_positioning.md.
+        weights = ResNet34_Weights.DEFAULT if pretrained else None
+        bb = models.resnet34(weights=weights)
+        embed_dim = bb.fc.in_features  # 512
         bb.fc = nn.Identity()
         return bb, embed_dim
 
