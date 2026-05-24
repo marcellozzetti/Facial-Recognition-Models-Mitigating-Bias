@@ -4,6 +4,19 @@
 > estruturada + posicionamento vs. nossos deltas. Complementa
 > [sota_review.md](sota_review.md) §5.0 e fecha o veredito de novidade
 > dos fatores 1 (dataset) e 2 (topologia). Data: 2026-05-19.
+>
+> ⚠️ **CORREÇÃO 2026-05-22 — supersedida em parte por auditoria textual.**
+> Esta síntese foi gerada a partir de **abstracts arXiv**, não dos PDFs
+> integrais. A leitura HTML completa do FineFACE em 2026-05-22 revelou
+> que ele **NÃO classifica raça** — classifica gênero + 13 atributos
+> faciais, com raça como atributo protegido para medir disparidade. A
+> "headline 96.4% acc" é accuracy de gênero, não de raça. Além disso,
+> a pesquisa textual identificou **Hassanpour et al. 2024** (arXiv
+> 2410.24148) como a SOTA real publicada para race 7-class FairFace
+> (RN-34 = 72% acc, FaceScanPaliGemma = 75.7% acc / 0.750 F1). Ver
+> `docs/sota_7class_race_audit.md` para a auditoria reproduzível
+> completa e `docs/baseline_positioning.md` §3 para a caracterização
+> correta do FineFACE.
 
 ## 0. TL;DR do veredito
 

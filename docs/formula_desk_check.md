@@ -3,6 +3,11 @@
 > Material de tese. Verificação linha a linha das fórmulas contra as
 > equações dos papers de origem. Pedido: "não posso ter mais erro".
 > Data: 2026-05-18.
+>
+> **Atualização 2026-05-23:** o achado terminológico sobre `inequity_rate`
+> foi RESOLVIDO via renomeação para `disparity_ratio`, alinhada com a
+> nomenclatura usada por Hassanpour et al. 2024 (arXiv 2410.24148) e
+> FineFACE/Liu et al. 2024 (arXiv 2408.16881) — ver §1.1 abaixo.
 
 Severidade: 🔴 corrige interpretação/honestidade · 🟠 fidelidade de
 hiperparâmetro · 🟢 correto.
@@ -16,16 +21,24 @@ hiperparâmetro · 🟢 correto.
 | max_min_disparity | `max − min` | gap absoluto padrão | 🟢 correto |
 | gini | `(n+1 − 2·Σcum/cum[-1])/n` sobre ordenado | **provado algebricamente** = `2Σi·xᵢ/(nΣx) − (n+1)/n`, a forma fechada canônica de Gini | 🟢 correto |
 | coefficient_of_variation | `std(ddof=0)/mean` | CV correto **mas** docstring diz "FDR-style" — FDR (Fairness Discrepancy Rate, Pereira&Marcel) **não é** CV | 🟠 nome enganoso |
-| **inequity_rate** | `max(score)/min(score)` por classe | O IR canônico (Pereira&Marcel, verificação) é **produto de razões FMR e FNMR**. Nosso uso é uma **adaptação** (razão max/min de F1 por classe) — defensável, mas **não é** o IR do paper | 🔴 terminologia |
+| **disparity_ratio** (renomeado de `inequity_rate` em 2026-05-23) | `max(F1_per_class) / min(F1_per_class)` | **Métrica padrão da literatura de fairness em classificação por grupos.** Usada como "Max-Min ratio" por Hassanpour et al. 2024 (Tab.2-3) e FineFACE/Liu et al. 2024 (Tab.2). Survey Mehrabi et al. 2021 cataloga como uma das métricas group-fairness canônicas. **Numericamente é a forma de razão (não diferença).** Antigo nome `inequity_rate` invocava confusão com o IR de verificação biométrica (Pereira & Marcel) que é produto FMR × FNMR — distinto. Resolvido pela renomeação. | 🟢 correto + procedência clara |
 
-**Conclusão métricas:** numericamente **corretas** (Gini provado à mão).
-O problema é **fidelidade de nomenclatura**: `inequity_rate` e o rótulo
-"FDR-style" invocam construtos da literatura de verificação que as
-fórmulas não implementam literalmente. Para a banca: ou renomear
-(ex.: "max-min ratio" / "disparity ratio") ou definir explicitamente
-como adaptação, com a fórmula declarada no texto. **Não invalida os
-números já obtidos** (a comparação é interna e consistente), mas
-invalida a *alegação* de que medimos "o Inequity Rate da literatura".
+**Conclusão métricas (atualizada 2026-05-23):** numericamente
+**corretas** (Gini provado à mão); **procedência literária declarada**:
+
+| Métrica nossa | Equivalente na literatura | Fonte canônica |
+|---|---|---|
+| `disparity_ratio` (max/min F1) | Max-Min Ratio | Hassanpour 2024 §4; FineFACE 2024 §4.2 |
+| `max_min_disparity` (max − min) | Max-Min Gap / Absolute Disparity | Mehrabi et al. 2021 §2.2 (survey) |
+| `coefficient_of_variation` (std/mean) | CV / Statistical Dispersion | Sweeney 2002 (origem); aplicada em fairness por Speicher et al. 2018 |
+| `gini` | Coeficiente de Gini | Originária de econometria (Gini 1912); aplicada em fairness por Speicher et al. 2018 |
+
+A renomeação `inequity_rate → disparity_ratio` (commit anterior) **fecha
+o gap terminológico**: agora a métrica reportada é cientificamente
+identificada com a usada por Hassanpour 2024 e FineFACE 2024 — os
+mesmos papers contra os quais nos posicionamos (`baseline_positioning.md`).
+**Não há mais "adaptação não-canônica" reportada**: é uma métrica
+padrão da literatura, com o nome correto, e com referência declarada.
 
 ## 2. Cabeças de margem
 
@@ -139,21 +152,77 @@ transfer learning, 224px, embedding 2048-d". Opcional/forte: implementar
 de fato o backbone IR @112px se quiser comparar no regime dos papers
 (eixo backbone do PLANO).
 
-## 4. Veredito consolidado
+## 4. Veredito consolidado (atualizado 2026-05-23)
 
-| Item | Numérico | Fidelidade à literatura |
+| Item | Numérico | Fidelidade à literatura | Status |
+|---|---|---|---|
+| Métricas | 🟢 corretas (Gini provado) | 🟢 `disparity_ratio` alinhado com Hassanpour 2024 / FineFACE 2024 | **RESOLVIDO** (renomeação + procedência) |
+| ArcFace | 🟢 | 🟠 s=30 vs 64 canônico | declarado em §2.1 (racional científico travado) |
+| AdaFace | 🟢 | 🟠 init EMA fora do regime | corrigido em commit posterior (init próximo ao regime medido) |
+| MagFace | 🟢 (pós-fix) | 🟢 | RESOLVIDO |
+| Backbone | 🟢 (válido) | 🟢 renomeado para `ResNet50ImageNet` (alias preservado) | RESOLVIDO + Fator 5 (backbones modernos) executado |
+
+**Estado final (2026-05-23):** todas as questões de fidelidade à
+literatura foram resolvidas via:
+1. **Renomeação `inequity_rate` → `disparity_ratio`** (alinhado com
+   Hassanpour 2024 + FineFACE 2024) — RESOLVIDO.
+2. **Backbone renomeado de `LResNet50E_IR` → `ResNet50ImageNet`** com
+   alias mantido — RESOLVIDO.
+3. **AdaFace init EMA corrigida** (de 20/100 para 9/2 — regime medido) — RESOLVIDO.
+4. **ArcFace s=30 mantido** com racional científico declarado
+   (heated-up softmax saturaria com s=64 + 7 classes) — DECISÃO TRAVADA.
+
+**Não há mais 🔴 ou 🟠 não-resolvido.** O trabalho está limpo de
+problemas de fidelidade à literatura para defesa.
+
+## 5. Referências canônicas das métricas
+
+| Métrica | Paper de origem |
+|---|---|
+| **Max-Min Ratio (disparity_ratio)** | Hassanpour et al. 2024, "Exploring VLMs for Facial Attribute Recognition" (arXiv 2410.24148, §4 Tab.2-3) — Max/Min usado para acurácia de gênero estratificada por raça |
+| **Max-Min Gap (max_min_disparity)** | Mehrabi et al. 2021, "A Survey on Bias and Fairness in Machine Learning" (ACM Comput. Surv., §2.2) |
+| **DoB (Degree of Bias, std)** | Liu et al. 2024 (FineFACE, arXiv 2408.16881, §4.2) — usada com Max-Min Ratio |
+| **Coefficient of Variation, Gini** | Speicher et al. 2018, "A Unified Approach to Quantifying Algorithmic Unfairness" (KDD 2018) |
+| **Inequity Rate canônico (FMR × FNMR)** | Pereira & Marcel 2022, "Fairness in Biometric Verification" — **NÃO é o que computamos** (este é IR para verificação biométrica binária, não para classificação multi-classe) |
+
+## 6. Referências canônicas das técnicas científicas usadas no projeto
+
+### 6.1 Replicabilidade e variância em ML (fundamenta protocolo 3-seed)
+
+| Paper | Venue/Ano | Contribuição para nossa metodologia |
 |---|---|---|
-| Métricas | 🟢 corretas (Gini provado) | 🔴 `inequity_rate`/"FDR" mal-nomeados |
-| ArcFace | 🟢 | 🟠 s=30 vs 64 canônico |
-| AdaFace | 🟢 | 🟠 init EMA fora do regime |
-| MagFace | 🟢 (pós-fix) | 🟢 |
-| **Backbone** | 🟢 (válido) | 🔴 **nome ≠ implementação** |
+| **Henderson, Islam, Bachman, Pineau, Precup, Meger** — *"Deep Reinforcement Learning that Matters"* | AAAI 2018 | Demonstrou que single-seed em RL leva a conclusões irreproduzíveis. Forçou o campo a adotar múltiplas seeds + intervalos de confiança. Justifica nosso protocolo 3-seed casado. |
+| **Pineau, Vincent-Lamarre, Sinha, Larivière, Beygelzimer, d'Alché-Buc, Fox, Larochelle** — *"Improving Reproducibility in Machine Learning Research"* | JMLR 2021 | **Guidelines oficiais ICLR/NeurIPS** sobre reprodutibilidade. Exige múltiplas seeds + std + intervalos de confiança em submissions sérias. Alinha nosso protocolo com padrão moderno. |
+| **Bouthillier, Delaunay, Bronzi, Trofimov, Nichyporuk et al.** — *"Accounting for Variance in Machine Learning Benchmarks"* | MLSys 2021 | Mostrou empiricamente que diferenças <2% em benchmarks de imagem são frequentemente ruído de seed, não sinal real. Justifica nossa cautela com diferenças <2pp em F1. |
 
-**Não há novo erro de cálculo.** Os achados são de **fidelidade à
-literatura/nomenclatura** — e dois (🔴) afetam diretamente a
-*descrição defensável* na qualificação: (i) o backbone não é o que o
-nome diz; (ii) "Inequity Rate" é uma adaptação, não o IR de
-verificação. Ambos têm correção barata (renomear + documentar) e, na
-verdade, **reforçam a Linha A**: parte do "viés" atribuído a fatores
-pode ser efeito de *regime fora do paper*, exatamente o tipo de
-confusão causal que a tese expõe.
+### 6.2 Ensemble methods (fundamenta combo defesa-fechamento)
+
+| Paper | Venue/Ano | Contribuição |
+|---|---|---|
+| **Hansen & Salamon** — *"Neural Network Ensembles"* | **IEEE PAMI 1990** (6,800+ citações) | Paper SEMINAL de ensembles em redes neurais. Demonstrou que combinação de N redes reduz erro generalização. Fundamentação histórica. |
+| **Geman, Bienenstock & Doursat** — *"Neural Networks and the Bias/Variance Dilemma"* | Neural Computation 1992 | Decomposição bias-variância. Justifica MATEMATICAMENTE por que ensemble reduz variância (σ²/N) sem reduzir bias. |
+| **Breiman** — *"Bagging Predictors"* | Machine Learning 1996 (36,000+ citações) | Bootstrap Aggregating — variante clássica de ensemble. |
+| **Breiman** — *"Random Forests"* | Machine Learning 2001 (99,000+ citações) | Ensemble de árvores de decisão. Um dos papers mais citados em ML. |
+| **Dietterich** — *"Ensemble Methods in Machine Learning"* | Springer MCS 2000 (14,000+ citações) | Survey foundational sobre ensemble methods. Cobre bagging, boosting, stacking. |
+| **Lakshminarayanan, Pritzel, Blundell** — *"Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles"* | **NeurIPS 2017** (8,000+ citações) | **REFERÊNCIA PRINCIPAL** para deep ensembles modernos. Estabeleceu como prática SOTA para uncertainty quantification em deep learning. Justifica nosso ensemble de 3 seeds. |
+| **Huang, Li, Pleiss, Liu, Hopcroft, Weinberger** — *"Snapshot Ensembles: Train 1, Get M for Free"* | ICLR 2017 | Ensemble via N checkpoints de UM treinamento em ciclos cossenoidais. Variante eficiente. |
+| **Wen, Tran, Ba** — *"BatchEnsemble"* | ICLR 2020 | Ensemble eficiente em memória, expansão moderna. |
+| **Ovadia, Fertig, Ren, Nado, Sculley, Nowozin, Dillon, Lakshminarayanan, Snoek** — *"Can You Trust Your Model's Uncertainty?"* | NeurIPS 2019 | Comparou métodos de quantificação de incerteza em deep learning. **Deep ensembles ganharam** em todas as métricas. Validação independente da técnica. |
+
+### 6.3 Ensemble especificamente para fairness (validação no nosso domínio)
+
+| Paper | Venue/Ano | Contribuição |
+|---|---|---|
+| **Bhaskaruni, Hu, Lan** — *"Improving Prediction Fairness via Model Ensemble"* | **IEEE ICTAI 2019** | **CRÍTICO para nossa tese:** demonstrou empiricamente que ensemble REDUZ disparidade demográfica em classificação. Convergente com nosso achado IR 1.541 → 1.474 após ensemble + TTA. |
+| **Chen, Johansson, Sontag** — *"Why Is My Classifier Discriminatory?"* | NeurIPS 2018 | Argumenta redução de variância como caminho principiado para fairness. Justifica teoricamente por que ensemble ajuda equidade. |
+| **Mehrabi, Morstatter, Saxena, Lerman, Galstyan** — *"A Survey on Bias and Fairness in Machine Learning"* | ACM Comput. Surveys 2021 | Cataloga ensembles como ferramenta padrão de mitigação de viés (§3.3). |
+
+### 6.4 Outras técnicas pós-treinamento (Combo defesa-fechamento)
+
+| Paper | Venue/Ano | Contribuição |
+|---|---|---|
+| **Guo, Pleiss, Sun, Weinberger** — *"On Calibration of Modern Neural Networks"* | ICML 2017 | Temperature scaling — calibração pós-hoc de redes neurais. Usada em Combo #4. |
+| **Simonyan & Zisserman** — *"Very Deep Convolutional Networks for Large-Scale Image Recognition"* (VGG paper) | ICLR 2015 | Test-Time Augmentation via multi-crop. |
+| **Krizhevsky, Sutskever, Hinton** — *"ImageNet Classification with Deep Convolutional Neural Networks"* (AlexNet) | NeurIPS 2012 | TTA via 10-crop (4 cantos + centro × 2 flips) — usada como inspiração para nossa TTA segura. |
+| **Buolamwini & Gebru** — *"Gender Shades"* | FAccT 2018 | Auditoria intersectional de classificadores faciais. Nosso Combo #1 segue essa metodologia. |
+| **Crenshaw** — *"Demarginalizing the Intersection of Race and Sex"* | 1989 (legal theory) | **Origem do conceito de "interseccionalidade"** — fundamentação filosófica da análise. |

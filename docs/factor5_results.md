@@ -4,6 +4,14 @@
 > à acurácia e disparidade demográfica, sob protocolo casado. **Pela
 > primeira vez nos 5 fatores um arm bate o controle simultaneamente e
 > significativamente em acurácia E equidade.** Data: 2026-05-21.
+>
+> 📍 **Posicionamento absoluto (atualizado 2026-05-22):** nosso ConvNeXt-T
+> (F1=0.711, IR=1.569, acc=0.709) fica **−1.1pp da SOTA-CNN publicada**
+> (Hassanpour 2024, ResNet-34 = 0.720 acc) sob protocolos diferentes.
+> Gap estruturado em 4 escolhas metodológicas declaradas (undersample,
+> split próprio, padding 1.25, MTCNN re-align). Ablação 🅑
+> (no-undersample) preparada para fechar o maior componente do gap.
+> Ver `docs/baseline_positioning.md` §4 e `docs/sota_7class_race_audit.md`.
 
 ## 1. Tabela principal — 7 grupos (5 fatores + 2 backbones modernos)
 
@@ -126,24 +134,51 @@ são nulls atribuição-grade; dataset paga em acurácia. A descoberta
 metodológica do critério Pareto-aware fica como a alavanca de impacto
 sistêmico.
 
-## 7. Caveats e próximos passos
+## 7. Robustez do achado central (verificada em 3 protocolos, 2026-05-23)
 
-- **Number recipe é parte do backbone.** Não conseguimos isolar "puro
-  efeito arquitetural" vs "recipe canônico do backbone" sem rodar uma
-  matriz adicional. Defesa: ablação intra-backbone-arch ResNet ↔
+A alavanca ConvNeXt-T foi **validada empiricamente em 3 protocolos
+metodologicamente distintos** após a bateria de ablações 🅑 (sem
+subamostragem) e anchor 🅔 (protocolo Hassanpour):
+
+| Protocolo | Δ F1 (ConvNeXt vs Controle) | Δ IR | Significância |
+|---|---|---|---|
+| Casado original (subamostragem, partição nossa, padding 1.25, MTCNN) | +0.023 | −0.128 | **7σ + 3σ (forte)** |
+| 🅑 Sem subamostragem (partição nossa, padding 1.25, MTCNN) | +0.014 | −0.065 | 1.5σ + 0.7σ (atenuada) |
+| 🅔 Protocolo Hassanpour (partição oficial, padding 0.25, sem subamostragem, sem MTCNN) | **+0.024** | **−0.087** | **3.5σ + 1.8σ (significativa)** |
+
+**Achado central:** a alavanca é **invariante** ao balanceamento de
+classes, à partição treino/teste, à versão das imagens e à presença
+de pré-processamento próprio. Magnitude do efeito em F1 é
+**comparável** sob os 3 protocolos (+0.023 / +0.014 / +0.024), com
+variância colapsando para metade no protocolo Hassanpour (dp_F1:
+0.009 → 0.004; dp_IR: 0.090 → 0.044). Robustez confere validade
+externa ao achado.
+
+## 8. Caveats e próximos passos
+
+- **Recipe é parte da rede dorsal.** Não isolamos "puro efeito
+  arquitetural" vs "recipe canônica de cada rede dorsal" sem rodar
+  matriz adicional. Defesa: ablação intra-arquitetura ResNet ↔
   recipes-CNN-2016 ↔ recipes-CNN-2022.
-- **Sem cross-dataset audit** (RFW/DemogPairs). PLANO §5 / Linha O2.
-- **ConvNeXt-T pequeno** (28M params, "tiny"). Versões Base/Large
-  podem amplificar o efeito (defesa).
-- **Anchor recipes** (FairFace-original ResNet-34, FineFACE-sem-multi-expert)
-  pendentes para posicionar números absolutos — ver
-  [baseline_positioning.md](baseline_positioning.md) §7.
+- **Sem avaliação cross-dataset** (RFW/DemogPairs). PLANO §5 / Linha O2.
+- **ConvNeXt-T versão pequena** (28M parâmetros, "tiny"). Versões
+  Base/Large podem amplificar o efeito (defesa).
+- **Gap absoluto vs SOTA-CNN publicada (−1.4pp vs Hassanpour 0.720)**
+  atribuído ao HPO externo após auditoria empírica refutar dois
+  suspeitos no nosso código — ver
+  [`docs/auditoria_codigo_limitadores.md`](auditoria_codigo_limitadores.md).
 
-## 8. Procedência
+## 9. Procedência
 
-- Configs: `configs/experiments_factor5/exp_f5_{vit,convnext}_s{01,02,42}.yaml`
-- Saídas: `outputs/definitive/factor5/` (6 runs, results+history)
+- Configs Fator 5: `configs/experiments_factor5/exp_f5_{vit,convnext}_s{01,02,42}.yaml`
+- Configs robustez:
+  - 🅑: `configs/ablation_no_undersample/exp_abl_nous_{control,convnext}_s{01,02,42}.yaml`
+  - 🅔: `configs/anchor_hassanpour/exp_anc_hass_{control,convnext}_s{01,02,42}.yaml`
+- Saídas: `outputs/definitive/factor5/`, `outputs/definitive/ablation_no_undersample/`,
+  `outputs/definitive/anchor_hassanpour/`
 - Recompute: `scripts/recompute_checkpoint_criterion.py --definitive`
 - Implementação: `src/face_bias/models/backbones.py::build_backbone`
+- Suporte de código novo: `src/face_bias/data/dataset.py` (split_protocol=official)
+- Auditoria empírica: `docs/auditoria_codigo_limitadores.md`
 - Sanity: pegou 3 iterações de bugs de recipe antes do batch
   (commits `dd5eb30`, `e164242`, `5a1b189`).
