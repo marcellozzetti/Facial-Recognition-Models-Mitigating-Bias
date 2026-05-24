@@ -51,6 +51,8 @@ def _build_transforms(config: dict[str, Any]) -> dict[str, transforms.Compose]:
     # Optional FineFACE-recipe-style aug (RandomCrop with padding after
     # Resize). None preserves the prior project-wide behaviour: HFlip only.
     rcrop_pad = config["training"].get("train_random_crop_padding")
+    # Optional TrivialAugmentWide (modern CNN fine-tuning baseline aug).
+    use_trivaug = config["training"].get("train_use_trivialaugment", False)
 
     eval_pipeline = transforms.Compose(
         [
@@ -64,8 +66,13 @@ def _build_transforms(config: dict[str, Any]) -> dict[str, transforms.Compose]:
         train_ops.append(
             transforms.RandomCrop(image_size, padding=int(rcrop_pad))
         )
+    train_ops.append(transforms.RandomHorizontalFlip())
+    if use_trivaug:
+        # TrivialAugmentWide: parameter-free auto-augmentation, gentle and
+        # SOTA for fine-tuning CNNs (ConvNeXt, EfficientNet recipes use it).
+        # Operates on PIL images, so inserted BEFORE ToTensor.
+        train_ops.append(transforms.TrivialAugmentWide())
     train_ops += [
-        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize(image_mean, image_std),
     ]
@@ -129,6 +136,37 @@ def _undersample_to_minority(
     return out
 
 
+def _oversample_to_majority(
+    csv_pd: pd.DataFrame, label_column: str, random_state: int
+) -> pd.DataFrame:
+    """Random oversample so every class has the same count as the majority.
+
+    Each minority class is duplicated (sample with replacement) until it
+    reaches the size of the largest class. The model effectively sees
+    minority examples multiple times per epoch — class proportions are
+    equalized without discarding majority data, at the cost of repeated
+    exposure to minority samples (potential for overfitting on those
+    specific images). Added 2026-05-23 as alternative to undersample.
+    """
+    counts = csv_pd[label_column].value_counts()
+    majority = int(counts.max())
+    logging.info(
+        f"Oversampling {label_column} to majority size {majority} (was: {counts.to_dict()})"
+    )
+    parts = []
+    for _, group in csv_pd.groupby(label_column, sort=False):
+        if len(group) >= majority:
+            parts.append(group)
+        else:
+            # sample with replacement to reach majority size
+            parts.append(
+                group.sample(n=majority, replace=True, random_state=random_state)
+            )
+    out = pd.concat(parts).sample(frac=1.0, random_state=random_state).reset_index(drop=True)
+    logging.info(f"Balanced dataset size: {len(out)} ({len(counts)} classes x {majority})")
+    return out
+
+
 def setup_dataset(config: dict[str, Any]):
     """Build train/val/test DataLoaders.
 
@@ -144,56 +182,122 @@ def setup_dataset(config: dict[str, Any]):
     csv_pd = _filter_existing_images(csv_pd, image_dir)
     csv_pd = _filter_by_class(csv_pd, "race", config["data"].get("class_filter"))
 
-    if config["data"].get("balance", "none") == "undersample":
-        csv_pd = _undersample_to_minority(
-            csv_pd,
-            label_column="race",
-            random_state=config["training"]["random_state"],
-        )
-
-    label_encoder = LabelEncoder()
-    label_encoder.fit(csv_pd["race"])
-    num_classes = len(label_encoder.classes_)
-    logging.info(f"{num_classes} classes: {list(label_encoder.classes_)}")
-    logging.info(f"{len(csv_pd)} images after filtering missing files")
-
-    X = csv_pd["file"]
-    y = csv_pd["race"]
-
-    test_size = config["training"]["test_size"]
-    val_size = config["training"].get("val_size")
+    split_protocol = config["data"].get("split_protocol", "stratified")
     random_state = config["training"]["random_state"]
 
-    # Stage 1: peel off the test set as `test_size` of the whole dataset.
-    X_train_val, X_test, y_train_val, y_test = train_test_split(
-        X, y, test_size=test_size, stratify=y, random_state=random_state
-    )
-
-    # Stage 2: peel off the validation set from the remaining train+val pool.
-    # When val_size is set, it is the *final* validation fraction of the whole
-    # dataset (so test_size=0.1 + val_size=0.1 -> 80/10/10). When omitted,
-    # we keep the legacy MBA cascade: train_test_split called twice with the
-    # same `test_size`, which yields ~64/16/20 for test_size=0.2.
-    if val_size is None:
-        stage2_test_size = test_size
+    if split_protocol == "official":
+        # Anchor 🅔 (Hassanpour-protocol): split por prefixo `file` do CSV
+        # do FairFace publication. test = val/ oficial (10,954 imgs);
+        # train+val = train/ oficial sub-dividido 75/25 com random_state.
+        # Undersample (se requisitado) aplica-se SÓ ao pool de treino, não ao
+        # test — assim o test reflete a distribuição natural do val oficial.
+        prefix = csv_pd["file"].str.split("/").str[0]
+        test_pool = csv_pd.loc[prefix == "val"].reset_index(drop=True)
+        train_pool = csv_pd.loc[prefix == "train"].reset_index(drop=True)
+        if len(test_pool) == 0 or len(train_pool) == 0:
+            raise ValueError(
+                f"split_protocol='official' requires CSV `file` column with"
+                f" 'train/' and 'val/' prefixes; got prefixes={prefix.unique().tolist()}"
+            )
         logging.info(
-            f"Split (legacy cascade): test={test_size:.0%}, "
-            f"val~{test_size * (1 - test_size):.0%}, "
-            f"train~{(1 - test_size) ** 2:.0%}"
+            f"Split (official FairFace): train_pool={len(train_pool)} (train/ prefix)"
+            f" + test={len(test_pool)} (val/ oficial)"
         )
+
+        label_encoder = LabelEncoder()
+        label_encoder.fit(csv_pd["race"])
+        num_classes = len(label_encoder.classes_)
+        logging.info(f"{num_classes} classes: {list(label_encoder.classes_)}")
+
+        X_test = test_pool["file"]
+        y_test = test_pool["race"]
+        # Sub-split do train_pool em train/val (75/25 por padrão; configurável
+        # via training.val_size que aqui é a fração do train_pool, não do total).
+        val_frac_of_train_pool = config["training"].get("val_size", 0.25)
+        X_train, X_val, y_train, y_val = train_test_split(
+            train_pool["file"],
+            train_pool["race"],
+            test_size=val_frac_of_train_pool,
+            stratify=train_pool["race"],
+            random_state=random_state,
+        )
+        logging.info(
+            f"Split sub-fractions (of train_pool): train={1-val_frac_of_train_pool:.0%},"
+            f" val={val_frac_of_train_pool:.0%}; test=val oficial"
+        )
+
+        # Aplicar balanceamento APENAS ao conjunto de treinamento (NUNCA
+        # ao val ou test). Para oversample, isso e CRITICO — aplicar antes
+        # do split causaria vazamento de dados (duplicatas em train + val).
+        balance_strategy = config["data"].get("balance", "none")
+        if balance_strategy in ("undersample", "oversample"):
+            train_df = pd.DataFrame({"file": X_train.values, "race": y_train.values})
+            if balance_strategy == "undersample":
+                train_df = _undersample_to_minority(train_df, "race", random_state)
+            else:  # oversample
+                train_df = _oversample_to_majority(train_df, "race", random_state)
+            X_train = train_df["file"]
+            y_train = train_df["race"]
     else:
-        stage2_test_size = val_size / (1 - test_size)
-        logging.info(
-            f"Split: train={1 - val_size - test_size:.0%}, val={val_size:.0%}, test={test_size:.0%}"
+        # Legacy "stratified": random stratified 80/10/10 (ou cascade) do
+        # CSV inteiro. Undersample aplica-se sobre o CSV inteiro antes
+        # de qualquer split (comportamento histórico de F1-F5 e anchors).
+        balance_strategy = config["data"].get("balance", "none")
+        if balance_strategy == "oversample":
+            raise ValueError(
+                "balance='oversample' nao e suportado em split_protocol='stratified'"
+                " (default) — duplicatas criariam vazamento entre train/val/test."
+                " Use split_protocol='official' para testar oversample."
+            )
+        if balance_strategy == "undersample":
+            csv_pd = _undersample_to_minority(
+                csv_pd,
+                label_column="race",
+                random_state=random_state,
+            )
+
+        label_encoder = LabelEncoder()
+        label_encoder.fit(csv_pd["race"])
+        num_classes = len(label_encoder.classes_)
+        logging.info(f"{num_classes} classes: {list(label_encoder.classes_)}")
+        logging.info(f"{len(csv_pd)} images after filtering missing files")
+
+        X = csv_pd["file"]
+        y = csv_pd["race"]
+
+        test_size = config["training"]["test_size"]
+        val_size = config["training"].get("val_size")
+
+        # Stage 1: peel off the test set as `test_size` of the whole dataset.
+        X_train_val, X_test, y_train_val, y_test = train_test_split(
+            X, y, test_size=test_size, stratify=y, random_state=random_state
         )
 
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train_val,
-        y_train_val,
-        test_size=stage2_test_size,
-        stratify=y_train_val,
-        random_state=random_state,
-    )
+        # Stage 2: peel off the validation set from the remaining train+val pool.
+        # When val_size is set, it is the *final* validation fraction of the whole
+        # dataset (so test_size=0.1 + val_size=0.1 -> 80/10/10). When omitted,
+        # we keep the legacy MBA cascade: train_test_split called twice with the
+        # same `test_size`, which yields ~64/16/20 for test_size=0.2.
+        if val_size is None:
+            stage2_test_size = test_size
+            logging.info(
+                f"Split (legacy cascade): test={test_size:.0%}, "
+                f"val~{test_size * (1 - test_size):.0%}, "
+                f"train~{(1 - test_size) ** 2:.0%}"
+            )
+        else:
+            stage2_test_size = val_size / (1 - test_size)
+            logging.info(
+                f"Split: train={1 - val_size - test_size:.0%}, val={val_size:.0%}, test={test_size:.0%}"
+            )
+
+        X_train, X_val, y_train, y_val = train_test_split(
+            X_train_val,
+            y_train_val,
+            test_size=stage2_test_size,
+            stratify=y_train_val,
+            random_state=random_state,
+        )
 
     # Encode the string labels once up-front so __getitem__ doesn't have
     # to call LabelEncoder.transform per sample in every worker.

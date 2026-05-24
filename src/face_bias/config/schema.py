@@ -92,6 +92,11 @@ class TrainingConfig(BaseModel):
     # Optional train-time RandomCrop padding (after Resize). 0/None disables
     # it. FineFACE recipe uses padding=8 (Resize 460 -> Crop 448).
     train_random_crop_padding: Optional[int] = Field(default=None, ge=0)
+    # Optional TrivialAugmentWide (Müller & Hutter 2021) on train images.
+    # Stronger augmentation policy used in modern CNN fine-tuning (ConvNeXt
+    # paper among others). When True, applied AFTER RandomHorizontalFlip and
+    # BEFORE ToTensor. Default False preserves backwards compatibility.
+    train_use_trivialaugment: bool = False
     scheduler: Literal["onecyclelr", "cosineannealingwarmrestarts"] = "onecyclelr"
     loss_function: Literal[
         "cross_entropy", "arcface", "adaface", "magface"
@@ -145,10 +150,19 @@ class DataConfig(BaseModel):
     dataset_file: Optional[str] = None
     dataset_image_input_path: Optional[str] = None
     dataset_image_output_path: Optional[str] = None
-    balance: Literal["none", "undersample"] = "none"
+    balance: Literal["none", "undersample", "oversample"] = "none"
     # When set, restrict the dataset to rows whose `race` is in this list
     # (used to reproduce MBA Exp. 7 and 8 — Black + White only).
     class_filter: Optional[list[str]] = None
+    # Split protocol (added 2026-05-22 for anchor 🅔 Hassanpour-protocol):
+    #   "stratified" (default, legacy): random stratified split via
+    #     train_test_split using training.{test_size, val_size, random_state}.
+    #   "official": uses FairFace's published train/val partition via the
+    #     `file` column prefix ("train/" vs "val/"). test = val oficial
+    #     (10,954 images); val = 25% sub-split of "train/" prefix (seeded by
+    #     training.random_state); train = remaining 75% of "train/" prefix.
+    #     Matches Hassanpour et al. 2024 protocol.
+    split_protocol: Literal["stratified", "official"] = "stratified"
 
 
 class BucketConfig(BaseModel):
