@@ -50,8 +50,8 @@ preprocessing:
   max_faces_per_image: 1
 data:
   dataset_file: data/raw/fairface/fairface_labels.csv
-  dataset_image_input_path: data/raw/bucket
-  dataset_image_output_path: data/raw/bucket
+  dataset_image_input_path: data/raw/bucket/fairface-img-margin125
+  dataset_image_output_path: data/raw/bucket/fairface-img-margin125
   balance: undersample
 bucket:
   function: download

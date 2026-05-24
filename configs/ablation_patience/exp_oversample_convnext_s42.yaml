@@ -1,0 +1,86 @@
+# Teste D (oversampling) — ConvNeXt-T + Hassanpour-protocol + balance: oversample
+#
+# Hipotese alternativa para fechar parte do gap -1.4pp vs Hassanpour:
+# replicar amostras minoritarias ate tamanho da majoritaria (em vez de
+# subamostragem que perde dados, ou imbalance natural que ignora desequilibrio).
+#
+# Setup: ConvNeXt-T sob protocolo Hassanpour (anchor 🅔) seed 42, mudando APENAS:
+#   - data.balance: none -> oversample
+# Aplicado APENAS ao conjunto de treinamento (apos sub-split do train_pool 75/25),
+# para evitar vazamento de dados entre train e val.
+#
+# Predicao baseada em literatura: oversampling melhora marginalmente fairness
+# (~+0.5pp acc), mas pode causar sobreajuste em amostras minoritarias
+# repetidas. Diferente de Teste B (TrivialAugment): nao altera imagens,
+# apenas frequencia de classes.
+#
+# Criterio explicito de parada: rodar mais seeds apenas se F1 subir >= +0.5pp
+# (criterio mais brando que Teste B porque a literatura sugere ganho menor).
+#
+# Custo: ~3h GPU (1 seed × ate ep.13 com early stop; dataset cresce de ~65k
+# para ~7*16.5k=~115k amostras, ~75% mais por epoca).
+
+model:
+  name: LResNet50E_IR
+  backbone_arch: convnext_tiny
+  pretrained: true
+  num_classes: 7
+  dropout: 0.2
+  head: linear
+  arcface_s: 30.0
+  arcface_m: 0.5
+  arcface_easy_margin: false
+training:
+  batch_size: 64
+  learning_rate: 0.0001
+  num_epochs: 25
+  optimizer: adamw
+  scheduler: cosineannealingwarmrestarts
+  loss_function: cross_entropy
+  test_size: 0.1
+  val_size: 0.25
+  num_workers: 0
+  random_state: 42
+  grad_clip_norm: 5.0
+  early_stopping_patience: 5
+  use_amp: false
+image:
+  image_size:
+  - 224
+  - 224
+  image_mean:
+  - 0.485
+  - 0.456
+  - 0.406
+  image_std:
+  - 0.229
+  - 0.224
+  - 0.225
+preprocessing:
+  processing_type: detect_adjust_image
+  num_workers: 4
+  rotate_angle: 45
+  num_rotations: 8
+  max_faces_per_image: 1
+data:
+  dataset_file: data/raw/fairface/fairface_labels.csv
+  dataset_image_input_path: data/raw/bucket/fairface-img-margin025
+  dataset_image_output_path: data/raw/bucket/fairface-img-margin025
+  balance: oversample   # <<< unica mudanca: none -> oversample
+  split_protocol: official
+bucket:
+  function: download
+  bucket_client: s3
+  bucket_path_file: data/raw/bucket/
+  object_file_name: fairface_original_images.zip
+  bucket_name: dataset-fairface
+logging:
+  log_dir: outputs/logs
+  log_level: INFO
+  format: '%(asctime)s [%(run_id)s] %(name)s %(levelname)s: %(message)s'
+  log_bucket_file: bucket.log
+  log_preprocessing_file: preprocessing.log
+  log_face_data_file: face_data.log
+  log_version_file: version.log
+  log_training_file: training.log
+  log_evaluation_file: evaluation.log

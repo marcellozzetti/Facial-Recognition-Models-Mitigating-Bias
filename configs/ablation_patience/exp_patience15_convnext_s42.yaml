@@ -1,0 +1,84 @@
+# Teste cirurgico A — ConvNeXt-T + Hassanpour-protocol + patience=15
+#
+# Hipotese: o limitador atual e a combinacao cosine warm restart T_0=8 +
+# early_stopping_patience=5. Padrao observado em todos experimentos: best
+# F1 entre ep.7-8 (antes do 1o restart), ep.9 colapsa pelo restart, ep.10-13
+# recupera mas nao bate, patience=5 dispara → early stop sistemico ~ep.12-14.
+#
+# Este teste mantem o ConvNeXt-T (alavanca confirmada) sob protocolo Hassanpour
+# (padding 0.25 + split oficial + no-undersample) seed 42, mudando APENAS
+# patience: 5 → 15. Permite ao modelo sobreviver atraves dos 2-3 ciclos cosine.
+#
+# Custo: ~2h GPU (1 seed × ate 25 ep).
+# Predicao: se cosine restart e o limitador, F1 sobe +1-2pp (fechando o gap
+# de -1.4pp vs Hassanpour RN-34 = 0.720).
+#
+# Se F1 nao mover (~0.71), o gap residual e HPO da recipe do Hassanpour
+# (parametros nao declarados que nao podemos isolar).
+#
+# Ver docs/auditoria_codigo_limitadores.md (a ser escrito apos resultado).
+
+model:
+  name: LResNet50E_IR
+  backbone_arch: convnext_tiny
+  pretrained: true
+  num_classes: 7
+  dropout: 0.2
+  head: linear
+  arcface_s: 30.0
+  arcface_m: 0.5
+  arcface_easy_margin: false
+training:
+  batch_size: 64
+  learning_rate: 0.0001
+  num_epochs: 25
+  optimizer: adamw
+  scheduler: cosineannealingwarmrestarts
+  loss_function: cross_entropy
+  test_size: 0.1
+  val_size: 0.25
+  num_workers: 0
+  random_state: 42
+  grad_clip_norm: 5.0
+  early_stopping_patience: 15   # <<< unica mudanca: 5 → 15
+  use_amp: false
+image:
+  image_size:
+  - 224
+  - 224
+  image_mean:
+  - 0.485
+  - 0.456
+  - 0.406
+  image_std:
+  - 0.229
+  - 0.224
+  - 0.225
+preprocessing:
+  processing_type: detect_adjust_image
+  num_workers: 4
+  rotate_angle: 45
+  num_rotations: 8
+  max_faces_per_image: 1
+data:
+  dataset_file: data/raw/fairface/fairface_labels.csv
+  dataset_image_input_path: data/raw/bucket/fairface-img-margin025
+  dataset_image_output_path: data/raw/bucket/fairface-img-margin025
+  balance: none
+  split_protocol: official
+bucket:
+  function: download
+  bucket_client: s3
+  bucket_path_file: data/raw/bucket/
+  object_file_name: fairface_original_images.zip
+  bucket_name: dataset-fairface
+logging:
+  log_dir: outputs/logs
+  log_level: INFO
+  format: '%(asctime)s [%(run_id)s] %(name)s %(levelname)s: %(message)s'
+  log_bucket_file: bucket.log
+  log_preprocessing_file: preprocessing.log
+  log_face_data_file: face_data.log
+  log_version_file: version.log
+  log_training_file: training.log
+  log_evaluation_file: evaluation.log

@@ -30,11 +30,14 @@ SEEDS = [42, 1, 2]
 
 # Paths das imagens RAW originais (read-only — não alterar):
 #   - CSV raw (97k linhas, sem multi-face cleaning) já existe localmente
-#   - Imagens FairFace publicado original em data/raw/bucket/{train,val}/*.jpg
+#   - Imagens FairFace publicado original em
+#     data/raw/bucket/fairface-img-margin125/{train,val}/*.jpg
 # F1-F5 NÃO usam estes paths — eles usam fairface_labels_clean.csv +
 # data/processed/fairface_aligned. Os dois pipelines coexistem.
+# Updated 2026-05-22: bucket reorganized — margin125 (existing) e margin025
+# (NEW, baixado para o anchor 🅔 Hassanpour-protocol).
 RAW_CSV = "data/raw/fairface/fairface_labels.csv"
-RAW_IMAGES = "data/raw/bucket"
+RAW_IMAGES = "data/raw/bucket/fairface-img-margin125"
 
 
 def _cfg(seed: int) -> dict:
