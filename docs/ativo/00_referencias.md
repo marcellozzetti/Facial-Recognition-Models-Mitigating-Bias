@@ -34,13 +34,15 @@
 |---|---|---|---|---|---|---|
 | S1 | arXiv:2410.24148 | **Nouar AlDahoul, Myles Joshua Toledo Tan, Harishwar Reddy Kasireddy, Yasir Zaki** | Exploring Vision Language Models for Facial Attribute Recognition: Emotion, Race, Gender, and Age | arXiv preprint, 2024 (submetido 31 Oct 2024) | ✅ VERIFIED | "Hassanpour et al. 2024" — INCORRETO |
 | S2 | arXiv:1908.04913 | **Kimmo Kärkkäinen, Jungseock Joo** | FairFace: Face Attribute Dataset for Balanced Race, Gender, and Age | WACV 2021 (arXiv v1 14 Aug 2019) | ✅ VERIFIED | (correto) |
-| S3 | arXiv:2408.16881 | **Ayesha Manzoor, Ajita Rattani** | FineFACE: Fair Facial Attribute Classification Leveraging Fine-grained Features | arXiv preprint, 2024 (submetido 29 Aug 2024) | ✅ VERIFIED | "Liu et al. 2024" — INCORRETO |
+| S3 | arXiv:2408.16881 | **Ayesha Manzoor, Ajita Rattani** | FineFACE: Fair Facial Attribute Classification Leveraging Fine-grained Features | **ICPR 2024** (Springer LNCS) — arXiv v1 29 Aug 2024 | ✅ VERIFIED | "Liu et al. 2024" — INCORRETO; venue inicialmente registrado como "preprint" — corrigido após triagem (Semantic Scholar 2026-05-25) |
 | S4 | arXiv:2404.09454 | **Sepehr Dehdashtian, Bashir Sadeghi, Vishnu Naresh Boddeti** | Utility-Fairness Trade-Offs and How to Find Them (U-FaTE) | IEEE/CVF CVPR 2024 | ✅ VERIFIED | "Sojitra et al. 2024" — INCORRETO |
 | S5 | arXiv:2207.10888 | **Xiaofeng Lin, Seungbae Kim, Jungseock Joo** | FairGRAPE: Fairness-aware GRAdient Pruning mEthod for Face Attribute Classification | ECCV 2022 | ✅ VERIFIED | (correto) |
 | S6 | arXiv:2312.14626 | **Iris Dominguez-Catena, Daniel Paternain, Mikel Galar** | DSAP: Analyzing Bias Through Demographic Comparison of Datasets | Information Fusion, 2024 | ✅ VERIFIED | "Sánchez-Sánchez et al. 2024" — INCORRETO |
 | S7 | arXiv:2504.08396 | **Valentin Lafargue, Emmanuelle Claeys, Jean-Michel Loubes** | Fairness is in the details: Face Dataset Auditing | ECML PKDD 2025 (LNCS vol 16022) | ✅ VERIFIED | "Galera-Zarco et al. 2025" — INCORRETO |
+| S8 | arXiv:1812.00194 | **Mei Wang, Weihong Deng, Jiani Hu, Xunqiang Tao, Yaohai Huang** | Racial Faces in-the-Wild: Reducing Racial Bias by Information Maximization Adaptation Network (RFW) | **ICCV 2019** (IEEE/CVF) | ✅ VERIFIED | (novo, incluído na triagem 2026-05-25 como dataset complementar ao FairFace) |
+| S9 | NISTIR 8280 | **Patrick J. Grother, Mei L. Ngan, Kayee K. Hanaoka** | Face Recognition Vendor Test (FRVT) Part 3: Demographic Effects | **NIST Interagency Report 8280**, dez/2019 (relatório técnico oficial) | ✅ VERIFIED | (novo, incluído na triagem 2026-05-25 como referência industry-wide; tipo: technical report, não peer-reviewed mas escala 200 algoritmos / 18M imagens) |
 
-**Score Seção 1:** 7 verificados | 5 estavam ERRADOS | 2 estavam CORRETOS
+**Score Seção 1:** 9 verificados | 5 estavam ERRADOS | 4 estavam CORRETOS (incluindo S8 e S9 novos)
 
 ## Seção 2 — Papers de arquitetura e métodos
 
@@ -123,7 +125,39 @@ como fonte para novos textos. Qualquer reuso requer re-verificação.
   efetivamente citadas em algum material ativo. Por ora, mantidas como
   conhecimento canônico não-disputado.
 
-## Seção 7 — Reconhecimento de falha (registro)
+## Seção 7 — Triagem editorial (Pesquisa Bibliográfica)
+
+A Pesquisa Bibliográfica formal (ver `04_pesquisa_bibliografica/README.md`)
+introduziu **dois critérios adicionais** de seleção de papers, exigidos
+pelo orientador na reunião de 2026-05-25:
+
+- **Critério 4 — Relevância editorial:** venue revisado por pares (lista
+  detalhada em `04_pesquisa_bibliografica/README.md` §3.2). Preprints
+  arXiv aceitos apenas com cobertura única ou impacto demonstrado.
+- **Critério 5 — Impacto:** contagem de citações via Semantic Scholar +
+  Google Scholar, modulada por idade do paper.
+
+Os dados de triagem (venue confirmado + contagem de citações + decisão
+de inclusão) dos papers desta Seção 1 + papers adicionais estão
+catalogados em `04_pesquisa_bibliografica/_triagem.md`. Resumo da
+Rodada 1 (2026-05-25):
+
+| Paper desta seção | Citações S2 (2026-05-25) | Decisão |
+|---|---|---|
+| S1 (AlDahoul et al. 2024) | 11 | ✅ aprovado por exceção (cobertura única) |
+| S2 (FairFace 2021) | ≥263 GS (S2 pendente por rate limit) | ✅ aprovado (dataset central) |
+| S3 (FineFACE / Manzoor & Rattani 2024) | 2 | ✅ aprovado por exceção (proximidade temática) |
+| S4 (U-FaTE / Dehdashtian et al. 2024) | 23 | ✅ aprovado |
+| S6 (DSAP / Dominguez-Catena et al. 2024) | 7 | ✅ aprovado (venue top: Information Fusion) |
+| S7 (Lafargue et al. 2025) | 1 | ✅ aprovado por exceção (cobertura única: EU AI Act) |
+| S8 (RFW / Wang et al. 2019) | pendente | ✅ aprovado (venue top + dataset seminal) |
+| S9 (NISTIR 8280 / Grother et al. 2019) | n/a (não-paper) | ✅ aprovado por exceção (technical report autoritativo) |
+
+Toda atualização futura (mudança de venue, citações novas, papers
+adicionais) é registrada em `_triagem.md` e refletida aqui após
+verificação. `_triagem.md` é log; este documento é a fonte de verdade.
+
+## Seção 8 — Reconhecimento de falha (registro)
 
 Entre 2026-05-10 e 2026-05-24, foram produzidos ~20 documentos
 contendo citações com autoria incorreta. A causa raiz foi **síntese de
