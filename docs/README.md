@@ -17,7 +17,7 @@ docs/
 │   ├── 01_taxonomia.md         ← nomenclatura + glossário EN-PT
 │   ├── 02_metodologia.md       ← protocolo experimental e métodos
 │   ├── 03_metricas.md          ← métricas usadas, com procedência
-│   ├── 04_survey/              ← uma ficha .md por paper VERIFIED e lido
+│   ├── 04_pesquisa_bibliografica/  ← metodologia + uma ficha .md por paper VERIFIED e lido
 │   ├── 05_landscape.md         ← síntese da paisagem da literatura
 │   ├── 06_gap.md               ← identificação do gap real
 │   ├── 07_thesis_statement.md  ← thesis statement v3
@@ -38,8 +38,9 @@ docs/
    Sem verificação, sem citação.
 
 2. **Toda síntese de conteúdo de um paper** deve ter um arquivo
-   correspondente em `ativo/04_survey/<autor>_<ano>.md` baseado em
-   leitura integral do PDF.
+   correspondente em `ativo/04_pesquisa_bibliografica/<autor>_<ano>.md`
+   baseado em leitura integral do PDF (template e critérios em
+   `ativo/04_pesquisa_bibliografica/README.md`).
 
 3. **Termos técnicos** seguem a taxonomia consolidada em
    `ativo/01_taxonomia.md`. Não introduzir termo novo sem registrá-lo lá.
@@ -62,7 +63,10 @@ docs/
   Cinco autorias estavam confabuladas; verificação documentada em
   `ativo/00_referencias.md`.
 - ⏳ `ativo/01_taxonomia.md` em construção.
-- ⏳ `ativo/02_metodologia.md`, `03_metricas.md`, `04_survey/` —
-  pendentes (parte do plano de trabalho aprovado em 2026-05-25).
+- ✅ `ativo/04_pesquisa_bibliografica/README.md` criado (metodologia
+  com 5 critérios de seleção, template de ficha em 10 seções, fluxo
+  em 4 fases A→D).
+- ⏳ `ativo/02_metodologia.md`, `03_metricas.md` — pendentes (parte do
+  plano de trabalho aprovado em 2026-05-25).
 - ⏳ Survey rigoroso da literatura de fairness em classificação racial
   facial — pendente.
