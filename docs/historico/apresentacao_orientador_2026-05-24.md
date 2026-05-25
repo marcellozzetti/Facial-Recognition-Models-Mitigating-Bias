@@ -31,7 +31,7 @@ Programa: Mestrado em Ciência da Computação — Unifesp/ICT
 | **Conjunto de dados** | Manter FairFace (97k brutas / 72k clean) | Único dataset facial explicitamente balanceado por raça (Kärkkäinen 2021); padrão na literatura de fairness |
 | **Asset do MBA** | Aproveitar pipeline + ganho de +1.35pp F1 do cleaning | Reuso de investimento — Cap. 4 MBA-USP estabeleceu baseline reproduzível |
 | **Tarefa de classificação** | Raça em 7 classes, no-domain | Tarefa sem benchmark canônico publicado — espaço fértil para atribuição |
-| **Arquitetura padrão** | ResNet-50 ImageNet pré-treinada | Equivalente arquitetural a Hassanpour 2024 ResNet-34 baseline |
+| **Arquitetura padrão** | ResNet-50 ImageNet pré-treinada | Equivalente arquitetural a AlDahoul et al. 2024 ResNet-34 baseline |
 | **Recipe de treino** | AdamW lr=1e-3 + 224×224 + 25 épocas + cosine warm restart | Modernização incremental da recipe FairFace original |
 | **Protocolo experimental** | 3 sementes aleatórias casadas (42, 1, 2) | Alinhado com Pineau JMLR 2021 (replicabilidade ML) |
 | **Critério de seleção** | val_f1_macro (Pareto-aware) | Corrige viés sistêmico de min(val_loss) p/ cabeças com margem angular |
@@ -59,7 +59,7 @@ entra/não entra na dissertação.
 
 ### Auditoria contínua
 - ✅ **Auditoria de fórmulas vs literatura** (`docs/formula_desk_check.md`)
-- ✅ **Procedência declarada** para cada métrica (Hassanpour, FineFACE, Mehrabi)
+- ✅ **Procedência declarada** para cada métrica (AlDahoul et al., FineFACE, Mehrabi)
 - ✅ **Documentação reproduzível** por experimento (configs YAML + scripts)
 
 ### Replicabilidade (alinhada com guidelines modernas)
@@ -83,7 +83,7 @@ entra/não entra na dissertação.
 
 | Métrica nossa | Equivalente literatura | Fonte |
 |---|---|---|
-| `disparity_ratio` | Max-Min Ratio | **Hassanpour 2024**, **FineFACE 2024** |
+| `disparity_ratio` | Max-Min Ratio | **AlDahoul et al. 2024**, **FineFACE 2024** |
 | `max_min_disparity` | Max-Min Gap | Mehrabi et al. ACM CSur 2021 |
 | `coefficient_of_variation` | CV / dispersão estatística | Speicher KDD 2018 |
 | `gini` | Coeficiente de Gini | Speicher KDD 2018; origem econométrica |
@@ -91,7 +91,7 @@ entra/não entra na dissertação.
 ### Decisão de nomenclatura
 
 `inequity_rate → disparity_ratio` (renomeação em 2026-05-23) — alinhado
-com Hassanpour 2024 e FineFACE 2024, evitando confusão com o IR de
+com AlDahoul et al. 2024 e FineFACE 2024, evitando confusão com o IR de
 verificação biométrica de Pereira & Marcel (que é produto FMR × FNMR).
 
 ---
@@ -146,9 +146,9 @@ mover equidade. Achado verificado e replicado em 3 protocolos.
 | FairGRAPE (ECCV 2022) | ❌ (compressão) |
 | DSAP (Inf. Fusion 2024) | ❌ (auditoria de dataset) |
 | Fairness-is-in-Details (ECML 2025) | ❌ (auditoria de dataset) |
-| **Hassanpour 2024 (arXiv 2410.24148)** | ✅ **ÚNICA referência publicada** |
+| **AlDahoul et al. 2024 (arXiv 2410.24148)** | ✅ **ÚNICA referência publicada** |
 
-**Achado central:** **Hassanpour 2024 é a SOTA-CNN real** (ResNet-34 = 0.720
+**Achado central:** **AlDahoul et al. 2024 é a SOTA-CNN real** (ResNet-34 = 0.720
 acurácia). FaceScanPaliGemma do mesmo paper = 0.757 mas é VLM de 3
 bilhões de parâmetros — não comparável arquiteturalmente.
 
@@ -161,12 +161,12 @@ bilhões de parâmetros — não comparável arquiteturalmente.
 | **Exp-FairFace** | Recipe paper-pai (RN-34 + Adam) | F1 = 0.676 ± 0.006 |
 | **Exp-FineFACE** | Recipe FineFACE sem multi-expert | F1 = 0.663 ± 0.007 |
 | **Exp-DadosBrutos** | Sem nosso pré-processamento | F1 = 0.695 ± 0.006 |
-| **Exp-ProtocoloSOTA** | Reprodução integral do protocolo Hassanpour | F1 = 0.703 ± 0.005, IR = 1.541 |
+| **Exp-ProtocoloSOTA** | Reprodução integral do protocolo AlDahoul et al. | F1 = 0.703 ± 0.005, IR = 1.541 |
 
 **Observações:**
 - Nosso recipe AdamW@224 é localmente ótimo (Exp-FairFace e Exp-FineFACE entregam F1 abaixo)
 - Pré-processamento custa F1 e IR (Exp-DadosBrutos melhora)
-- Sob protocolo Hassanpour idêntico: −0.85pp single-vs-single (1.7σ da variância)
+- Sob protocolo AlDahoul et al. idêntico: −0.85pp single-vs-single (1.7σ da variância)
 
 ---
 
@@ -185,7 +185,7 @@ bilhões de parâmetros — não comparável arquiteturalmente.
 2. **Alavanca ConvNeXt-T PERSISTE em 3 protocolos:**
    - Protocolo casado original: +2.3pp F1 (~7σ)
    - Sem subamostragem: +1.4pp F1 (~1.5σ — atenuada)
-   - Protocolo Hassanpour: +2.4pp F1 (~3.5σ)
+   - Protocolo AlDahoul et al.: +2.4pp F1 (~3.5σ)
    - **Robusta em 3 protocolos distintos**
 
 ---
@@ -232,7 +232,7 @@ simultaneamente, robusta em 3 protocolos:**
 |---|---|---|
 | Casado original (5 Fatores) | **+2.3pp (~7σ)** | **−0.128 (~3σ)** |
 | Sem subamostragem (Rob) | +1.4pp (~1.5σ) | −0.065 (~0.7σ) |
-| Protocolo Hassanpour (Exp-ProtocoloSOTA) | **+2.4pp (~3.5σ)** | **−0.087 (~1.8σ)** |
+| Protocolo AlDahoul et al. (Exp-ProtocoloSOTA) | **+2.4pp (~3.5σ)** | **−0.087 (~1.8σ)** |
 
 **Hipóteses mecanísticas a discutir** (Fator 5):
 - H1: LayerNorm > BatchNorm em lotes demograficamente assimétricos
@@ -267,7 +267,7 @@ com margem angular (ArcFace, AdaFace, MagFace).
 
 | Configuração | Acurácia | F1 | IR ↓ | Comparação |
 |---|---|---|---|---|
-| Hassanpour ResNet-34 baseline (single-run) | **0.720** | — | — | referência |
+| AlDahoul ResNet-34 baseline (single-run) | **0.720** | — | — | referência |
 | **Nosso ConvNeXt-T single seed (s42)** | **0.7115** | 0.7083 | 1.496 | **−0.85pp (1.7σ)** — simétrica |
 | Nosso ConvNeXt-T média 3 seeds | 0.7060 ± 0.005 | 0.7034 ± 0.005 | 1.541 ± 0.044 | −1.4pp (com variância) |
 | Nosso ConvNeXt-T deep ensemble | 0.7299 | 0.7285 | 1.501 | agregação (Lakshminarayanan 2017) |
@@ -277,7 +277,7 @@ com margem angular (ArcFace, AdaFace, MagFace).
 **Mensagem ética para a banca:**
 
 > *"Sob comparação simétrica single-vs-single (consistente com a
-> metodologia de single-run reportada por Hassanpour 2024), nosso sistema
+> metodologia de single-run reportada por AlDahoul et al. 2024), nosso sistema
 > fica a −0.85pp do baseline, dentro de 1.7σ da variância natural
 > medida em nosso protocolo 3-seed. As estimativas agregadas (ensemble,
 > TTA, calibração) refletem MAIOR CONFIABILIDADE da estimativa via

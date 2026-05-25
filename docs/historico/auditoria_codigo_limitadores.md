@@ -5,15 +5,15 @@
 > três limitadores suspeitos, testa empiricamente os dois mais prováveis,
 > e demonstra que **nenhum deles é o limitador real**. Conclui que o gap
 > absoluto residual vs SOTA é atribuível à otimização de hiperparâmetros
-> (HPO) não publicada por Hassanpour et al. 2024, fora do escopo desta
+> (HPO) não publicada por AlDahoul et al., 2024, fora do escopo desta
 > dissertação. Data: 2026-05-23.
 
 ## 1. Motivação científica
 
 Após a bateria experimental completa (5 fatores + 3 anchors + ablação 🅑
-no-undersample + anchor 🅔 Hassanpour-protocol), o gap absoluto de
+no-undersample + anchor 🅔 AlDahoul-protocol), o gap absoluto de
 **−1.4pp** entre nosso ConvNeXt-T (acurácia=0.706) e o ResNet-34 baseline
-de Hassanpour et al. 2024 (acurácia=0.720) sob protocolo idêntico
+de AlDahoul et al., 2024 (acurácia=0.720) sob protocolo idêntico
 permaneceu inexplicado. **Antes de atribuir o resíduo à recipe deles**,
 exigimos verificação empírica de que o nosso código não contém
 limitadores que estejam mascarando o desempenho real do modelo.
@@ -86,7 +86,7 @@ de ser limitador isolado). Caveat declarado.
 
 Para validar os suspeitos sem reabrir frente experimental, escolhi
 **dois testes cirúrgicos** sobre ConvNeXt-T seed 42 sob protocolo
-Hassanpour (anchor 🅔), variando **um único hiperparâmetro por vez**:
+AlDahoul et al. (anchor 🅔), variando **um único hiperparâmetro por vez**:
 
 ### 3.1 Teste A — paciência aumentada (5 → 15)
 
@@ -117,7 +117,7 @@ escalonador não é o limitador.
 
 ### 3.3 Teste B — augmentation moderna (TrivialAugmentWide)
 
-**Justificativa:** explorar se a recipe do Hassanpour usa augmentation
+**Justificativa:** explorar se a recipe do AlDahoul et al. usa augmentation
 mais rica não declarada. TrivialAugmentWide é a augmentation
 parameter-free recomendada no paper original do ConvNeXt e em
 benchmarks modernos de fine-tuning.
@@ -266,7 +266,7 @@ demograficamente).
 |---|---|---|---|---|
 | Cosine warm restart T_0=8 + paciência=5 | terminação prematura no fim do 1º ciclo | Teste A: paciência=15 | bit-a-bit idêntico | **refutado** |
 | Dropout=0.2 sobre-regularizando | dropout muito alto para ajuste fino moderno | Teste C1: dropout=0.0 | F1 −0.003, IR +0.058 | **refutado** (e descoberta inversa) |
-| Augmentation ausente | recipe Hassanpour usa augmentation rica não declarada | Teste B: TrivialAugmentWide | F1 +0.9pp (< +1pp critério); −6.71pp recall East Asian | **rejeitado por fundamento principiado** (deslocamento de viés) |
+| Augmentation ausente | recipe AlDahoul et al. usa augmentation rica não declarada | Teste B: TrivialAugmentWide | F1 +0.9pp (< +1pp critério); −6.71pp recall East Asian | **rejeitado por fundamento principiado** (deslocamento de viés) |
 | Desequilíbrio de classes (vs oversample) | oversample minoritárias melhora equidade | Teste D: balance=oversample | F1 −2.07pp; **Latino_Hispanic colapsou −12.51pp** | **rejeitado por evidência catastrófica** (memorização de duplicatas) |
 | Weight decay=5e-4 | wd alto para fine-tuning moderno | não testado | — | improvável (canônico AdamW) |
 
@@ -280,13 +280,13 @@ foi corroborado pelos testes empíricos.** Especificamente:
 2. O dropout p=0.2 não está sobre-regularizando — removê-lo piora F1 e
    piora razão de disparidade.
 
-**Implicação para o gap residual de −1.4pp vs Hassanpour et al. 2024:**
+**Implicação para o gap residual de −1.4pp vs AlDahoul et al., 2024:**
 
 > *"Sob protocolo metodologicamente idêntico (versão das imagens
 > padding=0.25, partição train/val oficial do FairFace, sem subamostragem
 > por raça, sem nossa limpeza multi-face nem realinhamento MTCNN),
 > nosso ConvNeXt-T entrega acurácia=0.7060 ± 0.0048 e razão de
-> disparidade=1.541 ± 0.044, comparado a 0.720 reportado por Hassanpour
+> disparidade=1.541 ± 0.044, comparado a 0.720 reportado por AlDahoul et al.
 > et al. 2024 com ResNet-34. O gap absoluto de −1.4pp é atribuído à
 > **otimização de hiperparâmetros (HPO) realizada pelos autores e não
 > publicada integralmente** — investigação empírica nas duas variáveis

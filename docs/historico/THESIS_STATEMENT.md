@@ -4,7 +4,7 @@
 > pesquisa, método, contribuições, achados, valor científico, limitações
 > honestas e escopo. Versão 2.0 (2026-05-23), incorporando os achados
 > finais das bateria 🅑 (ablação sem subamostragem) e 🅔 (protocolo
-> Hassanpour) + auditoria empírica de código (Testes A e C1).
+> AlDahoul et al.) + auditoria empírica de código (Testes A e C1).
 > Terminologia alinhada com Haykin, *Redes Neurais: Princípios e
 > Práticas* (2ª ed.). **Tudo que não cabe aqui é fora de escopo.**
 
@@ -30,7 +30,7 @@ facial?"**
 A pesquisa textual exaustiva ([sota_7class_race_audit.md](sota_7class_race_audit.md))
 identifica apenas duas referências publicadas para esta tarefa exata:
 
-- **Hassanpour et al. 2024** (arXiv 2410.24148, *Exploring Vision Language
+- **AlDahoul et al., 2024** (arXiv 2410.24148, *Exploring Vision Language
   Models for Facial Attribute Recognition*): ResNet-34 = 0.720 acurácia,
   FaceScanPaliGemma (VLM) = 0.757 acurácia / 0.750 F1.
 - **Modelo comunitário** (Anzhc HF, YOLO11x): 0.735 acurácia.
@@ -42,14 +42,14 @@ FairFace **não resolvem essa tarefa**:
   categorias mescladas (0.754 acurácia) e binário (0.937 acurácia);
   rodapé explícito da Tabela 3: *"only 4 races were used to make it
   comparable to UTKFace"*. **Não publica raça em 7 categorias no-domain.**
-- **FineFACE (Liu et al., 2024):** classifica **gênero** (binário) e 13
+- **FineFACE (Manzoor & Rattani, 2024):** classifica **gênero** (binário) e 13
   atributos faciais com raça como **atributo protegido** para medir
   disparidade entre grupos. A "manchete 96.4% accuracy" é acurácia de
   gênero, não de raça. **Não classifica raça.** (Achado da auditoria
   textual 2026-05-22.)
 
 **Consequência metodológica:** a tarefa que rodamos tem referência
-mínima (Hassanpour + YOLO), mas **carece de ecossistema saturado de
+mínima (AlDahoul et al. + YOLO), mas **carece de ecossistema saturado de
 mitigação**. Espaço fértil para contribuição metodológica de atribuição
 sobre tarefa não-saturada.
 
@@ -92,10 +92,10 @@ Para situar números absolutos vs a literatura sem reprodução integral:
   (3 sementes cada) com `balance: none`, mantendo nossa partição.
   Testa se a alavanca ConvNeXt-T sobrevive à decisão de balanceamento
   de classes por raça.
-- **🅔 (protocolo Hassanpour):** Mesmas duas arquiteturas com **padding
+- **🅔 (protocolo AlDahoul et al.):** Mesmas duas arquiteturas com **padding
   0.25 + partição oficial FairFace train/val + sem subamostragem +
   sem nossa limpeza multi-face**. Reproduz integralmente o setup
-  metodológico de Hassanpour 2024, fechando 5 confundidores de uma vez.
+  metodológico de AlDahoul et al. 2024, fechando 5 confundidores de uma vez.
 
 ### 3.4 Auditoria empírica de código (Testes A e C1)
 
@@ -124,15 +124,15 @@ Quadro consolidado (casado 3-seed, critério val_f1_macro):
 |---|---|---|---|
 | Casado original (subamostragem, partição nossa) | +0.023 | −0.128 | **7σ + 3σ** |
 | Ablação 🅑 (sem subamostragem, partição nossa) | +0.014 | −0.065 | 1.5σ + 0.7σ (atenuada) |
-| Anchor 🅔 (protocolo Hassanpour) | **+0.024** | **−0.087** | **3.5σ + 1.8σ** |
-| 🅔 + Ensemble + Calibração (combo defesa-fechamento) | — | — | acc=0.7304 **SUPERA Hassanpour 0.720** |
+| Anchor 🅔 (protocolo AlDahoul et al.) | **+0.024** | **−0.087** | **3.5σ + 1.8σ** |
+| 🅔 + Ensemble + Calibração (combo defesa-fechamento) | — | — | acc=0.7304 **SUPERA AlDahoul et al. 0.720** |
 
 **Claim defensável (Linha A):** *"Das cinco dimensões algorítmicas
 testadas em classificação de raça em 7 categorias no FairFace sob
 protocolo casado 3-seed, apenas a rede dorsal moderna LayerNorm-based
 (especificamente ConvNeXt-T) é alavanca robusta de acurácia + equidade
 simultânea. A alavanca persiste com significância estatística sob três
-protocolos distintos, incluindo o protocolo SOTA Hassanpour 2024 —
+protocolos distintos, incluindo o protocolo SOTA AlDahoul et al. 2024 —
 demonstra invariância ao balanceamento de classes, à partição
 treino/teste, à versão das imagens e à presença de pré-processamento."*
 
@@ -230,7 +230,7 @@ nosso setup — implicação metodológica relevante para a literatura."*
   tripla); pior subgrupo: Middle Eastern × Female × 3-9 anos (28.6%
   acurácia, n=49). **(ii) Deep ensemble** (Lakshminarayanan et al.
   NeurIPS 2017) de 3 seeds atinge acurácia=0.7299 / F1=0.7285 /
-  IR=1.501 — **NÃO uma superação direta vs Hassanpour single-run, mas
+  IR=1.501 — **NÃO uma superação direta vs AlDahoul et al. single-run, mas
   estimativa com menor variância via agregação principiada
   (Bhaskaruni IEEE ICTAI 2019 mostra que ensemble reduz disparidade
   demográfica)**. **(iii) TTA** com augmentations geometricamente
@@ -243,7 +243,7 @@ nosso setup — implicação metodológica relevante para a literatura."*
   [`intersectional_analysis.md`](intersectional_analysis.md). **Custo:
   ~4h trabalho + ~1h GPU, sem retreinamento adicional.** Posicionamento
   ético: comparação simétrica single-vs-single permanece com nosso
-  ConvNeXt-T 🅔 −0.85pp abaixo do Hassanpour ResNet-34 (dentro de 1.7σ
+  ConvNeXt-T 🅔 −0.85pp abaixo do AlDahoul ResNet-34 (dentro de 1.7σ
   da variância natural entre seeds). As técnicas de agregação elevam a
   **confiabilidade da estimativa**, conforme guidelines modernas
   (Pineau et al. JMLR 2021), e fecham vulnerabilidades clássicas de
@@ -255,16 +255,16 @@ nosso setup — implicação metodológica relevante para a literatura."*
 
 | Sistema | Tipo | Params | Pré-treino | Acurácia | F1 | IR |
 |---|---|---|---|---|---|---|
-| FaceScanPaliGemma (Hassanpour 2024) | **VLM (Visão-Linguagem)** | **~3 bi** | SigLIP + texto escala internet | **0.757** | **0.750** | — |
+| FaceScanPaliGemma (AlDahoul et al. 2024) | **VLM (Visão-Linguagem)** | **~3 bi** | SigLIP + texto escala internet | **0.757** | **0.750** | — |
 | YOLO11x (Anzhc HF community) | CNN detector | ~57M | COCO detection (não revisado por pares) | 0.735 | — | — |
-| **FairFace ResNet-34 baseline (Hassanpour)** | **CNN puro discriminativo** | **~21M** | **ImageNet-1k** | **0.720** | — | — |
-| **ConvNeXt-T nosso, anchor 🅔 (protocolo Hassanpour)** | **CNN puro discriminativo** | **~28M** | **ImageNet-1k** | **0.706 ± 0.005** | **0.703 ± 0.005** | **1.541 ± 0.044** |
+| **FairFace ResNet-34 baseline (AlDahoul et al.)** | **CNN puro discriminativo** | **~21M** | **ImageNet-1k** | **0.720** | — | — |
+| **ConvNeXt-T nosso, anchor 🅔 (protocolo AlDahoul et al.)** | **CNN puro discriminativo** | **~28M** | **ImageNet-1k** | **0.706 ± 0.005** | **0.703 ± 0.005** | **1.541 ± 0.044** |
 | 🅓 raw-data (nosso) | CNN puro | ~25M | ImageNet-1k | 0.695 | 0.695 | 1.649 |
 | Controle CE+linear (nosso, casado) | CNN puro | ~25M | ImageNet-1k | 0.687 | 0.688 | 1.697 |
 | 🅐.1 FairFace-recipe (nosso) | CNN puro | ~21M | ImageNet-1k | 0.674 | 0.676 | 1.722 |
 | 🅐.2 FineFACE-recipe sem multi-expert (nosso) | CNN puro | ~25M | ImageNet-1k | 0.664 | 0.663 | 1.724 |
 
-### 5.2 Por que a comparação primária é com Hassanpour ResNet-34, não com SOTA-VLM
+### 5.2 Por que a comparação primária é com AlDahoul ResNet-34, não com SOTA-VLM
 
 A comparação **cientificamente válida** é com sistemas **arquiteturalmente
 equivalentes** ao nosso:
@@ -278,20 +278,20 @@ equivalentes** ao nosso:
 - **YOLO11x (0.735)** é modelo comunitário não publicado, não revisado
   por pares. Útil como sanity check de magnitude, **não defensável como
   SOTA** em apresentação acadêmica.
-- **Hassanpour ResNet-34 (0.720)** é o **único sistema arquiteturalmente
+- **AlDahoul ResNet-34 (0.720)** é o **único sistema arquiteturalmente
   equivalente ao nosso ConvNeXt-T** (CNN puro discriminativo, escala
   ~25M parâmetros, ImageNet-1k) com número publicado para raça 7
   categorias FairFace no-domain. **É o ponto de referência relevante.**
 
-**Implicação para a banca:** o gap de **−1.4pp vs Hassanpour ResNet-34**
+**Implicação para a banca:** o gap de **−1.4pp vs AlDahoul ResNet-34**
 é a métrica válida. O gap de −5.1pp vs FaceScanPaliGemma é estruturalmente
 atribuível à diferença de paradigma (VLM vs CNN) e escala de pré-treinamento
 (3 bilhões vs 25 milhões de parâmetros), fora do espaço comparável.
 
-### 5.3 Decomposição final do gap absoluto (vs Hassanpour ResNet-34)
+### 5.3 Decomposição final do gap absoluto (vs AlDahoul ResNet-34)
 
 **Comparação simétrica single-vs-single:** nosso ConvNeXt-T seed 42 sob
-protocolo 🅔 = 0.7115 vs Hassanpour ResNet-34 = 0.720 (single-run, sem
+protocolo 🅔 = 0.7115 vs AlDahoul ResNet-34 = 0.720 (single-run, sem
 variância reportada pelos autores). **Gap = −0.85pp**, dentro de 1.7σ
 da variância natural entre seeds (dp_acc=0.005). Atribuível ao HPO não
 declarado pelos autores, após auditoria empírica refutar 2 suspeitos
@@ -301,19 +301,19 @@ de limitador no nosso código (Testes A e C1).
 
 | Config | Acurácia | F1 macro | IR ↓ | Comparação |
 |---|---|---|---|---|
-| Hassanpour RN-34 baseline (single-run) | 0.720 | — | — | referência (sem variância reportada) |
-| Single seed ConvNeXt-T 🅔 (s42, melhor) | 0.7115 | 0.7083 | 1.496 | **comparação simétrica** vs Hassanpour: −0.85pp |
+| AlDahoul et al. RN-34 baseline (single-run) | 0.720 | — | — | referência (sem variância reportada) |
+| Single seed ConvNeXt-T 🅔 (s42, melhor) | 0.7115 | 0.7083 | 1.496 | **comparação simétrica** vs AlDahoul et al.: −0.85pp |
 | Single seed ConvNeXt-T 🅔 (média 3 seeds) | 0.7060 ± 0.005 | 0.7034 ± 0.005 | 1.541 ± 0.044 | mais rigorosa: −1.4pp |
 | Deep Ensemble 3 seeds (Lakshminarayanan 2017) | 0.7299 | 0.7285 | 1.501 | **agregação científica**, não comparação direta |
 | Ensemble + TTA | 0.7298 | 0.7286 | **1.474** ⭐ | melhor equidade do projeto |
 | Ensemble + Calib + Threshold | 0.7304 | 0.7292 | 1.501 | melhor confiabilidade de F1/acc |
 
 **Posicionamento ético honesto:** sob comparação simétrica (single-vs-single),
-permanecemos **−0.85pp do baseline Hassanpour**, dentro da variância natural
+permanecemos **−0.85pp do baseline AlDahoul et al.**, dentro da variância natural
 entre seeds — sem superação. Aplicando **deep ensemble** (Lakshminarayanan
 et al. NeurIPS 2017, fundamentado em Hansen & Salamon IEEE PAMI 1990 e Geman
 1992 bias-variance), nosso sistema atinge 0.7304 acurácia. **Isto NÃO é
-uma comparação direta com Hassanpour** (que não usou ensemble) — é
+uma comparação direta com AlDahoul et al.** (que não usou ensemble) — é
 demonstração de que a estimativa de desempenho da nossa pipeline TEM MAIOR
 CONFIABILIDADE quando agregamos predições, conforme literatura científica
 estabelecida (Bhaskaruni IEEE ICTAI 2019 mostra que ensemble REDUZ
@@ -321,7 +321,7 @@ disparidade demográfica em fairness; Pineau et al. JMLR 2021 estabelece
 múltiplas seeds + agregação como guideline oficial ICLR/NeurIPS).
 
 **Contribuição metodológica de rigor:** nosso protocolo casado 3-seed
-fornece estimativa COM incerteza quantificada (dp_acc=0.005) que Hassanpour
+fornece estimativa COM incerteza quantificada (dp_acc=0.005) que AlDahoul et al.
 não reporta — alinhado com práticas pós-Henderson et al. AAAI 2018 sobre
 replicabilidade em deep learning.
 
@@ -329,7 +329,7 @@ Sob protocolo 🅔, **todos os 5 confundidores metodológicos identificados**
 (versão das imagens, partição, balanceamento, limpeza, MTCNN) **estão
 fechados ou neutralizados**. O resíduo de −1.4pp é honestamente
 atribuído à **otimização de hiperparâmetros (HPO) realizada por
-Hassanpour e não publicada integralmente** — irrecuperável no escopo
+AlDahoul et al. e não publicada integralmente** — irrecuperável no escopo
 desta dissertação. Auditoria empírica refutou dois suspeitos óbvios
 no nosso código (`docs/auditoria_codigo_limitadores.md`).
 
@@ -339,13 +339,13 @@ no nosso código (`docs/auditoria_codigo_limitadores.md`).
 > código (escalonamento cossenoidal e dropout) refutou ambas como
 > limitadores. O resíduo é atribuível à otimização de hiperparâmetros
 > não declarada nos autores referenciados. Importante notar:
-> superamos o SOTA em razão de disparidade (IR=1.541 vs Hassanpour
+> superamos o SOTA em razão de disparidade (IR=1.541 vs AlDahoul et al.
 > não reporta IR explícito), e nossa contribuição central é atribuição
 > entre fatores, invariante ao offset absoluto."*
 
 ## 6. Limitações declaradas
 
-1. **Gap absoluto de −1.4pp vs Hassanpour 2024 não fechado.** Atribuído
+1. **Gap absoluto de −1.4pp vs AlDahoul et al. 2024 não fechado.** Atribuído
    ao HPO deles após auditoria empírica refutar dois suspeitos no nosso
    código (Testes A e C1). Reprodução completa do HPO está fora do escopo.
 2. **Sem avaliação cross-dataset** (RFW, DemogPairs). Escopo de defesa.
@@ -359,7 +359,7 @@ no nosso código (`docs/auditoria_codigo_limitadores.md`).
    protocolo). Versão full two-view canônica fica para defesa.
 6. **Cinco confundidores metodológicos vs SOTA declarados** (versão das
    imagens, partição, balanceamento, limpeza, MTCNN). Anchor 🅔 fecha
-   todos os 5 simultaneamente sob protocolo Hassanpour.
+   todos os 5 simultaneamente sob protocolo AlDahoul et al..
 
 ## 7. Contribuições da dissertação (3 frases)
 
@@ -369,7 +369,7 @@ no nosso código (`docs/auditoria_codigo_limitadores.md`).
 > FairFace, identificando a rede dorsal moderna LayerNorm-based
 > (especificamente ConvNeXt-T) como única alavanca robusta de acurácia
 > e equidade simultâneas — robustez verificada sob três protocolos
-> distintos (casado original, sem subamostragem, protocolo Hassanpour
+> distintos (casado original, sem subamostragem, protocolo AlDahoul et al.
 > SOTA); **(2) critério Pareto-aware best-epoch** como prática
 > metodológica replicável que corrige viés sistemático na comparação
 > entre famílias de função de custo com cabeças de margem angular
@@ -387,7 +387,7 @@ no nosso código (`docs/auditoria_codigo_limitadores.md`).
    protocolo casado original). A maioria das dissertações em fairness
    termina em achado nulo — a nossa tem achado positivo robusto.
 2. **Robustez do achado verificada em 3 protocolos** (casado, sem
-   subamostragem, Hassanpour). Raro em mestrado — geralmente o
+   subamostragem, AlDahoul et al.). Raro em mestrado — geralmente o
    resultado é reportado em uma única configuração.
 3. **Contribuição metodológica replicável** (Pareto-aware criterion).
    Outros laboratórios podem aplicar amanhã, com correção empírica
@@ -402,7 +402,7 @@ no nosso código (`docs/auditoria_codigo_limitadores.md`).
 ### O que **não devemos inflar**:
 
 1. Não vencemos SOTA absoluta — somos −1.4pp abaixo do ResNet-34
-   Hassanpour sob protocolo idêntico. Defendido como gap-HPO honesto.
+   AlDahoul et al. sob protocolo idêntico. Defendido como gap-HPO honesto.
 2. Linha B (Pareto-aware) é forte como contribuição secundária dentro
    da dissertação, mas não candidata a paper standalone.
 3. Sem cross-dataset, sem ConvNeXt Base/Large, sem ablação intra-
@@ -439,11 +439,11 @@ no nosso código (`docs/auditoria_codigo_limitadores.md`).
 | 5 fatores rodados (casado 3-seed) | ✅ |
 | 3 anchors completos (🅐.1 + 🅐.2 + 🅓) | ✅ |
 | Ablação 🅑 (sem subamostragem) — 6 runs | ✅ Outcome B confirmado |
-| Anchor 🅔 (protocolo Hassanpour) — 6 runs | ✅ gap −1.4pp explicado |
+| Anchor 🅔 (protocolo AlDahoul et al.) — 6 runs | ✅ gap −1.4pp explicado |
 | Auditoria empírica de código (Testes A + C1) | ✅ 2 suspeitos refutados |
-| Pesquisa textual SOTA fechada | ✅ Hassanpour + Anzhc YOLO mapeados |
+| Pesquisa textual SOTA fechada | ✅ AlDahoul et al. + Anzhc YOLO mapeados |
 | Documentação técnica (12+ docs em `docs/`) | ✅ |
-| `docs/baseline_positioning.md` v2 (Hassanpour + 5 confundidores + 🅔) | ✅ |
+| `docs/baseline_positioning.md` v2 (AlDahoul et al. + 5 confundidores + 🅔) | ✅ |
 | `docs/anchors_results.md` v2 (3 anchors + 🅑 + 🅔 + valor) | ✅ |
 | `docs/auditoria_codigo_limitadores.md` (NEW) | ✅ |
 | Esta `THESIS_STATEMENT.md` v2 | ✅ |

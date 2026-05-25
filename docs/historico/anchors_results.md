@@ -2,7 +2,7 @@
 
 > Material de tese. Resultados finais dos 3 anchors de posicionamento
 > absoluto vs literatura, da ablação 🅑 (sem subamostragem) e do anchor
-> 🅔 (protocolo Hassanpour), todos rodados sob protocolo casado 3-seed
+> 🅔 (protocolo AlDahoul et al.), todos rodados sob protocolo casado 3-seed
 > {42,1,2}, critério val_f1_macro. Inclui auditoria empírica de código
 > (Testes A e C1) que refuta dois suspeitos de limitador no nosso
 > pipeline. Complementa `docs/baseline_positioning.md` (paisagem teórica),
@@ -18,7 +18,7 @@
 | 🅐.2 FineFACE-recipe | recipe do paper de fairness 2024: ResNet-50 + SGD lr=0.002 + 448 RandomCrop, **sem multi-expert** | "quanto da F1 controle vem do nosso recipe vs do recipe da literatura de fairness 448?" |
 | 🅓 raw-data | conjunto bruto FairFace publication (sem limpeza multi-face + sem re-alinhamento MTCNN) | "quanto da F1 controle vem do nosso pré-processamento?" |
 | 🅑 sem subamostragem | balanceamento de classes: subamostragem por raça → `none` | "a alavanca ConvNeXt-T sobrevive à decisão de balanceamento?" |
-| 🅔 protocolo Hassanpour | combinação: padding 0.25 + partição oficial + sem subamostragem + sem nossa limpeza multi-face | "sob protocolo idêntico ao SOTA publicado, alavanca persiste e gap absoluto se fecha?" |
+| 🅔 protocolo AlDahoul et al. | combinação: padding 0.25 + partição oficial + sem subamostragem + sem nossa limpeza multi-face | "sob protocolo idêntico ao SOTA publicado, alavanca persiste e gap absoluto se fecha?" |
 
 ## 2. Tabela consolidada — todos os pipelines (5 fatores + 3 anchors + ablação + anchor SOTA)
 
@@ -30,8 +30,8 @@
 | **🅓 raw-data** | ResNet-50 (recipe matched ctrl) | 0.695 ± 0.006 | 1.649 ± 0.008 | 0.695 | **+0.007** | **−0.048** |
 | **🅑 Controle sem subamostragem** | ResNet-50 | 0.687 ± 0.002 | 1.696 ± 0.055 | 0.689 | −0.001 | −0.001 |
 | **🅑 ConvNeXt-T sem subamostragem** | ConvNeXt-T | 0.700 ± 0.009 | 1.631 ± 0.090 | 0.703 | +0.012 | −0.066 |
-| **🅔 Controle protocolo Hassanpour** | ResNet-50 | 0.680 ± 0.005 | 1.628 ± 0.023 | 0.682 | −0.008 | −0.069 |
-| **🅔 ConvNeXt-T protocolo Hassanpour** | ConvNeXt-T | **0.703 ± 0.004** | **1.541 ± 0.044** | **0.706** | **+0.015** | **−0.156** |
+| **🅔 Controle protocolo AlDahoul et al.** | ResNet-50 | 0.680 ± 0.005 | 1.628 ± 0.023 | 0.682 | −0.008 | −0.069 |
+| **🅔 ConvNeXt-T protocolo AlDahoul et al.** | ConvNeXt-T | **0.703 ± 0.004** | **1.541 ± 0.044** | **0.706** | **+0.015** | **−0.156** |
 | **Fator 5 ConvNeXt-T** (referência positiva original) | ConvNeXt-T | 0.711 ± 0.003 | 1.569 ± 0.023 | 0.709 | +0.023 (~7σ) | −0.128 (~3σ) |
 
 ## 3. Veredito por anchor (regra do 1σ casada)
@@ -97,11 +97,11 @@ entre sementes dobra no braço ConvNeXt-T (dp_F1: 0.003 → 0.009; dp_IR:
 0.023 → 0.090). A subamostragem atua como **regularizador implícito** que
 estabiliza o treinamento entre sementes, mesmo não movendo a média.
 
-### 3.5 🅔 Anchor Hassanpour-protocol — pareamento metodológico com SOTA publicada
+### 3.5 🅔 Anchor AlDahoul-protocol — pareamento metodológico com SOTA publicada
 
 **Configuração:** padding 0.25 + partição oficial FairFace (86,744 train +
 10,954 test) + sem subamostragem + CSV bruto 97k. Reproduz integralmente
-o setup metodológico de Hassanpour et al. 2024.
+o setup metodológico de AlDahoul et al., 2024.
 
 **ConvNeXt-T sob 🅔 vs Controle sob 🅔:**
 
@@ -112,14 +112,14 @@ o setup metodológico de Hassanpour et al. 2024.
 | Razão de disparidade | −0.087 | 0.050 | **1.8σ borderline-significativo** |
 
 **Veredito CENTRAL para a tese:** **a alavanca ConvNeXt-T persiste com
-significância sob protocolo Hassanpour SOTA** — não é artefato do nosso
+significância sob protocolo AlDahoul et al. SOTA** — não é artefato do nosso
 protocolo casado original. Magnitude do efeito comparável (+0.024 F1 vs
 +0.023 no casado original), com variância colapsando para metade da
 ablação 🅑 (dp_F1: 0.009 → 0.004; dp_IR: 0.090 → 0.044).
 
-## 4. Pareamento absoluto vs SOTA publicada (Hassanpour 2024)
+## 4. Pareamento absoluto vs SOTA publicada (AlDahoul et al. 2024)
 
-### 4.0 Por que comparamos primariamente com Hassanpour ResNet-34, não com VLM ou YOLO
+### 4.0 Por que comparamos primariamente com AlDahoul ResNet-34, não com VLM ou YOLO
 
 Os três números publicados para raça 7-class FairFace pertencem a
 **classes arquiteturais distintas** — comparação válida requer
@@ -129,13 +129,13 @@ equivalência de paradigma e escala:
 |---|---|---|---|---|
 | FaceScanPaliGemma | VLM (Visão-Linguagem) | ~3 bilhões | SigLIP + texto escala internet | ❌ Não — outro paradigma + escala |
 | YOLO11x community | CNN detector | ~57M | COCO detection (não revisado) | ❌ Não — não revisado por pares |
-| **Hassanpour ResNet-34** | **CNN puro discriminativo** | **~21M** | **ImageNet-1k** | ✅ **Sim — único equivalente** |
+| **AlDahoul ResNet-34** | **CNN puro discriminativo** | **~21M** | **ImageNet-1k** | ✅ **Sim — único equivalente** |
 | **Nosso ConvNeXt-T** | **CNN puro discriminativo** | **~28M** | **ImageNet-1k** | (referência) |
 
 Comparar nossa CNN de 28M parâmetros com FaceScanPaliGemma (3 bilhões,
 escala internet) seria como comparar veículo popular com esportivo de
 F1 — tecnicamente correto, cientificamente irrelevante para nossa
-contribuição. **Hassanpour ResNet-34 é a única referência arquiteturalmente
+contribuição. **AlDahoul ResNet-34 é a única referência arquiteturalmente
 válida** para nossa comparação primária.
 
 ### 4.1 Resultados finais sob protocolo idêntico ao SOTA-CNN publicado
@@ -144,12 +144,12 @@ válida** para nossa comparação primária.
 |---|---|---|---|---|---|
 | FaceScanPaliGemma VLM (SOTA) | raça 7-class | partição oficial, sem subamostragem, padding 0.25 | **0.757** | **0.750** | — |
 | YOLO11x community | raça 7-class | idem | 0.735 | — | — |
-| **Hassanpour ResNet-34 baseline** | raça 7-class | idem | **0.720** | — | — |
+| **AlDahoul ResNet-34 baseline** | raça 7-class | idem | **0.720** | — | — |
 | **🅔 ConvNeXt-T (nosso)** | raça 7-class | idem | **0.706 ± 0.005** | **0.703 ± 0.005** | **1.541** |
 | 🅔 Controle ResNet-50 (nosso) | raça 7-class | idem | 0.682 ± 0.005 | 0.680 ± 0.005 | 1.628 |
 | Controle casado original (nosso) | raça 7-class | partição própria + subamostragem + padding 1.25 + MTCNN | 0.687 | 0.688 | 1.697 |
 
-**Decomposição final do gap absoluto −1.4pp (Hassanpour 0.720 vs 🅔 ConvNeXt 0.706):**
+**Decomposição final do gap absoluto −1.4pp (AlDahoul et al. 0.720 vs 🅔 ConvNeXt 0.706):**
 
 Sob protocolo 🅔, **todos os 5 confundidores metodológicos identificados
 estão fechados**:
@@ -161,7 +161,7 @@ estão fechados**:
 | Versão das imagens (padding) | ✅ sim (0.25 nativo) |
 | Limpeza multi-face | ✅ sim (CSV bruto 97k) |
 | Re-alinhamento MTCNN | ✅ sim (imagens originais) |
-| **HPO da recipe não declarado por Hassanpour** | ❌ **único resíduo possível** |
+| **HPO da recipe não declarado por AlDahoul et al.** | ❌ **único resíduo possível** |
 
 **Auditoria empírica refutou 2 hipóteses de limitador interno** (Testes
 A e C1 — ver `docs/auditoria_codigo_limitadores.md`):
@@ -179,7 +179,7 @@ e não publicada integralmente**. Está fora do escopo desta dissertação,
 cuja contribuição central é atribuição entre fatores sob protocolo casado.
 
 **Achado adicional:** nossa razão de disparidade (IR=1.541) sob protocolo
-🅔 é **a melhor de todos os pipelines do projeto** e, embora Hassanpour
+🅔 é **a melhor de todos os pipelines do projeto** e, embora AlDahoul et al.
 não reporte IR explicitamente, é evidência forte de que a alavanca
 ConvNeXt-T move equidade independentemente do offset absoluto em acurácia.
 
@@ -193,7 +193,7 @@ replicabilidade (Pineau JMLR 2021).** Documentação completa em
 
 | Config | Acurácia | F1 macro | IR ↓ | Tipo de comparação |
 |---|---|---|---|---|
-| Hassanpour RN-34 baseline (single-run) | 0.720 | — | — | referência (sem variância reportada) |
+| AlDahoul et al. RN-34 baseline (single-run) | 0.720 | — | — | referência (sem variância reportada) |
 | **Single seed s42 (nosso)** | **0.7115** | **0.7083** | **1.496** | **comparação simétrica**: −0.85pp |
 | Single seed (média 3 seeds) | 0.7060 ± 0.005 | 0.7034 ± 0.005 | 1.541 ± 0.044 | mais rigorosa: −1.4pp |
 | Deep Ensemble 3 seeds | 0.7299 | 0.7285 | 1.501 | agregação científica (Lakshminarayanan 2017) |
@@ -201,7 +201,7 @@ replicabilidade (Pineau JMLR 2021).** Documentação completa em
 | Ensemble + Calib + Threshold | 0.7304 | 0.7292 | 1.501 | melhor F1/Acc com calibração |
 
 **Posicionamento ético:** sob comparação simétrica single-vs-single
-(consistente com a metodologia de single-run reportada por Hassanpour),
+(consistente com a metodologia de single-run reportada por AlDahoul et al.),
 nosso ConvNeXt-T fica a **−0.85pp** — dentro de 1.7σ da variância natural
 entre seeds. As configurações com ensemble/TTA/calibração NÃO são
 reivindicações de superação direta — são estimativas mais CONFIÁVEIS da
@@ -223,7 +223,7 @@ convergente com nosso resultado IR 1.541 → 1.474.
    todas as métricas). Refuta empiricamente uma prática comum na
    literatura de fairness em FairFace.
 4. **Alavanca ConvNeXt-T sobrevive a 3 protocolos distintos** (casado
-   original 7σ + 3σ, sem subamostragem 1.5σ + 0.7σ, Hassanpour 3.5σ +
+   original 7σ + 3σ, sem subamostragem 1.5σ + 0.7σ, AlDahoul et al. 3.5σ +
    1.8σ). Achado central robusto a variações metodológicas substanciais.
 
 ## 6. FineFACE não classifica raça — descoberta da auditoria textual

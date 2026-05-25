@@ -1,7 +1,7 @@
 # Análise interseccional de fairness — raça × gênero × idade
 
 > Material de tese. Combo defesa-fechamento #1. Análise interseccional
-> sobre as predições do best ConvNeXt-T 🅔 seed 42 (Hassanpour-protocol)
+> sobre as predições do best ConvNeXt-T 🅔 seed 42 (AlDahoul-protocol)
 > no test set oficial FairFace (val/, 10,954 imagens). Cruza predições
 > com colunas `gender` e `age` do CSV original para identificar
 > subgrupos demograficamente vulneráveis. Custo: ~10min, zero GPU
@@ -20,7 +20,7 @@ demograficamente piores quando cruzamos com gênero e idade?"*
 
 ## 2. Setup
 
-- **Modelo:** ConvNeXt-T sob protocolo Hassanpour (anchor 🅔), seed 42
+- **Modelo:** ConvNeXt-T sob protocolo AlDahoul et al. (anchor 🅔), seed 42
   (best.pt = 0.7083 F1 macro / 0.7115 acurácia / 1.496 IR-raça)
 - **Test set:** val oficial FairFace = 10,954 imagens
 - **Metadados cruzados:** colunas `gender` (Female/Male) e `age`
@@ -103,7 +103,7 @@ esse subgrupo.**
 
 A literatura clássica de reconhecimento facial reporta que modelos têm
 pior desempenho em pessoas negras (Buolamwini & Gebru, 2018). **Nosso
-ConvNeXt-T sob protocolo Hassanpour reverte esse padrão**: Black × Male
+ConvNeXt-T sob protocolo AlDahoul et al. reverte esse padrão**: Black × Male
 é o subgrupo **MELHOR** atendido (86.1% acurácia).
 
 **Interpretação:**

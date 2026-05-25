@@ -3,7 +3,7 @@
 > Sumário estruturado dos 7 artigos do estado-da-arte (SOTA) e
 > trabalhos relacionados que fundamentam o posicionamento da
 > dissertação. Cobre: paper-pai do dataset (FairFace), SOTA real para
-> a tarefa (Hassanpour 2024), 5 papers de fairness facial mais citados
+> a tarefa (AlDahoul et al. 2024), 5 papers de fairness facial mais citados
 > (FineFACE, U-FaTE, FairGRAPE, DSAP, Fairness-is-in-Details). Para
 > cada um: o que faz, o que mede, números reportados, e
 > **relação explícita com nosso trabalho**. Data: 2026-05-24.
@@ -13,7 +13,7 @@
 | # | Paper | Venue/Ano | Tarefa principal | Relação conosco |
 |---|---|---|---|---|
 | 1 | **FairFace** (Kärkkäinen & Joo) | WACV 2021 | Propõe DATASET balanceado por raça | **Dataset que usamos** |
-| 2 | **Hassanpour 2024** | arXiv 2410.24148 | Classificação multi-atributo (raça 7-class explicitamente!) | **SOTA real da nossa tarefa exata — referência primária** |
+| 2 | **AlDahoul et al. 2024** | arXiv 2410.24148 | Classificação multi-atributo (raça 7-class explicitamente!) | **SOTA real da nossa tarefa exata — referência primária** |
 | 3 | **FineFACE** (Liu et al.) | arXiv 2408.16881 | Classificação de gênero + 13 atributos faciais | Concorrente em fairness — **NÃO classifica raça** (descoberta nossa) |
 | 4 | **U-FaTE** | arXiv 2404.09454 (CVPR 2024) | Quantifica trade-offs utilidade-fairness | Adjacente ao nosso critério Pareto-aware (Linha B) |
 | 5 | **FairGRAPE** | arXiv 2207.10888 (ECCV 2022) | Poda de redes preservando equidade | Mesmo domínio (FairFace), eixo ortogonal (compressão) |
@@ -62,7 +62,7 @@ nesses datasets têm desempenho inconsistente entre raças.
 - **Anchor Exp-FairFace** reproduz o recipe deles (ResNet-34 + Adam) sob
   nosso protocolo: entrega F1=0.676 — coerente.
 
-### 2.2 Hassanpour et al. 2024 (SOTA REAL para nossa tarefa)
+### 2.2 AlDahoul et al., 2024 (SOTA REAL para nossa tarefa)
 
 **Título completo:** *Exploring Vision Language Models for Facial
 Attribute Recognition: Emotion, Race, Gender, and Age*
@@ -106,12 +106,12 @@ demograficamente balanceados.
 - PaliGemma (VLM, 3 bilhões parâmetros, escala internet) está em
   outra classe arquitetural — comparação não-relevante.
 - **Comparação simétrica nossa:** ConvNeXt-T 🅔 (single-seed) = 0.7115
-  vs Hassanpour ResNet-34 = 0.720 → **−0.85pp dentro de 1.7σ da
+  vs AlDahoul ResNet-34 = 0.720 → **−0.85pp dentro de 1.7σ da
   variância natural entre seeds**.
 - Gap residual atribuído ao HPO não declarado pelos autores, após
   auditoria empírica refutar 2 suspeitos no nosso código.
 
-### 2.3 FineFACE (Liu et al. 2024) — **NÃO classifica raça** (achado nosso)
+### 2.3 FineFACE (Manzoor & Rattani, 2024) — **NÃO classifica raça** (achado nosso)
 
 **Título completo:** *FineFACE: Fair Facial Attribute Classification
 Leveraging Fine-grained Features*
@@ -163,7 +163,7 @@ estratificada por raça, não accuracy de raça.
 - **Defesa-relevante**: nosso achado de que FineFACE não é race
   classifier é original e elimina a comparação fantasma.
 
-### 2.4 U-FaTE (Sojitra et al., CVPR 2024)
+### 2.4 U-FaTE (Dehdashtian et al., CVPR 2024)
 
 **Título completo:** *Utility-Fairness Trade-Offs and How to Find Them*
 
@@ -210,7 +210,7 @@ demográfico — modelos comprimidos têm pior performance em minorias.
   compressão (FairGRAPE) são frentes distintas.
 - Sem overlap com nossa Linha A nem Linha B.
 
-### 2.6 DSAP (Sánchez-Sánchez et al., 2024)
+### 2.6 DSAP (Dominguez-Catena et al., 2024)
 
 **Título completo:** *DSAP: Analyzing Bias Through Demographic
 Comparison of Datasets*
@@ -231,7 +231,7 @@ Comparison of Datasets*
   Linha A mostra que parte do viés-de-dados se desloca para fatores
   algorítmicos (recipe, critério de checkpoint).
 
-### 2.7 Fairness-is-in-Details (Galera-Zarco et al., 2025)
+### 2.7 Fairness-is-in-Details (Lafargue et al., 2025)
 
 **Título completo:** *Fairness is in the details: Face Dataset Auditing*
 
@@ -258,7 +258,7 @@ Comparison of Datasets*
 | Trabalho | Faz race 7-class? | Faz atribuição entre fatores? | Faz seleção principiada de modelo? | Faz auditoria interseccional? |
 |---|---|---|---|---|
 | FairFace 2021 | 4-class merged | ❌ | ❌ | ❌ |
-| Hassanpour 2024 | ✅ (single-run) | ❌ | ❌ | ❌ |
+| AlDahoul et al. 2024 | ✅ (single-run) | ❌ | ❌ | ❌ |
 | FineFACE 2024 | ❌ (faz gênero) | ❌ | ❌ | ❌ |
 | U-FaTE 2024 | ❌ (multi-task) | ❌ | parcialmente (fronteira) | ❌ |
 | FairGRAPE 2022 | ✅ | ❌ | ❌ | ❌ |
@@ -290,7 +290,7 @@ Esta é a **lacuna** que nossa dissertação ocupa.
 @article{hassanpour2024exploring,
   title={Exploring Vision Language Models for Facial Attribute
          Recognition: Emotion, Race, Gender, and Age},
-  author={Hassanpour, Nahid and others},
+  author={AlDahoul et al., Nahid and others},
   journal={arXiv preprint arXiv:2410.24148},
   year={2024}
 }
@@ -305,7 +305,7 @@ Esta é a **lacuna** que nossa dissertação ocupa.
 
 @inproceedings{sojitra2024utility,
   title={Utility-Fairness Trade-Offs and How to Find Them},
-  author={Sojitra, [first authors]},
+  author={Dehdashtian, [first authors]},
   booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision
              and Pattern Recognition (CVPR)},
   year={2024},
@@ -331,7 +331,7 @@ Esta é a **lacuna** que nossa dissertação ocupa.
 
 @inproceedings{galerazarco2025fairness,
   title={Fairness is in the details: Face Dataset Auditing},
-  author={Galera-Zarco, [first authors]},
+  author={Lafargue, [first authors]},
   booktitle={European Conference on Machine Learning and Principles and
              Practice of Knowledge Discovery in Databases (ECML PKDD)},
   year={2025},
@@ -351,7 +351,7 @@ submeter a dissertação.
 |---|---|---|
 | **Introdução** | FairFace (motivação dataset balanceado), DSAP (auditoria dataset), FairGRAPE (compressão) | contextualizar viés em RF facial |
 | **Trabalhos relacionados** | TODOS os 7 | mapear paisagem |
-| **Posicionamento** | FairFace, Hassanpour, FineFACE | declarar comparabilidade arquitetural |
-| **Resultados** | Hassanpour (comparação direta) | tabela posicionamento absoluto |
+| **Posicionamento** | FairFace, AlDahoul et al., FineFACE | declarar comparabilidade arquitetural |
+| **Resultados** | AlDahoul et al. (comparação direta) | tabela posicionamento absoluto |
 | **Discussão** | U-FaTE (related work do Pareto), Fairness-is-in-Details (rigor metodológico), Bhaskaruni (ensemble reduz disparidade) | situar contribuições |
-| **Conclusão** | Hassanpour, FineFACE | comparação final + trabalhos futuros (Group DRO, DINOv2 — Roadmap) |
+| **Conclusão** | AlDahoul et al., FineFACE | comparação final + trabalhos futuros (Group DRO, DINOv2 — Roadmap) |

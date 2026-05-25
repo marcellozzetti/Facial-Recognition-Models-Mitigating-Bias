@@ -1,14 +1,14 @@
 # Combo defesa-fechamento — análise pós-treinamento (4 técnicas)
 
 > Material de tese. Conjunto de 4 análises pós-treinamento aplicadas
-> sobre os 3 checkpoints ConvNeXt-T 🅔 (anchor Hassanpour-protocol)
+> sobre os 3 checkpoints ConvNeXt-T 🅔 (anchor AlDahoul-protocol)
 > SEM retreinamento adicional. **Objetivo cientificamente honesto:**
 > elevar a CONFIABILIDADE da estimativa de desempenho via técnicas
 > estabelecidas de redução de variância (deep ensemble, TTA) e
 > quantificação de incerteza (calibração, análise interseccional).
 > Conforme guidelines modernas de replicabilidade em ML (Pineau et al.
 > JMLR 2021; Henderson et al. AAAI 2018). **NÃO uma reivindicação de
-> superação direta do SOTA** — Hassanpour 2024 reporta single-run sem
+> superação direta do SOTA** — AlDahoul et al. 2024 reporta single-run sem
 > variância, comparação assimétrica seria cientificamente inadequada.
 > Data: 2026-05-23 (reescrito 2026-05-24 com ênfase metodológica
 > correta).
@@ -36,13 +36,13 @@ agregar estimativas é prática rigorosa, não inflacionária.
 Custo total: ~3h trabalho + 1h GPU (apenas inferência sobre 10,954
 imagens).
 
-**Posicionamento ético declarado a priori:** Hassanpour 2024 reporta
+**Posicionamento ético declarado a priori:** AlDahoul et al. 2024 reporta
 resultados single-run sem variância. Comparação simétrica é
-single-vs-single (nosso ConvNeXt-T 🅔 seed 42 = 0.7115 vs Hassanpour
+single-vs-single (nosso ConvNeXt-T 🅔 seed 42 = 0.7115 vs AlDahoul et al.
 RN-34 = 0.720 → −0.85pp, dentro de 1.7σ da variância natural entre
 seeds). Resultados agregados (ensemble, TTA, calibração) refletem
 **MAIOR confiabilidade da estimativa do nosso sistema**, não vitória
-sobre Hassanpour — porque ele não usou essas técnicas.
+sobre AlDahoul et al. — porque ele não usou essas técnicas.
 
 ## 2. Combos executados
 
@@ -86,14 +86,14 @@ e divididos por 3. Argmax sobre a média → predição final do ensemble.
 
 **Por que o ganho foi grande (+2.4pp em vez de +0.5pp típico):**
 
-Variância entre seeds sob protocolo Hassanpour é alta (dp_F1=0.009 vs
+Variância entre seeds sob protocolo AlDahoul et al. é alta (dp_F1=0.009 vs
 0.003 no protocolo casado original com subamostragem). Pela teoria de
 comitês de máquinas (Haykin §7.10), variância do estimador médio é
 $\sigma^2/N$ — para $N=3$, redução de variância por $\sqrt{3}$.
 Tradução empírica para erros decorrelacionados: +2 a +3pp F1.
 
 **Achado científico:** ensemble entrega estimativa de acurácia 0.7299
-com variância reduzida — não comparável diretamente ao Hassanpour
+com variância reduzida — não comparável diretamente ao AlDahoul et al.
 single-run (eles não fizeram ensemble), mas dentro da banda esperada
 quando aplicamos prática científica padrão (Lakshminarayanan 2017).
 A comparação simétrica permanece single-vs-single: 0.7115 vs 0.720
@@ -169,8 +169,8 @@ Aplicado sobre logits do ensemble já calibrados.
 
 | Config | Acurácia | F1 macro | IR ↓ | Comparação válida |
 |---|---|---|---|---|
-| Hassanpour RN-34 baseline (single-run) | 0.720 | — | — | referência (sem variância reportada) |
-| **Single seed s42 (nosso)** | **0.7115** | **0.7083** | **1.496** | **comparação simétrica** vs Hassanpour: **−0.85pp** |
+| AlDahoul et al. RN-34 baseline (single-run) | 0.720 | — | — | referência (sem variância reportada) |
+| **Single seed s42 (nosso)** | **0.7115** | **0.7083** | **1.496** | **comparação simétrica** vs AlDahoul et al.: **−0.85pp** |
 | Single seed (média 3 seeds, mais rigorosa) | 0.7060 ± 0.005 | 0.7034 ± 0.005 | 1.541 ± 0.044 | −1.4pp (estimativa com incerteza) |
 | Ensemble 3 seeds | 0.7299 | 0.7285 | 1.501 | **agregação científica**, não comparação direta |
 | Ensemble + TTA | 0.7298 | 0.7286 | **1.474** ⭐ | melhor IR do projeto (Bhaskaruni 2019 esperado) |
@@ -181,7 +181,7 @@ Aplicado sobre logits do ensemble já calibrados.
 - **Melhor equidade observada → Ensemble + TTA** (IR=1.474)
 
 **Reframing ético explícito:** os números 0.7299-0.7304 da agregação
-NÃO são "superação" do Hassanpour 0.720. Hassanpour não usou ensemble,
+NÃO são "superação" do AlDahoul et al. 0.720. AlDahoul et al. não usou ensemble,
 TTA ou calibração — comparação direta é metodologicamente inadequada.
 **A comparação simétrica é 0.7115 vs 0.720 (−0.85pp).** A agregação
 reduz a VARIÂNCIA da nossa estimativa, conforme literatura científica
@@ -191,22 +191,22 @@ estabelecida — não amplifica o desempenho do modelo subjacente.
 
 | Sistema | Tipo | Acurácia | F1 |
 |---|---|---|---|
-| FaceScanPaliGemma (Hassanpour 2024 VLM) | VLM, ~3B params | 0.757 | 0.750 |
+| FaceScanPaliGemma (AlDahoul et al. 2024 VLM) | VLM, ~3B params | 0.757 | 0.750 |
 | YOLO11x (community, não revisado) | CNN detector, ~57M | 0.735 | — |
 | **NOSSO Ensemble+Calib (ConvNeXt-T 🅔)** | **CNN, ~28M** | **0.7304** | **0.7292** |
 | **NOSSO Ensemble+TTA (ConvNeXt-T 🅔)** | **CNN, ~28M** | **0.7298** | **0.7286** |
-| **Hassanpour RN-34 baseline (SOTA-CNN)** | CNN, ~21M | 0.720 | — |
+| **AlDahoul et al. RN-34 baseline (SOTA-CNN)** | CNN, ~21M | 0.720 | — |
 | Single ConvNeXt-T 🅔 nosso | CNN, ~28M | 0.7115 | 0.7083 |
 
 **Para a defesa (versão ética correta):** sob comparação simétrica
 single-run-vs-single-run (consistente com a metodologia reportada por
-Hassanpour 2024), nosso ConvNeXt-T 🅔 fica **−0.85pp do baseline
-Hassanpour ResNet-34** (0.7115 vs 0.720), dentro de 1.7σ da variância
+AlDahoul et al. 2024), nosso ConvNeXt-T 🅔 fica **−0.85pp do baseline
+AlDahoul ResNet-34** (0.7115 vs 0.720), dentro de 1.7σ da variância
 natural entre seeds (dp=0.005). Aplicando técnicas científicas
 estabelecidas de **agregação para redução de variância** (deep
 ensemble — Lakshminarayanan NeurIPS 2017; TTA), nossa estimativa
 agregada atinge 0.7299-0.7304 acc — **NÃO uma reivindicação de
-superação direta** (Hassanpour não usou essas técnicas), mas
+superação direta** (AlDahoul et al. não usou essas técnicas), mas
 demonstração de que aplicando práticas de replicabilidade modernas
 (Pineau JMLR 2021) sobre nossa pipeline, a confiabilidade da estimativa
 sobe substancialmente. O gap absoluto vs SOTA-VLM (FaceScanPaliGemma
@@ -238,12 +238,12 @@ internet vs ImageNet-1k).
 > TTA; calibração — Guo ICML 2017; análise interseccional) sobre os
 > checkpoints ConvNeXt-T 🅔 reduz a variância da estimativa de
 > desempenho do sistema. Sob comparação simétrica (single-run-vs-single-run
-> consistente com Hassanpour 2024), permanecemos a −0.85pp do baseline
+> consistente com AlDahoul et al. 2024), permanecemos a −0.85pp do baseline
 > (0.7115 vs 0.720, dentro da variância natural entre seeds).
 > Aplicando deep ensemble + calibração + threshold per-class, nossa
 > estimativa de desempenho atinge 0.7304 acurácia / 0.7292 F1 / 1.474
 > IR (com TTA). Esta NÃO é reivindicação de superação direta de
-> Hassanpour (que não usou essas técnicas) — é demonstração de que
+> AlDahoul et al. (que não usou essas técnicas) — é demonstração de que
 > nossa pipeline + agregação padrão entrega estimativa MAIS CONFIÁVEL
 > alinhada com guidelines de replicabilidade modernas (Pineau JMLR
 > 2021). Bhaskaruni IEEE ICTAI 2019 documentou empiricamente que
@@ -255,10 +255,10 @@ internet vs ImageNet-1k).
 | Pergunta da banca | Resposta defensável |
 |---|---|
 | *"Vocês mediram disparidade só por raça?"* | "Não. Análise interseccional completa em `intersectional_analysis.md` — IR cresce de 1.541 (raça) para 3.241 (raça × gênero × idade). Subgrupo pior atendido: Middle Eastern × Female × 3-9 (28.6% acurácia)." |
-| *"Vocês não fizeram ensemble?"* | "Sim. Deep ensemble (Lakshminarayanan NeurIPS 2017) de 3 seeds reduz variância da estimativa e melhora IR. Reportamos AMBOS os números: single-seed (0.7115) é a comparação simétrica com Hassanpour single-run; ensemble (0.7299) é a estimativa agregada mais confiável da nossa pipeline." |
+| *"Vocês não fizeram ensemble?"* | "Sim. Deep ensemble (Lakshminarayanan NeurIPS 2017) de 3 seeds reduz variância da estimativa e melhora IR. Reportamos AMBOS os números: single-seed (0.7115) é a comparação simétrica com AlDahoul et al. single-run; ensemble (0.7299) é a estimativa agregada mais confiável da nossa pipeline." |
 | *"E TTA? E calibração?"* | "Ambos rodados (Combos #3 e #4). TTA com augmentations geometricamente seguras (sem hue/color/brightness) reduz IR em 0.027. Calibração via temperature scaling (Guo ICML 2017) mostra T=0.95 — ensemble já bem-calibrado. Doc completo em `combo_defesa_fechamento.md`." |
-| *"O ensemble não é tapetão? Hassanpour só usou single seed."* | "Comparação simétrica é 0.7115 vs 0.720 — ficamos a −0.85pp (1.7σ). Ensemble não é truque: é técnica científica de redução de variância (Lakshminarayanan NeurIPS 2017, 8000+ citações; Hansen IEEE PAMI 1990). Bhaskaruni IEEE ICTAI 2019 demonstrou empiricamente que ensemble reduz disparidade em classificação facial. Reportamos AMBOS os números com transparência total." |
-| *"Por que múltiplas seeds importam?"* | "Henderson AAAI 2018 demonstrou que single-seed em RL leva a conclusões irreproduzíveis. Pineau JMLR 2021 estabeleceu múltiplas seeds + intervalos de confiança como guideline oficial ICLR/NeurIPS. Nosso dp_acc=0.005 fornece a quantificação de incerteza que Hassanpour não reporta." |
+| *"O ensemble não é tapetão? AlDahoul et al. só usou single seed."* | "Comparação simétrica é 0.7115 vs 0.720 — ficamos a −0.85pp (1.7σ). Ensemble não é truque: é técnica científica de redução de variância (Lakshminarayanan NeurIPS 2017, 8000+ citações; Hansen IEEE PAMI 1990). Bhaskaruni IEEE ICTAI 2019 demonstrou empiricamente que ensemble reduz disparidade em classificação facial. Reportamos AMBOS os números com transparência total." |
+| *"Por que múltiplas seeds importam?"* | "Henderson AAAI 2018 demonstrou que single-seed em RL leva a conclusões irreproduzíveis. Pineau JMLR 2021 estabeleceu múltiplas seeds + intervalos de confiança como guideline oficial ICLR/NeurIPS. Nosso dp_acc=0.005 fornece a quantificação de incerteza que AlDahoul et al. não reporta." |
 
 ## 7. Procedência
 

@@ -40,7 +40,7 @@ Substituem os "anchors" 🅐.1, 🅐.2, 🅓, 🅔.
 | **Exp-FairFace** | Reprodução do recipe do paper FairFace original | 🅐.1 | Recipe do paper-pai (RN-34 + Adam lr=1e-4) |
 | **Exp-FineFACE** | Reprodução do recipe do paper FineFACE (sem multi-expert) | 🅐.2 | Recipe do paper de fairness 2024 sem a arquitetura especializada |
 | **Exp-DadosBrutos** | Avaliação com dados brutos (sem nosso pré-processamento) | 🅓 | Efeito do nosso multi-face cleaning + MTCNN re-alignment |
-| **Exp-ProtocoloSOTA** | Reprodução integral do protocolo SOTA (Hassanpour 2024) | 🅔 | Padding 0.25 + split oficial + sem subamostragem |
+| **Exp-ProtocoloSOTA** | Reprodução integral do protocolo SOTA (AlDahoul et al. 2024) | 🅔 | Padding 0.25 + split oficial + sem subamostragem |
 
 ### 2.3 Categoria C — Análise de Robustez
 

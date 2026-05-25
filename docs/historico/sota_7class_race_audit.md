@@ -20,7 +20,7 @@ Procedimento (verificável por reexecução):
    - `FairFace race classification 7 classes benchmark accuracy SOTA paper`
    - `"FairFace" race 7-class classification accuracy F1 macro`
    - `FairFace dataset 7 categories race classification deep learning paper 2024 2025`
-2. **Leitura direta dos PDFs / HTML** dos candidatos identificados nas buscas (FairFace paper, FineFACE, Hassanpour 2024 VLM, Anzhc community model).
+2. **Leitura direta dos PDFs / HTML** dos candidatos identificados nas buscas (FairFace paper, FineFACE, AlDahoul et al. 2024 VLM, Anzhc community model).
 3. **Citação verbatim** das seções relevantes de cada fonte.
 
 **Limitação reconhecida:** o PDF do paper FairFace original retornou em formato binário comprimido (FlateDecode/DCTDecode) na tentativa de extração via WebFetch, impedindo nova leitura integral nesta auditoria. As conclusões sobre o paper FairFace consolidam **leitura anterior do PDF integral** já registrada em [baseline_positioning.md §2](baseline_positioning.md#L17-L44).
@@ -46,7 +46,7 @@ Procedimento (verificável por reexecução):
 
 **Conclusão:** o paper-pai do dataset **não publica número para a tarefa 7-class in-domain**. Eles mergeam para 4-class para comparabilidade com UTKFace.
 
-### 3.2 FineFACE (Liu et al., arXiv 2408.16881, 2024)
+### 3.2 FineFACE (Manzoor & Rattani, arXiv 2408.16881, 2024)
 
 **Fonte:** `arXiv 2408.16881` HTML version, leitura via WebFetch direto da seção 4 (Experimental Setup).
 
@@ -70,13 +70,13 @@ Procedimento (verificável por reexecução):
 
 **Conclusão:** FineFACE **não classifica raça**. A famosa figura de "96.4% acc" no paper é accuracy de classificação de **gênero** estratificada por raça. **Não há comparação direta com nossa tarefa.**
 
-### 3.3 Hassanpour et al. — "Exploring Vision Language Models for Facial Attribute Recognition" (arXiv 2410.24148, 2024)
+### 3.3 AlDahoul et al. — "Exploring Vision Language Models for Facial Attribute Recognition" (arXiv 2410.24148, 2024)
 
 **Fonte:** `arXiv 2410.24148` HTML version.
 
 **Esta é a SOTA real para FairFace race 7-class encontrada na pesquisa textual.**
 
-| Aspecto | Hassanpour 2024 |
+| Aspecto | AlDahoul et al. 2024 |
 |---|---|
 | Tarefa de classificação | Race 7-class (full FairFace taxonomy) + gender + age + emotion |
 | Setup race | **7 classes nativas** (White, Black, East Asian, Southeast Asian, Indian, Middle Eastern, Latino/Hispanic) |
@@ -119,15 +119,15 @@ Procedimento (verificável por reexecução):
 | YOLO11l | 0.733 |
 | YOLO11x | **0.735** |
 
-**Conclusão:** modelo comunitário, sem revisão por pares, mas reproduz a faixa de 72-73% para 7-class race com padding=0.25 e split oficial. Coerente com o número do Hassanpour 2024 para ResNet-34 (72%).
+**Conclusão:** modelo comunitário, sem revisão por pares, mas reproduz a faixa de 72-73% para 7-class race com padding=0.25 e split oficial. Coerente com o número do AlDahoul et al. 2024 para ResNet-34 (72%).
 
 ## 4. Quadro comparativo consolidado (números absolutos)
 
 | Sistema | Tarefa | Setup | Acc | F1 |
 |---|---|---|---|---|
-| **FaceScanPaliGemma** (Hassanpour 2024, SOTA) | race 7-class | FairFace split oficial, imbalance natural | **0.757** | **0.750** |
+| **FaceScanPaliGemma** (AlDahoul et al. 2024, SOTA) | race 7-class | FairFace split oficial, imbalance natural | **0.757** | **0.750** |
 | **YOLO11x** (community Anzhc) | race 7-class | FairFace split oficial, padding 0.25, imbalance natural | 0.735 | — |
-| FairFace ResNet-34 (re-impl. Hassanpour) | race 7-class | idem | 0.720 | — |
+| FairFace ResNet-34 (re-impl. AlDahoul et al.) | race 7-class | idem | 0.720 | — |
 | ConvNeXt-T (nosso Fator 5) | race 7-class | split 80/10/10 próprio, undersample, padding 1.25→224, MTCNN re-align | **0.709** | **0.711** |
 | 🅓 raw-data (nosso) | race 7-class | split 80/10/10 próprio, undersample, padding 1.25→224, sem re-align | 0.695 | 0.695 |
 | Controle CE+linear RN-50 (nosso) | race 7-class | split 80/10/10 próprio, undersample, padding 1.25→224, MTCNN re-align | 0.687 | 0.688 |
@@ -135,7 +135,7 @@ Procedimento (verificável por reexecução):
 | FairFace paper original (Kärkkäinen & Joo 2021) | race **4-class merged** | FairFace split oficial | 0.754 | — |
 | FineFACE 2024 — **não é race classifier** | gender 2-class | FairFace + cross | 0.964 | — |
 
-## 5. Decomposição do gap absoluto vs Hassanpour ResNet-34 baseline (72%)
+## 5. Decomposição do gap absoluto vs AlDahoul ResNet-34 baseline (72%)
 
 Nosso melhor (ConvNeXt-T, 70.9%) fica **−1.1pp da ResNet-34 baseline** publicada e **−4.8pp da SOTA VLM** (75.7%). O gap é estruturado em escolhas metodológicas declaradas:
 
@@ -147,7 +147,7 @@ Nosso melhor (ConvNeXt-T, 70.9%) fica **−1.1pp da ResNet-34 baseline** publica
 | Multi-face cleaning (72k vs 97k disponíveis para F1-F5) | ~+0.7pp (favorável a nós — visível no 🅓 vs F1-F5) |
 | **Soma estimada do gap explicável** | **−2 a −3pp** |
 
-**Interpretação:** se rodássemos ConvNeXt-T sob exatamente o protocolo de Hassanpour 2024 (split oficial, sem undersample, padding 0.25 nativo), nossa estimativa é Acc ≈ 72-73% — **alinhada com o intervalo SOTA-CNN (72-73%) e ~3pp abaixo da SOTA-VLM (75.7%)**.
+**Interpretação:** se rodássemos ConvNeXt-T sob exatamente o protocolo de AlDahoul et al. 2024 (split oficial, sem undersample, padding 0.25 nativo), nossa estimativa é Acc ≈ 72-73% — **alinhada com o intervalo SOTA-CNN (72-73%) e ~3pp abaixo da SOTA-VLM (75.7%)**.
 
 ## 6. Implicações revisadas para a tese (reposicionamento)
 
@@ -155,7 +155,7 @@ Nosso melhor (ConvNeXt-T, 70.9%) fica **−1.1pp da ResNet-34 baseline** publica
 
 A afirmação anterior em §6 do `baseline_positioning.md` (*"Como não há SOTA-único bem definido..."*) **está parcialmente incorreta e deve ser revisada**:
 
-> *Versão revisada:* "Existe baseline publicada para race 7-class FairFace in-domain (Hassanpour et al., 2024: 72% ResNet-34, 75.7% VLM-SOTA), mas com **diferenças metodológicas controlando o setup**: imbalance natural, split oficial, padding nativo 0.25. Nosso protocolo difere em quatro dimensões metodológicas declaradas (undersample por raça, split 80/10/10 próprio, padding 1.25→224, multi-face cleaning), introduzindo gap absoluto estimado de −2 a −3pp. A contribuição da Linha A é metodológica (atribuição matched 3-seed entre 5 dimensões algorítmicas) e invariante a esse offset estrutural."
+> *Versão revisada:* "Existe baseline publicada para race 7-class FairFace in-domain (AlDahoul et al., 2024: 72% ResNet-34, 75.7% VLM-SOTA), mas com **diferenças metodológicas controlando o setup**: imbalance natural, split oficial, padding nativo 0.25. Nosso protocolo difere em quatro dimensões metodológicas declaradas (undersample por raça, split 80/10/10 próprio, padding 1.25→224, multi-face cleaning), introduzindo gap absoluto estimado de −2 a −3pp. A contribuição da Linha A é metodológica (atribuição matched 3-seed entre 5 dimensões algorítmicas) e invariante a esse offset estrutural."
 
 ### 6.2 Honestidade defensável vs banca
 
@@ -163,7 +163,7 @@ A afirmação anterior em §6 do `baseline_positioning.md` (*"Como não há SOTA
 
 | Pergunta da banca | Resposta defensável |
 |---|---|
-| *"Vocês ficam atrás do SOTA Hassanpour 2024 (75.7%) e até da ResNet-34 deles (72%). Por quê?"* | "Quatro escolhas metodológicas declaradas (undersample, split próprio, padding 1.25, multi-face cleaning) somam ~−2 a −3pp em acc absoluto. A contribuição é a atribuição entre fatores sob protocolo matched, invariante a esse offset. A ablação de undersample/split oficial em ConvNeXt-T é uma extensão natural (escopo defesa)." |
+| *"Vocês ficam atrás do SOTA AlDahoul et al. 2024 (75.7%) e até da ResNet-34 deles (72%). Por quê?"* | "Quatro escolhas metodológicas declaradas (undersample, split próprio, padding 1.25, multi-face cleaning) somam ~−2 a −3pp em acc absoluto. A contribuição é a atribuição entre fatores sob protocolo matched, invariante a esse offset. A ablação de undersample/split oficial em ConvNeXt-T é uma extensão natural (escopo defesa)." |
 | *"Por que não rodar sem undersample para pegar +2pp?"* | "Trade-off explícito: undersample dá garantia de F1 macro estável (todas as classes igualmente representadas), facilitando atribuição entre fatores. Sem undersample, mudanças em IR podem ser ruído de imbalance, não efeito atribuível ao fator." |
 | *"O FineFACE bate vocês em 96.4%."* | "FineFACE classifica gênero, não raça. As tarefas são distintas; comparação numérica direta não se aplica." (citar Seção 4 do FineFACE) |
 
@@ -182,9 +182,9 @@ Vale ou não rodar 1 experimento adicional (ConvNeXt-T + controle, 3 seeds, **se
 |---|---|---|
 | FairFace paper | https://arxiv.org/pdf/1908.04913 | *"FairFace defines 7 race categories but only 4 races... were used in this result to make it comparable to UTKFace."* (Tab.3 footnote) |
 | FineFACE paper (HTML) | https://arxiv.org/html/2408.16881 | *"two sets of experiments (1) gender classifier... (2) 13 gender-independent facial attribute classifiers"* (§4) |
-| Hassanpour 2024 (HTML) | https://arxiv.org/html/2410.24148v1 | Table 10: ResNet-34 72% acc, FaceScanPaliGemma 75.7% acc / 75% F1 |
+| AlDahoul et al. 2024 (HTML) | https://arxiv.org/html/2410.24148v1 | Table 10: ResNet-34 72% acc, FaceScanPaliGemma 75.7% acc / 75% F1 |
 | Anzhc HF community model | https://huggingface.co/Anzhc/Race-Classification-FairFace-YOLOv8 | YOLO11x top-1 acc = 0.735 em 7-class |
 
 ## 8. Resumo de uma linha
 
-> *"A pesquisa textual confirma: (a) FairFace paper publica apenas 4-class e binário; (b) FineFACE classifica gênero, não raça; (c) Hassanpour 2024 é a SOTA real para race 7-class (72% RN-34 / 75.7% VLM); (d) nosso ConvNeXt-T (70.9%) fica 1-5pp abaixo, gap estruturalmente explicado por 4 escolhas metodológicas declaradas; (e) a Linha A (atribuição matched) é invariante a esse offset e permanece a contribuição central."*
+> *"A pesquisa textual confirma: (a) FairFace paper publica apenas 4-class e binário; (b) FineFACE classifica gênero, não raça; (c) AlDahoul et al. 2024 é a SOTA real para race 7-class (72% RN-34 / 75.7% VLM); (d) nosso ConvNeXt-T (70.9%) fica 1-5pp abaixo, gap estruturalmente explicado por 4 escolhas metodológicas declaradas; (e) a Linha A (atribuição matched) é invariante a esse offset e permanece a contribuição central."*

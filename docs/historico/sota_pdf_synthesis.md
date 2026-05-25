@@ -11,7 +11,7 @@
 > que ele **NÃO classifica raça** — classifica gênero + 13 atributos
 > faciais, com raça como atributo protegido para medir disparidade. A
 > "headline 96.4% acc" é accuracy de gênero, não de raça. Além disso,
-> a pesquisa textual identificou **Hassanpour et al. 2024** (arXiv
+> a pesquisa textual identificou **AlDahoul et al., 2024** (arXiv
 > 2410.24148) como a SOTA real publicada para race 7-class FairFace
 > (RN-34 = 72% acc, FaceScanPaliGemma = 75.7% acc / 0.750 F1). Ver
 > `docs/sota_7class_race_audit.md` para a auditoria reproduzível

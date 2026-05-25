@@ -6,8 +6,8 @@
 >
 > **Atualização 2026-05-23:** o achado terminológico sobre `inequity_rate`
 > foi RESOLVIDO via renomeação para `disparity_ratio`, alinhada com a
-> nomenclatura usada por Hassanpour et al. 2024 (arXiv 2410.24148) e
-> FineFACE/Liu et al. 2024 (arXiv 2408.16881) — ver §1.1 abaixo.
+> nomenclatura usada por AlDahoul et al., 2024 (arXiv 2410.24148) e
+> FineFACE / Manzoor & Rattani, 2024 (arXiv 2408.16881) — ver §1.1 abaixo.
 
 Severidade: 🔴 corrige interpretação/honestidade · 🟠 fidelidade de
 hiperparâmetro · 🟢 correto.
@@ -21,21 +21,21 @@ hiperparâmetro · 🟢 correto.
 | max_min_disparity | `max − min` | gap absoluto padrão | 🟢 correto |
 | gini | `(n+1 − 2·Σcum/cum[-1])/n` sobre ordenado | **provado algebricamente** = `2Σi·xᵢ/(nΣx) − (n+1)/n`, a forma fechada canônica de Gini | 🟢 correto |
 | coefficient_of_variation | `std(ddof=0)/mean` | CV correto **mas** docstring diz "FDR-style" — FDR (Fairness Discrepancy Rate, Pereira&Marcel) **não é** CV | 🟠 nome enganoso |
-| **disparity_ratio** (renomeado de `inequity_rate` em 2026-05-23) | `max(F1_per_class) / min(F1_per_class)` | **Métrica padrão da literatura de fairness em classificação por grupos.** Usada como "Max-Min ratio" por Hassanpour et al. 2024 (Tab.2-3) e FineFACE/Liu et al. 2024 (Tab.2). Survey Mehrabi et al. 2021 cataloga como uma das métricas group-fairness canônicas. **Numericamente é a forma de razão (não diferença).** Antigo nome `inequity_rate` invocava confusão com o IR de verificação biométrica (Pereira & Marcel) que é produto FMR × FNMR — distinto. Resolvido pela renomeação. | 🟢 correto + procedência clara |
+| **disparity_ratio** (renomeado de `inequity_rate` em 2026-05-23) | `max(F1_per_class) / min(F1_per_class)` | **Métrica padrão da literatura de fairness em classificação por grupos.** Usada como "Max-Min ratio" por AlDahoul et al., 2024 (Tab.2-3) e FineFACE / Manzoor & Rattani, 2024 (Tab.2). Survey Mehrabi et al. 2021 cataloga como uma das métricas group-fairness canônicas. **Numericamente é a forma de razão (não diferença).** Antigo nome `inequity_rate` invocava confusão com o IR de verificação biométrica (Pereira & Marcel) que é produto FMR × FNMR — distinto. Resolvido pela renomeação. | 🟢 correto + procedência clara |
 
 **Conclusão métricas (atualizada 2026-05-23):** numericamente
 **corretas** (Gini provado à mão); **procedência literária declarada**:
 
 | Métrica nossa | Equivalente na literatura | Fonte canônica |
 |---|---|---|
-| `disparity_ratio` (max/min F1) | Max-Min Ratio | Hassanpour 2024 §4; FineFACE 2024 §4.2 |
+| `disparity_ratio` (max/min F1) | Max-Min Ratio | AlDahoul et al. 2024 §4; FineFACE 2024 §4.2 |
 | `max_min_disparity` (max − min) | Max-Min Gap / Absolute Disparity | Mehrabi et al. 2021 §2.2 (survey) |
 | `coefficient_of_variation` (std/mean) | CV / Statistical Dispersion | Sweeney 2002 (origem); aplicada em fairness por Speicher et al. 2018 |
 | `gini` | Coeficiente de Gini | Originária de econometria (Gini 1912); aplicada em fairness por Speicher et al. 2018 |
 
 A renomeação `inequity_rate → disparity_ratio` (commit anterior) **fecha
 o gap terminológico**: agora a métrica reportada é cientificamente
-identificada com a usada por Hassanpour 2024 e FineFACE 2024 — os
+identificada com a usada por AlDahoul et al. 2024 e FineFACE 2024 — os
 mesmos papers contra os quais nos posicionamos (`baseline_positioning.md`).
 **Não há mais "adaptação não-canônica" reportada**: é uma métrica
 padrão da literatura, com o nome correto, e com referência declarada.
@@ -156,7 +156,7 @@ de fato o backbone IR @112px se quiser comparar no regime dos papers
 
 | Item | Numérico | Fidelidade à literatura | Status |
 |---|---|---|---|
-| Métricas | 🟢 corretas (Gini provado) | 🟢 `disparity_ratio` alinhado com Hassanpour 2024 / FineFACE 2024 | **RESOLVIDO** (renomeação + procedência) |
+| Métricas | 🟢 corretas (Gini provado) | 🟢 `disparity_ratio` alinhado com AlDahoul et al. 2024 / FineFACE 2024 | **RESOLVIDO** (renomeação + procedência) |
 | ArcFace | 🟢 | 🟠 s=30 vs 64 canônico | declarado em §2.1 (racional científico travado) |
 | AdaFace | 🟢 | 🟠 init EMA fora do regime | corrigido em commit posterior (init próximo ao regime medido) |
 | MagFace | 🟢 (pós-fix) | 🟢 | RESOLVIDO |
@@ -165,7 +165,7 @@ de fato o backbone IR @112px se quiser comparar no regime dos papers
 **Estado final (2026-05-23):** todas as questões de fidelidade à
 literatura foram resolvidas via:
 1. **Renomeação `inequity_rate` → `disparity_ratio`** (alinhado com
-   Hassanpour 2024 + FineFACE 2024) — RESOLVIDO.
+   AlDahoul et al. 2024 + FineFACE 2024) — RESOLVIDO.
 2. **Backbone renomeado de `LResNet50E_IR` → `ResNet50ImageNet`** com
    alias mantido — RESOLVIDO.
 3. **AdaFace init EMA corrigida** (de 20/100 para 9/2 — regime medido) — RESOLVIDO.
@@ -179,9 +179,9 @@ problemas de fidelidade à literatura para defesa.
 
 | Métrica | Paper de origem |
 |---|---|
-| **Max-Min Ratio (disparity_ratio)** | Hassanpour et al. 2024, "Exploring VLMs for Facial Attribute Recognition" (arXiv 2410.24148, §4 Tab.2-3) — Max/Min usado para acurácia de gênero estratificada por raça |
+| **Max-Min Ratio (disparity_ratio)** | AlDahoul et al., 2024, "Exploring VLMs for Facial Attribute Recognition" (arXiv 2410.24148, §4 Tab.2-3) — Max/Min usado para acurácia de gênero estratificada por raça |
 | **Max-Min Gap (max_min_disparity)** | Mehrabi et al. 2021, "A Survey on Bias and Fairness in Machine Learning" (ACM Comput. Surv., §2.2) |
-| **DoB (Degree of Bias, std)** | Liu et al. 2024 (FineFACE, arXiv 2408.16881, §4.2) — usada com Max-Min Ratio |
+| **DoB (Degree of Bias, std)** | Manzoor & Rattani 2024 (FineFACE, arXiv 2408.16881, §4.2) — usada com Max-Min Ratio |
 | **Coefficient of Variation, Gini** | Speicher et al. 2018, "A Unified Approach to Quantifying Algorithmic Unfairness" (KDD 2018) |
 | **Inequity Rate canônico (FMR × FNMR)** | Pereira & Marcel 2022, "Fairness in Biometric Verification" — **NÃO é o que computamos** (este é IR para verificação biométrica binária, não para classificação multi-classe) |
 

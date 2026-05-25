@@ -7,7 +7,7 @@
 >
 > 📍 **Posicionamento absoluto (atualizado 2026-05-22):** nosso ConvNeXt-T
 > (F1=0.711, IR=1.569, acc=0.709) fica **−1.1pp da SOTA-CNN publicada**
-> (Hassanpour 2024, ResNet-34 = 0.720 acc) sob protocolos diferentes.
+> (AlDahoul et al. 2024, ResNet-34 = 0.720 acc) sob protocolos diferentes.
 > Gap estruturado em 4 escolhas metodológicas declaradas (undersample,
 > split próprio, padding 1.25, MTCNN re-align). Ablação 🅑
 > (no-undersample) preparada para fechar o maior componente do gap.
@@ -138,19 +138,19 @@ sistêmico.
 
 A alavanca ConvNeXt-T foi **validada empiricamente em 3 protocolos
 metodologicamente distintos** após a bateria de ablações 🅑 (sem
-subamostragem) e anchor 🅔 (protocolo Hassanpour):
+subamostragem) e anchor 🅔 (protocolo AlDahoul et al.):
 
 | Protocolo | Δ F1 (ConvNeXt vs Controle) | Δ IR | Significância |
 |---|---|---|---|
 | Casado original (subamostragem, partição nossa, padding 1.25, MTCNN) | +0.023 | −0.128 | **7σ + 3σ (forte)** |
 | 🅑 Sem subamostragem (partição nossa, padding 1.25, MTCNN) | +0.014 | −0.065 | 1.5σ + 0.7σ (atenuada) |
-| 🅔 Protocolo Hassanpour (partição oficial, padding 0.25, sem subamostragem, sem MTCNN) | **+0.024** | **−0.087** | **3.5σ + 1.8σ (significativa)** |
+| 🅔 Protocolo AlDahoul et al. (partição oficial, padding 0.25, sem subamostragem, sem MTCNN) | **+0.024** | **−0.087** | **3.5σ + 1.8σ (significativa)** |
 
 **Achado central:** a alavanca é **invariante** ao balanceamento de
 classes, à partição treino/teste, à versão das imagens e à presença
 de pré-processamento próprio. Magnitude do efeito em F1 é
 **comparável** sob os 3 protocolos (+0.023 / +0.014 / +0.024), com
-variância colapsando para metade no protocolo Hassanpour (dp_F1:
+variância colapsando para metade no protocolo AlDahoul et al. (dp_F1:
 0.009 → 0.004; dp_IR: 0.090 → 0.044). Robustez confere validade
 externa ao achado.
 
@@ -163,7 +163,7 @@ externa ao achado.
 - **Sem avaliação cross-dataset** (RFW/DemogPairs). PLANO §5 / Linha O2.
 - **ConvNeXt-T versão pequena** (28M parâmetros, "tiny"). Versões
   Base/Large podem amplificar o efeito (defesa).
-- **Gap absoluto vs SOTA-CNN publicada (−1.4pp vs Hassanpour 0.720)**
+- **Gap absoluto vs SOTA-CNN publicada (−1.4pp vs AlDahoul et al. 0.720)**
   atribuído ao HPO externo após auditoria empírica refutar dois
   suspeitos no nosso código — ver
   [`docs/auditoria_codigo_limitadores.md`](auditoria_codigo_limitadores.md).
