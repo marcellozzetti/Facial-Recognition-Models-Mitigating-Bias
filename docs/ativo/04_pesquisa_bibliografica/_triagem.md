@@ -70,3 +70,83 @@ Ordem sugerida de leitura (priorização por valor para `06_gap.md`):
 7. **S3 AlDahoul et al.** — única referência para a tarefa exata.
 8. **S4 FineFACE** — armadilha textual já identificada (gênero ≠ raça); ler para entender o que NÃO é nosso problema.
 9. **S7 Lafargue et al.** — auditoria regulatória, ancora discussão ética/EU AI Act.
+
+## Rodada 2.5 — Verificação dedicada de SOTA (2026-05-25)
+
+**Motivação:** após Rodada 1 completar leitura dos 9 papers seed e
+identificar AlDahoul et al. 2024 (arXiv:2410.24148) como única
+referência para FairFace race 7-class classification, o usuário
+levantou preocupação metodológica de **certeza absoluta sobre SOTA**
+— precedente do caso "Hassanpour" (autoria fabricada em Rodada 0
+pré-pivot) torna risco de erro inaceitável.
+
+### 2.5.1 Procedimento
+
+Busca em 4 frentes:
+
+1. **Semantic Scholar "cited by" de arXiv:2410.24148** — 11 papers
+   citantes inspecionados; nenhum reporta número superior em FairFace
+   7-class race classification.
+2. **Google Scholar / WebSearch para "FairFace race 7-class
+   accuracy 2025 2026"** — sem competidor identificado.
+3. **Papers with Code FairFace leaderboard** — **fora do ar**:
+   plataforma descontinuada por Meta em jul/2025; dados arquivados
+   em GitHub paperswithcode/paperswithcode-data sem atualizações.
+4. **Identificação de versão peer-reviewed do AlDahoul 2024** —
+   confirmado: paper foi aceito em **Nature Scientific Reports 2026**
+   (DOI: 10.1038/s41598-026-39584-3) com título atualizado
+   "FaceScanPaliGemma Multi-Agent Vision Language Models for
+   Facial Attribute Recognition". Mesmos números experimentais.
+
+### 2.5.2 Candidatos descartados como competidores
+
+| Candidato | Razão de descarte |
+|---|---|
+| FairViT (Tian et al. ECCV 2024, arXiv:2407.14799) | Não usa FairFace; testa em CelebA |
+| Sufian et al. ICPR 2024 Workshop FAIRBIO (arXiv:2506.05383) | Face authentication (verificação), não classificação racial; sem FairFace |
+| Hosseini et al. 2025 (arXiv:2502.11049) | Facial expression recognition, não race; testa em AffectNet/ExpW/Fer2013/RAF-DB |
+| GPT-4o (zero-shot) | Já avaliado por AlDahoul (68% acc 7-class, inferior ao FaceScanPaliGemma) |
+| CLIP zero-shot | Já avaliado por AlDahoul (64.2% acc 7-class, inferior) |
+| VGGFace-ResNet-50 + SVM | Já avaliado por AlDahoul (72.6% acc 7-class, inferior) |
+| Google FaceNet + SVM | Já avaliado por AlDahoul (68.9% acc 7-class, inferior) |
+
+### 2.5.3 Veredito de SOTA verificado
+
+**Estado da arte para FairFace race classification in-domain
+(test split do próprio FairFace, 10 954 imagens), em 2026-05-25:**
+
+| Classes | Modelo | Accuracy | F1 macro | Referência canônica |
+|---|---|---|---|---|
+| **7 classes** (White, Black, Indian, East Asian, Southeast Asian, Middle East, Latinx/Hispanic) | **FaceScanPaliGemma** (fine-tuned PaliGemma 3B) | **75.7%** | **75%** | **AlDahoul, Tan, Kasireddy & Zaki (2026), Nature Scientific Reports** (DOI 10.1038/s41598-026-39584-3). Tabela 10 do arXiv 2410.24148 (mesma data). |
+| **6 classes** (East+SE Asian merged em "Asian") | FaceScanPaliGemma | 81.1% | 79% | AlDahoul et al. (2026), Tabela 8/9 do arXiv 2410.24148. |
+| **Baseline 7-class** | FairFace ResNet-34 | 72% | 72% | AlDahoul et al. (2026), Tabela 10 — **NÃO confundir com 81.5% do paper original do FairFace** (que é out-of-domain Twitter/Media/Protest). |
+
+### 2.5.4 Implicações para a dissertação
+
+1. **Citação canônica:** sempre referenciar **AlDahoul, Tan, Kasireddy
+   & Zaki (2026), Nature Scientific Reports** (não mais arXiv preprint),
+   exceto quando se discutir cronologia da literatura.
+2. **Número SOTA:** **75.7% accuracy / 75% F1 macro** para 7-class
+   in-domain FairFace race classification. **Não 81.5%** (que é
+   out-of-domain) **e não 81.1%** (que é 6-class).
+3. **Baseline para comparação:** **72% accuracy / 72% F1** (FairFace
+   ResNet-34 baseline conforme AlDahoul Tabela 10, **não 0.815** do
+   paper original do FairFace).
+4. **Margem para superação:** qualquer trabalho que reportar **≥ 76%
+   accuracy** em FairFace 7-class in-domain, com protocolo
+   metodológico defensável (multi-seed, IC), seria o novo SOTA.
+5. **Caveat de single seed:** AlDahoul reporta single-run sem IC.
+   Nosso trabalho com 3-seed casado já oferece **rigor estatístico
+   superior** mesmo se atingir apenas 72-75% accuracy.
+
+### 2.5.5 Reabertura programada
+
+Esta verificação tem prazo de validade. Re-verificar antes da defesa
+da dissertação:
+
+- [ ] Re-rodar Semantic Scholar "cited by" de AlDahoul 2026 (Nature)
+      para capturar publicações pós-fev-2026.
+- [ ] Re-rodar arXiv search para "FairFace race" no mês anterior à
+      defesa.
+- [ ] Monitorar canais de pré-publicação: CVPR, ICCV, ECCV, FAccT
+      proceedings, IEEE TBIOM, ACM CSur.

@@ -4,11 +4,11 @@ status_verificacao: VERIFIED
 autores: [Nouar AlDahoul, Myles Joshua Toledo Tan, Harishwar Reddy Kasireddy, Yasir Zaki]
 ano: 2024
 titulo: "Exploring Vision Language Models for Facial Attribute Recognition: Emotion, Race, Gender, and Age"
-venue: "arXiv preprint 2410.24148 (NYU Abu Dhabi + University of Florida; follow-up Nature Scientific Reports 2026 a verificar separadamente)"
-tipo_publicacao: preprint
+venue: "Nature Scientific Reports 2026 (DOI: 10.1038/s41598-026-39584-3) — arXiv preprint 2410.24148 anterior (out/2024)"
+tipo_publicacao: journal
 arxiv_id: "2410.24148"
-doi: null
-url_primario: https://arxiv.org/abs/2410.24148
+doi: "10.1038/s41598-026-39584-3"
+url_primario: https://www.nature.com/articles/s41598-026-39584-3
 citacoes_google_scholar: null
 citacoes_semantic_scholar: 11
 data_verificacao_citacoes: 2026-05-25
@@ -17,13 +17,29 @@ lente_disrupcao: metodologica
 fonte_leitura: PDF integral extraído via pypdf (pdfs/aldahoul_2024_vlm.pdf), 40+ páginas
 ---
 
-# Exploring VLMs for Facial Attribute Recognition (AlDahoul, Tan, Kasireddy & Zaki, 2024)
+# FaceScanPaliGemma / VLMs for Facial Attribute Recognition (AlDahoul, Tan, Kasireddy & Zaki, 2024/2026)
 
 > **Nota sobre autoria:** este é o paper anteriormente referido como
 > "Hassanpour et al. 2024" na documentação do projeto. A atribuição
 > "Hassanpour" foi um erro identificado em 2026-05-25; a autoria
 > correta é AlDahoul, Tan, Kasireddy, Zaki, verificada via arXiv
 > 2410.24148.
+>
+> **Nota sobre venue (atualizada na Rodada 2.5 — 2026-05-25):** o paper
+> foi originalmente posto no arXiv em outubro de 2024 (2410.24148) e
+> **aceito em Nature Scientific Reports em 5 de fevereiro de 2026**
+> (DOI 10.1038/s41598-026-39584-3) sob o título "FaceScanPaliGemma
+> Multi-Agent Vision Language Models for Facial Attribute Recognition".
+> Os números experimentais (81.1% 6-class, 75.7% 7-class, 95.8% gender,
+> 80% age, 59.4% emotion) são idênticos entre as duas versões — a
+> Nature SR é a publicação peer-reviewed da mesma metodologia. **Para
+> a dissertação, citar a versão Nature 2026.**
+>
+> **Verificação de SOTA (Rodada 2.5):** busca via Semantic Scholar
+> "cited by" (11 papers), Google Scholar, e arXiv 2024-2026 não
+> identificou competidor que supere FaceScanPaliGemma em FairFace
+> race 7-class in-domain. Papers with Code foi descontinuado em
+> jul/2025 (Meta), eliminando leaderboard como fonte de checagem.
 
 ## 1. Resumo do problema atacado
 
