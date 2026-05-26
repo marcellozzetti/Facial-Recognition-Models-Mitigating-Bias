@@ -54,10 +54,14 @@ def main() -> int:
     ap.add_argument("pdf", type=Path, help="path to PDF (relative to cwd)")
     ap.add_argument("--pages", type=str, default=None, help='e.g. "1-5" or "1,3,7-9"')
     ap.add_argument("--download", type=str, default=None, help="arXiv id to download into pdf path if missing")
+    ap.add_argument("--url", type=str, default=None, help="arbitrary PDF URL to download into pdf path if missing")
     args = ap.parse_args()
 
     if args.download and not args.pdf.exists():
         download_arxiv(args.download, args.pdf)
+    elif args.url and not args.pdf.exists():
+        args.pdf.parent.mkdir(parents=True, exist_ok=True)
+        urllib.request.urlretrieve(args.url, args.pdf)
 
     if not args.pdf.exists():
         print(f"PDF not found: {args.pdf}", file=sys.stderr)
