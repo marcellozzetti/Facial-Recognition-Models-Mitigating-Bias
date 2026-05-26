@@ -81,3 +81,6 @@ htmlcov/
 
 # --- Claude Code local settings ---
 .claude/
+
+# --- Pesquisa bibliográfica: PDFs baixados localmente, não versionar ---
+docs/ativo/04_pesquisa_bibliografica/pdfs/
