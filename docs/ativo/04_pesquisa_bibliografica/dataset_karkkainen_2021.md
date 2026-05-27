@@ -264,3 +264,26 @@ nosso trabalho experimental treina e avalia sobre FairFace.
   [[wang_2019]] (RFW, dataset complementar), [[aldahoul_2024]] (única
   referência publicada para nossa tarefa exata).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 1, linha S2.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section 5 (Conclusion):
+
+- **Treinar modelos diversos sobre FairFace** — autores entregam o
+  dataset, sugerem que pesquisadores usem. ✅ **Alinhada com toda
+  literatura subsequente**.
+- **Verificar fairness em outros classificadores comerciais** —
+  ResNet-34 é baseline; outros backbones devem ser testados.
+  ✅ **Alinhada com Q06**.
+- **Estender taxonomia para incluir Hawaiian/Pacific Islanders e
+  Native Americans** — autores descartaram por amostragem
+  insuficiente. ❌ Fora do nosso escopo (escala de dados).
+- **Investigar métricas fairness alternativas** — autores reportam
+  ε (log-ratio max disparity), outras formulações possíveis.
+  ✅ **Alinhada com Q05**.
+- **Combinar FairFace com técnicas de mitigação algorítmica** —
+  paper deixa em aberto o que fazer com o dataset balanceado.
+  ✅ **Alinhada com Q04** — gap CENTRAL nossa.
+- **NÃO** mencionam continuous labels ou cross-reference com skin
+  tone. ✅ **Q09 e Q10 são frentes genuinamente abertas** —
+  autores do dataset não cobrem.

@@ -239,3 +239,24 @@ propriedades úteis para triangulação:
   [[grother_2019]] (NIST FRVT — auditoria industrial mais ampla, com
   variação demográfica).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 1, linha S8.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Conclusion:
+
+- **Estender RFW para mais categorias raciais** — 4 é coarse;
+  Middle Eastern, Latinx, Southeast Asian estão ausentes. ⚠ Alinhada
+  com Q08 (debate sobre granularidade).
+- **Aplicar IMAN a outras tarefas** além de FR verification. ❌
+  Tangencial.
+- **Combinar IMAN com técnicas supervisionadas** — atualmente UDA
+  puro. ⚠ Direção combinada.
+- **Investigar por que mesmo race-balanced training não elimina
+  disparities** — autores reconhecem mas deixam aberto. ✅ **Alinhada
+  com Q10** (matriz skin tone × race) — hipótese fenotípica
+  estrutural.
+- **Modernizar backbones** — ResNet-34 e Center-loss/SphereFace/
+  ArcFace são de 2018-2019. ✅ **Alinhada com Q06**.
+- **Validar IMAN em settings com mais raças** — paper foca em
+  Caucasian → other races. Generalização não testada. ❌ Fora do
+  escopo (RFW é 4-class).

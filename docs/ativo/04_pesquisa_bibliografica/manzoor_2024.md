@@ -276,3 +276,24 @@ e como **demonstração de existência** de soluções Pareto-efficient.
   [[aldahoul_2024]] (paper para classificação de raça propriamente
   dita).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 1, linha S3.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Conclusão (ICPR 2024 papers são curtos; future work
+geralmente inferido):
+
+- **Aplicar FineFACE a outras tarefas faciais além de gender e 13
+  attributes** — race classification 7-class é candidato natural.
+  ✅ **Alinhada com Q04** — diretamente.
+- **Testar backbones mais modernos** (ViT, ConvNeXt) — paper só usa
+  ResNet50. ✅ **Alinhada com Q06**.
+- **Ablation de número de experts** (atualmente N=3) — efeito de
+  N=5 ou N=10 não testado. ⚠ Detalhe metodológico.
+- **Reduzir image size de 448×448** — custo computacional 4× de
+  224×224. ⚠ Ortogonal à nossa pesquisa.
+- **Aplicar a image domains além de face** (autores citam): outras
+  fine-grained classification (birds, cars, plants). ❌ Fora do
+  escopo.
+- **Sem mencionar uso de demographic annotations no treino**, mas
+  exigem no eval — possível direção: fairness sem demographic labels.
+  ⚠ Direção paralela emergente (SensitiveNets).

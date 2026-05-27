@@ -112,3 +112,21 @@ Error Rate), accuracy por subgrupo.
   [[neto_2025]] (BFW é benchmark de teste em Neto), [[grother_2019]]
   (NIST FRVT, escala industrial paralela).
 - Responde Q07 (datasets não-FairFace) em [[_perguntas]].
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Conclusion:
+
+- **Expandir BFW para mais etnias** (atualmente 4 = A, B, I, W) —
+  Middle Eastern, Latinx, SE Asian estão ausentes. ⚠ Alinhada com
+  Q07/Q08 (debate sobre granularidade).
+- **Reduzir tamanho do gap entre fairness e performance** via
+  **subgroup-specific thresholds** + outras técnicas combinadas.
+  ✅ **Alinhada com Q04** (mitigação algorítmica).
+- **Estender avaliação humana** para mais demografias e contextos
+  (paper testou em pool limitado nos EUA). ❌ Fora do escopo.
+- **Auditar viés em soft biometrics** (idade, pose, qualidade).
+  ⚠ Parcialmente alinhada.
+- **Cross-disciplinary work com ciência social e direito** — viés
+  algorítmico tem implicações jurídicas. ❌ Fora do nosso escopo
+  experimental.

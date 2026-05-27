@@ -179,3 +179,33 @@ Mehrabi 2021 mais geral).
   [[grother_2019]] (NIST FRVT — cited extensively),
   [[neto_2025]] (Kotwal precede Neto 2025; este vai além
   questionando discretização).
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section VII (Open Challenges):
+
+- **Standardização internacional de demographic fairness metrics** —
+  ISO/IEC 19795-10 é início, mas adoção é parcial. ✅ **Alinhada com
+  Q05** (métrica multi-classe sem consenso).
+- **Investigar structural facial features além de skin tone** —
+  citando Muthukumar et al., dark-skinned females têm features
+  anatômicos contribuindo mais que tom de pele. ✅ **Alinhada com Q10**
+  — quando a matriz tom × race for construída, verificar se features
+  estruturais explicam erro residual.
+- **Mitigação em estágios diversos do pipeline** (não só training-time)
+  — Section VI lista pre-/in-/post-processing, mas avaliação
+  comparativa é escassa. ✅ **Alinhada com Q04**.
+- **Soft attributes (brightness, head pose, image quality)** como
+  confundidores — controlar para isolar effect demográfico genuíno.
+  ⚠ Parcialmente alinhada (nossa pesquisa não controla esses).
+- **Cohort-specific models / dynamic model selection** (Klare et al.
+  citado) — alternativa a um único modelo global. ❌ Fora do escopo
+  imediato (mas direção interessante).
+- **Privacy-preserving fairness measurement** — fairness sem expor
+  atributos sensíveis. Emergente em SensitiveNets etc. ❌ Não
+  alinhado com nossa pesquisa.
+- **Generative models para data augmentation balanceada** —
+  alternativa a sub-sampling que descarta dados. ❌ Fora do escopo
+  (S10 já em standby).
+- **Datasets com self-identification em escala** — referência implícita
+  ao Casual Conversations. ✅ **Alinhada com Q01**.

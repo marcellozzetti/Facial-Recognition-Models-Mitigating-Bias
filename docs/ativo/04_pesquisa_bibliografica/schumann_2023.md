@@ -141,3 +141,25 @@ necessidade de pool diverso + alta replicação.
   [[dataset_hazirbas_2021]] (Casual Conversations + Fitzpatrick),
   [[lafargue_2025]] (cita MST mas adota Fitzpatrick).
 - **Responde Q01 🔬 (template metodológico), fundamenta Q10 🔬**.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Conclusão e Discussion:
+
+- **Estender MST-E para mais sujeitos e geografias** — 19 sujeitos em
+  MST-E é insuficiente para training reference em escala global.
+  ❌ Fora do escopo (criação de dataset).
+- **Investigar interação com tarefas downstream** — paper só estuda
+  anotação per se, não impacto em modelos de classification.
+  ✅ **Alinhada com Q10** — exatamente isso (MST → impacto em race
+  classification).
+- **Comparar MST vs Fitzpatrick em scoring de fairness real** —
+  declaração: "ambos exigem anotação cuidadosa" mas qual produz
+  melhor sinal de bias? Aberto. ✅ **Alinhada com Q10**.
+- **Modelos que incorporam perspectiva de anotador individual** (não
+  só consenso) — cita literatura emergente (Goyal, Aroyo, Díaz).
+  ⚠ Parcialmente alinhada — direção sociotécnica, complemento ao
+  nosso work.
+- **Reduzir cognitive load em scales muito granulares** (Felix von
+  Luschan 36-pt) — sugestão para outros pesquisadores; MST como
+  compromisso. ❌ Fora do escopo.

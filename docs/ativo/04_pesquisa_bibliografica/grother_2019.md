@@ -264,3 +264,26 @@ escala única** sobre viés demográfico em sistemas faciais.
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 1, linha S9.
 - Anexos NIST com 1200+ páginas de breakdowns por algoritmo: ver
   doi.org/10.6028/NIST.IR.8280.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Sections 8 e 9 do relatório:
+
+- **Pesquisa em técnicas de mitigação de differential performance**
+  — relatório explicitamente recomenda pesquisa em mitigação, sem
+  prescrever técnica. ✅ **Alinhada com Q04** — totalmente.
+- **Avaliação operacional sobre dados operacionais** — system
+  owners devem testar com seus próprios pipelines + dados. ❌ Fora
+  do escopo acadêmico imediato.
+- **Standards de reporting** — relatório enfatiza necessidade de
+  reportar AMBOS FMR E FNMR em threshold fixo. ✅ **Alinhada com
+  Q05**.
+- **Pesquisa em training datasets balanceados** — sem prescrever
+  técnica. ⚠ Direção genérica.
+- **In-group effect (algoritmos chineses em East Asians)** merece
+  investigação dedicada — paper observa mas não diagnostica.
+  ✅ **Alinhada com Q01 e Q10** (composição de treino).
+- **Avaliar interação humano-máquina** em sistemas de
+  identification — fora do escopo do paper. ❌ Fora do nosso escopo.
+- **Continuação periódica da FRVT** — sugestão institucional, não
+  acadêmica. ❌ Fora do escopo.

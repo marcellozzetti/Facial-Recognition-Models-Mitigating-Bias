@@ -240,3 +240,27 @@ relevância é em três frentes:
   [[dataset_karkkainen_2021]] (FairFace usado como gender/age
   classifier no pipeline).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 1, linha S7.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section 7 (Conclusion) + Discussion:
+
+- **Estender gender labels além do binário** — autores reconhecem
+  como limitação. ❌ Fora do nosso foco em race.
+- **Tratamento estatístico de variáveis multi-modais como nativamente
+  multi-classe** (não one-vs-all) — atualmente fazem one-vs-all em
+  testes estatísticos. ✅ **Alinhada com Q05** (métrica multi-classe).
+- **Pipeline aplicável a datasets em escala industrial (≥1M
+  imagens)** — paper testa em 10K (Generated) e 1.5K (CelebA subset).
+  ⚠ Parcialmente alinhada (escalabilidade do nosso pipeline também
+  importa).
+- **Validar uncertainty-aware test contra ground truth real
+  (não-sintético)** — Generated Photos é sintético. Aplicar a
+  FairFace seria validation natural. ✅ **Alinhada com Q10**.
+- **Investigar viés sistemático do classifier auxiliar** —
+  permutation aleatória assume erro aleatório, mas erros sistemáticos
+  por classe (e.g., classifier erra mais em Latinx) não são tratados.
+  ✅ **Alinhada com Q01** (anotação não-uniforme entre classes).
+- **Incorporar Monk Skin Tone Scale** — paper menciona MST mas adota
+  Fitzpatrick por simplicidade. ✅ **Alinhada com Q10** —
+  MST > Fitzpatrick em granularidade.

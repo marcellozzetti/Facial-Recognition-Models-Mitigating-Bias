@@ -231,3 +231,25 @@ técnica de mitigação. Para a dissertação, é útil em três frentes:
   auditoria de outro estilo, sobre algoritmos).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 1, linha S6.
 - Código DSAP: https://github.com/irisdominguez/DSAP.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section VI (Conclusions):
+
+- **Aplicar DSAP a outras tarefas além de FER** — paper só testa
+  emoção. Race, gender, age classification são candidatos. ✅ **Alinhada
+  com Q10** — auditar FairFace via DSAP é exatamente o que
+  precisaríamos.
+- **Investigar dependência do auxiliary model** — autores reconhecem
+  circularidade. ✅ **Alinhada com Q01** (anotação não confiável).
+- **Incorporar continuous data** — DSAP atualmente assume classes
+  discretas. ✅ **Alinhada com Q09** (Neto 2025).
+- **Demographic relatedness scores** — autores dizem "nearly
+  impossible" mas reconhecem que ecologia avançada usa relatedness
+  filogenético. Inspiração possível: hierarquia étnica do US Census
+  (Latinx como sub-grupo de White ou separado). ⚠ Tangencial.
+- **Análise temporal** (dataset drift) — DSAP suporta mas não foi
+  validado longitudinalmente. ❌ Fora do nosso escopo (single-
+  snapshot).
+- **Combinar DSAP com bias mitigation techniques** — auditoria sem
+  ação é incompleta. ✅ **Alinhada com Q04**.

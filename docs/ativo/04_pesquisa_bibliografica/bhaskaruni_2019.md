@@ -210,3 +210,21 @@ Aplicabilidade direta à nossa pesquisa de visão computacional é
   mutual attention), [[mehrabi_2021]] (survey que catalogou
   ensemble como técnica de mitigação).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 3.1, linha F4.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section V (Conclusion):
+
+- **Extender método a outras tarefas além de fair ML clássico** —
+  paper testa apenas em tabular (Credit, Crime). ✅ **Alinhada com
+  Q04** — face classification é candidato.
+- **Investigar redução do trade-off accuracy×fairness** — método
+  proposto não é Pareto-efficient. ✅ **Alinhada com Q04** —
+  FSCL+ (Park 2022) resolve isso 3 anos depois.
+- **Aplicar a deep learning** — paper só testa em LR (logistic
+  regression). ✅ **Alinhada com Q04** — deep ensemble equivalente
+  é o que rodamos.
+- **Variar identificação de unfair instances além de k-NN**. ⚠
+  Técnico, não direcional.
+- **Testar em datasets faciais** — autores não testam. ✅ **Alinhada
+  com Q04** — direção CENTRAL.

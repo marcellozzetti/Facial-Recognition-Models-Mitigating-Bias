@@ -249,3 +249,24 @@ viés demográfico facial cita este paper.
   [[grother_2019]] (auditoria NIST industry-wide subsequente),
   [[dehdashtian_2024]] (trade-off teorizado posteriormente).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 3.2, linha F10.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Discussion / Conclusion:
+
+- **Expandir auditoria interseccional para outras tarefas faciais
+  além de gender** — race classification, age estimation, emotion.
+  ✅ **Alinhada com Q04** — diretamente.
+- **Incorporar dimensões adicionais de identidade** além de gender
+  binário — transgender, non-binary. ❌ Fora do nosso foco (race).
+- **Métricas além de error rate** — paper só usa error rate por
+  subgrupo. ✅ **Alinhada com Q05**.
+- **Auditoria contínua de sistemas comerciais** — paper é snapshot
+  abril-maio 2017. ❌ Fora do escopo experimental.
+- **Reproduzir auditoria em datasets in-the-wild** — PPB é
+  constrained. ⚠ Direção complementar.
+- **Estudar correlação skin type × ethnicity formalmente** —
+  autores reconhecem trade-off mas não fazem cross-reference.
+  ✅ **Alinhada com Q10** — exatamente nossa frente.
+- **Investigar viés em outras tasks: face recognition, face
+  generation** — sugestão genérica. ⚠ Tangencial.

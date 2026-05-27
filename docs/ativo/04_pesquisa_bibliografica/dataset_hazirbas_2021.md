@@ -163,3 +163,26 @@ narrative consistente):**
   [[dataset_karkkainen_2021]] (FairFace — alvo da crítica metodológica).
 - **Responde parcialmente Q01 🔬, fundamenta Q09 e Q10 🔬** em
   [[_perguntas]].
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section 5 (Conclusion) + Discussion sections:
+
+- **Casual Conversations v2** (já publicada por Porgali et al. 2023):
+  expandir para 7 países além dos EUA. Cobrir diversidade geográfica.
+  ⚠ Parcialmente alinhada (não modifica nossa metodologia core).
+- **Aplicar Casual Conversations a outras tarefas além de DFDC** —
+  age/gender/emotion classification, face recognition. ✅ **Alinhada
+  com Q10** — usar pipeline de anotação para FairFace seria adaptação
+  direta.
+- **Avaliar AI generative models** com mesma metodologia (text-to-image,
+  AI avatars). ❌ Fora do escopo (geração).
+- **Color-correction protocols** para improved inter-rater agreement
+  em Fitzpatrick. ✅ **Alinhada com Q10** (anotação MST/Fitzpatrick
+  manual exige protocolo similar).
+- **Métodos de bias mitigation** usando dataset com self-reported
+  attributes como ground truth. ✅ **Alinhada com Q01** — auditoria
+  de anotações third-party (caso FairFace) contra self-reported é
+  exatamente o gold-standard que falta.
+- **Expandir para gender labels além do binário** — autores
+  reconhecem limitação. ❌ Fora do nosso foco em race.

@@ -311,3 +311,26 @@ posicionamento da nossa pesquisa.
   classificação de raça mas é gênero),
   [[dehdashtian_2024]] (U-FaTE — teoriza trade-off complementar).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 1, linha S1.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section 6 (Conclusion):
+
+- **Multi-pessoa via fine-tuning específico** — atualmente requer
+  detection upstream. Autores sugerem fine-tunar PaliGemma em
+  dataset multi-pessoa (DiverseFaces). ❌ Fora do escopo (single-
+  person no FairFace).
+- **Estender para emotion classification com mais nuances** —
+  FaceScanPaliGemma 59.4% em AffectNet ainda inferior a SOTA (FMAE
+  65%). ❌ Fora do escopo (emoção).
+- **Combinar VLMs com técnicas de fairness explícitas** — paper só
+  faz fine-tuning vanilla; não testa FSCL+, Group DRO, etc.
+  ✅ **Alinhada com Q04** — direção CENTRAL para nossa pesquisa.
+- **Avaliação multi-seed com intervalo de confiança** — paper roda
+  single seed por tarefa. Reconhecem informalmente como limitação.
+  ✅ **Alinhada com nossa metodologia** (3-seed casado).
+- **Backbones mais leves que PaliGemma 3B** com performance
+  competitiva — PaliGemma é caro computacionalmente.
+  ✅ **Alinhada com Q06** (hipótese H4: ConvNeXt-T 28M competitivo).
+- **Investigar disparidade Latinx/Hispanic (60% F1)** — pior classe.
+  ✅ **Alinhada com Q01 e Q10** — exatamente nossa frente.

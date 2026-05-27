@@ -218,6 +218,14 @@ Não copiar trechos do paper — formular paráfrases verificáveis.]
 - PDF local: `pdfs/<autor>_<ano>.pdf`
 - Entradas relacionadas: [[outro-autor-ano]], [[outro-autor-ano]]
 - Referência canônica em: `docs/ativo/00_referencias.md` (Seção X.Y)
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+[Lista literal das direções de "Future Work" / "Limitations
+addressable in future" / "Conclusions" do paper, com referência ao
+local no PDF (página/seção). Marcar cada item com:
+- ✅ Alinhada com nossa frente 🔬 (citar Q-id)
+- ⚠ Parcialmente alinhada
+- ❌ Divergente / fora do nosso escopo]
 ```
 
 ## 6. Convenções de nomenclatura

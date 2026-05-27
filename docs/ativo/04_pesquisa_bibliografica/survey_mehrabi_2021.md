@@ -219,3 +219,23 @@ Selbst (2016).
   [[park_2022]] (instância de in-processing por contrastive learning),
   [[bhaskaruni_2019]] (instância de ensemble como mitigação).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 3.2, linha F11.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section 6 (Challenges and Opportunities):
+
+- **Padronização de definições de fairness** — survey lista 10
+  definições mas há divergência prática. ✅ **Alinhada com Q05**.
+- **Fairness em sistemas multimodais e generativos** — relevante mas
+  futurística (paper de 2021). ❌ Fora do escopo.
+- **Ferramentas de assessment automatizado** (Aequitas, AIF360) —
+  precisam adoção e validação cross-domain. ⚠ Tangencial.
+- **Equidade temporal / longitudinal** — modelos podem virar
+  enviesados ao longo do tempo. ❌ Fora do escopo.
+- **Multidisciplinaridade com social sciences** — engenharia +
+  estudos sociais. ❌ Fora do escopo experimental.
+- **Causal fairness** — direção emergente. ❌ Fora do escopo.
+- **Fairness em deep learning especificamente** — ainda exploratório
+  vs ML clássico. ✅ **Alinhada com Q04**.
+- **Fairness sem demographic labels** (privacy-preserving). ⚠
+  Direção emergente.

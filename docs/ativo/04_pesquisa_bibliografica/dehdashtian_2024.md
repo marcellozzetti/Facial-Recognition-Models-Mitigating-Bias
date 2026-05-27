@@ -242,3 +242,24 @@ estimação.
   [[dominguez_2024]] (DSAP — auditoria de datasets como input para
   estimativa de trade-offs).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 1, linha S4.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section 7 (Concluding Remarks):
+
+- **Estender U-FaTE para classificação multi-classe** — formulação
+  atual é Y, S binários. Para race 7-class, generalização é não-
+  trivial. ✅ **Alinhada com Q04 e Q05** — direção crítica.
+- **Estimar trade-offs com fairness individual** — paper só cobre
+  group fairness. ❌ Direção paralela.
+- **Aplicar a tarefas faciais multi-classe complexas** — autores
+  citam emoção, atributos múltiplos. ✅ **Alinhada com Q04** —
+  race classification é candidato direto.
+- **Investigar por que alguns modelos supervisionados ultrapassam
+  DST** — região "Possible with Extra Data" precisa caracterização.
+  ✅ **Alinhada com Q06** (decomposição do ceiling).
+- **Combinar U-FaTE com técnicas algorítmicas explícitas**
+  (FSCL, Group DRO) — paper só avalia representations existentes.
+  ✅ **Alinhada com Q04**.
+- **Aplicar a FairFace race 7-class** — autores testam sex em
+  FairFace mas não race. Extensão direta. ✅ **GAP CENTRAL — Q04**.

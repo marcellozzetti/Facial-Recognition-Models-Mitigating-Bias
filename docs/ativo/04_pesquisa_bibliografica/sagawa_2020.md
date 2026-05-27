@@ -241,3 +241,23 @@ race 7-class.
   [[dehdashtian_2024]] (U-FaTE — formaliza o trade-off entre
   worst-case e average).
 - Referência canônica: `docs/ativo/00_referencias.md` Seção 3.2, linha F9.
+
+## 11. Trabalhos sugeridos pelos autores (Future Work)
+
+Extraído de Section 6 (Discussion) + Limitations:
+
+- **Group DRO sem labels demográficos no treino** — atualmente
+  exige (x, y, g). Direção: descobrir g via clustering. ⚠ Paralela,
+  emergente em SensitiveNets.
+- **Aplicar a tarefas multi-classe complexas** — paper testa
+  worst-group em 4-6 grupos binários. Extensão para FairFace
+  race 7-class não trivial. ✅ **Alinhada com Q04 e Q05**.
+- **Estudar interação Group DRO × outras técnicas de regularização**
+  (não só ℓ2 e early stopping) — autores enfatizam que strong reg é
+  essencial. ✅ **Alinhada com Q04**.
+- **Aprimorar algoritmo estocástico** — autores propõem como
+  convergence-guaranteed mas não otimizado. ⚠ Engenharia, não
+  pesquisa.
+- **Aplicar a face race classification** — autores testam CelebA
+  hair color × gender mas não FairFace race 7-class. ✅ **GAP
+  CENTRAL — Q04**.
