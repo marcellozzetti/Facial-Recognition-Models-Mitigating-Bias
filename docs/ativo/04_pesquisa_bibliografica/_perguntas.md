@@ -24,6 +24,10 @@
 | Q04 | Quais técnicas de mitigação algorítmica já foram testadas em FairFace race 7-class? | ⚠ PARTIAL → 🔬 |
 | Q05 | Existe consenso na literatura sobre métrica de fairness para classificação multi-classe (vs binária)? | ❌ OPEN → 🔬 |
 | Q06 | O baseline ResNet-34 = 72% acurácia é teto da arquitetura ou da metodologia? | ⚠ PARTIAL → 🔬 |
+| Q07 | Existe pesquisa de fairness em biometria facial **sem usar FairFace**? | ✅ ANSWERED |
+| Q08 | Por que os estudos tentam sempre fazer merge de classes raciais? | ✅ ANSWERED |
+| Q09 | 7 classes é realmente a taxonomia correta para fairness racial facial? | ❌ OPEN → 🔬 |
+| Q10 | Existe matriz associativa Fitzpatrick/MST × FairFace 7-race? | ❌ OPEN → 🔬 (NEW RESEARCH FRONT — CANDIDATA PRINCIPAL) |
 
 ---
 
@@ -587,6 +591,396 @@ accuracy esperado é +2-3 pp; Latinx F1 não muda. O ceiling principal
 direta da nossa pesquisa experimental** (já temos resultados de
 backbone comparison). Documentar em `06_gap.md` como "Gap-aux 2 —
 decomposição do ceiling".
+
+---
+
+## Q07 — Existe pesquisa de fairness em biometria facial sem usar FairFace?
+
+- **Status:** ✅ ANSWERED
+- **Data:** 2026-05-25
+- **Última atualização:** 2026-05-25 (após Rodada 3 — broadening intencional)
+- **Fichas consultadas:** todas as 19 do corpus, com ênfase em [[dataset_wang_2019]], [[dataset_robinson_2020]], [[buolamwini_2018]], [[dataset_hazirbas_2021]], [[schumann_2023]], [[grother_2019]], [[neto_2025]], [[survey_kotwal_2025]]
+
+### Evidências coletadas
+
+**SIM, há um ecossistema substancial de pesquisa de fairness facial
+sem FairFace.** Mapeamento por dimensão demográfica:
+
+**Track 1 — Face Recognition (verification 1:1 / identification 1:N) com balanceamento racial:**
+
+| Dataset | Imagens / IDs | Categorias | Origem | Ficha |
+|---|---|---|---|---|
+| **RFW** | ~40K / 12K | 4 (Caucasian, Asian, Indian, African) | ICCV 2019 | [[dataset_wang_2019]] |
+| **BFW** | 20K / 800 | 4×2 (race×gender) | CVPRW 2020 | [[dataset_robinson_2020]] |
+| **BUPT-Balancedface** | ~1.3M / 28K | 4 ethnicities | Wang et al. (citado em Neto, [[neto_2025]]) | (mencionado, sem ficha dedicada) |
+| **DemogPairs** | curado | 3 (Asian, Black, White) | Hupont & Tena (citado em Robinson) | (mencionado) |
+| **NIST FRVT datasets** | 18.27M / 8.49M | country-of-birth proxy | governmental | [[grother_2019]] |
+
+**Track 2 — Skin tone (Fitzpatrick / MST) como alternativa a race:**
+
+| Dataset | Sujeitos / Imagens | Escala | Ficha |
+|---|---|---|---|
+| **PPB** | 1 270 | Fitzpatrick (anotador dermatologista) | [[buolamwini_2018]] |
+| **Casual Conversations v1** | 3 011 / 45K vídeos | Fitzpatrick + self-reported age/gender | [[dataset_hazirbas_2021]] |
+| **Casual Conversations v2** | 5 567 (7 países) | (extensão) | (mencionado em [[schumann_2023]]) |
+| **MST-E** | 1 515 + 31 vídeos | Monk Skin Tone 10-pt | [[schumann_2023]] |
+| **Generated Photos** | 10 000 sintéticas | Fitzpatrick | [[lafargue_2025]] |
+
+**Track 3 — Fairness em outras tarefas faciais (gender, attribute, expression):**
+
+| Dataset | Tarefa | Ficha |
+|---|---|---|
+| CelebA | gender / 40 attributes | [[park_2022]], [[manzoor_2024]], [[sagawa_2020]] |
+| UTKFace | gender / ethnicity 5-class | múltiplas |
+| AffectNet | emotion (8 classes) | [[aldahoul_2024]], [[dominguez_2024]] |
+| 20 FER datasets | facial expression | [[dominguez_2024]] |
+
+**Track 4 — Fairness fora de visão facial (paralelos teóricos):**
+
+| Dataset | Domínio | Ficha |
+|---|---|---|
+| Waterbirds | bird classification + spurious bg | [[sagawa_2020]] |
+| MultiNLI | language inference | [[sagawa_2020]] |
+| Community Crime, Credit Default | tabular | [[bhaskaruni_2019]] |
+
+### Resposta
+
+**SIM, existe pesquisa de fairness em biometria facial sem FairFace e
+em escala substancial.** Distribuição aproximada por tarefa:
+
+- **Para race classification (nosso problema específico):** FairFace
+  domina (Q02), com **UTKFace** como cross-dataset.
+- **Para race em face recognition (verification/identification):**
+  ecossistema próprio com **RFW, BFW, BUPT-Balancedface, NIST FRVT,
+  DemogPairs**. **FairFace tem papel auxiliar nessa subliteratura,
+  não central.**
+- **Para skin tone fairness:** **track paralelo** com PPB, Casual
+  Conversations, MST-E — **não usa race labels**, opta por
+  Fitzpatrick ou MST.
+- **Para gender/attribute fairness facial:** CelebA é dominante.
+
+### Implicação para nossa pesquisa
+
+1. **Posicionamento da dissertação:** estamos no **track de race
+   classification** especificamente. FairFace é justificadamente o
+   dataset principal nesse track.
+2. **Triangulação possível:** podemos citar evidência de RFW, BFW,
+   NIST FRVT para mostrar **convergência de findings** ("balanceamento
+   não basta" aparece em 4+ datasets independentes).
+3. **Track skin-tone (Casual Conversations, MST-E) é parente próximo:**
+   alimenta Q10 🔬 (matriz skin tone × race). Pode-se argumentar que
+   nossa dissertação está **conectando dois tracks paralelos**.
+
+### Lacunas residuais
+
+- **BUPT-Balancedface** e **DemogPairs** não têm fichas dedicadas
+  ainda. Decidir em `06_gap.md` se relevantes ou citáveis sem ficha
+  individual.
+- **Casual Conversations v2 (Porgali et al. 2023)** não tem ficha
+  separada — pode justificar Rodada 4 mais tarde.
+
+---
+
+## Q08 — Por que os estudos tentam sempre fazer merge de classes raciais?
+
+- **Status:** ✅ ANSWERED
+- **Data:** 2026-05-25
+- **Última atualização:** 2026-05-25
+- **Fichas consultadas:** [[dataset_karkkainen_2021]], [[aldahoul_2024]], [[lin_2022]], [[dataset_wang_2019]], [[dataset_robinson_2020]], [[neto_2025]], [[buolamwini_2018]]
+
+### Evidências coletadas
+
+**Padrão observado:** estudos com taxonomia 7-classe (FairFace) e
+4-classe (RFW, BFW) raramente convergem; mais comum é estudo cobrir
+**4 ou 5 classes** com **fusões pragmáticas**.
+
+**Exemplos no corpus:**
+
+| Paper | Taxonomia usada | Classes mescladas |
+|---|---|---|
+| FairFace original | 7 train, **4 em cross-dataset Table 4** | "Only 4 races (W, B, Asian, Indian)" para comparar com UTKFace [[dataset_karkkainen_2021]] |
+| AlDahoul 2024/2026 | testa **ambos** 6 e 7 | 6-class merge East+SE Asian → "Asian"; resultado: 81.1% (6) vs 75.7% (7) acc [[aldahoul_2024]] |
+| FairGRAPE (Lin 2022) | 7 mantido | uso pleno do FairFace [[lin_2022]] |
+| RFW | **4** (W, A, I, Afr) | sem distinção East/SE Asian [[dataset_wang_2019]] |
+| BFW | **4×2** (race×gender) | sem Middle East ou Latinx [[dataset_robinson_2020]] |
+| UTKFace | **5** (W, B, A, I, "Others") | "Others" mescla Latinx + Middle East + Hispanic |
+| Neto 2025 | **4** (W, A, I, Afr) | aceita taxonomia do RFW/BFW [[neto_2025]] |
+| Gender Shades | **0 race** (Fitzpatrick 6) | descarta race por instabilidade [[buolamwini_2018]] |
+
+### Razões identificadas (consolidadas)
+
+**1. Cross-dataset comparability** (mais frequente)
+
+FairFace tem 7; UTKFace tem 5; RFW tem 4; LFWA+ tem 5 (com
+"Undefined"). Para comparação cross-dataset, **só o menor denominador
+comum** funciona — tipicamente 4 (W, B, Asian, Indian). O paper do
+FairFace explicita isso em Tabela 4: *"only 4 races were used to make
+it comparable to UTKFace"*.
+
+**2. Annotation reliability** (East Asian vs Southeast Asian)
+
+[[schumann_2023]] documenta que anotadores de diferentes regiões
+divergem sistematicamente. Distinguir East Asian de Southeast Asian
+exige conhecimento etnográfico que MTurk workers (especialmente nos
+EUA) tipicamente não têm. **Fusão para "Asian" resolve o
+disagreement.**
+
+**3. Class imbalance** mesmo em datasets "balanceados"
+
+FairFace train: White=19%, Latinx=15%, Middle East=11% (lido em
+[[aldahoul_2024]]). Classes menores têm sinal mais ruidoso; fusão
+aumenta o número de exemplos por classe efetiva.
+
+**4. Ambiguidade conceitual estrutural**
+
+[[neto_2025]] argumenta que a fronteira East Asian / Southeast Asian
+é fundamentalmente **borrada**: traços fenotípicos têm continuidade
+no sudeste asiático. Não é falha de anotação — é a categoria que
+é fuzzy. Análogo: "Hispanic" como ethnia × race.
+
+**5. Conveniência metodológica**
+
+Métricas multi-classe são ad-hoc (Q05). Reduzir para 4 simplifica
+formulação (e.g., Equalized Odds binarizada por One-vs-Rest).
+
+**6. AlDahoul demonstra trade-off explícito**
+
+Em 7-class: 75.7% acc, F1 = 75%.
+Em 6-class (East+SE merged): 81.1% acc.
+**Mergeando ganha-se 5.4 pp.** **Trade-off:** perde-se granularidade
+auditável vs ganha-se accuracy reportável. Papers frequentemente
+optam pelo accuracy maior.
+
+### Resposta sintética
+
+**Os estudos fazem merge por uma combinação de fatores estruturais:**
+
+1. **Cross-dataset comparability** (sobreposição mínima de taxonomias).
+2. **Annotation reliability** (categorias fuzzy entre humanos).
+3. **Class imbalance** mesmo em "balanced" datasets.
+4. **Ambiguidade conceitual** intrínseca de algumas categorias
+   (East/SE Asian, Latinx/Hispanic).
+5. **Métricas multi-classe não-padronizadas** (Q05).
+6. **Trade-off accuracy×granularidade** — accuracy reportável é
+   prioridade competitiva.
+
+### Implicação para nossa pesquisa
+
+1. **Justifica reportar AMBOS 7-class E 6-class** seguindo AlDahoul.
+2. **Reconhecer fronteira fuzzy** entre East/SE Asian e
+   Latinx/Hispanic na discussão metodológica.
+3. **Não comparar diretamente nossos números contra RFW/BFW** (taxonomia
+   diferente; comparação é falsa).
+
+---
+
+## Q09 — 7 classes é realmente a taxonomia correta para fairness racial facial?
+
+- **Status:** ❌ OPEN → 🔬 NEW RESEARCH FRONT
+- **Data:** 2026-05-25
+- **Última atualização:** 2026-05-25
+- **Fichas consultadas:** [[dataset_karkkainen_2021]], [[neto_2025]], [[buolamwini_2018]], [[dataset_hazirbas_2021]], [[schumann_2023]], [[survey_kotwal_2025]], [[survey_mehrabi_2021]]
+
+### Evidências coletadas — argumentos POR e CONTRA
+
+**Argumentos POR 7 classes (FairFace):**
+
+- Inclusão explícita de Middle Eastern e Latinx (ausentes em RFW/BFW).
+- Distinção East × Southeast Asian — relevante para
+  representatividade global.
+- Granularidade > 4 → melhor para auditoria interseccional.
+- Aceitação pela literatura (Q02 — dataset mais usado).
+
+**Argumentos CONTRA 7 classes (e contra discretização em geral):**
+
+1. **Race é socialmente construída** (não biológica):
+   - US Census 2010: 6 categorias + Hispanic como **ethnia separada**.
+   - IBGE (Brasil): 5 categorias (Branca, Preta, Parda, Amarela,
+     Indígena).
+   - Sistemas latino-americanos: contínuo de mestiçagem.
+   - **Qualquer número discreto é arbitrário** ([[neto_2025]] formaliza
+     este argumento).
+
+2. **Latinx/Hispanic é etnia, não raça** (consenso US Census).
+   FairFace trata como raça por "facial appearance" —
+   [[dataset_karkkainen_2021]] §3.1. Esta escolha **introduz
+   confusão** (caso mais difícil — F1=60% em todos os modelos).
+
+3. **Buolamwini & Gebru (2018)** argumentam explicitamente contra
+   race labels:
+   > *"Race and ethnic labels are unstable... we decided to use skin
+   > type as a more visually precise label."*
+
+4. **Hazirbas et al. (2021)** [[dataset_hazirbas_2021]] reforça:
+   > *"There may be no difference in facial appearance of
+   > African-American and African people, although they may be
+   > referred to with two distinct racial categories."*
+
+5. **Neto et al. (2025)** [[neto_2025]] demonstra **empiricamente**
+   que modelos treinados em datasets balanceados no **espaço
+   contínuo** superam discreto-balanceados — mesmo com 50% menos
+   identidades.
+
+6. **Schumann et al. (2023)** [[schumann_2023]] mostra que anotadores
+   de diferentes regiões divergem **sistematicamente** sobre skin
+   tone (MST). Por extensão, divergem **mais ainda** sobre race
+   (que é mais subjetiva).
+
+7. **Kotwal & Marcel (2025)** [[survey_kotwal_2025]] sintetiza:
+   *"Wang et al. observed that even race-balanced datasets failed to
+   eliminate accuracy differentials, hypothesizing that certain
+   ethnicities are inherently more challenging to recognize."*
+   **Hipótese alternativa nossa:** não é "inherently more challenging";
+   é **rótulo mal definido**.
+
+### Resposta
+
+**NÃO há resposta definitiva** e nem deveria haver — a pergunta
+revela uma tensão estrutural da literatura:
+
+- **7 classes (FairFace) é o melhor compromisso prático** disponível
+  para race classification — granular, inclusivo, balanceado em
+  data, amplamente aceito.
+- **MAS 7 classes não é "correto"** em sentido absoluto:
+  - Race é construto social, não biológico.
+  - Latinx como categoria racial é metodologicamente problemática.
+  - Categorias fuzzy (East/SE Asian) refletem realidade demográfica.
+  - Skin tone (MST) seria mais defensável biologicamente.
+  - Rótulos contínuos seriam mais defensáveis estatisticamente.
+
+### 🔬 Frente nova identificada
+
+**A pergunta "7 classes é correto?" abre 3 sub-frentes:**
+
+1. **Continuação discreta:** seguir literatura dominante. Pragmática.
+2. **Transição skin tone:** abandonar race, usar MST (alinhado com
+   Schumann 2023, Hazirbas 2021).
+3. **Transição contínua:** rótulos contínuos (alinhado com Neto
+   2025).
+
+**Para a dissertação:** propostamos um **caminho híbrido — Q10**:
+**manter 7 classes (FairFace) E adicionar Fitzpatrick/MST como
+dimensão paralela**, construindo a matriz de associação. Isto
+preserva comparabilidade com literatura existente E adiciona
+contribuição metodológica conectando dois tracks paralelos.
+
+---
+
+## Q10 — Existe matriz associativa Fitzpatrick/MST × FairFace 7-race?
+
+- **Status:** ❌ OPEN → 🔬 NEW RESEARCH FRONT (**CANDIDATA PRINCIPAL** para contribuição experimental da dissertação)
+- **Data:** 2026-05-25
+- **Última atualização:** 2026-05-25
+- **Fichas consultadas:** [[dataset_karkkainen_2021]], [[dataset_hazirbas_2021]], [[schumann_2023]], [[buolamwini_2018]], [[lafargue_2025]], [[neto_2025]]
+- **Pesquisa externa:** Draelos, Kesty & Kesty (J. Cosmetic Dermatology, 2025), Schumann et al. NeurIPS 2023 (MST-E).
+
+### Evidências coletadas
+
+**O que existe (precedentes parciais):**
+
+| Trabalho | O que faz | Por que NÃO responde Q10 |
+|---|---|---|
+| **FairFace original Figure 1** ([[dataset_karkkainen_2021]]) | ITA distribuição por raça | Apenas plot ilustrativo; sem matriz tabular; sem validação manual |
+| **Draelos et al. 2025** (J Cosmetic Dermatology) | Aplica Fitzpatrick a subset FairFace (parte de "SkinAnalysis 3 662 imagens") | NÃO cross-referencia com race labels; foco dermatológico (pigmentação, vermelhidão, rugas); **dados não públicos** ("privacy/ethical restrictions") |
+| **Casual Conversations** ([[dataset_hazirbas_2021]]) | Fitzpatrick anotado | **Não tem race labels** (design) |
+| **MST-E** ([[schumann_2023]]) | MST anotado | **Não usa FairFace** |
+| **Lafargue 2025** ([[lafargue_2025]]) | Fitzpatrick + ITA + skin segmentation | **Usa Generated Photos + CelebA, não FairFace** |
+| **PPB** ([[buolamwini_2018]]) | Fitzpatrick por dermatologista | 1 270 sujeitos; não FairFace |
+
+### Resposta
+
+**NÃO existe trabalho público que construa a matriz P(Fitzpatrick | race) ou P(MST | race) sobre o dataset FairFace.**
+
+A peça mais próxima é Draelos et al. 2025, mas é (i) dermatológica,
+(ii) subset não-público, (iii) sem cross-reference com race labels.
+
+### 🔬 Desenho experimental proposto
+
+**Justificativa:** se construirmos a matriz e ela revelar (como
+hipótese) que **Latinx span ampla faixa de skin tone com sobreposição
+com White, Middle Eastern e Indian**, podemos decompor o "erro
+intrínseco" da classe Latinx em duas componentes:
+
+- **Componente A — Erro fenotípico estrutural:** ambiguidade visual
+  com classes vizinhas (não-redutível por modelo).
+- **Componente B — Erro de modelo:** falha de aprender features
+  discriminativas (redutível por mitigação algorítmica).
+
+**Fase 1 — Anotação automatizada (≥10 954 imagens, FairFace val set):**
+
+- Aplicar modelo MST automatizado disponível (Schumann et al. 2023
+  open-source da Google ou model auxiliar treinado em MST-E).
+- Saída: para cada imagem `i ∈ FairFace_val`, vetor de logits sobre
+  10 categorias MST → MST_pred(i).
+- Custo: cpu/gpu hours; sem custo humano direto.
+
+**Fase 2 — Validação manual (subset 500–700 imagens estratificadas):**
+
+- Amostragem estratificada: 100 imagens por raça (7 × 100 = 700) ou
+  proporcional ao train (e.g., White 100, Latinx 100, ME 70, etc.).
+- **3 anotadores regionalmente diversos** (recomendação Schumann
+  2023): e.g., um do Brasil, um dos EUA, um da Índia ou Oriente
+  Médio.
+- **Material de treinamento:** MST-E dataset.
+- **Voto majoritário + reportar inter-rater agreement (κ de Fleiss)
+  por classe racial.**
+- Comparar MST manual vs MST_pred automatizado → medir confiabilidade
+  do classifier automatizado.
+
+**Fase 3 — Construção da matriz:**
+
+Tabela P(MST_k | race_j), k ∈ {1..10}, j ∈ {7 raças FairFace}:
+
+- Linhas: 7 raças.
+- Colunas: 10 MST.
+- Células: frequência condicional.
+- Identificar **overlapping zones** (e.g., MST 4-6 onde White,
+  Latinx, Middle East coexistem).
+
+**Fase 4 — Análise diagnóstica:**
+
+- Pegar confusion matrix do nosso modelo ResNet/ConvNeXt sobre
+  FairFace val 7-class race.
+- Cross-reference: das misclassificações Latinx→White e Latinx→ME,
+  qual % está em MST overlapping zone vs MST non-overlapping?
+- Hipótese: se >70% das misclassificações estão em overlapping zone,
+  conclui-se que **erro Latinx é majoritariamente fenotípico
+  estrutural** (Componente A), não falha de modelo.
+
+**Fase 5 — Publicação:**
+
+- Matriz pública (open dataset CSV).
+- Análise como capítulo da dissertação OU paper standalone
+  (workshop CVPRW Fair AI, FAccT, ou TBIOM extended).
+- Posição: **conecta tracks paralelos** (race classification ←→ skin
+  tone fairness) que a literatura tratou separadamente.
+
+### Estimativa de custo e cronograma
+
+| Fase | Trabalho | Tempo estimado |
+|---|---|---|
+| Fase 1 (automatizado) | Implementar pipeline MST classifier + rodar sobre val set | 2-3 semanas |
+| Fase 2 (manual) | Recrutar anotadores; protocolo + treinamento; 500-700 imagens × 3 anotadores | 4-6 semanas (gargalo principal) |
+| Fase 3 (matriz) | Análise estatística | 1 semana |
+| Fase 4 (diagnóstico) | Cross-reference com confusion matrix do modelo | 1-2 semanas |
+| Fase 5 (escrita) | Capítulo de dissertação | 3-4 semanas |
+| **Total estimado** | | **3 meses** |
+
+### Risco e mitigação
+
+- **Risco:** anotadores manuais difíceis de recrutar com diversidade
+  regional.
+- **Mitigação A:** começar com Fase 1 + Fase 3-4 apenas com MST
+  automatizado (proof of concept).
+- **Mitigação B:** Fase 2 pode ser feita com **5 anotadores via
+  Prolific** (mais barato que MTurk, melhor controle de demografia).
+
+### Encaminhamento
+
+**Esta frente Q10 🔬 deve ser registrada em `06_gap.md` como CANDIDATA
+PRINCIPAL** para a contribuição experimental original da dissertação.
+Discutir prioridade vs alternativas (mitigação algorítmica testando
+H1-H6 das Q04 e Q06) durante elaboração de `07_thesis_statement.md`.
 
 ---
 

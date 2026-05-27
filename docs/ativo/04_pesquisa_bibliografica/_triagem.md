@@ -71,6 +71,52 @@ Ordem sugerida de leitura (priorização por valor para `06_gap.md`):
 8. **S4 FineFACE** — armadilha textual já identificada (gênero ≠ raça); ler para entender o que NÃO é nosso problema.
 9. **S7 Lafargue et al.** — auditoria regulatória, ancora discussão ética/EU AI Act.
 
+## Rodada 3 — Snowballing direcionado: fairness sem FairFace (2026-05-25)
+
+**Motivação:** após Rodada 2 completar 14 fichas, usuário levantou
+preocupação metodológica de **viés de cobertura**: corpus pode estar
+muito FairFace-cêntrico. Adicionalmente, levantou questões sobre
+**merge de classes** e **correção da taxonomia 7-class**.
+
+### 3.1 Critérios de busca
+
+- Datasets de fairness facial **alternativos ao FairFace**.
+- Trabalhos sobre **skin tone** (Fitzpatrick / MST) como alternativa a
+  race.
+- Trabalhos que **questionam a taxonomia discreta** em si.
+- Surveys recentes (2023+) que possam ter referências cruzadas
+  faltantes.
+
+### 3.2 Candidatos verificados
+
+| # | Paper | Venue | Tipo | Citações | Decisão | Justificativa |
+|---|---|---|---|---|---|---|
+| R3-1 | **Neto, Damer, Cardoso & Sequeira (2025)** — Continuous Demographic Labels | arXiv 2506.01532 (UNDER REVIEW) | preprint | 0 (recente demais) | ✅ APROVADO POR EXCEÇÃO | Único paper que questiona discretização de raça em FR. 65+ modelos treinados, 20+ subsets. Aprovar por **cobertura única** (Q09 sem outra resposta). Reavaliar antes da defesa. |
+| R3-2 | **Schumann, Olanubi, Wright, Monk Jr., Heldreth & Ricco (2023)** — MST consensus | **NeurIPS 2023 Datasets and Benchmarks Track** | conference (peer-reviewed top venue) | (sem rate-limit; assumido alto) | ✅ APROVADO | NeurIPS D&B é top venue. Liberação do MST-E + protocolo de anotação canônico. Responde Q01 🔬 e Q10 🔬. |
+| R3-3 | **Robinson, Livitz, Henon, Qin, Fu & Timoner (2020)** — BFW | **CVPRW 2020** | conference workshop (peer-reviewed) | (sem rate-limit) | ✅ APROVADO | Alternativa balanceada ao FairFace para verification. Permite triangulação. Citado por [[neto_2025]]. |
+| R3-4 | **Hazirbas, Bitton, Dolhansky, Pan, Gordo & Canton Ferrer (2021)** — Casual Conversations | **CVPRW 2021** | conference workshop (peer-reviewed) | (sem rate-limit) | ✅ APROVADO | Self-reported demographics (gold standard) + Fitzpatrick. Argumento explícito contra race labeling (citação direta). Fundamenta Q01 🔬, Q09, Q10 🔬. |
+| R3-5 | **Kotwal & Marcel (2025)** — Review of Demographic Fairness in FR | **IEEE TBIOM 2025** | journal (top biometrics) | (recente; sem citações ainda) | ✅ APROVADO POR EXCEÇÃO | Survey mais recente e mais específico de demographic fairness em FR (vs Mehrabi 2021 mais geral). Mesmo grupo de [[lafargue_2025]] (Sébastien Marcel). |
+
+### 3.3 Candidatos identificados mas não-aprovados (Rodada 3)
+
+| Paper | Razão para não-aprovar |
+|---|---|
+| **BUPT-Balancedface** (Wang et al.) | Citado em Neto 2025 mas sem ficha dedicada por enquanto — pode justificar Rodada 4 se necessário em `06_gap.md` |
+| **DemogPairs** (Hupont & Tena) | Citado em Robinson 2020 — small dataset (~3 ethnicities); curado sob VGGFace2; cobertura sobreposta com BFW |
+| **Casual Conversations v2** (Porgali et al. 2023) | Extensão da v1; principais conceitos já cobertos em v1. Reavaliar se v2 trouxer mudança qualitativa. |
+| **Draelos, Kesty & Kesty (2025)** (J Cosmetic Dermatology) | Aplica Fitzpatrick a subset FairFace, MAS (i) dermatologia, não fairness; (ii) dados não-públicos; (iii) sem cross-reference race × Fitzpatrick. **Referência conceitual em Q10** apenas, sem ficha. |
+| **AI-Face** (Lin 2025 CVPR) | Não verificado em detalhe; provável extensão de tarefa diferente (face manipulation) |
+
+### 3.4 Resumo Rodada 3
+
+- **5 papers adicionais aprovados.**
+- Cobertura agora inclui: race classification, race recognition, skin
+  tone (Fitzpatrick + MST), continuous labels, survey atualizado.
+- **Total corpus: 19 fichas** (9 R1 + 5 R2 + 5 R3) + Rodada 2.5
+  validação SOTA.
+- **Novos pontos de pesquisa identificados (Q07-Q10):** documentados
+  em `_perguntas.md`.
+
 ## Rodada 2.5 — Verificação dedicada de SOTA (2026-05-25)
 
 **Motivação:** após Rodada 1 completar leitura dos 9 papers seed e
