@@ -1,0 +1,130 @@
+# INDEX — Pesquisa Bibliográfica
+
+> Navegação central das **19 fichas** do corpus. Para conteúdo
+> integral do paper consultar PDF local. Para resumo estruturado em
+> 11 seções consultar ficha `.md`.
+>
+> Atualizado: 2026-05-25 (Rodada 3 completa).
+
+## Ordem de leitura recomendada
+
+Priorização para **construir entendimento progressivo** da literatura
+de fairness racial em biometria facial — começa pela motivação
+ética, passa pelo dataset central, vai para mitigações, e termina
+com surveys + papers críticos.
+
+| # | Paper | Por que ler aqui |
+|---|---|---|
+| 1 | [Buolamwini & Gebru 2018](buolamwini_2018.md) — Gender Shades | Marco fundador; estabelece o problema |
+| 2 | [Karkkainen & Joo 2021](dataset_karkkainen_2021.md) — FairFace | Dataset central da dissertação |
+| 3 | [AlDahoul et al. 2024/2026](aldahoul_2024.md) — VLMs/FaceScanPaliGemma | SOTA atual para race 7-class FairFace |
+| 4 | [Lin, Kim & Joo 2022](lin_2022.md) — FairGRAPE | Validação cruzada do baseline 72% + mitigação |
+| 5 | [Wang et al. 2019](dataset_wang_2019.md) — RFW | Dataset paralelo (4-class), evidência convergente |
+| 6 | [Robinson et al. 2020](dataset_robinson_2020.md) — BFW | Outro dataset balanceado, threshold adaptativo |
+| 7 | [Grother, Ngan & Hanaoka 2019](grother_2019.md) — NISTIR 8280 | Escala industrial, distinção FR vs classification |
+| 8 | [Manzoor & Rattani 2024](manzoor_2024.md) — FineFACE | Armadilha textual (gender ≠ race); Pareto-efficient em CelebA |
+| 9 | [Park et al. 2022](park_2022.md) — FSCL | Fair contrastive learning; **NÃO testou em FairFace** |
+| 10 | [Sagawa et al. 2020](sagawa_2020.md) — Group DRO | Worst-group + strong regularization |
+| 11 | [Dehdashtian et al. 2024](dehdashtian_2024.md) — U-FaTE | Esqueleto teórico do trade-off accuracy×fairness |
+| 12 | [Bhaskaruni et al. 2019](bhaskaruni_2019.md) — Ensemble fair | Ensemble naive ≠ fairness; AdaBoost-fair funciona |
+| 13 | [Hazirbas et al. 2021](dataset_hazirbas_2021.md) — Casual Conversations | Self-reported + Fitzpatrick; gold standard de anotação |
+| 14 | [Schumann et al. 2023](schumann_2023.md) — MST consensus | Monk Skin Tone Scale + protocolo de anotação |
+| 15 | [Dominguez-Catena et al. 2024](dominguez_2024.md) — DSAP | Auditoria de datasets; métricas unificadas [0,1] |
+| 16 | [Lafargue, Claeys & Loubes 2025](lafargue_2025.md) — Fairness in Details | EU AI Act + uncertainty-aware testing |
+| 17 | [Neto et al. 2025](neto_2025.md) — Continuous Labels | Questiona discretização per se |
+| 18 | [Mehrabi et al. 2021](survey_mehrabi_2021.md) — Survey ACM CSur | Taxonomia canônica de bias e fairness |
+| 19 | [Kotwal & Marcel 2025](survey_kotwal_2025.md) — Survey TBIOM | Survey mais recente focado em FR fairness |
+
+## Por track temático
+
+### Track A — Race classification (alvo direto da dissertação)
+
+| Paper | Tipo |
+|---|---|
+| [Karkkainen & Joo 2021](dataset_karkkainen_2021.md) | Dataset central |
+| [AlDahoul et al. 2024/2026](aldahoul_2024.md) | SOTA |
+| [Lin et al. 2022](lin_2022.md) | Mitigação + validação |
+
+### Track B — Face recognition fairness (paralelo)
+
+| Paper | Tipo |
+|---|---|
+| [Wang et al. 2019](dataset_wang_2019.md) | RFW |
+| [Robinson et al. 2020](dataset_robinson_2020.md) | BFW |
+| [Grother et al. 2019](grother_2019.md) | NIST FRVT |
+| [Neto et al. 2025](neto_2025.md) | Continuous labels |
+
+### Track C — Skin tone como dimensão alternativa
+
+| Paper | Tipo |
+|---|---|
+| [Buolamwini & Gebru 2018](buolamwini_2018.md) | Fitzpatrick (PPB) |
+| [Hazirbas et al. 2021](dataset_hazirbas_2021.md) | Casual Conversations |
+| [Schumann et al. 2023](schumann_2023.md) | MST scale |
+| [Lafargue et al. 2025](lafargue_2025.md) | Fitzpatrick + ITA |
+
+### Track D — Mitigação algorítmica (técnicas)
+
+| Paper | Técnica |
+|---|---|
+| [Park et al. 2022](park_2022.md) | Fair Supervised Contrastive Loss (FSCL+) |
+| [Sagawa et al. 2020](sagawa_2020.md) | Group DRO + strong regularization |
+| [Manzoor & Rattani 2024](manzoor_2024.md) | Cross-layer mutual attention (FineFACE) |
+| [Bhaskaruni et al. 2019](bhaskaruni_2019.md) | Ensemble AdaBoost-fair |
+| [Dehdashtian et al. 2024](dehdashtian_2024.md) | U-FaTE (estimador trade-off) |
+| [Lin et al. 2022](lin_2022.md) | FairGRAPE pruning |
+
+### Track E — Auditoria e metodologia
+
+| Paper | Foco |
+|---|---|
+| [Dominguez-Catena et al. 2024](dominguez_2024.md) | DSAP — auditoria de datasets |
+| [Lafargue et al. 2025](lafargue_2025.md) | Statistical tests uncertainty-aware |
+| [Mehrabi et al. 2021](survey_mehrabi_2021.md) | Survey geral ML |
+| [Kotwal & Marcel 2025](survey_kotwal_2025.md) | Survey específico FR |
+
+## Localização de PDFs (gitignored — local apenas)
+
+Todos os PDFs em `pdfs/`:
+
+```
+pdfs/
+├── aldahoul_2024_vlm.pdf
+├── aldahoul_2026_naturesr.pdf       # follow-up Nature SR
+├── bhaskaruni_2019_ensemble.pdf
+├── buolamwini_2018_gendershades.pdf
+├── dehdashtian_2024_ufate.pdf
+├── dominguez_2024_dsap.pdf
+├── grother_2019_nistir8280.pdf
+├── hazirbas_2021_casual.pdf
+├── karkkainen_2021_fairface.pdf
+├── kotwal_2025_survey.pdf
+├── lafargue_2025_fairdetails.pdf
+├── lin_2022_fairgrape.pdf
+├── manzoor_2024_fineface.pdf
+├── mehrabi_2021_survey.pdf
+├── neto_2025_continuous.pdf
+├── park_2022_fscl.pdf
+├── robinson_2020_bfw.pdf
+├── sagawa_2020_groupdro.pdf
+├── schumann_2023_mst.pdf
+└── wang_2019_rfw.pdf
+```
+
+Tamanho total: ~83 MB. Não-versionados (gitignored por política de
+copyright editorial).
+
+## Artefatos administrativos
+
+- [README.md](README.md) — metodologia da Pesquisa Bibliográfica.
+- [_triagem.md](_triagem.md) — log de decisões editoriais (R1, R2, R2.5, R3).
+- [_perguntas.md](_perguntas.md) — Q01–Q10 respondidas, 5 frentes 🔬 abertas.
+- [`../00_referencias.md`](../00_referencias.md) — lista canônica de citações verificadas.
+
+## Próximos arquivos (Fase 4)
+
+A serem produzidos:
+
+- `../05_landscape.md` — síntese transversal das 19 fichas (em construção).
+- `../06_gap.md` — gaps consolidados, 5 frentes 🔬 ranqueadas.
+- `../07_thesis_statement.md` — v3 reformulado sobre o gap escolhido.
