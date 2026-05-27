@@ -1,10 +1,10 @@
 # INDEX — Pesquisa Bibliográfica
 
-> Navegação central das **19 fichas** do corpus. Para conteúdo
+> Navegação central das **23 fichas** do corpus. Para conteúdo
 > integral do paper consultar PDF local. Para resumo estruturado em
 > 11 seções consultar ficha `.md`.
 >
-> Atualizado: 2026-05-25 (Rodada 3 completa).
+> Atualizado: 2026-05-25 (Rodada 4 completa — fundamentação científica).
 
 ## Ordem de leitura recomendada
 
@@ -34,6 +34,10 @@ com surveys + papers críticos.
 | 17 | [Neto et al. 2025](neto_2025.md) — Continuous Labels | Questiona discretização per se |
 | 18 | [Mehrabi et al. 2021](survey_mehrabi_2021.md) — Survey ACM CSur | Taxonomia canônica de bias e fairness |
 | 19 | [Kotwal & Marcel 2025](survey_kotwal_2025.md) — Survey TBIOM | Survey mais recente focado em FR fairness |
+| 20 | [Fuentes et al. 2019](fuentes_2019.md) — AAPA Statement | Statement oficial sobre raça (fundamento teórico) |
+| 21 | [Lewontin 1972](lewontin_1972.md) — Apportionment of Human Diversity | Evidência genética clássica (85/6/8 partition) |
+| 22 | [Fitzpatrick 1988](fitzpatrick_1988.md) — Sun-Reactive Skin Types | Origem dermatológica da escala Fitzpatrick |
+| 23 | [Massey & Martin 2003](massey_martin_2003.md) — NIS Skin Color Scale | Precedente sociológico do MST |
 
 ## Por track temático
 
@@ -82,6 +86,15 @@ com surveys + papers críticos.
 | [Lafargue et al. 2025](lafargue_2025.md) | Statistical tests uncertainty-aware |
 | [Mehrabi et al. 2021](survey_mehrabi_2021.md) | Survey geral ML |
 | [Kotwal & Marcel 2025](survey_kotwal_2025.md) | Survey específico FR |
+
+### Track F — Fundamentação científica de raça e tom de pele (NOVO Rodada 4)
+
+| Paper | Foco |
+|---|---|
+| [Fuentes et al. 2019](fuentes_2019.md) | AAPA Statement — race ≠ biology |
+| [Lewontin 1972](lewontin_1972.md) | Apportionment 85/6/8 — refutação genética |
+| [Fitzpatrick 1988](fitzpatrick_1988.md) | Origem dermatológica Fitzpatrick (PUVA) |
+| [Massey & Martin 2003](massey_martin_2003.md) | NIS Skin Color Scale (precedente MST) |
 
 ## Localização de PDFs (gitignored — local apenas)
 

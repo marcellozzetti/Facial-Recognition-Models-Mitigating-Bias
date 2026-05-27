@@ -153,7 +153,16 @@ fundamentalmente errada e precisa reformulação.
 
 - **Taxonomia 7-class do FairFace é socialmente construída.** Não
   representa "verdade biológica" nem cobre todas as identidades
-  raciais possíveis. ([Q09](04_pesquisa_bibliografica/_perguntas.md))
+  raciais possíveis ([Q09](04_pesquisa_bibliografica/_perguntas.md),
+  [Q11](04_pesquisa_bibliografica/_perguntas.md)). Esta posição é
+  consolidada pela American Association of Biological Anthropologists
+  ([Fuentes et al., 2019](04_pesquisa_bibliografica/fuentes_2019.md)):
+  *"Race does not provide an accurate representation of human
+  biological variation."* Fundamentação genética: a partição clássica
+  de Lewontin ([1972](04_pesquisa_bibliografica/lewontin_1972.md))
+  estabelece que ~85% da variação genética humana é intra-populacional,
+  apenas ~6% inter-racial — refutação estatística da reificação
+  biológica de categorias raciais.
 - **Anotação MTurk do FairFace** sem inter-annotator agreement por
   classe ([Q01](04_pesquisa_bibliografica/_perguntas.md)) — sub-estimamos
   ruído de label.

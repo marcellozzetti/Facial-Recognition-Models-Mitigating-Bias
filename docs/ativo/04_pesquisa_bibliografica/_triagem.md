@@ -117,6 +117,70 @@ muito FairFace-cêntrico. Adicionalmente, levantou questões sobre
 - **Novos pontos de pesquisa identificados (Q07-Q10):** documentados
   em `_perguntas.md`.
 
+## Rodada 4 — Fundamentação científica de raça e tom de pele (2026-05-25)
+
+**Motivação:** após Rodada 3 + Fase 4 (landscape, gap, thesis v3),
+usuário levantou 4 perguntas fundamentais sobre o **substrato
+científico** da pesquisa:
+
+1. Existem características físicas associadas à raça identificáveis
+   em imagens?
+2. Tom de pele × raça — estudos médicos/científicos?
+3. As 7 raças FairFace existem cientificamente?
+4. Quantos tons de pele cientificamente (medicina)?
+
+Estas perguntas tocam o **fundamento epistemológico** da dissertação
+e exigem ancoragem em literatura fundadora de antropologia,
+genética e dermatologia.
+
+### 4.1 Critérios de busca
+
+- **Position statements oficiais** de associações científicas sobre
+  raça.
+- **Genética populacional clássica** sobre apportionment.
+- **Origem documentada** de escalas de tom de pele (Fitzpatrick,
+  Felix von Luschan, Massey-Martin, MST).
+- **Antropologia forense moderna** — uso de "population affinity".
+
+### 4.2 Candidatos verificados
+
+| # | Paper | Venue | Tipo | Decisão | Justificativa |
+|---|---|---|---|---|---|
+| R4-1 | **Fuentes, Ackermann et al. (2019)** — AAPA Statement on Race and Racism | **Am J Phys Anthropol** (vol 169, no 3) | journal (peer-reviewed, posição institucional) | ✅ APROVADO | Statement oficial AABA/AAPA. Fundamento institucional para Q11. Comunidade científica de antropologia biológica. |
+| R4-2 | **Lewontin (1972)** — The Apportionment of Human Diversity | *Evolutionary Biology*, vol 6, Springer | book chapter (peer-reviewed) | ✅ APROVADO | Citação clássica fundadora. 50+ anos de literatura derivada. Evidência genética principal (85% intra-pop). Fundamento para Q11. |
+| R4-3 | **Fitzpatrick (1988)** — The Validity and Practicality of Sun-Reactive Skin Types I Through VI | *Archives of Dermatology* (JAMA Network) | journal (peer-reviewed) | ✅ APROVADO | Paper fonte da escala Fitzpatrick. Documenta propósito original (PUVA dosimetry), refuta uso indevido como classificação racial. Fundamento para Q13. |
+| R4-4 | **Massey & Martin (2003)** — The NIS Skin Color Scale | Princeton/NIS technical doc | technical report | ✅ APROVADO POR EXCEÇÃO | Documento técnico do New Immigrant Survey. Não é paper acadêmico mas é **escala canônica** em sociologia americana, adotada por GSS, NLSY97, ANES. Precedente histórico-metodológico do MST. Fundamento para Q14. |
+
+### 4.3 Candidato originalmente proposto mas substituído
+
+| Paper | Razão para substituir |
+|---|---|
+| **Sparks & Jantz 2002** (PNAS, "Boas revisited") | Após leitura: paper na verdade DEFENDE estabilidade craniana (refuta Boas), não argumenta contra raça. Substituído por Lewontin 1972 que é citação genética clássica adequada. |
+
+### 4.4 Resumo Rodada 4
+
+- **4 papers aprovados** como referências de fundamentação científica.
+- **3 com PDF integral via download direto bloqueado por anti-scraping**
+  — conteúdo capturado via WebFetch sobre HTML/PMC e WebSearch
+  summaries. Anotado nas fichas em campo `fonte_leitura`.
+- **Total corpus: 23 fichas** (9 R1 + 5 R2 + 5 R3 + 4 R4) + Rodada
+  2.5.
+
+### 4.5 Impacto na tese
+
+Rodada 4 **fundamenta teoricamente** a tese v3:
+
+- **AAPA 2019 + Lewontin 1972** sustentam a posição
+  epistemológica de que **race ≠ biology**, justificando Q10 (matriz
+  skin tone × race) como **conexão entre dois construtos
+  diferentes**, não cross-reference de variáveis redundantes.
+- **Fitzpatrick 1988** esclarece o **erro categorial** que permeia
+  literatura de ML fairness usando Fitzpatrick como proxy de raça.
+  Justifica adoção de MST.
+- **Massey-Martin 2003** demonstra que **tom de pele tem efeitos
+  sociais independentes de raça**, sustentando a relevância prática
+  de Q10.
+
 ## Rodada 2.5 — Verificação dedicada de SOTA (2026-05-25)
 
 **Motivação:** após Rodada 1 completar leitura dos 9 papers seed e

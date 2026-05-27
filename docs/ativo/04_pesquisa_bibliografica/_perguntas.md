@@ -28,6 +28,10 @@
 | Q08 | Por que os estudos tentam sempre fazer merge de classes raciais? | ✅ ANSWERED |
 | Q09 | 7 classes é realmente a taxonomia correta para fairness racial facial? | ❌ OPEN → 🔬 |
 | Q10 | Existe matriz associativa Fitzpatrick/MST × FairFace 7-race? | ❌ OPEN → 🔬 (NEW RESEARCH FRONT — CANDIDATA PRINCIPAL) |
+| Q11 | As 7 categorias raciais do FairFace têm fundamento biológico ou são socio-políticas? | ✅ ANSWERED (FUNDAMENTAL) |
+| Q12 | Como antropologia forense moderna trata "raça"? Qual o consenso? | ✅ ANSWERED |
+| Q13 | Origem e propósito da Fitzpatrick scale — para que foi criada cientificamente? | ✅ ANSWERED |
+| Q14 | Quantos tons de pele existem cientificamente (medicina/biometria)? | ✅ ANSWERED |
 
 ---
 
@@ -981,6 +985,269 @@ Tabela P(MST_k | race_j), k ∈ {1..10}, j ∈ {7 raças FairFace}:
 PRINCIPAL** para a contribuição experimental original da dissertação.
 Discutir prioridade vs alternativas (mitigação algorítmica testando
 H1-H6 das Q04 e Q06) durante elaboração de `07_thesis_statement.md`.
+
+---
+
+## Q11 — As 7 categorias raciais do FairFace têm fundamento biológico ou são socio-políticas?
+
+- **Status:** ✅ ANSWERED (FUNDAMENTAL para a tese)
+- **Data:** 2026-05-25
+- **Última atualização:** 2026-05-25
+- **Fichas consultadas:** [[fuentes_2019]], [[lewontin_1972]], [[dataset_karkkainen_2021]], [[neto_2025]], [[buolamwini_2018]]
+
+### Evidências coletadas
+
+**Da American Association of Biological Anthropologists (AAPA/AABA),
+statement oficial 2019** ([[fuentes_2019]]):
+
+> *"Race does not provide an accurate representation of human
+> biological variation. It was never accurate in the past, and it
+> remains inaccurate when referencing contemporary human populations."*
+
+> *"Humans are not divided biologically into distinct continental
+> types or racial genetic clusters."*
+
+> *"The Western concept of race must be understood as a
+> classification system that emerged from, and in support of,
+> European colonialism."*
+
+**Da genética populacional clássica** ([[lewontin_1972]]):
+
+- **85.4%** da variação genética humana é **dentro** de qualquer
+  população local.
+- Apenas **6.3%** é **entre** categorias raciais convencionais.
+- Confirmado por estudos genômicos modernos (Rosenberg et al. 2002,
+  Bergstrom et al. 2020).
+
+**Da literatura facial de fairness:**
+
+- Karkkainen & Joo (2021) **declaram explicitamente** em §3.1:
+  *"Race is not a discrete concept and needs to be clearly defined
+  before data collection."*
+- Buolamwini & Gebru (2018): *"Race and ethnic labels are
+  unstable... we decided to use skin type as a more visually precise
+  label."*
+- Hazirbas et al. (2021): *"Labeling the ethnicity of subjects could
+  lead to inaccuracies."*
+- Neto et al. (2025): demonstra empiricamente que **continuous**
+  > **discrete** balanceamento para fairness.
+
+### Resposta
+
+**As 7 categorias raciais do FairFace (White, Black, Indian, East
+Asian, Southeast Asian, Middle Eastern, Latino) NÃO têm fundamento
+biológico em sentido científico estrito.** São **construto socio-
+político**, derivadas em parte do US Census Bureau e ajustadas pelos
+autores do FairFace para incluir grupos previamente sub-representados.
+
+**Argumentos hierarquizados:**
+
+1. **Genético** (Lewontin 1972 + replicações modernas): a variação
+   genética humana **não se particiona** majoritariamente entre
+   categorias raciais — só 6% inter-grupos, 85% intra-grupos.
+2. **Antropológico** (AABA 2019): consenso institucional de que
+   raça é **construto colonial**, não biológico.
+3. **Histórico**: categorias raciais variam por país (US Census 6
+   + Hispanic ethnia separada; IBGE Brasil 5; FairFace 7) — não há
+   "verdadeiro número de raças".
+4. **Operacional**: mesmo os criadores do FairFace reconhecem
+   arbitrariedade da escolha (descartaram Hawaiian/Pacific Islanders,
+   Native Americans por amostragem insuficiente — escolha **prática**,
+   não biológica).
+
+### Implicação para a dissertação
+
+**A tese v3 é fundamentada teoricamente:** o "ceiling Latinx 60% F1"
+**não é falha do dataset ou do modelo**; é **consequência matemática
+direta** de impor categorização discreta sobre fenótipo contínuo. Q10
+(matriz MST × race) quantifica essa imposição.
+
+**Citação canônica obrigatória:** Fuentes et al. (2019) + Lewontin
+(1972) em introdução teórica da dissertação.
+
+---
+
+## Q12 — Como antropologia forense moderna trata "raça"? Qual o consenso?
+
+- **Status:** ✅ ANSWERED
+- **Data:** 2026-05-25
+- **Última atualização:** 2026-05-25
+- **Fichas consultadas:** [[fuentes_2019]], [[lewontin_1972]]
+- **Pesquisa externa:** Sparks & Jantz 2002 (PNAS, "Boas revisited"),
+  Ousley & Jantz forensic literature.
+
+### Evidências coletadas
+
+**Posição moderna da antropologia forense (consolidada por AABA
+2019 e literatura post-2000):**
+
+1. **Termo "race" foi substituído por "population affinity" ou
+   "biogeographical ancestry"** em literatura técnica forense.
+2. **Cranial measurements estimam probabilísticamente** a origem
+   geográfica de um esqueleto desconhecido — **não classificam em
+   raças discretas**.
+3. **Sparks & Jantz (2002, PNAS):** mostra que dimensões cranianas
+   têm **alta estabilidade genética** (refutando Boas 1912 sobre
+   plasticidade massiva), MAS essa estabilidade permite **identificar
+   ancestralidade geográfica**, não validar taxonomia racial.
+4. **Edwards (2003), "Lewontin's Fallacy":** com **suficientes
+   loci/features**, classificação populacional é estatisticamente
+   possível — mas isso NÃO equivale a justificação biológica de
+   categorias raciais discretas (Lewontin permanece correto sobre
+   a estrutura central da variação).
+
+### Resposta
+
+**A antropologia forense moderna abandonou "race" como categoria
+biológica e adotou "population affinity" / "biogeographical
+ancestry"** — termos que reconhecem:
+
+- Existência de **clusters fenotípicos correlacionados com origem
+  geográfica** (medíveis em ossos, dentes, e fenótipos visíveis).
+- **Continuidade da variação** entre regiões — clusters têm bordas
+  borradas.
+- **Probabilidade estatística**, não certeza taxonômica, na atribuição
+  individual.
+
+**Distinção conceitual crítica:**
+
+- "Population affinity" / "ancestry": **válido cientificamente**, é o
+  que sistemas faciais MEDEM (clusters de feature space).
+- "Race": **construto social**, é o que sistemas faciais ROTULAM.
+
+Sistemas de classificação facial racial **conflagam** os dois —
+medem ancestralidade probabilística e rotulam como categoria racial
+discreta.
+
+### Implicação para a dissertação
+
+Nossa tese v3 pode ser **reformulada com mais precisão** usando
+esta distinção:
+
+> O ceiling em FairFace race 7-class reflete o **gap epistemológico**
+> entre **ancestry probabilística** (o que modelos medem) e **categoria
+> racial discreta** (o que FairFace rotula). Latinx é caso paradigmático:
+> ancestry continua entre múltiplos clusters geográficos (Indígena
+> americano + Europeu + Africano), forçada em rótulo único.
+
+---
+
+## Q13 — Origem e propósito da Fitzpatrick scale — para que foi criada cientificamente?
+
+- **Status:** ✅ ANSWERED
+- **Data:** 2026-05-25
+- **Última atualização:** 2026-05-25
+- **Fichas consultadas:** [[fitzpatrick_1988]], [[buolamwini_2018]],
+  [[dataset_hazirbas_2021]], [[lafargue_2025]], [[schumann_2023]]
+
+### Evidências coletadas
+
+**Da ficha [[fitzpatrick_1988]]:**
+
+- **Ano**: conceito introduzido em **1975** por Thomas B. Fitzpatrick
+  (dermatologista, Harvard Medical School).
+- **Propósito original**: **prescrever dose inicial de UVA segura**
+  em fotoquimioterapia oral com metoxsaleno (PUVA) para psoríase.
+- **Variável proxy**: histórico de queimadura solar + capacidade de
+  bronzear (não cor de pele direta).
+- **Validade revisada**: paper de 1988 (*Arch Dermatol*) ampliou para
+  6 tipos (originalmente 4) — admitindo que escala original era
+  **inadequada para skin of color**.
+
+**Da prática clínica (literatura moderna em dermatologia):**
+
+- Hall et al. (2022): "Fitzpatrick scale gives a false sense of
+  security for skin cancer risk in skin types IV-VI" — escala
+  subestima risco em pele escura.
+- **1/3 dos dermatologistas confunde Fitzpatrick com raça/etnia**
+  — erro categorial documentado.
+
+### Resposta
+
+**A escala Fitzpatrick foi criada para um propósito DERMATOLÓGICO
+ESPECÍFICO — dosagem segura de UV em fotoquimioterapia — e NÃO
+para classificação racial.**
+
+Confusão posterior na literatura de ML fairness (e em parte da
+dermatologia) **estende uso indevido** da escala:
+
+- Buolamwini & Gebru (2018) — **escolheram Fitzpatrick justamente por
+  ser mais "estável" que raça**, mas reconhecem limitações da escala.
+- Hazirbas et al. (2021) — **adotam Fitzpatrick** em Casual
+  Conversations, mas defendem a escolha por dificuldade de race
+  labeling (não por adequação biométrica).
+- Lafargue et al. (2025) — usam Fitzpatrick + ITA; reconhecem MST
+  como sucessor mas adotam Fitzpatrick por simplicidade.
+- Schumann et al. (2023) — argumentam que Fitzpatrick é
+  **caucasiano-cêntrica** (3/6 tipos cobrem "perceived White") e
+  propõem MST 10-point como alternativa.
+
+### Implicação para a dissertação
+
+1. **Citar Fitzpatrick 1988 explicitamente** ao introduzir a escala —
+  reconhecer propósito original.
+2. **Justificar adoção de MST** em vez de Fitzpatrick para Q10:
+   MST foi explicitamente desenhada para fairness research.
+3. **Discussão metodológica honesta:** a escala Fitzpatrick **funciona
+   como proxy** mas não é instrumento purpose-built para fairness.
+
+---
+
+## Q14 — Quantos tons de pele existem cientificamente (medicina/biometria)?
+
+- **Status:** ✅ ANSWERED
+- **Data:** 2026-05-25
+- **Última atualização:** 2026-05-25
+- **Fichas consultadas:** [[fitzpatrick_1988]], [[massey_martin_2003]],
+  [[schumann_2023]], [[lafargue_2025]]
+
+### Evidências coletadas
+
+**Inventário de escalas de tom de pele em uso científico:**
+
+| Escala | Ano | Categorias | Origem disciplinar | Propósito | Status atual |
+|---|---|---|---|---|---|
+| **Felix von Luschan** | 1897 | 36 | Antropologia (eugenista) | Classificação racial colonial | **Descontinuada** |
+| **Fitzpatrick** | 1975/1988 | 6 (I-VI) | Dermatologia | Dosimetria PUVA | **Dominante em derma**; criticada por viés |
+| **NIS / Massey-Martin** | 2003 | 11 (0-10) | Sociologia (NIS, GSS, ANES) | Estudos de colorism | **Estabelecida em ciência social** |
+| **ITA (Individual Typology Angle)** | 1991 (Chardon) | **Contínuo** (graus) | Dermatologia / biometria | Medição objetiva via L*a*b* colorimetria | **Padrão biométrico** em pesquisa |
+| **Monk Skin Tone (MST)** | 2023 | 10 | Sociologia + tech (Monk + Google) | Fairness em ML | **Padrão emergente** pós-2023 |
+
+### Resposta
+
+**Não há "número cientificamente correto" de tons de pele.** Cada
+escala é **instrumento** para um propósito específico, com tradeoffs
+diferentes:
+
+- **Mais granular = mais inclusivo**, mas **menor inter-rater
+  agreement** (Schumann 2023 documenta cognitive load em escalas
+  finas).
+- **Menos granular = mais confiável**, mas **perde nuance**.
+- **Contínua (ITA)** = objetiva mas exige espectrofotometria, não
+  anotação visual.
+
+**Hierarquia de adequação por propósito:**
+
+| Propósito | Escala recomendada |
+|---|---|
+| Dosimetria UV / dermatologia clínica | Fitzpatrick (origem) |
+| Estudos sociológicos de colorism | Massey-Martin / NIS (11 pts) |
+| Fairness em ML / visão computacional | **MST (Monk, 2023)** — desenhada para isso |
+| Medição biométrica objetiva | ITA contínuo |
+
+**Para nossa pesquisa (Q10):** **MST 10-point é a escolha correta**:
+
+- Desenvolvida explicitamente para fairness research.
+- Mais granular e menos caucasiano-cêntrica que Fitzpatrick.
+- Estabelecida via partner Google + research peer-reviewed (Schumann
+  NeurIPS 2023).
+- API publicamente disponível ([skintone.google](https://skintone.google)).
+
+### Implicação para a dissertação
+
+**Adotar MST em Q10** com justificativa explícita ancorada em Q14.
+Reportar também ITA contínuo onde possível (proxy biométrico
+objetivo).
 
 ---
 
