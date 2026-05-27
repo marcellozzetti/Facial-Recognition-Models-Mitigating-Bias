@@ -259,10 +259,75 @@ Papers seed adicionais a buscar (não verificados ainda):
 - `_queries_log.md` — registro de queries executadas (Fase A).
 - `_triagem.md` — registro da triagem editorial (Fase B).
 - `_descartados.md` — papers descartados com justificativa.
+- `_perguntas.md` — **registro de perguntas de pesquisa vs respostas**
+  agregadas do corpus (ver §9).
 - `pdfs/` — PDFs baixados (gitignored).
 - `<autor>_<ano>.md` — uma ficha por paper aprovado.
 
-## 9. Pendências
+## 9. Perguntas de pesquisa (Q&A metodológico)
+
+Mecanismo para transformar a leitura **passiva** das fichas em
+**interrogação ativa** da literatura. Cada pergunta de pesquisa é
+respondida via **agregação de evidências** do corpus catalogado em
+`<autor>_<ano>.md`. Se o corpus não responde, a pergunta vira **nova
+frente de pesquisa** explícita.
+
+### 9.1 Estrutura
+
+Todas as perguntas são registradas em `_perguntas.md` com o template:
+
+```markdown
+## Q<NN> — <pergunta>
+
+- **Status:** ✅ ANSWERED | ⚠ PARTIAL | ❌ OPEN | 🔬 NEW RESEARCH FRONT
+- **Data:** YYYY-MM-DD (primeira investigação)
+- **Última atualização:** YYYY-MM-DD
+- **Fichas consultadas:** [[autor-ano]], [[autor-ano]], ...
+
+### Evidências coletadas
+[Síntese das evidências por ficha, com citação numérica:
+  - [[autor-ano]] reporta X (Seção Y da ficha).]
+
+### Resposta
+[Síntese consolidada da resposta.]
+
+### Lacunas / Nova frente de pesquisa
+[O que NÃO foi respondido. Se gera direção experimental concreta,
+marcar 🔬 NEW RESEARCH FRONT com descrição da hipótese a investigar.]
+```
+
+### 9.2 Status flags
+
+- **✅ ANSWERED:** corpus oferece resposta consolidada e cross-validated
+  por ≥2 fichas independentes.
+- **⚠ PARTIAL:** resposta existe mas com cobertura limitada (e.g., só
+  um paper aborda; cobertura temporal incompleta).
+- **❌ OPEN:** nenhuma ficha do corpus aborda a pergunta. Pode
+  indicar (a) necessidade de mais snowballing, (b) gap genuíno na
+  literatura.
+- **🔬 NEW RESEARCH FRONT:** a pergunta, ao não ter resposta, define
+  uma direção experimental para a dissertação. Deve ser referenciada
+  em `06_gap.md`.
+
+### 9.3 Fluxo de uso
+
+1. **Antes de iniciar uma síntese** (e.g., `05_landscape.md`,
+   `06_gap.md`), listar as perguntas que precisam ser respondidas.
+2. **Para cada pergunta**, consultar fichas relevantes e sintetizar
+   resposta em `_perguntas.md`.
+3. **Se nova evidência surgir** (nova ficha, paper novo), atualizar
+   o registro da pergunta com "Última atualização" e revisar status.
+4. **Perguntas com status 🔬** alimentam `06_gap.md` diretamente.
+
+### 9.4 Vínculo com fichas
+
+Opcionalmente, fichas podem adicionar uma **Seção 11 — Perguntas
+que este paper ajuda a responder** com lista de Q<NN> ids. Não é
+obrigatório nesta etapa; preferimos manter o catálogo bidirecional em
+`_perguntas.md` (perguntas referenciam fichas; fichas referenciam
+perguntas só quando intuição de discoverability justifica).
+
+## 10. Pendências
 
 - [ ] Re-verificar venue + citações dos 7 papers seed acima.
 - [ ] Buscar papers seed adicionais (RFW, NIST FRVT, fair generation).
