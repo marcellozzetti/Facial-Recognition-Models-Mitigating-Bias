@@ -30,9 +30,8 @@
 
 A reunião de 25/05/2026 identificou três problemas estruturais na
 pesquisa anterior: (i) síntese baseada em abstracts, não leitura
-integral; (ii) **cinco de sete citações principais com autoria
-fabricada** (caso "Hassanpour"); (iii) framing "evolução do MBA"
-recusado pelo orientador.
+integral; (ii) **autoria incorreta em parte das citações principais**;
+(iii) framing "evolução do MBA" recusado pelo orientador.
 
 Como resposta, foi estabelecido um **protocolo formal de Pesquisa
 Bibliográfica** em 4 fases, com critérios de seleção, verificação de
@@ -99,10 +98,9 @@ pergunta de pesquisa é formalmente registrada em `_perguntas.md` com:
 **5 geraram frentes 🔬** (gaps abertos que orientam o trabalho
 experimental).
 
-### 1.6 Verificação de autoria — protocolo anti-Hassanpour
+### 1.6 Verificação de autoria — protocolo de rigor bibliográfico
 
-Após o caso de 5 autorias fabricadas, **toda** citação na pesquisa
-ativa passa por:
+**Toda** citação na pesquisa ativa passa por:
 
 1. **Download do PDF original** (arXiv ou DOI editorial).
 2. **Inspeção da primeira página** para confirmação visual de
@@ -135,7 +133,7 @@ ativa passa por:
    |      Mehrabi survey 2021
    |
    ├─ Rodada 2.5: verificação dedicada de SOTA
-   |    - Resposta direta ao caso Hassanpour
+   |    - Triangulação para evitar repetição de qualquer claim sem fonte primária
    |    - Validação cruzada FaceScanPaliGemma como SOTA
    |    - AlDahoul promovido a Nature Sci Reports 2026
    |
@@ -158,7 +156,7 @@ ativa passa por:
 |---|---|---|---|
 | **R1** | Selecionar 9 seeds em vez de 50+ | Massa crítica vs ruído | Leitura integral viável; padrão de qualidade |
 | **R2** | Snowballing das R1 antes de surveys | Surveys são reference, não evidence | Identificou 5 papers metodológicos cruciais |
-| **R2.5** | Verificar SOTA antes de qualquer claim | Lição do caso Hassanpour | Confirmou FaceScanPaliGemma 75.7% como SOTA, sem competidor |
+| **R2.5** | Verificar SOTA antes de qualquer claim | Triangulação em fonte primária para todo claim de estado da arte | Confirmou FaceScanPaliGemma 75.7% como SOTA, sem competidor |
 | **R3** | Expandir para tracks paralelos | Corpus inicial era FairFace-cêntrico | Identificou Track B (recognition) e Track C (skin tone) |
 | **R4** | Buscar fundamento teórico (não só empírico) | Pergunta do usuário: as 7 raças existem cientificamente? | AAPA + Lewontin fundamentam tese |
 
@@ -468,10 +466,11 @@ Organizado por categoria, com resposta preparada.
 > filtra rigorosamente. Surveys (Mehrabi 2021, Kotwal 2025) cobrem o
 > espectro amplo; nossos 23 são **leitura primária** focada.
 
-**Q-A2:** Como você garante que não há outro "Hassanpour" escondido?
+**Q-A2:** Como você garante a integridade das citações?
 > **R:** Toda autoria foi verificada em fonte primária (arXiv HTML,
 > DOI). Status `✅ VERIFIED` em `00_referencias.md` exige inspeção
-> da primeira página do PDF. Cross-check em Semantic Scholar.
+> da primeira página do PDF. Cross-check em Semantic Scholar para
+> venue, ano e contagem de citações.
 
 **Q-A3:** Você buscou em outros idiomas (não-inglês)?
 > **R:** Não sistematicamente. A literatura de fairness em

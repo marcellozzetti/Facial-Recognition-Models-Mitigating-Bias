@@ -281,7 +281,7 @@ def build_presentation(out_path: Path) -> None:
     )
 
     # ==================== CAP 1 ====================
-    add_section_divider(prs, "1", "Metodologia de pesquisa", "5 critérios + 4 fases + verificação anti-Hassanpour")
+    add_section_divider(prs, "1", "Metodologia de pesquisa", "5 critérios + 4 fases + rigor de citação")
 
     add_content_slide(
         prs,
@@ -289,7 +289,7 @@ def build_presentation(out_path: Path) -> None:
         [
             "Três problemas estruturais identificados pelo orientador:",
             ("(i) Síntese baseada em abstracts, não leitura integral", 1),
-            ("(ii) Cinco de sete citações principais com autoria fabricada (caso Hassanpour)", 1),
+            ("(ii) Autoria incorreta em parte das citações principais", 1),
             ("(iii) Framing 'evolução do MBA' recusado", 1),
             "",
             "Resposta: protocolo formal de Pesquisa Bibliográfica em 4 fases, com:",
@@ -353,7 +353,7 @@ def build_presentation(out_path: Path) -> None:
 
     add_content_slide(
         prs,
-        "1.5  Metodologia Q&A e protocolo anti-Hassanpour",
+        "1.5  Metodologia Q&A e protocolo de rigor bibliográfico",
         [
             "Metodologia Q&A — interrogação ativa do corpus:",
             ("• 14 perguntas de pesquisa formuladas e respondidas em _perguntas.md", 1),
@@ -382,7 +382,7 @@ def build_presentation(out_path: Path) -> None:
             "Rodada 2 — snowballing das R1",
             ("+5 papers: FSCL (Park), FairGRAPE (Lin), Bhaskaruni, Group DRO (Sagawa), Mehrabi survey", 1),
             "Rodada 2.5 — verificação dedicada de SOTA",
-            ("Resposta direta ao caso Hassanpour; FaceScanPaliGemma confirmado como SOTA atual", 1),
+            ("Triangulação em fonte primária; FaceScanPaliGemma confirmado como SOTA atual", 1),
             "Rodada 3 — broadening (não-FairFace)",
             ("Crítica metodológica: corpus muito FairFace-cêntrico", 1),
             ("+5 papers: BFW, Casual Conversations, MST-E, Continuous Labels (Neto), Kotwal survey TBIOM", 1),
