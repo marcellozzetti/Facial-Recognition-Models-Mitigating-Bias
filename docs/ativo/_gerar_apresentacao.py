@@ -105,7 +105,7 @@ def add_section_divider(prs: Presentation, num: str, title: str, subtitle: str =
     if subtitle:
         p2 = tf.add_paragraph()
         p2.text = subtitle
-        p2.font.size = Pt(18)
+        p2.font.size = Pt(20)
         p2.font.color.rgb = GRAY_LT
 
 
@@ -120,7 +120,7 @@ def add_content_slide(prs: Presentation, title: str, bullets: list, footer: str 
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.text = title
-    p.font.size = Pt(28)
+    p.font.size = Pt(30)
     p.font.bold = True
     p.font.color.rgb = NAVY
 
@@ -131,7 +131,7 @@ def add_content_slide(prs: Presentation, title: str, bullets: list, footer: str 
     line.line.fill.background()
 
     # Body
-    tx_b = slide.shapes.add_textbox(Inches(0.6), Inches(1.5), Inches(12.3), Inches(5.5))
+    tx_b = slide.shapes.add_textbox(Inches(0.6), Inches(1.5), Inches(12.3), Inches(5.4))
     bf = tx_b.text_frame
     bf.word_wrap = True
 
@@ -145,11 +145,11 @@ def add_content_slide(prs: Presentation, title: str, bullets: list, footer: str 
         p.text = text
         p.level = level
         if level == 0:
-            p.font.size = Pt(17)
+            p.font.size = Pt(20)
             p.font.color.rgb = GRAY_DK
             p.font.bold = False
         else:
-            p.font.size = Pt(15)
+            p.font.size = Pt(17)
             p.font.color.rgb = GRAY_MD
         p.space_after = Pt(8)
 
@@ -158,7 +158,7 @@ def add_content_slide(prs: Presentation, title: str, bullets: list, footer: str 
         tx_f = slide.shapes.add_textbox(Inches(0.5), Inches(7.0), Inches(12.5), Inches(0.4))
         pf = tx_f.text_frame.paragraphs[0]
         pf.text = footer
-        pf.font.size = Pt(10)
+        pf.font.size = Pt(15)
         pf.font.color.rgb = GRAY_MD
         pf.font.italic = True
 
@@ -172,7 +172,7 @@ def add_table_slide(prs: Presentation, title: str, headers: list, rows: list, fo
     tx_t = slide.shapes.add_textbox(Inches(0.5), Inches(0.4), Inches(12.5), Inches(0.9))
     p = tx_t.text_frame.paragraphs[0]
     p.text = title
-    p.font.size = Pt(26)
+    p.font.size = Pt(30)
     p.font.bold = True
     p.font.color.rgb = NAVY
 
@@ -185,7 +185,7 @@ def add_table_slide(prs: Presentation, title: str, headers: list, rows: list, fo
     # Tabela
     nrows = len(rows) + 1
     ncols = len(headers)
-    table_h = Inches(5.5)
+    table_h = Inches(5.4)
     table = slide.shapes.add_table(nrows, ncols, Inches(0.5), Inches(1.5), Inches(12.5), table_h).table
 
     # Headers
@@ -198,7 +198,7 @@ def add_table_slide(prs: Presentation, title: str, headers: list, rows: list, fo
             for r in p.runs:
                 r.font.bold = True
                 r.font.color.rgb = WHITE
-                r.font.size = Pt(12)
+                r.font.size = Pt(16)
 
     # Rows
     for i, row in enumerate(rows, start=1):
@@ -209,14 +209,14 @@ def add_table_slide(prs: Presentation, title: str, headers: list, rows: list, fo
             cell.fill.fore_color.rgb = WHITE if i % 2 else GRAY_LT
             for p in cell.text_frame.paragraphs:
                 for r in p.runs:
-                    r.font.size = Pt(10)
+                    r.font.size = Pt(15)
                     r.font.color.rgb = GRAY_DK
 
     if footer:
         tx_f = slide.shapes.add_textbox(Inches(0.5), Inches(7.0), Inches(12.5), Inches(0.4))
         pf = tx_f.text_frame.paragraphs[0]
         pf.text = footer
-        pf.font.size = Pt(10)
+        pf.font.size = Pt(15)
         pf.font.color.rgb = GRAY_MD
         pf.font.italic = True
 
@@ -230,12 +230,12 @@ def add_thesis_slide(prs: Presentation, title: str, statement: str) -> None:
     tx_t = slide.shapes.add_textbox(Inches(0.5), Inches(0.4), Inches(12.5), Inches(0.9))
     p = tx_t.text_frame.paragraphs[0]
     p.text = title
-    p.font.size = Pt(28)
+    p.font.size = Pt(30)
     p.font.bold = True
     p.font.color.rgb = NAVY
 
     # Quote box
-    box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.7), Inches(11.7), Inches(5.0))
+    box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.8), Inches(1.7), Inches(11.7), Inches(5.4))
     box.fill.solid()
     box.fill.fore_color.rgb = GRAY_LT
     box.line.color.rgb = NAVY
@@ -250,7 +250,7 @@ def add_thesis_slide(prs: Presentation, title: str, statement: str) -> None:
 
     p = tf.paragraphs[0]
     p.text = statement
-    p.font.size = Pt(18)
+    p.font.size = Pt(20)
     p.font.color.rgb = NAVY
     p.font.italic = True
     p.alignment = PP_ALIGN.LEFT
@@ -274,8 +274,6 @@ def build_presentation(out_path: Path) -> None:
             "3. Visão dos principais artigos",
             "4. Gaps, considerações e achados",
             "5. Próximos passos",
-            "Anexo A — Perguntas antecipadas",
-            "Anexo B — Tabela de relevância dos 23 papers",
         ],
         footer="23 fichas catalogadas | 14 perguntas respondidas | 5 frentes de pesquisa identificadas",
     )
@@ -373,41 +371,23 @@ def build_presentation(out_path: Path) -> None:
     # ==================== CAP 2 ====================
     add_section_divider(prs, "2", "Racional / Historyline", "Evolução da pesquisa em 4 rodadas + 2.5")
 
-    add_content_slide(
-        prs,
-        "2.1  Mapa temporal das 4 rodadas",
-        [
-            "Rodada 1 (25/05) — 9 seeds iniciais",
-            ("FairFace, Gender Shades, U-FaTE, RFW, DSAP, NISTIR 8280, AlDahoul, FineFACE, Lafargue", 1),
-            "Rodada 2 — snowballing das R1",
-            ("+5 papers: FSCL (Park), FairGRAPE (Lin), Bhaskaruni, Group DRO (Sagawa), Mehrabi survey", 1),
-            "Rodada 2.5 — verificação dedicada de SOTA",
-            ("Triangulação em fonte primária; FaceScanPaliGemma confirmado como SOTA atual", 1),
-            "Rodada 3 — broadening (não-FairFace)",
-            ("Crítica metodológica: corpus muito FairFace-cêntrico", 1),
-            ("+5 papers: BFW, Casual Conversations, MST-E, Continuous Labels (Neto), Kotwal survey TBIOM", 1),
-            "Rodada 4 — fundamentação científica",
-            ("Perguntas fundamentais: as 7 raças existem cientificamente?", 1),
-            ("+4 papers fundadores: AAPA 2019, Lewontin 1972, Fitzpatrick 1988, Massey-Martin 2003", 1),
-        ],
-    )
-
     add_table_slide(
         prs,
-        "2.2  Decisões críticas em cada rodada",
-        ["Rodada", "Decisão chave", "Resultado"],
+        "2.1  Mapa temporal das 4 rodadas",
+        ["Rodada", "Foco da rodada", "Papers", "Achado principal"],
         [
-            ["R1", "Selecionar 9 seeds em vez de 50+", "Leitura integral viável; padrão de qualidade"],
-            ["R2", "Snowballing das R1 antes de surveys", "5 papers metodológicos cruciais identificados"],
-            ["R2.5", "Verificar SOTA antes de qualquer claim", "FaceScanPaliGemma 75.7% confirmado SEM competidor"],
-            ["R3", "Expandir para tracks paralelos", "Tracks B (recognition) e C (skin tone) mapeados"],
-            ["R4", "Buscar fundamento teórico", "AAPA + Lewontin fundamentam tese v3.1"],
+            ["R1 — Seeds iniciais", "Cobertura temática direta", "9", "FairFace + Gender Shades + AlDahoul formam a base"],
+            ["R2 — Snowballing", "Técnicas metodológicas", "+5", "Mitigações existem (FSCL+, Group DRO) mas nunca em race 7-class"],
+            ["R2.5 — Verificação", "Triangulação de SOTA", "—", "FaceScanPaliGemma 75.7% confirmado como SOTA único"],
+            ["R3 — Broadening", "Tracks paralelos (não-FairFace)", "+5", "BFW, Casual Conv, MST-E ampliam o panorama"],
+            ["R4 — Fundamentação", "Substrato teórico", "+4", "AAPA + Lewontin: race não é biologia (fundamenta a tese)"],
         ],
+        footer="Total: 23 fichas catalogadas | todas com autoria verificada em fonte primária",
     )
 
     add_content_slide(
         prs,
-        "2.3  Aprendizados metodológicos do processo",
+        "2.2  Aprendizados metodológicos do processo",
         [
             "1. A literatura confirma o problema mas raramente executa a solução",
             ("7 papers sugerem mitigação em race classification multi-classe; ZERO executam", 1),
@@ -427,20 +407,19 @@ def build_presentation(out_path: Path) -> None:
     # ==================== CAP 3 ====================
     add_section_divider(prs, "3", "Visão dos principais artigos", "10 papers centrais detalhados")
 
-    add_content_slide(
+    add_table_slide(
         prs,
-        "3.0  Corpus final: 23 papers em 6 tracks",
+        "3.0  Achados por track temático",
+        ["Track", "Foco", "Achado central"],
         [
-            "Track A — Race classification (3 papers): FairFace, AlDahoul, FairGRAPE",
-            "Track B — Face recognition (4 papers): RFW, BFW, NIST FRVT, Neto continuous",
-            "Track C — Skin tone (4 papers): Gender Shades, Casual Conversations, Schumann MST, Lafargue",
-            "Track D — Mitigação algorítmica (6 papers): FSCL, Group DRO, FineFACE, U-FaTE, Bhaskaruni, FairGRAPE",
-            "Track E — Auditoria & metodologia (4 papers): DSAP, Lafargue, Mehrabi survey, Kotwal survey",
-            "Track F — Fundamentação científica (4 papers): AAPA 2019, Lewontin 1972, Fitzpatrick 1988, Massey-Martin 2003",
-            "",
-            "(Alguns papers aparecem em mais de um track — natureza interdisciplinar)",
+            ["A — Race classification", "Treino e teste sobre raça", "SOTA atual = 75.7% F1; Latinx persistentemente em 60% F1"],
+            ["B — Face recognition fairness", "Verification balanceada", "Neto 2025 questiona discretização per se das categorias"],
+            ["C — Skin tone (Fitzpatrick / MST)", "Auditoria com escala física", "MST > Fitzpatrick para fairness research (NeurIPS 2023)"],
+            ["D — Mitigação algorítmica", "Técnicas anti-viés (FSCL+, DRO)", "7 papers sugerem; ZERO executam em race 7-class FairFace"],
+            ["E — Auditoria e metodologia", "Surveys e ferramentas de audit", "Kotwal & Marcel 2025 (TBIOM) é a referência mais atualizada"],
+            ["F — Fundamentação científica", "Substrato teórico", "Race ≠ biologia: AAPA 2019 + Lewontin 1972 (85% intra-pop)"],
         ],
-        footer="A seguir: 10 papers detalhados | tabela completa no Anexo B",
+        footer="A seguir: 10 papers detalhados (1 por slide)",
     )
 
     # 10 main papers
@@ -699,112 +678,6 @@ def build_presentation(out_path: Path) -> None:
             "Cronograma de submissões:",
             ("Cap 3 (Q10) decoupled — submeter durante escrita dos demais capítulos", 1),
             ("Tese completa: Dez 2026 / Fev 2027", 1),
-        ],
-    )
-
-    # ==================== ANEXO A — PERGUNTAS ====================
-    add_section_divider(prs, "A", "Anexo A — Perguntas antecipadas", "25 perguntas com respostas preparadas")
-
-    add_content_slide(
-        prs,
-        "Perguntas antecipadas — distribuição por categoria",
-        [
-            "Total: 25 perguntas com respostas preparadas (documento completo no repositório):",
-            "",
-            "A.1 — Sobre metodologia da pesquisa bibliográfica (4 perguntas)",
-            "A.2 — Sobre a tese teórica (4 perguntas)",
-            "A.3 — Sobre o plano experimental (5 perguntas)",
-            "A.4 — Sobre originalidade (3 perguntas)",
-            "A.5 — Logística e ética (4 perguntas)",
-            "A.6 — Riscos e contingências (5 perguntas)",
-            "",
-            "A seguir: as 5 perguntas com maior probabilidade.",
-        ],
-        footer="Material completo: docs/ativo/material_reuniao_orientador_2026-06.md (Anexo A)",
-    )
-
-    add_content_slide(
-        prs,
-        "Q-A6: Se race não é biologia, por que estudar classificação racial?",
-        [
-            "Distinção fundamental (Fuentes 2019):",
-            ("Race é biologicamente vazia MAS socialmente operativa", 1),
-            "",
-            "Sistemas faciais reificam categorias raciais com consequências de deployment:",
-            ("NIST FRVT 8280 — diferenciais de 10–100× FPR entre raças em sistemas comerciais", 1),
-            ("EU AI Act (2024) exige auditoria sistemática", 1),
-            "",
-            "Nossa pesquisa AUDITA esse exercício classificatório, não o valida.",
-            "",
-            "A tese v3.1 reconhece esta tensão explicitamente em §6.1 (limitações estruturais).",
-        ],
-    )
-
-    add_content_slide(
-        prs,
-        "Q-A9: Por que ConvNeXt-T (28M) e não ViT-L (300M) ou DINOv2 (1B)?",
-        [
-            "ConvNeXt-T é Pareto-eficiente:",
-            ("Competitivo em ImageNet com fração do compute", 1),
-            "",
-            "Hipótese H4 da tese:",
-            ("Se ceiling é fenotípico (não arquitetural), backbones maiores não ajudam proporcionalmente", 1),
-            "",
-            "Evidência empírica:",
-            ("AlDahoul confirma: PaliGemma 3B (150× ResNet-34) ganha SÓ 3.7 pp", 1),
-            ("Diminishing returns em FairFace já documentados", 1),
-            "",
-            "Se H2 for refutada (ConvNeXt-T não ajuda), achado interessante per se — aprofundamos.",
-        ],
-    )
-
-    add_content_slide(
-        prs,
-        "Q-A14: Qual sua contribuição vs FaceScanPaliGemma (SOTA)?",
-        [
-            "AlDahoul: ALCANÇA o SOTA via fine-tuning de modelo gigante (PaliGemma 3B) sem mitigação algorítmica explícita.",
-            "",
-            "Nós: INVESTIGAMOS DUAS PERGUNTAS QUE ELES NÃO RESPONDEM:",
-            ("(a) Modelo 100× menor (ConvNeXt-T 28M) com mitigação atinge o quê?", 1),
-            ("(b) Quanto do gap restante é fenotipicamente irredutível?", 1),
-            "",
-            "Posicionamento: COOPERATIVA, não competitiva.",
-            ("AlDahoul fornece SOTA empírico", 1),
-            ("Nós oferecemos diagnóstico estrutural do que esse SOTA representa", 1),
-        ],
-    )
-
-    add_content_slide(
-        prs,
-        "Q-A21: E se H4 (Latinx ≥50% overlap MST) for refutada?",
-        [
-            "Plano B na tese §6.3:",
-            "",
-            "Refutação NÃO inviabiliza a dissertação. Mantemos:",
-            ("C2 — Benchmark sistemática de mitigações algorítmicas (independente de H4)", 1),
-            ("C5 — Triangulação DR + worst-class + CV como métrica padrão", 1),
-            "",
-            "Reformulamos C1+C3 como OBSERVAÇÃO NEGATIVA:",
-            ("'Matriz construída e diagnóstico não confirma hipótese", 1),
-            ("Erro é majoritariamente algorítmico, não fenotípico'", 1),
-            "",
-            "Cientificamente válido — observação negativa é informação útil para o campo.",
-        ],
-    )
-
-    add_content_slide(
-        prs,
-        "Q-A24: Cronograma de 6–8 meses é realista?",
-        [
-            "Apertado mas viável dado:",
-            ("(i) Infra experimental já existe (Rodada 1 do MBA — agora em historico/)", 1),
-            ("(ii) Técnicas têm código open-source (FSCL+, Group DRO, FineFACE — todos no GitHub)", 1),
-            ("(iii) Escrita em paralelo aos experimentos", 1),
-            ("(iv) PDFs e fichas já centralizados — pesquisa bibliográfica encerrada", 1),
-            "",
-            "Buffer recomendado: +2 meses para imprevistos = 8–10 meses total.",
-            "",
-            "Marco de descontinuação: se Cap 1 (Q06) não fechar em 6 semanas, repensar escopo.",
         ],
     )
 
