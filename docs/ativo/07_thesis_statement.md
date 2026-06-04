@@ -1,247 +1,322 @@
-# Thesis Statement v3
+# Thesis Statement v3.2 — Prescritiva
 
-> Reformulação final da tese, baseada na decisão de escopo em
-> [`06_gap.md`](06_gap.md). Substitui [`historico/THESIS_STATEMENT.md`](historico/THESIS_STATEMENT.md)
-> (v1 + v2) — versões anteriores foram arquivadas no pivot
-> estratégico de 2026-05-25 por terem sido construídas sobre
-> "evolução do MBA", framing recusado pelo orientador.
+> Reformulação **prescritiva** da tese após reunião com orientador
+> (Prof. Marcos Quiles, 2026-06-04) e Rodada 5 de pesquisa
+> bibliográfica (mecanismos ML / redes neurais).
 >
-> Esta v3 é construída sobre **gap identificado na literatura**, não
-> sobre continuidade do trabalho anterior.
+> **Substitui v3.1** ("diagnóstica") por orientação direta do
+> orientador para postura mais executiva e com extensão a face
+> recognition.
 >
-> Versão: v3.0 — 2026-05-25.
+> Versão: **v3.2** — 2026-06-04.
 
 ## 1. Tese central
 
-> **O ceiling de 72-75.7% F1 macro observado em classificação racial
-> de 7 categorias sobre o FairFace dataset não é primariamente
-> arquitetural nem metodologicamente solúvel apenas via mitigação
-> algorítmica.**
+> **A incorporação explícita de informação de tom de pele (Monk
+> Skin Tone — MST) como sinal auxiliar condicionante no treinamento
+> de classificadores faciais profundos melhora métricas de fairness
+> demográfica em classificação racial multi-classe e estende essa
+> melhoria a tarefas downstream de reconhecimento facial em grupos
+> sub-representados.**
 >
-> **Existe componente fenotípico irredutível, derivado da sobreposição
-> distribucional de tom de pele entre categorias raciais — sobreposição
-> particularmente aguda para a categoria Latinx/Hispanic, que ocupa
-> faixa contínua compartilhada com White, Middle Eastern e Indian no
-> espaço Fitzpatrick/Monk Skin Tone.**
+> A dissertação contribui originalmente com:
 >
-> **A presente dissertação contribui originalmente com:**
+> **(a) um pipeline operacional MST→FiLM→classifier — primeira
+> instância documentada de condicionamento explícito por tom de
+> pele em race classification multi-classe sobre FairFace, ancorado
+> em FiLM (Perez et al., AAAI 2018) e Fair Representation Learning
+> (Zemel et al., ICML 2013 Test-of-Time);**
 >
-> **(a) a primeira matriz pública Fitzpatrick/MST × FairFace 7-race
-> construída via classifier automatizado validado por anotação manual
-> regionalmente diversa;**
+> **(b) a primeira matriz pública P(MST | race) sobre FairFace,
+> construída via classifier MST validado contra anotação manual
+> regionalmente diversa (protocolo Schumann et al., NeurIPS 2023);**
 >
-> **(b) a primeira benchmark sistemática de mitigações algorítmicas
-> de fairness (FSCL+ multi-classe, Group DRO + strong regularization,
-> deep ensemble + temperature scaling + group reweighting) aplicadas
-> ao problema de race classification multi-classe in-domain;**
+> **(c) demonstração empírica da propriedade de fair transferência
+> (Madras et al., LAFTR ICML 2018) do pipeline para face
+> recognition — aplicação a RFW (Wang et al., ICCV 2019) ou BFW
+> (Robinson et al., CVPRW 2020) com avaliação de melhora em accuracy
+> para grupos sub-representados (Black/African);**
 >
-> **(c) decomposição empírica do "erro Latinx" em componente
-> fenotipicamente irredutível vs componente algoritmicamente redutível,
-> quantificando a fração de cada um;**
->
-> **(d) protocolo metodológico de triangulação de métricas
-> (DR max/min + worst-class F1 + CV) como padrão defensável para
-> reportar fairness em classificação multi-classe.**
+> **(d) protocolo de métrica triangular (Disparity Ratio + worst-class
+> F1 + Coefficient of Variation) para fairness em classificação
+> multi-classe, justificado pela impossibilidade matemática de
+> métrica única (Kleinberg, Mullainathan & Raghavan, ITCS 2017).**
 
-## 2. Justificativa
+## 2. Pipeline experimental
 
-### 2.1 Por que o problema importa
+```
+Fase 1 — Classifier MST auxiliar
+  Treinar/validar sobre MST-E (Schumann 2023) +
+  Casual Conversations (Hazirbas 2021)
+                  ↓
+            f_MST(x) ∈ ℝ^10 (logits MST)
+                  ↓
+Fase 2 — Auditoria da matriz P(MST | race) sobre FairFace val
+  Aplicar f_MST sobre 10 954 imagens
+  Validação manual em subset (≥3 anotadores regionais)
+  Matriz pública como CSV
+                  ↓
+Fase 3 — Race classifier condicionado
+  Backbone: ConvNeXt-T (28M params)
+  Camadas FiLM (Perez et al. 2018) condicionadas por f_MST(x)
+  Treino 3-seed casado sobre FairFace train
+                  ↓
+Fase 4 — Comparação fairness com vs sem MST
+  Métricas: F1 macro, DR (max/min F1), worst-class F1, CV
+  Baselines: ConvNeXt-T sem MST (vanilla), FSCL+ (Park 2022),
+             Group DRO (Sagawa 2020), Adversarial (Zhang 2018)
+                  ↓
+Fase 5 — Extensão a face recognition
+  Aplicar pipeline análogo a RFW ou BFW (verification 1:1)
+  Condicionar embedding network por f_MST
+                  ↓
+Fase 6 — Validação da fair transferência (LAFTR style)
+  Métrica primária: accuracy de verificação para Black/African
+  Comparação com baseline sem MST
+```
 
-Sistemas de classificação facial demográfica são deployed em
-contextos sensíveis (segurança, marketing, ciências sociais). O
-[NIST FRVT 2019](04_pesquisa_bibliografica/grother_2019.md) documenta
-diferenciais de FPR entre raças variando em **uma a duas ordens de
-magnitude** em sistemas comerciais. O **EU AI Act** (entrada em vigor
-2024) exige auditoria sistemática de fairness ([Lafargue et al., 2025](04_pesquisa_bibliografica/lafargue_2025.md)).
-Compreender **por que** sistemas de classificação racial falham — e
-**em qual fração esse erro é remediável** — é pré-requisito para
-deployment ético.
+## 3. Justificativa
 
-### 2.2 Por que esta tese (vs alternativas)
+### 3.1 Por que abordagem prescritiva (vs diagnóstica de v3.1)
 
-**Alternativa A — focar apenas em mitigação algorítmica:** insuficiente.
-Vários papers ([Park 2022](04_pesquisa_bibliografica/park_2022.md),
-[Sagawa 2020](04_pesquisa_bibliografica/sagawa_2020.md),
-[Manzoor 2024](04_pesquisa_bibliografica/manzoor_2024.md)) sugerem
-direção, e Track A (race classification) é demonstravelmente vazio
-nesta direção. Mas mitigar **sem diagnosticar** o erro é otimização
-no escuro: se 50% do erro é fenotipicamente irredutível, métodos
-agressivos podem **piorar accuracy sem reduzir fairness real**.
+**v3.1** propunha decompor erro Latinx em componente irredutível vs
+algoritmicamente redutível — postura **diagnóstica**. O orientador
+solicitou postura mais **prescritiva**: demonstrar empiricamente
+que **uma intervenção específica** (MST como sinal condicionante)
+produz melhora mensurável em fairness, e que essa melhora
+**transfere** para face recognition.
 
-**Alternativa B — focar apenas em matriz skin tone × race:**
-contribuição forte mas incompleta. Mostra **por que existe gap** mas
-não responde **se pode ser reduzido**.
+Vantagens da v3.2:
 
-**Alternativa C — combinar mitigação + diagnóstico fenotípico:**
-adotada por esta dissertação. **Única decomposição na literatura**
-que separa as duas fontes de erro e quantifica cada uma.
+- **Output operacional**: pipeline reproduzível e aplicável.
+- **Critério de sucesso mais claro**: melhora medida em métricas
+  concretas, não apenas observação descritiva.
+- **Maior impacto prático**: classifier com MST conditioning é
+  **artefato deployável**, não apenas análise post-hoc.
 
-### 2.3 Por que o FairFace especificamente
+### 3.2 Por que MST especificamente (não Fitzpatrick)
 
-Conforme [Q02](04_pesquisa_bibliografica/_perguntas.md):
+- **Schumann et al. NeurIPS 2023**: MST tem distribuição balanceada
+  entre tons claros e escuros (não cluster artificial em "perceived
+  White" como Fitzpatrick).
+- **Origem purpose-built**: MST foi desenhado especificamente para
+  ML fairness research (Monk + Google), não dermatologia clínica.
+- **API + dataset públicos**: `skintone.google` + MST-E facilitam
+  Fase 1 do pipeline sem necessidade de treinar classifier MST do
+  zero.
+- **Fitzpatrick é apenas referência histórica** ([[fitzpatrick_1988]]):
+  foi criada para dosimetria PUVA em 1975, não para fairness em ML.
 
-- **FairFace é o dataset mais utilizado** para race fairness
-  classification (6/14 papers do corpus original, expandido para
-  6/19 com Rodada 3).
-- **Único dataset com 7 categorias raciais** (inclui Middle Eastern
-  e Latinx, ausentes em RFW/BFW/UTKFace).
-- **Validação cruzada disponível** via UTKFace (cross-dataset 5-class).
+### 3.3 Por que FiLM como mecanismo de condicionamento
 
-Qualquer contribuição em fairness facial racial **precisa pousar no
-FairFace** para conexão com a literatura. Esta dissertação não
-foge dessa âncora.
+- **Perez et al. AAAI 2018**: provem que feature-wise linear
+  modulation é **simples, eficiente e expressivo** — γ_i, β_i têm
+  dimensão C (não C×H×W).
+- **Compatível com ConvNeXt-T**: FiLM atua após normalização e
+  antes de não-linearidade, ortogonal à escolha de backbone.
+- **Parameter-efficient**: overhead < 1% sobre ConvNeXt-T (28M
+  params).
+- **Ablação trivial**: comparar accuracy/fairness **com vs sem**
+  FiLM, mesma arquitetura — isolamento limpo do efeito do
+  conditioning.
 
-## 3. Contribuições originais
+### 3.4 Por que estender a face recognition
 
-| # | Contribuição | Originalidade | Material de evidência |
-|---|---|---|---|
-| **C1** | Matriz Fitzpatrick/MST × FairFace 7-race (CSV público + análise) | **Totalmente original** — 0 precedentes em fairness/biometria | [Q10](04_pesquisa_bibliografica/_perguntas.md), [landscape §6.4](05_landscape.md) |
-| **C2** | Benchmark sistemática de FSCL+/Group DRO/ensemble em FairFace race 7-class (3-seed casado) | **Execução original** — 7 papers sugerem, 0 executam | [Q04](04_pesquisa_bibliografica/_perguntas.md), [landscape §6.1](05_landscape.md) |
-| **C3** | Decomposição empírica erro Latinx: fenotípico irredutível vs algoritmicamente redutível | **Conceitualmente original** — combina C1 + C2 | [gap §4.3 H3+H4](06_gap.md) |
-| **C4** | Decomposição empírica do ceiling 72%: arquitetural / metodológico / dados | **Execução controlada original** — vários variam, ninguém isola | [Q06](04_pesquisa_bibliografica/_perguntas.md) |
-| **C5** | Triangulação DR + worst-class F1 + CV como métrica padrão | **Combinação proposta** — componentes existem | [Q05](04_pesquisa_bibliografica/_perguntas.md) |
+- **Madras et al. LAFTR ICML 2018**: prova teórica + demonstração
+  empírica de **fair transferência** — representação fair em uma
+  tarefa permanece fair em tarefas downstream.
+- **Linha do orientador**: aplicar o mesmo pipeline a face
+  recognition operacionalmente verifica se **o ganho em fairness
+  generaliza** ou é específico de classification.
+- **Datasets disponíveis**: RFW (4 etnias, ICCV 2019) ou BFW (4×2
+  raça × gênero, CVPRW 2020) — ambos já catalogados em nosso corpus.
+- **Métrica concreta**: accuracy de verificação para Black/African
+  é **diretamente comparável** com baselines existentes (NIST FRVT
+  8280 documenta 10-100× FPR differentials em sistemas comerciais).
 
 ## 4. Hipóteses falsificáveis
 
-A tese **só é defensível se** as seguintes hipóteses se confirmarem
-quantitativamente:
+A tese é defensável **se** as seguintes hipóteses forem confirmadas
+quantitativamente. Cada uma tem critério binário de aceitação/
+refutação.
 
-| ID | Hipótese | Confirmação | Refutação |
+| ID | Hipótese | Critério de confirmação | Critério de refutação |
 |---|---|---|---|
-| **H1** | ≥1 técnica algorítmica (FSCL+ multi-classe, Group DRO, ensemble + reweighting) reduz DR em FairFace race 7-class em **≥30%** sobre baseline ResNet-34, sem perder >2 pp F1 macro | reducao≥30% E perda F1 ≤2 pp | nenhuma técnica atinge esse threshold |
-| **H2** | Troca ResNet-34→ConvNeXt-T mantendo pipeline ganha +2 a +5 pp F1 macro; **Latinx F1 permanece ≈60% (±3 pp)** sem mitigação específica | ganho 2-5 pp E Latinx invariante | ganho fora da faixa OU Latinx muda mais que ±3 pp |
-| **H3** | Spread MST de Latinx em FairFace **cobre ≥5 categorias MST** com sobreposição forte com White, ME, Indian | spread ≥5 categorias com pico distribuído | spread <5 ou distribuição concentrada |
-| **H4** | **≥50% das misclassificações Latinx→outras classes** estão em zonas MST de sobreposição (interseção das distribuições marginais ≥30%) | %_overlap ≥50% | %_overlap <50% (sugere que o erro é predominantemente de modelo, não fenotípico) |
-| **H5** | Ceiling efetivo F1 macro em FairFace race 7-class é **80-82%** (não 99%): modelos ≥78% saturados | maior modelo testado fica ≤82% e plateau-shape visível | modelo passa de 82% (refuta) |
+| **H1** | Pipeline MST→FiLM→ConvNeXt-T supera baseline ResNet-34 em F1 macro **≥ +2 pp** E reduz DR (max/min F1) **≥ 20%** | Ambos satisfeitos simultaneamente | Qualquer um abaixo do threshold |
+| **H2** | ConvNeXt-T vanilla (sem MST) ganha **+2 a +5 pp** F1 macro sobre ResNet-34; Latinx F1 permanece **≈ 60% (±3 pp)** | Ganho no range E Latinx invariante | Ganho fora do range OU Latinx muda >±3 pp |
+| **H3** | Matriz P(MST \| race) revela spread Latinx em **≥ 5 categorias MST** com sobreposição forte com White, Middle East, Indian | Spread ≥ 5 com pico distribuído | Spread < 5 ou pico concentrado |
+| **H4** | **≥ 50%** das misclassificações Latinx→outras classes do baseline vanilla estão em zonas MST de sobreposição | %_overlap ≥ 50% | %_overlap < 50% (sugere erro algoritmico, não fenotípico) |
+| **H5** | Pipeline análogo aplicado a RFW (ou BFW) **face recognition** melhora accuracy em Black/African em **≥ +3 pp** sobre baseline sem MST | Ganho ≥ 3 pp | Ganho < 3 pp ou negativo |
 
-**H4 é a hipótese central da tese.** Se refutada, a tese é
-fundamentalmente errada e precisa reformulação.
+**H1, H4 e H5 são hipóteses CENTRAIS:**
 
-## 5. Escopo
+- H1 — sustenta a tese prescritiva (intervenção funciona em race classification).
+- H4 — sustenta a interpretação fenotípica (não é apenas mais um trick algorítmico).
+- H5 — sustenta a transferência para face recognition (linha do orientador).
 
-### 5.1 Dentro do escopo
+**Plano se refutadas**: ver §6.4.
 
-- Race classification **in-domain** no FairFace 7-class (train→val).
-- Backbones: **ResNet-34** (baseline) + **ConvNeXt-T** (modernização).
-- Mitigações: **FSCL+ adaptado multi-classe**, **Group DRO + strong
-  ℓ2 + early stopping**, **deep ensemble 3-seed + temperature scaling
-  + group reweighting**. Possivelmente também **FineFACE cross-layer
-  attention adaptado** (escopo expandido se cronograma permitir).
-- Skin tone: **MST 10-pt** (preferencial) via [Google MST classifier](https://skintone.google)
-  + validação manual em subset.
-- Métricas: **F1 macro + accuracy** + tripla **DR + worst-class F1 + CV**.
-- Multi-seed: **3 seeds (42, 1, 2)** com **média ± std** e
-  **comparação pareada**.
+## 5. Contribuições originais declaradas
 
-### 5.2 Fora do escopo (declarado)
+| # | Contribuição | Originalidade | Ancoragem |
+|---|---|---|---|
+| **C1** | Pipeline operacional MST → FiLM → race classifier | **Primeira instância** documentada em race classification 7-class | [[perez_2018]] (FiLM), [[zemel_2013]] (FRL paradigma) |
+| **C2** | Matriz P(MST \| race) sobre FairFace val + análise overlap | **Zero precedentes** públicos em fairness/biometria | [[schumann_2023]] (MST protocolo); Draelos 2025 é dermatologia |
+| **C3** | Demonstração empírica de fair transferência race classification → face recognition | **Primeira aplicação** documentada em FairFace + RFW/BFW | [[madras_2018]] (LAFTR transferência teórica) |
+| **C4** | Triangulação DR + worst-class F1 + CV como métrica padrão multi-classe | **Combinação proposta** | [[kleinberg_2017]] (impossibilidade); [[hardt_2016]] (EO/EOD base) |
+| **C5** | Quantificação do componente fenotípico vs algorítmico do erro Latinx | **Diagnóstico inédito** combinando C1+C2 | [[fuentes_2019]], [[lewontin_1972]] (fundamento teórico) |
 
-- **Continuous demographic labels** ([Neto 2025](04_pesquisa_bibliografica/neto_2025.md))
-  — mencionar como direção futura, não implementar.
-- **Re-anotação racial completa do FairFace** — apenas validação MST.
-- **Cross-dataset RFW/BFW evaluation** — taxonomias diferentes.
-- **Mitigação de gender / age** — foco em race.
-- **Multi-task simultâneo** (race × gender × age) — single-task.
-- **ViT-B / DINOv2 / EfficientNet** como backbones — ConvNeXt-T já
-  cobre "moderno" sem explodir escopo.
-- **Fairness em geração / VLM zero-shot** — fora do problema.
-- **Dimensão temporal / longitudinal** — single-snapshot.
-- **Privacy-preserving fairness** — não relevante.
+## 6. Escopo e limitações
 
-## 6. Limitações honestas declaradas
+### 6.1 Dentro do escopo
 
-### 6.1 Limitações estruturais (não-elimináveis pela dissertação)
+- **Classification**: race em 7 classes (FairFace) — in-domain (train→val).
+- **Face recognition**: RFW OU BFW (a decidir após Cap 1 — RFW tem
+  4 etnias compatíveis; BFW tem 4×2).
+- **Backbone**: ResNet-34 (baseline) + **ConvNeXt-T** (modernização).
+- **Mitigação alternativa para baseline comparativo**: FSCL+ (Park
+  2022), Group DRO + strong ℓ2 (Sagawa 2020), Adversarial debiasing
+  (Zhang 2018).
+- **Conditioning**: **FiLM** (Perez 2018) é mecanismo escolhido.
+- **Métrica MST**: 10 pontos via Google API + validação manual em subset.
+- **Métricas**: F1 macro + accuracy + **triangulação DR + worst-class
+  F1 + CV** + EO_h/EOD por classe.
+- **Multi-seed**: **3 seeds (42, 1, 2)** com média ± std + comparação
+  pareada.
 
-- **Taxonomia 7-class do FairFace é socialmente construída.** Não
-  representa "verdade biológica" nem cobre todas as identidades
-  raciais possíveis ([Q09](04_pesquisa_bibliografica/_perguntas.md),
-  [Q11](04_pesquisa_bibliografica/_perguntas.md)). Esta posição é
-  consolidada pela American Association of Biological Anthropologists
-  ([Fuentes et al., 2019](04_pesquisa_bibliografica/fuentes_2019.md)):
-  *"Race does not provide an accurate representation of human
-  biological variation."* Fundamentação genética: a partição clássica
-  de Lewontin ([1972](04_pesquisa_bibliografica/lewontin_1972.md))
-  estabelece que ~85% da variação genética humana é intra-populacional,
-  apenas ~6% inter-racial — refutação estatística da reificação
-  biológica de categorias raciais.
-- **Anotação MTurk do FairFace** sem inter-annotator agreement por
-  classe ([Q01](04_pesquisa_bibliografica/_perguntas.md)) — sub-estimamos
-  ruído de label.
-- **In-domain evaluation** (FairFace val) — generalização para
-  outros datasets é limitada por incompatibilidade taxonômica.
+### 6.2 Fora do escopo (declarado)
 
-### 6.2 Limitações metodológicas (assumidas conscientemente)
+- **Continuous demographic labels** ([[neto_2025]]): mencionar como
+  direção futura, não implementar.
+- **Re-anotação racial completa do FairFace**: apenas validação MST
+  em subset.
+- **Cross-dataset 4-class race classification** (RFW/BFW como
+  classification, não verification): taxonomias incompatíveis.
+- **Fairness em gender ou age** isoladamente: foco em race.
+- **Multi-task simultâneo** (race × gender × age): single-task.
+- **Backbones acima de ConvNeXt-T** (ViT-L, DINOv2): foco em
+  Pareto-eficiência.
+- **VLM fine-tuning** (FaceScanPaliGemma): citado como SOTA, não
+  replicado.
+- **Geração** (fair face generation): grupo S10 mantido em standby.
+- **Dimensão temporal / longitudinal**: single-snapshot.
 
-- **3-seed casado** é o mínimo defensável; **5-10 seeds** seriam
-  ideais para CI mais estreito. Tradeoff de compute.
-- **Validação manual MST** sobre subset, não dataset completo —
-  matriz aproximada, não exata.
-- **Classifier MST automatizado** ([Schumann 2023](04_pesquisa_bibliografica/schumann_2023.md))
-  pode ter viés próprio — circularidade reconhecida.
-- **Single backbone moderno** (ConvNeXt-T) — comparação com ViT-B
-  / DINOv2 deixada como trabalho futuro.
+### 6.3 Limitações estruturais (não-elimináveis)
 
-### 6.3 Riscos de falsificação
+- **Taxonomia 7-class é socialmente construída** ([[fuentes_2019]],
+  [[lewontin_1972]]) — qualquer "fairness" opera sobre categoria
+  socio-política, não biológica.
+- **Anotação MTurk do FairFace sem κ por classe** ([[Q01]]) —
+  ruído de label sub-estimado.
+- **In-domain evaluation** — generalização para outros datasets é
+  limitada por incompatibilidade taxonômica.
+- **Impossibilidade Kleinberg-Mullainathan-Raghavan** ([[kleinberg_2017]]):
+  não é possível satisfazer simultaneamente calibration,
+  balance-positive e balance-negative. Tese opta por DR + EO_h
+  conscientemente.
 
-Se H4 for **refutada** (i.e., overlap MST não explica ≥50% do erro
-Latinx), a tese **precisa ser reformulada**. Plano B:
+### 6.4 Plano B (se hipóteses refutadas)
 
-- Manter C2 (benchmark de mitigações) e C5 (métrica triangular)
-  como contribuições estáveis.
-- Reformular C1+C3 como **observação negativa** ("matriz construída
-  e diagnóstico não confirma hipótese; erro é majoritariamente
-  algorítmico").
-- A dissertação **continua publicável** mesmo com H4 refutada —
-  observação negativa é informação cientificamente válida.
+| Hipótese refutada | Plano B |
+|---|---|
+| **H1 falha** (pipeline não melhora) | Manter C2 (matriz) + C4 (triangulação) + C5 (decomposição). Reframing como **observação negativa**: "MST conditioning não melhora — implica que erro Latinx é majoritariamente algorítmico" |
+| **H2 falha** (Latinx muda com backbone modernizado) | Achado interessante: contradiz hipótese fenotípica. **Aprofundar análise**: por que ConvNeXt-T move Latinx? Eventual reformulação parcial |
+| **H3 falha** (Latinx não tem spread MST amplo) | Refuta hipótese central de sobreposição fenotípica. Reframing: Latinx tem outras dimensões fenotípicas (forma craniana, features faciais) — direção futura |
+| **H4 falha** (overlap MST não explica misclassificações) | Refuta interpretação fenotípica. Manter C1+C4+C5 como contribuição metodológica; reformular C2+C3 como achado negativo |
+| **H5 falha** (face recognition não melhora) | Limitação de transferência. Reframing: pipeline funciona em classification mas não em recognition; abre questão de research futura |
+
+**Observação científica importante**: tese permanece publicável
+mesmo se H1, H3, H4 ou H5 forem refutadas — observações negativas
+são cientificamente válidas e raramente publicadas.
 
 ## 7. Conexão com plano experimental
 
-Esta tese é executada em **3 capítulos experimentais** definidos em
-[`06_gap.md` §4.1](06_gap.md):
+Esta tese é executada em **3 capítulos experimentais + síntese**:
 
-```
-Cap 1 (Q06) — Decomposição ceiling 72%
-    ResNet-34 → ConvNeXt-T, 3-seed casado, HPO modesto
-    Teste de H2
+### 7.1 Capítulo 1 — Classifier MST e matriz MST × race
+(~4 semanas)
 
-Cap 2 (Q04) — Mitigação algorítmica
-    FSCL+ adaptado, Group DRO + strong reg, ensemble + reweighting
-    3 técnicas × 3 seeds = 9 runs comparáveis ao baseline
-    Teste de H1
+- Treinar/validar classifier MST sobre MST-E + Casual Conversations.
+- Aplicar sobre FairFace val (10 954 imgs).
+- Validação manual em subset 500–700 imgs × 3 anotadores
+  regionalmente diversos (protocolo Schumann 2023).
+- Reportar matriz P(MST | race) + κ de Fleiss por classe.
+- **Testar H3**.
 
-Cap 3 (Q10) — Matriz skin tone × race
-    MST automatizado sobre val (10 954 imgs)
-    Anotação manual subset (500-700 imgs × 3 anotadores)
-    Matriz P(MST | race) + análise overlap
-    Cross-reference com confusion matrix do melhor modelo
-    Teste de H3 e H4
+### 7.2 Capítulo 2 — Race classifier condicionado por MST
+(~10–12 semanas)
 
-Síntese — Decomposição final
-    erro_total = erro_fenotípico_irredutível + erro_redutível_modelo
-    Quantificação por classe (especialmente Latinx)
-    Teste de H5
-```
+- **Baseline ResNet-34** sem MST (validação cruzada do 72%
+  reportado em AlDahoul/Lin).
+- **Vanilla ConvNeXt-T** sem MST (teste de H2).
+- **Pipeline ConvNeXt-T + FiLM** condicionado por MST (teste de H1).
+- **Baselines comparativos**:
+  - FSCL+ (Park 2022) adaptado multi-classe.
+  - Group DRO + strong ℓ2 (Sagawa 2020).
+  - Adversarial debiasing (Zhang 2018).
+- 3 seeds casados, comparação pareada com paired t-test.
+- Cross-reference matriz × confusion matrix → **testar H4**.
 
-Cronograma: ver [`06_gap.md` §4.5](06_gap.md). Estimativa total **6-8
-meses** de pesquisa ativa.
+### 7.3 Capítulo 3 — Extensão a face recognition
+(~6 semanas)
+
+- Selecionar dataset (RFW preferível por escala e história; BFW
+  secundário se BFW for mais simples).
+- Aplicar pipeline análogo (encoder + FiLM condicionado por MST).
+- Comparar com/sem MST conditioning em verification 1:1.
+- Métrica primária: TAR @ FAR fixo por raça, foco em **Black/African**.
+- **Testar H5**.
+
+### 7.4 Síntese — Decomposição e conclusões
+(~4 semanas + escrita)
+
+- Joint analysis das 5 hipóteses.
+- Decomposição final: erro_total = irredutível_fenotípico +
+  redutível_algorítmico, por classe.
+- Implicações para deployment, ética, e direções futuras.
+
+### 7.5 Cronograma estimado
+
+| Bloco | Duração | Marco |
+|---|---|---|
+| Setup metodológico (02, 03, 08) | 2 semanas | Especificações executáveis |
+| Cap 1 (Classifier MST + matriz) | 4 semanas | H3 testada |
+| Cap 2 (Race com MST conditioning) | 10–12 semanas | H1, H2, H4 testadas |
+| Cap 3 (Face recognition) | 6 semanas | H5 testada |
+| Síntese | 4 semanas | Decomposição final |
+| Escrita capítulos (paralelo) | 8–12 semanas | Defesa |
+| **Total estimado** | **~28–32 semanas** | **~Jan–Mar 2027** |
 
 ## 8. Status do thesis statement
 
-- **v1**: histórico (pre-pivot), construído sobre evolução do MBA.
-- **v2**: histórico (versão 2.0 de 2026-05-23), incorporando achados
-  iniciais, mas ainda framing MBA.
-- **v3 (este arquivo)**: construído sobre gap identificado em corpus
-  de 19 fichas + 10 perguntas de pesquisa + 5 frentes 🔬 ranqueadas.
+- **v1**: histórico (pre-pivot 25/05/2026, framing MBA-evolution).
+- **v2**: histórico (versão 2.0 de 23/05, ainda framing MBA).
+- **v3**: histórico (pós-pivot 25/05 — diagnóstica empírica).
+- **v3.1**: histórico (06/01 — fundamentação teórica AAPA + Lewontin).
+- **v3.2 (este arquivo)**: **prescritiva** — pós-reunião 04/06 + Rodada 5.
 
-**Status:** **PRONTO PARA APROVAÇÃO COM ORIENTADOR** (Prof. Marcos
-Quiles).
+**Status:** **PRONTO PARA REVISÃO PELO ORIENTADOR** (próxima reunião).
 
-**Próximos arquivos a produzir:**
+## 9. Documentos relacionados (estado pós-reunião 2026-06-04)
 
-- [`02_metodologia.md`](02_metodologia.md): protocolo experimental
-  detalhado (sementes, splits, hiperparâmetros, padding, multi-seed).
-- [`03_metricas.md`](03_metricas.md): definição formal de DR,
-  worst-class F1, CV, com derivação e propriedades.
-- [`08_experimentos.md`](08_experimentos.md): tabela de fatores,
-  ablações e rationale para cada run.
-- [`09_resultados.md`](09_resultados.md): a ser preenchido durante
-  execução.
+- [`05_landscape.md`](05_landscape.md): síntese transversal do
+  corpus (em v3.1 — pendente nota sobre Track G).
+- [`06_gap.md`](06_gap.md): ranqueamento das 5 frentes 🔬 (em v3.1
+  — Q04 + Q10 viram pipeline único em v3.2; ranqueamento mantém).
+- [`04_pesquisa_bibliografica/_perguntas.md`](04_pesquisa_bibliografica/_perguntas.md):
+  Q01–Q14 respondidas, 5 frentes 🔬 abertas.
+- [`04_pesquisa_bibliografica/_metricas_corpus.md`](04_pesquisa_bibliografica/_metricas_corpus.md):
+  big numbers do corpus para reuniões.
+- [`04_pesquisa_bibliografica/_triagem.md`](04_pesquisa_bibliografica/_triagem.md):
+  log de decisões editoriais R1–R5 + R2.5/R2.6.
+
+## 10. Pendências pós-aprovação v3.2
+
+- [ ] Atualizar `06_gap.md` para refletir pipeline integrado Q04+Q10
+      (em v3.1, eram capítulos paralelos).
+- [ ] Adicionar nota em `05_landscape.md` sobre Track G (Rodada 5).
+- [ ] Regenerar PPTX para v3.2 (script `_gerar_apresentacao.py`
+      arquivado em `docs/historico/reuniao_2026-06/`; replicar e
+      ajustar para nova tese).
+- [ ] Criar `02_metodologia.md`, `03_metricas.md`, `08_experimentos.md`
+      com especificações detalhadas dos 3 capítulos experimentais.
