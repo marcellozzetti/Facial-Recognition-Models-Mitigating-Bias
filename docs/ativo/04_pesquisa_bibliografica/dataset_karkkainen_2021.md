@@ -287,3 +287,61 @@ Extraído de Section 5 (Conclusion):
 - **NÃO** mencionam continuous labels ou cross-reference com skin
   tone. ✅ **Q09 e Q10 são frentes genuinamente abertas** —
   autores do dataset não cobrem.
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+
+### (a) Rigor formal
+
+- **Métrica ε (max accuracy disparity log-ratio)** é matematicamente
+  bem definida mas **não tem intervalo de confiança reportado**.
+  Para n=1500 imagens por subgrupo, IC de 95% sobre accuracy seria
+  aproximadamente ±1.5 pp — o ε reportado de 0.055 pode ter overlap
+  estatístico com 0.078 (UTKFace), enfraquecendo a conclusão de
+  superioridade.
+- Conexão com [[hardt_2016]]: ε é log-ratio de TPR; pode ser visto
+  como variante de EO_h. **Conversão para EO_h padrão facilitaria
+  comparação com literatura subsequente** (Park 2022, Sagawa 2020).
+
+### (b) Reprodutibilidade
+
+- **Crítico:** hiperparâmetros não declarados no paper. Apenas
+  "ADAM + lr=0.0001". Faltam: batch size, épocas, weight decay,
+  scheduler, augmentation, image size pré-processamento,
+  early-stopping criterion.
+- Split train/val: **não declarado textualmente**, só via GitHub.
+- Sem multi-seed — single run reportado.
+- **Implicação para nossa Fase 5**: precisamos **decidir
+  hiperparâmetros e documentá-los explicitamente** em
+  `02_metodologia.md` para reprodução.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Dataset é a base do nosso pipeline** — não há "aplicabilidade
+  questionável" no sentido convencional. **Mas há caveat
+  metodológico**: como o paper não declara hiperparâmetros, o
+  baseline 72% (Lin 2022, AlDahoul 2024) usa **escolhas que reproduzem
+  empiricamente** o original, não escolhas garantidas idênticas.
+- Para v3.2 (MST + race), FairFace **não tem labels MST** — exige
+  classifier auxiliar ([[schumann_2023]] API). Trade-off: API tem
+  viés próprio.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| 7 categorias raciais (incluir Middle East + Latino) | ✅ Justificada (cobertura de subgrupos não representados em outros datasets) |
+| Descartar Hawaiian/Pacific Islanders + Native American | ✅ Justificada (sample insuficiente) |
+| MTurk como anotador (não especialista) | ❌ Assumida — sem comparação com expert annotation |
+| 3 anotadores + voto majoritário | ⚠ Implícita — sem reportar inter-rater agreement (κ) por classe |
+| Padding=0.25 vs 1.25 (versões diferentes) | ✅ Justificada (versões para diferentes propósitos) |
+
+### (e) Conexão com R5
+
+- [[hardt_2016]]: ε do FairFace é variante de EO_h log-ratio. Tradução
+  para EO_h padrão é direta.
+- [[zemel_2013]]: FairFace é **apenas dataset**, não método de
+  representação fair. Sua adoção em Fair Representation Learning
+  (Park 2022, Madras 2018) é pós-hoc.
+- [[kleinberg_2017]]: a métrica ε do FairFace satisfaz "balance for
+  positive class" mas não calibration. Confirma teorema da
+  impossibilidade — escolha de ε é decisão de design.

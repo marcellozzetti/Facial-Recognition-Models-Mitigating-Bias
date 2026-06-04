@@ -334,3 +334,63 @@ Extraído de Section 6 (Conclusion):
   ✅ **Alinhada com Q06** (hipótese H4: ConvNeXt-T 28M competitivo).
 - **Investigar disparidade Latinx/Hispanic (60% F1)** — pior classe.
   ✅ **Alinhada com Q01 e Q10** — exatamente nossa frente.
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+
+### (a) Rigor formal
+
+- **Fine-tuning de PaliGemma 3B como Visual Question Answering** é
+  formulação operacional, **não teorema**. Não há análise formal de
+  por que VLM bate CNN em race classification.
+- Prompts específicos influenciam fortemente a resposta — não há
+  ablation de **prompt engineering** documentada. *"Pick one of the
+  following: [Black, East Asian, Indian, Latinx or Hispanic, Middle
+  Eastern, Southeast Asian, White]"* — escolha de **ordem** das
+  classes pode afetar via positional bias do LLM.
+- Sem **métrica formal de fairness** (EO_h, EOD, DR). Reporta apenas
+  Acc/Prec/Rec/F1 por classe — leitor inferir disparidade.
+
+### (b) Reprodutibilidade
+
+- **Crítico**: hiperparâmetros de fine-tuning **NÃO declarados**:
+  learning rate, batch size, épocas, LoRA rank (se LoRA), número de
+  GPUs, tempo de treino. Apenas "75/25 train/val split".
+- Single seed reportado — sem desvio padrão.
+- Critério de seleção de checkpoint **não declarado** (best val acc?
+  best val F1?).
+- Sem código de fine-tuning público — apenas pesos no HuggingFace.
+- **Implicação**: nossa H1 (≥30% redução em DR) precisa ser testada
+  contra **range** de números do AlDahoul, não único valor — falta
+  informação para estabelecer IC do baseline 75.7%.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **AlDahoul é referência empírica**, não método transferível
+  diretamente. **PaliGemma 3B com 75/25 split** é caro: ~24GB VRAM
+  para fine-tuning, lento.
+- Para **v3.2 com ConvNeXt-T (28M)**: 100× menos compute. Pareto
+  argument empírico vai ser **direto**.
+- Multi-person (FaceScanGPT) **não se aplica** ao nosso pipeline
+  (FairFace é single-person crops).
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Reformular como VQA | ⚠ Assumida — não compara com fine-tuning supervisionado clássico |
+| Fine-tune apenas PaliGemma (não GPT-4o, etc.) | ✅ Justificada (acesso aos pesos, custo) |
+| Single seed | ❌ Assumida (limitação de compute? não declarado) |
+| Prompts hard-coded com lista de classes | ❌ Assumida — sem ablation de prompt |
+| Não combinar com mitigação algorítmica | ⚠ Reconhecida como future work (Seção 11), não justificada como escolha |
+
+### (e) Conexão com R5
+
+- [[perez_2018]] FiLM: **direta extensão possível** — usar saída de
+  MST classifier como contexto FiLM em PaliGemma. Não testado no
+  paper.
+- [[madras_2018]] LAFTR: race classifier de AlDahoul **NÃO é fair
+  representation** — é fine-tuning vanilla. Madras justifica que
+  representation pode transferir; sugere que **fine-tuning vanilla
+  perde informação fair**.
+- [[hardt_2016]] EO_h/EOD: AlDahoul **não reporta** EOD por classe.
+  Reconstrução via F1 per-class é possível mas indireta.

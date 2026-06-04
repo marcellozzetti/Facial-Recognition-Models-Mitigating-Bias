@@ -178,3 +178,50 @@ pesquisa implícito que foi executado pela genômica populacional pós-
   ⚠ Tangencial.
 - **Implicações sociais e éticas** — desenvolvido por Roberts (2011),
   Fuentes (2019), entre outros. ✅ Fundamenta nossa **posição ética**.
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+
+### (a) Rigor formal
+
+- **Decomposição da variância F-statistics** é matematicamente
+  sólida — método clássico de genética populacional.
+- **17 loci é amostra pequena** comparado a estudos modernos
+  (Rosenberg 2002: 377 microssatélites; Bergstrom 2020: milhões de
+  SNPs). Conclusão central (~85% intra-pop) é **robusta**
+  matematicamente; replicada em amostras maiores.
+- **Edwards 2003 "Lewontin's Fallacy"** argumenta que mesmo 6%
+  permite classificação — não refuta Lewontin matematicamente,
+  refuta sua interpretação epistemológica.
+
+### (b) Reprodutibilidade
+
+- ✅ Dados públicos da época (sistemas genéticos por imunologia/
+  eletroforese).
+- ⚠ Tecnologia de medição de 1972 é obsoleta; replicação moderna
+  usa SNPs/microssatélites.
+- ✅ Análise foi reproduzida múltiplas vezes (Lasisi 2022 PMC
+  9014183, Rosenberg 2002 PNAS, Bergstrom 2020).
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- Não é técnica computacional. **Fundamento estatístico** para
+  justificar Q10: sobreposição fenotípica entre raças é
+  previsão direta da partição genética.
+- Para a tese: ancora a hipótese H4 (overlap MST por raça é
+  matemática previsão).
+
+### (d) Design choices justificadas vs assumidas
+
+- 17 loci (1972) ⚠ Limitação tecnológica da época, não escolha.
+- Categorias raciais usadas (Caucasoid/Mongoloid/Negroid) ⚠ Era da
+  época — desuso atual.
+- Decomposição F-statistics ✅ Justificada (técnica clássica).
+
+### (e) Conexão com R5
+
+- [[fuentes_2019]]: Fuentes 2019 é a **destilação institucional** de
+  50 anos de findings post-Lewontin.
+- [[kleinberg_2017]]: combinação Lewontin (race ≠ biology
+  estatística) + Kleinberg (fairness é impossível formalmente) =
+  dupla incompatibilidade conceitual. Nossa tese opera
+  conscientemente nesse espaço.

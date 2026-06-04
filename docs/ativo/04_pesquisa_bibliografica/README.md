@@ -226,6 +226,22 @@ local no PDF (página/seção). Marcar cada item com:
 - ✅ Alinhada com nossa frente 🔬 (citar Q-id)
 - ⚠ Parcialmente alinhada
 - ❌ Divergente / fora do nosso escopo]
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+[Adicionada após Rodada 5 + feedback do orientador. Avalia:
+- (a) **Rigor formal**: a formulação matemática é defensável?
+  Pressupostos declarados? Provas/derivações verificáveis?
+- (b) **Reprodutibilidade**: hiperparâmetros declarados? Código
+  disponível? Protocolo de treino completo? Seeds reportadas?
+- (c) **Aplicabilidade ao pipeline v3.2**: o método funcionaria
+  se aplicado ao FairFace race 7-class condicionado por MST?
+  Onde falharia? O que precisa adaptação?
+- (d) **Design choices**: quais escolhas têm justificativa explícita
+  vs são assumidas implicitamente? Onde o paper "esconde"
+  decisões críticas?
+- (e) **Conexão com R5** (Hardt 2016, FiLM, LAFTR, Zhang 2018, Zemel
+  2013, Kleinberg 2017): como o método dialoga com os
+  mecanismos formais identificados na Rodada 5?]
 ```
 
 ## 6. Convenções de nomenclatura

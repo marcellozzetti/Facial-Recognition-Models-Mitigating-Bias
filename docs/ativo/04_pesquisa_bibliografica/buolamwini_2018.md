@@ -270,3 +270,52 @@ Extraído de Discussion / Conclusion:
   ✅ **Alinhada com Q10** — exatamente nossa frente.
 - **Investigar viés em outras tasks: face recognition, face
   generation** — sugestão genérica. ⚠ Tangencial.
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+
+### (a) Rigor formal
+
+- **Auditoria observacional**, não teste de hipótese formal sobre
+  causalidade do viés. Reporta diferenças em error rate sem prova de
+  que dados de treinamento são a causa (apesar de discutir
+  qualitativamente).
+- Métricas (TPR, FPR, PPV, error rate) bem definidas mas sem IC
+  reportados (n=1270 sujeitos divididos em 4 células, ~318/célula
+  → IC de ±5pp esperado).
+
+### (b) Reprodutibilidade
+
+- ✅ Dataset PPB público + amostra de Adience e IJB-A.
+- ⚠ Sistemas auditados (Microsoft/IBM/Face++) são **caixas-pretas
+  comerciais**. Mesmas APIs em 2026 dão resultados diferentes —
+  paper é **snapshot abril-maio 2017** não-reproduzível em 2026.
+- Anotações Fitzpatrick: dermatologista + 3 anotadores para PPB,
+  apenas 1 autor para IJB-A/Adience. Inconsistência.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Não é método experimental** para nosso pipeline. É **motivação
+  ética + paradigma de avaliação interseccional** (4 células: DF,
+  DM, LF, LM).
+- v3.2 herda a noção de avaliar por subgrupo (race × tom), embora
+  Buolamwini opte por tom (Fitzpatrick) e não race.
+
+### (d) Design choices justificadas vs assumidas
+
+- Fitzpatrick em vez de race ✅ **Justificada extensivamente** (Section 3).
+- 6 países parlamentares ✅ Justificada por gender parity + skin diversity.
+- 1 imagem por sujeito ⚠ Choice — limita variability analysis.
+- Sem multi-seed ❌ Single audit run.
+- Não distinguir causa do viés ⚠ Reconhecida em Discussion.
+
+### (e) Conexão com R5
+
+- [[fitzpatrick_1988]]: Buolamwini é **adopter principal** da escala
+  em ML fairness. Reconhece limitações.
+- [[hardt_2016]]: max gap de error rate Buolamwini é **precursor
+  empírico** das definições formais de EO_h/EOD.
+- [[fuentes_2019]]: Buolamwini é citada por AAPA 2019 como
+  evidência das consequências sociais da reificação racial em ML.
+- [[kleinberg_2017]]: gap entre subgrupos é **descrição**, não
+  satisfação de critério formal de fairness — Buolamwini não
+  apresenta solução, apenas problema.

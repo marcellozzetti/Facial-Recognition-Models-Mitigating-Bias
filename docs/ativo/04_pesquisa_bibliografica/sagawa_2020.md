@@ -261,3 +261,69 @@ Extraído de Section 6 (Discussion) + Limitations:
 - **Aplicar a face race classification** — autores testam CelebA
   hair color × gender mas não FairFace race 7-class. ✅ **GAP
   CENTRAL — Q04**.
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+
+### (a) Rigor formal
+
+- **Formulação min-max bem definida**: argmin_θ max_g E[ℓ(θ;
+  (x,y,g))]. Pressupõe partição de grupos conhecida no treino.
+- **Achado paradoxal formalmente verificado**: em regime
+  overparametrizado, ERM e DRO convergem ao mesmo limite (Bayes
+  risk zero em treino implica worst-group loss zero em treino).
+  Empíricamente demonstrado (Tabela 1) + interpretado.
+- **Algoritmo estocástico** com garantia de convergência no caso
+  convexo (Section 5). Caso não-convexo (deep networks) é
+  empírico — convergência observada mas sem prova.
+
+### (b) Reprodutibilidade
+
+- ✅ **Hiperparâmetros declarados**: SGD minibatch para ERM,
+  algoritmo próprio para DRO. λ ℓ2 reportado em (1.0 Waterbirds,
+  0.1 CelebA). Default ℓ2 do ResNet50 = 0.0001.
+- ⚠ **Single run reportado** — sem desvio padrão entre seeds.
+  Sagawa et al. apenas dizem "trained to convergence".
+- ✅ **Código público**: github.com/kohpangwei/group_DRO.
+- Critério de seleção: dois cenários separados — (a) treinar até
+  convergência total (regime degenerado), (b) early stopping
+  (regime útil).
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Strong ℓ2 = 0.1-1.0** é específico de ResNet50 com BatchNorm.
+  **ConvNeXt-T usa LayerNorm** — efeito de ℓ2 forte pode ser
+  diferente. **Sweep de λ necessário** (não plug-and-play).
+- **m = grupos**: para race 7-class × gender = 14 grupos. Para
+  race 7-class apenas (sem gender), m=7. Tamanho de pior grupo
+  fica pequeno (Latinx test = 1623 — gerenciável).
+- **Worst-group accuracy** é métrica natural para reportar; mapeia
+  bem para worst-class F1 que adotamos.
+- **Conexão com FiLM** ([[perez_2018]]) **não-trivial**: Group DRO
+  opera no nível de loss, FiLM no nível de feature. Combinação seria
+  ortogonal.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Group DRO (worst-case sobre grupos) | ✅ **Formalmente justificada** como caso especial de DRO (Ben-Tal et al. 2013) |
+| Strong ℓ2 regularization | ✅ Justificada — Section 3.1 demonstra que sem reg, DRO ≈ ERM |
+| Early stopping como alternativa | ✅ Justificada empíricamente |
+| ResNet50 + BatchNorm | ❌ Assumida — sem comparação com LayerNorm/ConvNeXt |
+| Single run reportado | ❌ Assumida (custo? não declarado) |
+| Group labels conhecidos no treino | ⚠ Reconhecida como limitação |
+
+### (e) Conexão com R5
+
+- [[hardt_2016]] EO_h/EOD: Group DRO **não otimiza diretamente** EO.
+  Worst-group é métrica relacionada mas distinta (mínimo absoluto vs
+  razão). Pode-se computar EO post-hoc.
+- [[zemel_2013]]: Group DRO **não aprende fair representation** —
+  treina classifier robusto sem alterar features. Paradigma
+  diferente.
+- [[madras_2018]] LAFTR: Group DRO e LAFTR são **complementares**:
+  Madras representa, Sagawa otimiza. Combinação testável (LAFTR
+  + DRO loss) **não explorada na literatura**.
+- [[perez_2018]] FiLM: ortogonal ao Group DRO — pode ser usado em
+  conjunto, FiLM modula features condicionadas a MST, DRO escolhe o
+  pior caso de grupo.

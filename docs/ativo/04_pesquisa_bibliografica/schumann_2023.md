@@ -163,3 +163,70 @@ Extraído de Conclusão e Discussion:
 - **Reduzir cognitive load em scales muito granulares** (Felix von
   Luschan 36-pt) — sugestão para outros pesquisadores; MST como
   compromisso. ❌ Fora do escopo.
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+
+### (a) Rigor formal
+
+- **Estudo é predominantemente observacional**, não experimental
+  controlado. Demonstra **variação inter-anotador** (krippendorff
+  α, agreement rates) mas não testa intervenções para reduzir
+  variação.
+- Métrica de agreement reportada por experimento, não
+  consolidada num índice global. Faltam intervalos de confiança
+  formais.
+- Comparação MST-E vs MST-real não é teste de hipótese formal.
+
+### (b) Reprodutibilidade
+
+- ✅ **MST-E dataset público** (1 515 imagens, 31 vídeos, 19
+  sujeitos).
+- ✅ **Protocolo de anotação documentado**: pool diverso,
+  replicação alta (≥3), treinamento prévio com MST-E.
+- ⚠ **Modelo automático Google MST não open-source** — disponível
+  apenas como API. Para v3.2 Fase 1 (classifier MST sobre FairFace
+  val 10 954 imgs), dependência de API externa.
+- Pool de anotadores específicos do estudo (Google contractors em
+  diferentes geografias) **não replicável** sem acesso a Prolific
+  ou plataforma similar.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Crítico para Q10 / Cap 3**: protocolo importável diretamente
+  para Fase 2 do nosso plano:
+  1. Anotadores recrutados via Prolific (~$2/img × 700 = ~$1400).
+  2. Treinamento com MST-E.
+  3. ≥3 anotadores por imagem.
+  4. Voto majoritário.
+  5. Reportar inter-rater agreement (κ Fleiss).
+- **Riscos**: variação regional documentada por Schumann é
+  **feature**, não bug. Resultado: nossa matriz P(MST | race) tem
+  **incerteza intrínseca**.
+- **Combinação com classifier automatizado**: paper sugere
+  classifier como suplemento, não substituto. Para v3.2 Fase 1,
+  precisamos validar API output contra subset manual.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| 10 pontos MST vs Fitzpatrick 6 | ✅ Justificada — Section 2 demonstra cognitive overload em 36-pt |
+| Mestrado MST-E como reference | ✅ Justificada — necessidade de calibration |
+| Pool de anotadores diverso | ✅ Justificada empiricamente (achado central) |
+| Não treinar modelo automático open-source | ⚠ Assumida (Google policy) — limitação para reprodução |
+| Nenhuma intervenção para reduzir variação | ❌ Assumida — paper só documenta |
+| Subjetividade como característica, não falha | ✅ Argumentado filosoficamente (Section 1) |
+
+### (e) Conexão com R5
+
+- [[fitzpatrick_1988]]: MST supera Fitzpatrick em 3 dimensões
+  (granularidade, equilíbrio, propósito). Schumann demonstra
+  empiricamente.
+- [[perez_2018]] FiLM: saída de MST classifier é input natural para
+  FiLM no v3.2. **Compatibilidade direta** (10-dim logits → γ, β).
+- [[hardt_2016]]: agregação MST entre anotadores deve respeitar
+  Equal Opportunity entre regiões — variação sistemática viola
+  EO entre subgrupos de anotadores. Reconhecida implícitamente.
+- [[kleinberg_2017]]: trade-off entre granularidade (10 pts) e
+  agreement (mais classes = menor agreement) é instância do
+  teorema da impossibilidade — não há "MST perfeito".

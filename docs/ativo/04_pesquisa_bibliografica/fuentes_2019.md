@@ -178,3 +178,46 @@ Statement não tem "future work" formal. Recomendações implícitas:
   tone × race — auditoria honesta).
 - **Substituir AAPA statement de 1996** (já feito); reavaliar
   periodicamente. ❌ Institucional.
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+
+### (a) Rigor formal
+
+- **Statement institucional**, não paper de método empírico ou
+  teorema formal. Argumentação retórica + apelo a literatura
+  prévia (genética populacional, antropologia, sociologia).
+- **Não cita estudos específicos** com evidências quantitativas
+  (e.g., não cita Lewontin 1972 nem Rosenberg 2002 explicitamente
+  com números) — confia no consenso disciplinar.
+
+### (b) Reprodutibilidade
+
+- N/A — documento de posição, não experimento.
+- Processo de aprovação (Committee on Diversity, AABA) é
+  documentado mas não auditável publicamente.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Não é técnica**, é **fundamento teórico**. Sustenta:
+  1. Limitação reconhecida da tese (§6.1): race é construto social.
+  2. Justificativa de Q10 (matriz MST × race): conectar dimensão
+     fenotípica (mensurável) à categoria social (FairFace).
+  3. Posicionamento ético da pesquisa: auditamos, não validamos.
+
+### (d) Design choices justificadas vs assumidas
+
+- Não usar nomenclatura genética técnica ⚠ Choice — pode dificultar
+  leitor técnico em ML.
+- Foco em race + racism (não outras dimensões biológicas) ✅
+  Justificada pelo escopo institucional.
+- Não prescrever metodologia para pesquisa ❌ Assumida — deixa
+  cada disciplina decidir.
+
+### (e) Conexão com R5
+
+- [[lewontin_1972]]: Fuentes 2019 é a **formalização institucional**
+  de 50 anos de findings genéticos consolidados em Lewontin.
+- [[kleinberg_2017]]: a impossibilidade matemática + a
+  arbitrariedade social das categorias raciais reforçam
+  mutuamente — fairness sob categoria socialmente construída tem
+  duas camadas de não-resolução.

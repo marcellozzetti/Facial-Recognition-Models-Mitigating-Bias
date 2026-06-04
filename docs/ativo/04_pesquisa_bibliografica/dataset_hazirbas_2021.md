@@ -186,3 +186,50 @@ Extraído de Section 5 (Conclusion) + Discussion sections:
   exatamente o gold-standard que falta.
 - **Expandir para gender labels além do binário** — autores
   reconhecem limitação. ❌ Fora do nosso foco em race.
+
+## 12. Análise crítica do método (revisão pós-reunião 2026-06-04)
+
+### (a) Rigor formal
+
+- Casual Conversations é **dataset**, não método. Rigor é sobre
+  **protocolo de aquisição** (consentimento, captura) e
+  **anotação** (Fitzpatrick por treinados, voto majoritário sobre
+  frames múltiplos), não derivação matemática.
+- Avaliação dos top-5 DFDC winners é descritiva — sem testes de
+  hipótese formais.
+
+### (b) Reprodutibilidade
+
+- ✅ Dataset público (Meta licensing): github.com/facebookresearch/CasualConversations.
+- ✅ Protocolo de anotação documentado.
+- ⚠ Pool específico de paid actors **não-replicável** — caracteriza
+  dataset, não método transferível.
+- v2 (Porgali 2023) expande mas adiciona complexidade reprodutiva.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- Como **dataset alternativo**: Casual Conversations tem
+  Fitzpatrick mas **não tem race labels** — pode complementar
+  validação de MST classifier, mas não substitui FairFace para
+  race classification.
+- **Protocolo self-report**: importante referência para v3.2 Fase 2
+  — combinar self-report + observação treinada é ideal mas custoso.
+
+### (d) Design choices justificadas vs assumidas
+
+- Self-report age/gender ✅ Justificada (Section 1).
+- Fitzpatrick em vez de MST ⚠ Justificada (MST não existia em
+  2021), mas defasada pós-2023.
+- Paid actors em vez of in-the-wild ❌ Choice — não in-the-wild
+  limita generalização.
+- Apenas EUA na v1 ⚠ Reconhecida como limitação (corrigida em v2).
+
+### (e) Conexão com R5
+
+- [[fitzpatrick_1988]]: Hazirbas usa Fitzpatrick — adoção
+  contemporânea consistente. Pós-Schumann 2023, **MST é o sucessor
+  recomendado**.
+- [[hardt_2016]]: dataset enables auditoria via EO_h/EOD para
+  qualquer classifier downstream.
+- [[zemel_2013]]: dataset facilita fair representation learning
+  sem necessidade de proxy labels.
