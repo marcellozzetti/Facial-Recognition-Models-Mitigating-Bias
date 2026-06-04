@@ -1,12 +1,15 @@
 # Landscape — síntese transversal da literatura
 
-> Síntese cruzada das **19 fichas** catalogadas em
+> Síntese cruzada das **29 fichas** catalogadas em
 > [`04_pesquisa_bibliografica/`](04_pesquisa_bibliografica/) (Rodadas
-> 1, 2, 2.5 e 3 da triagem editorial — 2026-05-25). Cobre fairness
-> em biometria facial, com ênfase em **classificação racial**.
+> 1, 2, 2.5, 3, 4, 5 e 2.6 da triagem editorial). Cobre fairness em
+> biometria facial, com ênfase em **classificação racial**.
+>
+> **Atualizado em 2026-06-04** após Rodada 5 (+6 papers de mecanismos
+> ML/redes neurais, Track G) e Rodada 2.6 (re-verificação SOTA).
 >
 > Este documento é a **base argumentativa** para `06_gap.md`
-> (identificação de gaps) e `07_thesis_statement.md` (tese v3).
+> (identificação de gaps) e `07_thesis_statement.md` (tese v3.2).
 
 ## 1. Sumário executivo
 
@@ -32,7 +35,7 @@ ideal para contribuição experimental original.
 
 ## 2. Topologia da literatura
 
-### 2.1 Os quatro tracks
+### 2.1 Os sete tracks (atualizado após Rodadas 4 e 5)
 
 ```
                     ┌─ Track A: Race CLASSIFICATION ─┐
@@ -83,6 +86,48 @@ ideal para contribuição experimental original.
 
 - **C ↔ D**: técnicas de mitigação treinadas com skin tone como
   protected attribute são raras (FineFACE faz parcialmente em CelebA).
+
+### 2.3 Tracks adicionais (Rodadas 4 e 5)
+
+**Track F — Fundamentação científica de raça e tom de pele** (Rodada 4):
+
+- [[fuentes_2019]] — AAPA Statement on Race and Racism (Am J Phys Anthropol)
+- [[lewontin_1972]] — Apportionment of Human Diversity (Springer, Test-of-Time)
+- [[fitzpatrick_1988]] — Validity and Practicality of Sun-Reactive Skin Types I-VI (JAMA Network)
+- [[massey_martin_2003]] — NIS Skin Color Scale (Princeton)
+
+**Função**: fundamenta teoricamente que race é **construto social,
+não biológico**. Sustenta Q11 e a limitação reconhecida da tese
+v3.2 §6.3. Conecta diretamente aos achados de Lewontin (85.4% da
+variação genética é intra-populacional).
+
+**Track G — Mecanismos ML / Redes Neurais** (Rodada 5):
+
+- [[hardt_2016]] — Equality of Opportunity (NeurIPS 2016)
+- [[perez_2018]] — FiLM Visual Reasoning (AAAI 2018)
+- [[zemel_2013]] — Learning Fair Representations (ICML 2013, Test-of-Time)
+- [[madras_2018]] — LAFTR Adversarially Fair Transferable (ICML 2018)
+- [[zhang_2018]] — Mitigating Unwanted Biases with Adversarial Learning (AAAI/ACM AIES)
+- [[kleinberg_2017]] — Inherent Trade-Offs in Fair Determination (ITCS)
+
+**Função**: fornece **mecanismos formais** para o pipeline v3.2 do
+orientador. Especificamente:
+
+- **FiLM ([[perez_2018]])**: mecanismo de condicionamento neural —
+  usar saída do MST classifier (10 logits) como contexto para
+  modular features do race classifier. **Diretamente operacional**.
+- **LAFTR ([[madras_2018]])**: prova de **fair transferência** —
+  representação treinada fair em uma tarefa permanece fair em
+  tarefas downstream. Sustenta extensão a face recognition (Cap 3 v3.2).
+- **Hardt 2016 ([[hardt_2016]])**: paper-fonte das métricas EO_h/EOD
+  usadas pelos baselines (Park, Sagawa, Manzoor).
+- **Zemel 2013 ([[zemel_2013]])**: paradigma fundador (Test-of-Time
+  ICML 2023). Posiciona historicamente o pipeline v3.2 na linhagem
+  de Fair Representation Learning.
+- **Zhang 2018 ([[zhang_2018]])**: baseline adversarial alternativo
+  para Cap 2.
+- **Kleinberg 2017 ([[kleinberg_2017]])**: teorema da impossibilidade —
+  justifica triangulação DR + worst-class F1 + CV (C4 da tese v3.2).
 
 ## 3. Cross-reference matrix
 
@@ -392,3 +437,37 @@ autores). Direções por **número de papers que endossam**:
 **Próximo arquivo:** [`06_gap.md`](06_gap.md) — ranqueamento das 5
 frentes 🔬 por viabilidade, originalidade e impacto; decisão final
 sobre escopo experimental da dissertação.
+
+## 9. Atualização v3.2 (2026-06-04)
+
+Após reunião com orientador e Rodada 5 (+6 papers Track G), a tese
+foi reformulada de **diagnóstica** (v3.1) para **prescritiva** (v3.2)
+com integração de Q04 + Q10 em pipeline único, ancorado em FiLM
+([[perez_2018]]) e LAFTR ([[madras_2018]]):
+
+**Pipeline integrado v3.2:**
+
+```
+Classifier MST (Schumann 2023)
+    ↓
+Auditoria matriz P(MST | race) sobre FairFace val
+    ↓
+Race classifier ConvNeXt-T + FiLM(MST)  ← NOVO: condicionamento explícito
+    ↓
+Comparação fairness com vs sem MST
+    ↓
+Extensão a face recognition (RFW ou BFW)  ← NOVO: linha do orientador
+    ↓
+Validação fair transferência (LAFTR-style)
+```
+
+**Implicações para o landscape:**
+
+- **Conexão A ↔ C** deixa de ser gap teórico e vira **execução
+  empírica** (Cap 1 + Cap 2 v3.2).
+- **Conexão A ↔ B** (race classification ↔ face recognition) torna-se
+  **central** via extensão Cap 3.
+- **Track G** fornece **toolkit formal** que não existia em v3.1.
+
+Detalhamento da tese v3.2 em [`07_thesis_statement.md`](07_thesis_statement.md).
+Plano experimental detalhado em [`06_gap.md`](06_gap.md) §4.
