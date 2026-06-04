@@ -117,6 +117,59 @@ muito FairFace-cêntrico. Adicionalmente, levantou questões sobre
 - **Novos pontos de pesquisa identificados (Q07-Q10):** documentados
   em `_perguntas.md`.
 
+## Rodada 5 — Mecanismos algorítmicos ML / Redes Neurais (2026-06-04)
+
+**Motivação:** após reunião com orientador (Prof. Quiles), feedback
+explícito de que faltava ampliar pesquisa para venues de ML / Redes
+Neurais. Adicionalmente, ele propôs **linha de pesquisa
+prescritiva** (tese v3.2): treinar MST classifier, usar saída para
+condicionar race classifier, aplicar a face recognition para
+verificar melhora em grupos sub-representados.
+
+### 5.1 Critérios de busca
+
+- Papers fundadores de **fair representation learning** em ML.
+- Mecanismos de **condicionamento neural** (FiLM, conditional BN,
+  attention modulada).
+- **Adversarial debiasing** — formalização e prática.
+- **Métricas de fairness** com prova teórica (impossibilidade
+  Kleinberg).
+- **Venues**: NeurIPS, ICML, ICLR, AAAI, KDD, AIES.
+
+### 5.2 Candidatos verificados
+
+| # | Paper | Venue | Tipo | Decisão | Justificativa |
+|---|---|---|---|---|---|
+| R5-1 | **Hardt, Price & Srebro (2016)** — Equality of Opportunity in Supervised Learning | **NeurIPS 2016** | conference (top venue) | ✅ APROVADO | Paper-fonte das métricas EO_h/EOD usadas em toda literatura subsequente. Citado em 7 fichas existentes; faltava ficha dedicada. |
+| R5-2 | **Perez, Strub, de Vries, Dumoulin & Courville (2018)** — FiLM | **AAAI 2018** | conference (top venue) | ✅ APROVADO | Mecanismo formal de condicionamento neural — direta operacionalização do pipeline v3.2 do orientador. |
+| R5-3 | **Zemel, Wu, Swersky, Pitassi & Dwork (2013)** — Learning Fair Representations | **ICML 2013** (Test-of-Time Award ICML 2023) | conference (top venue) | ✅ APROVADO | Paradigma fundador de Fair Representation Learning. Test-of-Time Award = forte endosso comunidade. |
+| R5-4 | **Madras, Creager, Pitassi & Zemel (2018)** — LAFTR | **ICML 2018** | conference (top venue) | ✅ APROVADO | Conecta formalmente noção de fairness ↔ objetivo adversarial. Demonstra fair transfer learning — fundamenta extensão race→face recognition. |
+| R5-5 | **Zhang, Lemoine & Mitchell (2018)** — Mitigating Unwanted Biases with Adversarial Learning | **AAAI/ACM AIES 2018** | conference (top venue ética AI) | ✅ APROVADO | Adversarial debiasing operacional. Candidato a baseline mitigação para Cap 2 v3.2. |
+| R5-6 | **Kleinberg, Mullainathan & Raghavan (2017)** — Inherent Trade-Offs in the Fair Determination of Risk Scores | **ITCS 2017** (LIPIcs) | conference (top theory venue) | ✅ APROVADO | Teorema da impossibilidade da fairness. Fundamenta nossa escolha de triangulação de métricas (Q05). |
+
+### 5.3 Resumo Rodada 5
+
+- **6 papers aprovados.**
+- Todos top venues ML/CS (NeurIPS, ICML, AAAI, ITCS, AIES).
+- **Track G — Mecanismos ML / Redes Neurais** consolidado.
+- **Total corpus: 29 fichas** (9 R1 + 5 R2 + 5 R3 + 4 R4 + 6 R5).
+
+### 5.4 Impacto na tese (v3.1 → v3.2)
+
+R5 fundamenta a **reformulação prescritiva** sugerida pelo
+orientador:
+
+- **FiLM** ([[perez_2018]]): mecanismo formal para condicionar race
+  classifier com saída do MST classifier.
+- **LAFTR** ([[madras_2018]]): fundamenta extensão race → face
+  recognition (fair transfer learning).
+- **Hardt 2016** ([[hardt_2016]]): formalização das métricas EO_h/EOD
+  reportadas.
+- **Kleinberg 2017** ([[kleinberg_2017]]): justifica triangulação de
+  métricas (não há "fairness única").
+- **Zhang 2018** ([[zhang_2018]]): baseline adversarial alternativo
+  ao FSCL+ ([[park_2022]]) para Cap 2.
+
 ## Rodada 4 — Fundamentação científica de raça e tom de pele (2026-05-25)
 
 **Motivação:** após Rodada 3 + Fase 4 (landscape, gap, thesis v3),

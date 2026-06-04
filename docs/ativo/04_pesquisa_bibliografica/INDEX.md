@@ -1,10 +1,10 @@
 # INDEX — Pesquisa Bibliográfica
 
-> Navegação central das **23 fichas** do corpus. Para conteúdo
+> Navegação central das **29 fichas** do corpus. Para conteúdo
 > integral do paper consultar PDF local. Para resumo estruturado em
 > 11 seções consultar ficha `.md`.
 >
-> Atualizado: 2026-05-25 (Rodada 4 completa — fundamentação científica).
+> Atualizado: 2026-06-04 (Rodada 5 completa — mecanismos ML / redes neurais).
 
 ## Ordem de leitura recomendada
 
@@ -87,7 +87,7 @@ com surveys + papers críticos.
 | [Mehrabi et al. 2021](survey_mehrabi_2021.md) | Survey geral ML |
 | [Kotwal & Marcel 2025](survey_kotwal_2025.md) | Survey específico FR |
 
-### Track F — Fundamentação científica de raça e tom de pele (NOVO Rodada 4)
+### Track F — Fundamentação científica de raça e tom de pele (Rodada 4)
 
 | Paper | Foco |
 |---|---|
@@ -95,6 +95,17 @@ com surveys + papers críticos.
 | [Lewontin 1972](lewontin_1972.md) | Apportionment 85/6/8 — refutação genética |
 | [Fitzpatrick 1988](fitzpatrick_1988.md) | Origem dermatológica Fitzpatrick (PUVA) |
 | [Massey & Martin 2003](massey_martin_2003.md) | NIS Skin Color Scale (precedente MST) |
+
+### Track G — Mecanismos ML / Redes Neurais (NOVO Rodada 5)
+
+| Paper | Foco | Relevância v3.2 |
+|---|---|---|
+| [Hardt, Price & Srebro 2016](hardt_2016.md) | NeurIPS 2016 — Equal Opportunity / Equalized Odds | Fonte das métricas EO_h/EOD usadas pela literatura |
+| [Perez et al. 2018 (FiLM)](perez_2018.md) | AAAI 2018 — conditional layer | Mecanismo para condicionar race classifier com saída MST |
+| [Zemel et al. 2013 (LFR)](zemel_2013.md) | ICML 2013 (Test-of-Time 2023) — Fair Representations | Paradigma fundador do campo |
+| [Madras et al. 2018 (LAFTR)](madras_2018.md) | ICML 2018 — Adversarial Fair Transferable | Fundamenta extensão race → face recognition |
+| [Zhang et al. 2018](zhang_2018.md) | AAAI/ACM AIES 2018 — Adversarial debiasing | Baseline mitigação alternativo a FSCL+ |
+| [Kleinberg et al. 2017](kleinberg_2017.md) | ITCS 2017 — Impossibility theorem | Justifica triangulação DR + worst-class + CV |
 
 ## Localização de PDFs (gitignored — local apenas)
 
