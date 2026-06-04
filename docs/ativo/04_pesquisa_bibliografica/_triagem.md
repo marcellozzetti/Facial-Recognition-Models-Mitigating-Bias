@@ -117,6 +117,67 @@ muito FairFace-cêntrico. Adicionalmente, levantou questões sobre
 - **Novos pontos de pesquisa identificados (Q07-Q10):** documentados
   em `_perguntas.md`.
 
+## Rodada 2.6 — Re-verificação SOTA pós-reunião (2026-06-04)
+
+**Motivação:** orientador pediu **double-check** do SOTA após
+reunião de 2026-06-04. Janela: fevereiro a junho de 2026 (período
+post-Rodada 2.5 que rodou em maio).
+
+### 2.6.1 Procedimento
+
+Busca em 4 frentes:
+
+1. **Semantic Scholar "cited by" de arXiv:2410.24148** (AlDahoul VLM
+   preprint). **12 papers citantes** examinados (lista no commit
+   log da Rodada 2.6).
+2. **Google Scholar** janela fev-jun 2026 — busca por
+   "FairFace race classification SOTA new method".
+3. **Busca direcionada por valores numéricos** ("75.7", "76", "77",
+   "78" + FairFace race 7-class accuracy 2026).
+4. **arXiv recent submissions** (cs.CV jan-jun 2026 + filtros race
+   classification).
+
+### 2.6.2 Análise dos 12 citantes do FaceScanPaliGemma
+
+Nenhum dos 12 papers que citam AlDahoul roda **FairFace race 7-class
+in-domain** como métrica principal:
+
+| Paper | Tarefa principal | Conexão com nosso problema |
+|---|---|---|
+| Molinaro 2026 — Group Emotion Recognition | Emoção em grupos | ❌ Não-race |
+| Roygaga 2026 WACV — Human-Like Biases in VLMs | Auditoria subjetiva | ⚠ Audit, sem novo classifier |
+| Sajib 2025 ICCIT — VLAgeBench | Age estimation | ❌ Não-race |
+| V 2025 ICAFT — YOLO Human Detection | Detecção, não classificação | ❌ Não-race |
+| Park 2025 — Stereotypes T2I | Bias em geração T2I | ❌ Não-classification |
+| Ngai 2025 — Feline Grimace Scale | Veterinária (felinos) | ❌ Irrelevante |
+| Ceschini 2025 CVPRW — Gender Scaling Laws CLIP | Gender em CLIP | ❌ Não-race |
+| Hosseini 2025 — Faces of Fairness FER | Bias em expressão facial | ⚠ Audit FER, não race classification |
+| Hambarde 2025 — Re-ID LVLMs | Re-identification | ❌ Não-classification atributo |
+| Wang 2026 IEEE Access — FM-GCN Gender Micro-Expr | Gender micro-expressions | ❌ Não-race |
+| Debnath 2025 IEEE Access — LightSTATE | Activity detection | ❌ Não-race |
+| Narayanan 2025 IEEE Access — YOLOv9 Face Detection | Face detection (não classification) | ❌ Não-race |
+
+### 2.6.3 Conclusão
+
+**FaceScanPaliGemma (AlDahoul et al. 2024 arXiv / 2026 Nature
+Scientific Reports) permanece SOTA único para FairFace race 7-class
+in-domain como junho de 2026.**
+
+- Acurácia: **75.7%** (7-class), **81.1%** (6-class East+SE merged)
+- F1 macro: **75%** (7-class)
+- Per-class F1: Black 90% > White 80% > Indian 79% > East Asian 78% >
+  Middle East 73% > SE Asian 67% > **Latinx 60%** (pior)
+
+Padrão hierárquico Black > Latinx confirmado por **2 fontes
+independentes** (AlDahoul 2024 + Lin 2022 FairGRAPE) — robusto.
+
+### 2.6.4 Implicação para tese v3.2
+
+Hipóteses H1-H5 mantêm-se válidas. Plano experimental Cap 1 (Q06)
+e Cap 2 (Q04) podem reportar contra baseline 72% (ResNet-34) e SOTA
+75.7% (FaceScanPaliGemma) como **dois números canônicos** sem risco
+de obsolescência durante a dissertação.
+
 ## Rodada 5 — Mecanismos algorítmicos ML / Redes Neurais (2026-06-04)
 
 **Motivação:** após reunião com orientador (Prof. Quiles), feedback
