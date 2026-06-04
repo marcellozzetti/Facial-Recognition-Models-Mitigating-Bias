@@ -141,8 +141,9 @@ copyright editorial).
 ## Artefatos administrativos
 
 - [README.md](README.md) — metodologia da Pesquisa Bibliográfica.
-- [_triagem.md](_triagem.md) — log de decisões editoriais (R1, R2, R2.5, R3).
-- [_perguntas.md](_perguntas.md) — Q01–Q10 respondidas, 5 frentes 🔬 abertas.
+- [_triagem.md](_triagem.md) — log de decisões editoriais (R1, R2, R2.5, R3, R4, R5, R2.6).
+- [_perguntas.md](_perguntas.md) — Q01–Q14 respondidas, 5 frentes 🔬 abertas.
+- [_metricas_corpus.md](_metricas_corpus.md) — **big numbers do corpus** para uso em reuniões com orientador.
 - [`../00_referencias.md`](../00_referencias.md) — lista canônica de citações verificadas.
 
 ## Próximos arquivos (Fase 4)
