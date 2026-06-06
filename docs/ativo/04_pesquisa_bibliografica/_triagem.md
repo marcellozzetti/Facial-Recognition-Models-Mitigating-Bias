@@ -226,19 +226,23 @@ R6 abre **5 riscos críticos** que motivam revisão da v3.2 para v3.3:
 
 - **Risco A** (R6-1, Pangelinan 2023): H5 precisa ser reformulada para
   reconhecer pixel info como confounder em FR; adicionar quality control
-  de imagem ao Cap 3.
+  de imagem ao Cap 3. **⏸️ DECISÃO ADIADA para reunião de segunda
+  (2026-06-08)** — 3 versões de reformulação preparadas para discussão.
 - **Risco B** (R6-2, Pereira 2026): considerar usar **SkinToneNet
   pré-treinado** como insumo em vez de treinar próprio classificador
   MST; foco da contribuição passa a ser **FiLM-conditioning** + matriz
-  MST × race.
+  MST × race. **✅ DECIDIDO 2026-06-06: usar SkinToneNet pré-treinado**
+  (recomendação técnica baseada em evidência R6).
 - **Risco C** (sem precedente direto FiLM+MST→race): mitigar com piloto
-  inicial em subset FairFace.
+  inicial em subset FairFace. Já contemplado no plano.
 - **Risco D** (R6-8, Raumanns 2024): adversarial debiasing pode superar
-  FiLM; já contemplado como baseline forte.
+  FiLM; já contemplado como baseline forte. **✅ DECIDIDO 2026-06-06:
+  adicionar Adversarial debiasing (Zhang 2018) à lista de baselines.**
 - **Risco E** (R6-2, ConvNeXt-T não-benchmarkado para skin tone): rodar
-  ConvNeXt-T vs ViT-Small em sub-experimento no Cap 1.
+  ConvNeXt-T vs ViT-Small em sub-experimento no Cap 1. Já contemplado.
 
 Detalhes completos em [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md).
+Material de discussão de H5 na Seção 11 do mesmo arquivo.
 
 ## Rodada 5 — Mecanismos algorítmicos ML / Redes Neurais (2026-06-04)
 

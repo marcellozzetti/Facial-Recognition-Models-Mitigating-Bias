@@ -343,44 +343,165 @@ Em ordem de prioridade:
 
 ---
 
-## 9. Decisões pendentes para discussão com orientador
+## 9. Decisões — status atualizado 2026-06-06
 
-1. **H5 — Reformular?**
-   - Versão atual (otimista): "fairness transfere para FR"
-   - Versão proposta (cautelosa): "fairness pode transferir desde que
-     pixel info seja controlada"
-   - **Recomendação:** versão cautelosa, alinhada com Pangelinan 2023.
+### 9.1 H5 — Reformular? ⏸️ PENDENTE — DISCUTIR NA REUNIÃO DE SEGUNDA
 
-2. **Classificador MST — Treinar próprio ou usar SkinToneNet?**
-   - Treinar próprio: contribuição extra (~3 semanas), risco de não
-     superar SOTA
-   - Usar SkinToneNet: foco na contribuição central FiLM (~zero semanas),
-     mas dependência externa
-   - **Recomendação:** usar SkinToneNet como insumo, focar contribuição
-     em FiLM-conditioning + matriz MST×raça.
+- **Status:** decisão adiada para discussão com orientador (Prof. Quiles).
+- **Material para a reunião:** ver Seção 11 abaixo (alternativas
+  formuladas com pros/contras de cada).
+- **Versões em mesa:**
+  - V1 (atual, otimista): "fairness transfere para FR; Black/African ≥+3pp"
+  - V2 (cautelosa): "transferência condicionada a quality control de pixel info"
+  - V3 (separada): manter H5 atual + adicionar H6 (controle de pixel info)
 
-3. **Baselines — Confirmar lista?**
-   - ResNet-34 (Karkkainen 2021)
-   - ConvNeXt-T puro (sem FiLM)
-   - FSCL+ (Park 2022)
-   - Group DRO (Sagawa 2020)
-   - FineFACE (Manzoor 2024)
-   - Adversarial debiasing (Zhang 2018) — **adicionar?** Recomendo sim
-     dado Raumanns 2024
-   - BNMR (Liu 2025 FAccT) — **adicionar?** Opcional, paper muito recente
+### 9.2 Classificador MST — SkinToneNet ✅ DECIDIDO (recomendação para orientador)
 
-4. **Datasets MST de treino — Adicionar STW?**
-   - STW (Pereira 2026): 42,313 imagens, 3,564 indivíduos, MST 10-classe
-   - MST-E (Schumann 2023): ~1,500 imagens
-   - Casual Conversations (Hazirbas 2021): ~45,000 frames
-   - **Recomendação:** combinar STW + CC; MST-E para validação interna
+- **Decisão:** **usar SkinToneNet pré-treinado** (Pereira 2026) como
+  insumo do pipeline.
+- **Justificativa:**
+  - Economiza ~3 semanas de cronograma (treino + validação manual).
+  - SkinToneNet já é SOTA em skin-tone-in-the-wild (treinado no STW
+    com 42k imagens, validado em 6 datasets out-of-domain).
+  - Contribuição central da tese passa a ser **FiLM-conditioning +
+    matriz MST × race**, não o classificador MST em si.
+- **Risco assumido:** dependência externa de um modelo de pesquisa
+  recente (preprint mar/2026). Mitigação: verificar disponibilidade de
+  pesos/código antes do início do Cap 1; se não disponível, treinar
+  próprio com mesma arquitetura (ViT-Small).
+- **Comunicar ao orientador:** registrar como decisão informada (não
+  é decisão para o orientador aprovar — é nossa escolha técnica
+  baseada na evidência da Rodada 6).
+
+### 9.3 Adversarial debiasing como baseline forte ✅ DECIDIDO
+
+- **Decisão:** **adicionar Adversarial debiasing (Zhang 2018) à lista
+  de baselines.**
+- **Justificativa:** Raumanns 2024 mostra empiricamente que adversarial
+  > multi-task naive para fairness. Sem esse baseline, revisor pode
+  questionar se FiLM-conditioning não está sendo comparado contra
+  alternativa fraca.
+- **Lista final de baselines:**
+  1. **ResNet-34** (Karkkainen 2021) — baseline histórico do FairFace
+  2. **ConvNeXt-T puro (sem FiLM)** — controle arquitetural; testa H2
+  3. **FSCL+** (Park 2022) — fair supervised contrastive
+  4. **Group DRO** (Sagawa 2020) — worst-group robust
+  5. **FineFACE** (Manzoor 2024) — cross-layer attention fair
+  6. **Adversarial debiasing** (Zhang 2018) — **NOVO** — adversarial classifier
+  7. **BNMR** (Liu 2025 FAccT) — opcional, paper muito recente
+- **Impacto no cronograma:** Adversarial debiasing tem implementação
+  pública (AIF360 / código próprio do paper); estimar +1-2 semanas
+  no Cap 2.
+
+### 9.4 Datasets MST de treino — N/A após decisão 9.2
+
+- **Status:** decisão obsoleta após escolha de SkinToneNet pré-treinado.
+- **Por que a pergunta existia:** se treinássemos nosso próprio
+  classificador MST, precisaríamos escolher entre MST-E (1.5k imgs),
+  Casual Conversations (45k frames), STW (42k imgs) ou combinação.
+- **Por que não importa mais:** SkinToneNet já vem treinado no STW. Os
+  outros datasets entram apenas em **validação externa** opcional do
+  Cap 1, não no treino.
+- **Sub-decisão técnica que pode esperar:** se em algum momento for
+  necessário fine-tunar o SkinToneNet em dados adicionais (ex: melhor
+  generalização para faces brasileiras), avaliar então qual fonte
+  usar. Por enquanto: deixar como veio.
 
 ---
 
-## 10. Próximas ações
+## 10. Próximas ações (atualizadas)
 
-1. **Esta semana** — Criar fichas R6 para os 9 papers (Seção 7)
+1. **Esta semana** — Criar fichas R6 para os 8 papers aprovados
 2. **Esta semana** — Atualizar `06_gap.md` com Risco A explicitamente endereçado
-3. **Esta semana** — Atualizar `07_thesis_statement.md` v3.3 com H5 reformulada
-4. **Próxima reunião com orientador** — Decisões pendentes (Seção 9)
-5. **Pós-aprovação** — Detalhar `02_metodologia.md` com SkinToneNet integrado
+3. **Esta semana** — Preparar slide específico para discussão de H5 (Seção 11)
+4. **Reunião de segunda** — Apresentar reformulação proposta de H5;
+   informar decisão sobre SkinToneNet; confirmar adversarial baseline
+5. **Pós-reunião** — Atualizar `07_thesis_statement.md` v3.2 → v3.3
+   com H5 reformulada conforme decisão do orientador
+6. **Pós-aprovação** — Detalhar `02_metodologia.md` com:
+   - SkinToneNet integrado como insumo
+   - 6 baselines incluindo Adversarial debiasing
+   - Sub-experimento ConvNeXt-T vs ViT-Small no Cap 1
+
+---
+
+## 11. Material para discussão de H5 na reunião de segunda (08-jun-2026)
+
+### 11.1 H5 atual (v3.2)
+
+> A representação aprendida com condicionamento por MST mantém ou melhora
+> as métricas de fairness em downstream face recognition.
+> **Critério de sucesso:** Black/African melhora ≥+3pp em RFW ou BFW.
+
+### 11.2 A refutação que motiva reformular
+
+**Pangelinan et al. 2023** (arXiv:2304.07175, autores Notre Dame/Florida Tech):
+*"demographic differences in face PIXEL INFORMATION of the test images
+appear to most directly impact the resultant differences in face
+recognition accuracy."*
+
+Em outras palavras: **para FR (verificação 1:1), o fator dominante de
+disparity é qualidade/quantidade de pixels de face, não tom de pele
+direto**. Como nossa H5 assume que skin tone-conditioning vai melhorar
+FR, esse achado é uma ameaça direta.
+
+### 11.3 Embasamento teórico que SUSTENTA H5
+
+| Fonte | O que dá apoio à H5 |
+|---|---|
+| **Madras 2018 (LAFTR)** | Prova teórica de fair transferência via representação |
+| **Aguirre & Dredze 2023** | Empírico em NLP: multi-task fair transfer FUNCIONA |
+| **Kotwal & Marcel 2025** (survey FR fairness) | Tom de pele é citado como dimensão relevante |
+| **Buolamwini 2018** | Tom de pele × gênero é causa documentada de disparity |
+| **Dooley 2022/23** | Arquitetura impacta fairness em FR; mecanismo arquitetural funciona |
+
+### 11.4 Alternativas de reformulação (3 versões)
+
+#### Versão A (manter, ignorar Pangelinan) — NÃO RECOMENDADA
+
+> H5 atual sem alteração.
+
+**Pros:** simples, hipótese clara.
+**Contras:** ignora evidência conflitante; revisor pode questionar.
+
+#### Versão B (cautelosa, controle de qualidade)
+
+> A representação aprendida com condicionamento por MST mantém ou melhora
+> as métricas de fairness em downstream face recognition **quando a
+> qualidade de imagem (face crop + alinhamento) é controlada e
+> equalizada entre subgrupos**.
+> **Critério:** Black/African melhora ≥+3pp em RFW ou BFW, **após
+> normalização de pixel info**.
+
+**Pros:** epistemologicamente honesta; endereça Pangelinan; adiciona
+contribuição menor (controle de qualidade).
+**Contras:** adiciona ~2 semanas ao Cap 3 para implementar quality
+control rigoroso.
+
+#### Versão C (separar em duas hipóteses)
+
+> **H5:** A representação aprendida com condicionamento por MST mantém
+> ou melhora fairness em FR. *(Black/African ≥+3pp em RFW/BFW)*
+>
+> **H6 (nova):** A disparity residual em Black/African após
+> condicionamento por MST é explicada predominantemente por diferenças
+> de pixel info (Pangelinan 2023), não por tom de pele.
+> *(Decomposição: % variance explicada por skin tone vs pixel quality)*
+
+**Pros:** transforma a refutação em **contribuição quantitativa**
+(decomposição de variância); permite que H5 seja parcialmente refutada
+sem refutar a tese inteira.
+**Contras:** adiciona uma hipótese ao plano; relatório de Cap 3 fica
+mais complexo (mas mais rico).
+
+### 11.5 Recomendação técnica
+
+**Versão C** porque:
+1. Transforma uma ameaça em contribuição.
+2. Se Pangelinan estiver certo (pixel info > skin tone), nossa H6
+   demonstra isso quantitativamente — virou achado, não falha.
+3. Se Pangelinan estiver parcialmente certo, H5 e H6 capturam o
+   trade-off.
+4. Se Pangelinan estiver errado, H5 confirma; H6 vira nota.
+
+**Decisão final fica com o orientador.**
