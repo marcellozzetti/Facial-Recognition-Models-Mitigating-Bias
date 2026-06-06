@@ -178,6 +178,68 @@ e Cap 2 (Q04) podem reportar contra baseline 72% (ResNet-34) e SOTA
 75.7% (FaceScanPaliGemma) como **dois números canônicos** sem risco
 de obsolescência durante a dissertação.
 
+## Rodada 6 — Validação científica do pipeline v3.2 (2026-06-06)
+
+**Motivação:** após v3.2 escrita e PPTX v3.2.1 entregue, usuário
+solicitou abrir frente de pesquisa para verificar se cada etapa do
+pipeline tem embasamento (ou identificar refutações). Mapeamento
+pipeline-step × evidência em 5 áreas críticas. Documento síntese em
+`docs/ativo/_validacao_cientifica_pipeline.md`.
+
+### 6.1 Áreas pesquisadas
+
+1. Condicionamento por atributo auxiliar para fairness (FiLM-like, multi-task, adversarial)
+2. MST aplicado a auditoria de FairFace (matriz pública MST × race)
+3. Transferência empírica fair classification → fair face recognition
+4. Backbone leve (ConvNeXt-T) para skin-tone prediction
+5. Disparidade Black/African em face recognition
+
+### 6.2 Candidatos verificados
+
+| # | Paper | Venue | Tipo | Decisão | Justificativa / impacto na tese |
+|---|---|---|---|---|---|
+| R6-1 | **Pangelinan et al. 2023** — Exploring Causes of Demographic Variations In FR Accuracy (arXiv:2304.07175) | preprint (autores Notre Dame/IST/Florida Tech) | preprint | ⚠ STANDBY → ✅ APROVADO POR EXCEÇÃO | **Refutação potencial de H5**: "demographic differences in face pixel information of the test images appear to most directly impact the resultant differences in FR accuracy" — sugere que para FR, pixel info > skin tone. Necessário endereçar diretamente; aprovação por **risco crítico identificado**. |
+| R6-2 | **Pereira et al. 2026** — Large-Scale Dataset and Benchmark for Skin Tone Classification in the Wild / SkinToneNet + STW (arXiv:2603.02475) | preprint (3 autores ICMC-USP / IMPA) | preprint | ⚠ STANDBY → ✅ APROVADO POR EXCEÇÃO | **Overlap parcial com C2**: auditou FairFace usando MST classifier (ViT-Small fine-tuned), reportou subrepresentação MST 6-10, MAS **não publicou matriz cruzada MST × race**. Nossa C2 segue original. Critical para citar e diferenciar. STW (42,313 imgs) deve ser considerado para treino. |
+| R6-3 | **Dooley et al. 2022/23** — Rethinking Bias Mitigation: Fairer Architectures Make for Fairer FR (arXiv:2210.09943) | NAS / FR — preprint citado em literatura recente | preprint (publicado em NeurIPS 2023 workshop FAccT-adj.) | ✅ APROVADO | "biases são inerentes a arquiteturas neurais" — Pareto-domina baselines de mitigação. **Fortalece a importância de ConvNeXt-T** como escolha arquitetural moderna. Suporte para H2. |
+| R6-4 | **Aguirre & Dredze 2023/24** — Transferring Fairness using Multi-Task Learning with Limited Demographic Information (arXiv:2305.12671) | preprint (Johns Hopkins) | preprint | ✅ APROVADO POR EXCEÇÃO | Prova empírica de que **demographic fairness objectives transfer fairness within a multi-task framework**. Reforça princípio teórico do pipeline (etapas 3 e 5). Domínio é NLP mas princípio se transfere. |
+| R6-5 | **Kolla & Savadamuthu 2022** — The Impact of Racial Distribution in Training Data on FR Bias: A Closer Look (arXiv:2211.14498) | **WACVW 2023** (IEEE/CVF) | workshop conference (peer-reviewed) | ✅ APROVADO | "uniform distribution of races in training datasets alone does not guarantee bias-free FR" — REFORÇA necessidade de mecanismo arquitetural além de balanceamento. Justifica FiLM-conditioning. |
+| R6-6 | **Liu et al. 2025** — Component-Based Fairness in Face Attribute Classification with Bayesian Network-informed Meta Learning (BNMR) (arXiv:2505.01699) | **ACM FAccT 2025** | conference (top venue ética AI) | ✅ APROVADO | Baseline competitivo recente. Mecanismo ortogonal (meta-learning sample reweighting via Bayesian Network) ao FiLM. Candidato a baseline forte do Cap 2. |
+| R6-7 | **Ramachandran & Rattani 2024** — A Self-Supervised Learning Pipeline for Demographically Fair Facial Attribute Classification (arXiv:2407.10104) | **IJCB 2024** | conference (peer-reviewed) | ✅ APROVADO | SSL fair attribute classification em FairFace + CelebA. Baseline competitivo, mecanismo distinto (pseudo-labels + meta-learning contrastive). |
+| R6-8 | **Raumanns et al. 2024** — Dataset Distribution Impacts Model Fairness: Single vs. Multi-Task Learning (arXiv:2407.17543) | **FAIMI EPIMI 2024 Workshop** (LNCS 15198) | workshop (peer-reviewed) | ✅ APROVADO POR EXCEÇÃO | Domínio é skin lesion (não face), mas achado é generalizável: **"reinforcement multi-task does NOT remove sex bias; adversarial scheme eliminates it in some cases"**. Cautela contra multi-task naive. Reforça adversarial (Zhang 2018) como baseline forte. |
+| R6-9 | **Lu 2025** — TrueSkin: Towards Fair and Accurate Skin Tone Recognition and Generation (arXiv:2509.10980) | preprint | preprint | ⚠ STANDBY | 7,299 imagens em **6 classes** (não 10 MST). Não compete diretamente. Manter em standby — incluir só se discussão da escolha de 10 classes precisar de ancoragem comparativa. |
+
+### 6.3 Resumo Rodada 6
+
+- **8 papers aprovados** (R6-1 a R6-8); 1 em standby (R6-9).
+- Mistura de venues: FAccT, IJCB, WACVW, FAIMI EPIMI + 4 preprints.
+- **Cobertura por área:**
+  - Área 1 (auxiliary conditioning): R6-4, R6-6, R6-7, R6-8
+  - Área 2 (MST × FairFace audit): R6-2
+  - Área 3 (fair transfer): R6-1, R6-3, R6-4, R6-8
+  - Área 4 (backbone skin tone): R6-2 (ViT-Small SkinToneNet)
+  - Área 5 (Black/African FR): R6-1, R6-3, R6-5
+- **Total corpus após R6: 37 fichas** (29 + 8 aprovados).
+
+### 6.4 Impacto na tese (v3.2 → v3.3)
+
+R6 abre **5 riscos críticos** que motivam revisão da v3.2 para v3.3:
+
+- **Risco A** (R6-1, Pangelinan 2023): H5 precisa ser reformulada para
+  reconhecer pixel info como confounder em FR; adicionar quality control
+  de imagem ao Cap 3.
+- **Risco B** (R6-2, Pereira 2026): considerar usar **SkinToneNet
+  pré-treinado** como insumo em vez de treinar próprio classificador
+  MST; foco da contribuição passa a ser **FiLM-conditioning** + matriz
+  MST × race.
+- **Risco C** (sem precedente direto FiLM+MST→race): mitigar com piloto
+  inicial em subset FairFace.
+- **Risco D** (R6-8, Raumanns 2024): adversarial debiasing pode superar
+  FiLM; já contemplado como baseline forte.
+- **Risco E** (R6-2, ConvNeXt-T não-benchmarkado para skin tone): rodar
+  ConvNeXt-T vs ViT-Small em sub-experimento no Cap 1.
+
+Detalhes completos em [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md).
+
 ## Rodada 5 — Mecanismos algorítmicos ML / Redes Neurais (2026-06-04)
 
 **Motivação:** após reunião com orientador (Prof. Quiles), feedback

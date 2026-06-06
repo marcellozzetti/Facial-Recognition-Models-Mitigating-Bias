@@ -1,10 +1,13 @@
 # INDEX — Pesquisa Bibliográfica
 
-> Navegação central das **29 fichas** do corpus. Para conteúdo
-> integral do paper consultar PDF local. Para resumo estruturado em
-> 11 seções consultar ficha `.md`.
+> Navegação central das **29 fichas consolidadas** do corpus + **8 candidatos
+> aprovados em Rodada 6** (a fichar). Para conteúdo integral do paper
+> consultar PDF local. Para resumo estruturado em 11 seções consultar
+> ficha `.md`.
 >
-> Atualizado: 2026-06-04 (Rodada 5 completa — mecanismos ML / redes neurais).
+> Atualizado: 2026-06-06 (Rodada 6 — validação científica do pipeline v3.2,
+> 8 candidatos aprovados, ver [_triagem.md](_triagem.md#rodada-6) e
+> [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md)).
 
 ## Ordem de leitura recomendada
 
@@ -95,6 +98,21 @@ com surveys + papers críticos.
 | [Lewontin 1972](lewontin_1972.md) | Apportionment 85/6/8 — refutação genética |
 | [Fitzpatrick 1988](fitzpatrick_1988.md) | Origem dermatológica Fitzpatrick (PUVA) |
 | [Massey & Martin 2003](massey_martin_2003.md) | NIS Skin Color Scale (precedente MST) |
+
+### Track H — Validação científica do pipeline v3.2 (NOVO Rodada 6, candidatos aprovados — fichas pendentes)
+
+| Paper | Foco | Relevância v3.2 |
+|---|---|---|
+| Pangelinan et al. 2023 (arXiv:2304.07175) | Causas de variação demográfica em FR accuracy | **Refutação potencial de H5**: pixel info > skin tone |
+| Pereira et al. 2026 (arXiv:2603.02475) — SkinToneNet | MST classifier ViT-Small + STW dataset (42k imgs) | Overlap parcial C2: auditou FairFace mas não publicou matriz cruzada |
+| Dooley et al. 2022/23 (arXiv:2210.09943) | Fairer architectures (NAS) make for fairer FR | Reforça H2: arquitetura por si só importa; valida ConvNeXt-T |
+| Aguirre & Dredze 2023/24 (arXiv:2305.12671) | Multi-task fairness transfer com demographic info limitada | Reforça princípio teórico do pipeline (etapas 3 e 5) |
+| Kolla & Savadamuthu 2022/23 WACVW (arXiv:2211.14498) | Impacto da distribuição racial no treino de FR | Balanceamento NÃO basta; justifica mecanismo arquitetural |
+| Liu et al. 2025 FAccT (arXiv:2505.01699) — BNMR | Bayesian Network meta-learning sample reweighting | Baseline competitivo recente para Cap 2 |
+| Ramachandran & Rattani 2024 IJCB (arXiv:2407.10104) | SSL pipeline para fair facial attribute classification | Baseline competitivo SSL em FairFace + CelebA |
+| Raumanns et al. 2024 FAIMI (arXiv:2407.17543) | Single vs multi-task fairness em skin lesion | Cautela contra multi-task naive; adversarial > reinforce |
+
+Detalhes em [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md).
 
 ### Track G — Mecanismos ML / Redes Neurais (NOVO Rodada 5)
 
