@@ -351,36 +351,19 @@ def build_presentation(out_path: Path) -> None:
     # ==================== PARTE 1: ONDE PARAMOS ====================
     add_section_divider(prs, "1", "Onde paramos na última reunião", "Recap da última reunião e orientações")
 
-    add_content_slide(
+    add_table_slide(
         prs,
-        "Como a tese estava na última reunião",
+        "Como a tese estava na última reunião — visão resumida",
+        ["Dimensão", "Estado naquele momento"],
         [
-            "A tese era DIAGNÓSTICA — focada em explicar por que o erro existe:",
-            "",
-            "“O limite atual de 75% F1 em classificação racial sobre o FairFace não é só problema de arquitetura nem só problema de método. Tem um componente fenotípico irredutível: as raças se sobrepõem em tom de pele, especialmente Latinx. A dissertação ia construir a primeira matriz pública dessa sobreposição e quantificar o que dá para reduzir vs o que é estrutural.”",
-            "",
-            "Corpus naquele momento: 23 fichas catalogadas em 6 tracks temáticos:",
-            ("Track A — Race classification (alvo direto da dissertação)", 1),
-            ("Track B — Face recognition fairness (paralelo)", 1),
-            ("Track C — Skin tone como dimensão alternativa", 1),
-            ("Track D — Mitigação algorítmica (técnicas)", 1),
-            ("Track E — Auditoria e metodologia", 1),
-            ("Track F — Fundamentação científica de raça e tom de pele", 1),
+            ["Postura", "Diagnóstica — explicar por que o erro existe"],
+            ["Tese central", "75% F1 é teto fenotípico irredutível: raças se sobrepõem em tom de pele, especialmente Latinx"],
+            ["Tarefa", "Apenas race classification (sem face recognition)"],
+            ["Critério de sucesso", "Decomposição: irredutível vs redutível"],
+            ["Corpus", "23 fichas em 6 tracks (A: race clf; B: FR fairness; C: skin tone; D: mitigação; E: auditoria; F: fundamentação)"],
+            ["Validado na reunião", "Evolução metodológica, SOTA (FaceScanPaliGemma 75.7%), linha de pesquisa proposta"],
         ],
-    )
-
-    add_content_slide(
-        prs,
-        "O que validamos na última reunião",
-        [
-            "✓  Concordamos que a evolução metodológica melhorou significativamente",
-            "",
-            "✓  Validamos que o SOTA encontrado (FaceScanPaliGemma 75.7% F1) é mesmo o atual",
-            "",
-            "✓  Alinhamos e validamos a linha de pesquisa proposta",
-            "",
-            "Estas 3 validações são a base sobre a qual estou construindo a nova versão da tese.",
-        ],
+        footer="Esta é a base sobre a qual estamos construindo a nova versão (prescritiva) da tese",
     )
 
     add_content_slide(
@@ -486,7 +469,7 @@ def build_presentation(out_path: Path) -> None:
             ("Aplicabilidade direta a uma das 14 perguntas de pesquisa", 1),
             ("Aprovação por exceção (cobertura única) com justificativa registrada", 1),
             "",
-            "Cada decisão (aprovado / standby / descartado) tem data e justificativa em _triagem.md.",
+            "Cada decisão (aprovado / standby / descartado) tem data e justificativa registradas.",
         ],
     )
 
@@ -549,27 +532,7 @@ def build_presentation(out_path: Path) -> None:
         footer="Etapas 1, 4 e 5 reforçadas pela Rodada 6 (SkinToneNet, Adversarial debiasing, fair transfer empírico)",
     )
 
-    add_content_slide(
-        prs,
-        "As métricas que vamos reportar — todas públicas e estabelecidas",
-        [
-            "F1 macro — média das pontuações nas 7 raças, tratando todas igualmente",
-            ("Referência: van Rijsbergen 1979 (livro Information Retrieval). Implementação: sklearn.metrics.f1_score(average='macro').", 1),
-            ("Quanto maior, melhor. SOTA atual = 75% (FaceScanPaliGemma).", 1),
-            "",
-            "DR (Disparity Ratio) — razão entre a melhor e a pior raça",
-            ("Referência: Hardt, Price & Srebro 2016 (NeurIPS) — Equal Opportunity / Equalized Odds.", 1),
-            ("Quanto mais perto de 1.0, mais justo. Latinx vs Black atualmente = 60% / 90% = 0.67.", 1),
-            "",
-            "Worst-class F1 — pontuação na raça em que o modelo se sai pior",
-            ("Referência: Sagawa et al. 2020 (ICLR) — Group DRO. Métrica = min_g F1(g).", 1),
-            ("Atualmente = 60% (Latinx). Quanto maior, melhor o pior caso.", 1),
-            "",
-            "Por que 3 métricas e não uma?",
-            ("Teorema da impossibilidade (Kleinberg, Mullainathan & Raghavan 2017, ITCS): não existe métrica única de fairness — reportar as 3 é forma honesta de comunicar trade-offs.", 1),
-        ],
-        footer="Todas as 3 métricas + teorema da impossibilidade já têm ficha catalogada no corpus",
-    )
+    _add_metrics_slide(prs)
 
     add_table_slide(
         prs,
@@ -676,55 +639,73 @@ def build_presentation(out_path: Path) -> None:
 
     _add_paper_card_slide(
         prs,
-        "Pangelinan et al. (2023) — Causas de variação demográfica em FR",
-        "arXiv:2304.07175 — autores Notre Dame / Florida Tech",
-        "Analisa POR QUE a accuracy de face recognition varia entre grupos demográficos. Conclui que diferenças de pixel info da face nas imagens de teste explicam mais variação do que tom de pele direto.",
-        "Refutação potencial de H5. Para FR (verificação 1:1), pixel info pode ser causa primária. Motivou reformulação de H5 em discussão na pauta de hoje.",
+        "Pangelinan et al. (2023) — Causas de variação demográfica em FR accuracy",
+        "arXiv:2304.07175 — autores Notre Dame / Florida Tech / IST",
+        pergunta="Por que a accuracy de face recognition varia entre grupos demográficos? É skin tone direto, face size/shape, desbalanceamento de treino ou qualidade da imagem?",
+        metodo="Auditoria de modelos de FR estado-da-arte (ArcFace, AdaFace) avaliando 4 hipóteses causais sobre imagens de teste de grupos demográficos. Mede 'face pixel information' (área útil de pixels após detecção e crop) e correlaciona com accuracy por grupo.",
+        resultados="Diferenças de face pixel information entre grupos demográficos explicam a maior parte da variação de accuracy em FR. Skin tone direto é fator secundário; balanceamento de treino tem efeito menor que o esperado.",
+        critica="Trabalha com FR (verificação 1:1), não com race classification — tarefas distintas. Não testa intervenções arquiteturais para mitigar o efeito de pixel info. Resultado é correlacional, não causal estrito.",
+        impacto="REFUTAÇÃO POTENCIAL DE H5. Se pixel info é a causa primária em FR, a transferência de fairness do Cap 2 para o Cap 3 pode ser confounded. Motivou as 3 versões de reformulação de H5 (V1/V2/V3) na pauta de discussão de hoje.",
         accent=ACCENT,
     )
 
     _add_paper_card_slide(
         prs,
         "Pereira et al. (2026) — SkinToneNet + dataset STW",
-        "arXiv:2603.02475 — autores ICMC-USP / IMPA",
-        "Propõe classificador MST (ViT-Small fine-tuned) treinado em dataset STW (42 mil imagens, 3,5 mil indivíduos, MST 10 classes). Audita FairFace e reporta ausência sistêmica de MST 6-10. NÃO publica matriz cruzada MST × raça.",
-        "Insumo direto do nosso pipeline: usar SkinToneNet pré-treinado em vez de treinar do zero. Nossa contribuição C2 (matriz cruzada) segue original. Economiza ~3 semanas de cronograma.",
+        "arXiv:2603.02475 — ICMC-USP / IMPA — preprint mar/2026",
+        pergunta="É possível treinar um classificador MST robusto e generalizável que funcione 'in-the-wild' (fora dos datasets de origem)?",
+        metodo="Constrói STW (Skin Tone in the Wild) — 42.313 imagens de 3.564 indivíduos, anotadas pela escala Monk Skin Tone 10-classe. Treina SkinToneNet (ViT-Small fine-tuned em ImageNet) sobre STW. Audita 6 datasets faciais incluindo FairFace.",
+        resultados="SkinToneNet atinge SOTA em skin-tone classification cross-domain. FairFace exibe distribuição agregada com forte ausência de MST 6-10. NÃO publica a matriz cruzada MST × race (apenas distribuição global).",
+        critica="STW concentra-se em sujeitos da web (viés de quem é fotografado e publicado). Dataset não tem split público fixo para benchmarks. Anotação MST não passa por consenso multi-anotador como o protocolo de Schumann 2023.",
+        impacto="DECISÃO TÉCNICA: usar SkinToneNet pré-treinado como insumo do pipeline (economiza ~3 semanas). Nossa C2 (matriz cruzada MST × raça) segue contribuição original. STW pode ser usado como dataset de validação externa do Cap 1.",
         accent=GREEN,
     )
 
     _add_paper_card_slide(
         prs,
-        "Dooley et al. (2022) — Fairer architectures make for fairer FR",
-        "arXiv:2210.09943 — NAS search para FR fairness",
-        "Argumenta que biases são inerentes a arquiteturas neurais. Faz busca de arquitetura (NAS) jointly com hiperparâmetros e produz modelos que Pareto-dominam baselines de mitigação tradicionais.",
-        "Reforça nossa H2: trocar a arquitetura por si só importa. Valida escolha de ConvNeXt-T como backbone moderno. Se H1 falhar mas ConvNeXt-T puro já reduzir disparity, parte do efeito é arquitetural.",
+        "Dooley et al. (2022/23) — Fairer architectures make for fairer FR",
+        "arXiv:2210.09943 — Maryland / Bosch / ELLIS / Tübingen — versão dez/2023",
+        pergunta="Bias em FR é inerente aos dados de treino ou também emerge da arquitetura escolhida? Existe arquitetura que reduza disparity sem nenhuma intervenção de dados?",
+        metodo="Neural Architecture Search (NAS) com objetivo bi-critério: accuracy + fairness (medida por DR / EOD). Busca jointly arquitetura e hiperparâmetros sobre espaço de centenas de candidatos. Avalia em CelebA, RFW, BFW.",
+        resultados="A frente de Pareto inclui arquiteturas que dominam ResNet-50/100 e MobileNet em accuracy E fairness simultaneamente. Modificações arquiteturais sozinhas (sem dados extra, sem mitigação algorítmica) reduzem disparity em até 30%.",
+        critica="Custo computacional altíssimo (NAS proibitivo para a maioria). Arquiteturas vencedoras não têm interpretação semântica clara. Não testa em FairFace 7-class race especificamente. ConvNeXt-T não está na busca.",
+        impacto="REFORÇA H2 (testar se trocar de ResNet-34 para ConvNeXt-T já reduz disparity). Justifica escolha de backbone moderno como ConvNeXt-T. Se H1 falhar mas ConvNeXt-T puro já reduzir disparity, atribuímos parte do efeito à arquitetura.",
         accent=NAVY,
     )
 
     _add_paper_card_slide(
         prs,
-        "Aguirre & Dredze (2023) — Transferring fairness via multi-task",
-        "arXiv:2305.12671 — Johns Hopkins",
-        "Adapta uma fairness loss single-task para um framework multi-task e demonstra empiricamente que objetivos de fairness demográfico SE TRANSFEREM entre tarefas que compartilham representação. Domínio dos experimentos é NLP.",
-        "Reforço empírico do princípio teórico do LAFTR (Madras 2018). Fortalece as etapas 3 e 5 do pipeline (race classifier condicionado e extensão para FR).",
+        "Aguirre & Dredze (2023) — Transferring fairness via multi-task learning",
+        "arXiv:2305.12671 — Johns Hopkins (NLP) — versão revisada abr/2024",
+        pergunta="Quando demographic labels estão disponíveis apenas em uma tarefa relacionada (não na tarefa-alvo), é possível transferir fairness via multi-task learning?",
+        metodo="Adapta single-task fairness loss para framework multi-task. Treina classificador em tarefa-alvo SEM demographic labels usando demographic labels APENAS na tarefa auxiliar. Avalia em datasets de NLP (toxicidade, sentiment) com atributos sensíveis de raça/gênero.",
+        resultados="Objetivos de fairness demográfico se transferem empiricamente para a tarefa-alvo em todos os datasets testados. Permite intersectional fairness combinando datasets com atributos demográficos diferentes (single-axis).",
+        critica="Experimentos em NLP — não validados ainda em CV/face. Magnitude da transferência depende de quão correlacionadas estão as tarefas auxiliar e alvo. Não testa robustez sob distribution shift.",
+        impacto="REFORÇO EMPÍRICO do princípio teórico do LAFTR. Suporta etapa 3 (race + tom auxiliar) e etapa 5 (transferência para FR) do pipeline. Princípio é independente da modalidade, mas precisamos validar empiricamente em face.",
         accent=NAVY,
     )
 
     _add_paper_card_slide(
         prs,
-        "Kolla & Savadamuthu (2022) — Impact of racial distribution in training",
-        "arXiv:2211.14498 — WACVW 2023 (IEEE/CVF)",
-        "Investiga o efeito da distribuição racial nos dados de treino sobre disparities de face recognition. Conclui que distribuição uniforme de raças NO TREINO sozinha não garante FR sem viés.",
-        "Reforça necessidade de intervenção arquitetural além de balanceamento de dados. FairFace já é balanceado e o gap Latinx persiste — coerente com a tese de que precisamos do FiLM-conditioning.",
+        "Kolla & Savadamuthu (2022/23) — Impact of racial distribution in FR training",
+        "arXiv:2211.14498 — WACVW 2023 (IEEE/CVF Winter Conf. on Apps. of CV Workshops)",
+        pergunta="Balancear a distribuição racial no dataset de treino é SUFICIENTE para eliminar disparities raciais em face recognition?",
+        metodo="Treina ArcFace em variantes do dataset MS1MV2 com proporções variáveis de raças (uniforme, skewed-toward-Black, skewed-toward-White). Introduz métrica de 'racial gradation' para medir correlação intra/inter-classe. Avalia em RFW.",
+        resultados="Distribuição uniforme de raças no treino NÃO garante FR sem viés. Skewed-toward-Black supera uniforme para grupo Black. Qualidade da imagem (resolução, iluminação) introduz disparity adicional que balanceamento não captura.",
+        critica="Workshop paper (revisão menos profunda). Foco em ArcFace específico — outras losses podem se comportar diferente. Não compara contra intervenções arquiteturais.",
+        impacto="JUSTIFICA INTERVENÇÃO ARQUITETURAL além de balanceamento de dados. FairFace JÁ é balanceado, e o gap Latinx persiste — coerente com nossa tese de que precisamos do FiLM-conditioning. Reforça argumento contra resolver fairness só com dados.",
         accent=NAVY,
     )
 
     _add_paper_card_slide(
         prs,
-        "Liu et al. (2025) — BNMR Bayesian meta-learning",
-        "arXiv:2505.01699 — ACM FAccT 2025",
-        "Propõe BNMR (Bayesian Network-informed Meta Reweighting): uma rede bayesiana calibra meta-learning de reweighting de amostras durante treino, tracking de viés do modelo em tempo real.",
-        "Baseline competitivo recente. Mecanismo é ortogonal ao nosso (sample reweighting vs FiLM-conditioning). Candidato a baseline forte do Cap 2 para comparação justa.",
+        "Liu et al. (2025) — BNMR: Bayesian Network meta-learning para fairness",
+        "arXiv:2505.01699 — ACM FAccT 2025 (top venue ética AI)",
+        pergunta="É possível mitigar bias em face attribute classification de forma adaptativa, sem hiperparâmetros de fairness fixos a priori?",
+        metodo="BNMR (Bayesian Network-informed Meta Reweighting): rede bayesiana modela dependências entre atributos faciais (componentes) e calibra meta-learning de sample reweighting durante treino. Tracking dinâmico de viés do modelo em tempo real.",
+        resultados="Supera baselines (FSCL+, Group DRO, AdvDebias) em CelebA em métricas de fairness DEMOGRAPHIC PARITY e EQUAL OPPORTUNITY. Permite calibração adaptativa do trade-off accuracy×fairness sem grid search.",
+        critica="Custo computacional adicional da rede bayesiana (precisa ser treinada). Testado em CelebA, não em FairFace race 7-class. Pressupõe que o usuário define corretamente a estrutura causal entre atributos.",
+        impacto="BASELINE COMPETITIVO recente do Cap 2. Mecanismo ortogonal ao nosso (sample reweighting vs FiLM-conditioning) — comparação justa contra abordagem state-of-the-art em fairness 2025. Se BNMR superar nosso pipeline, é informação útil para a tese.",
         accent=NAVY,
     )
 
@@ -732,8 +713,66 @@ def build_presentation(out_path: Path) -> None:
     prs.save(str(out_path))
 
 
+def _add_metrics_slide(prs: Presentation) -> None:
+    """Slide das 3 métricas + teorema da impossibilidade — fonte reduzida para caber."""
+    blank = prs.slide_layouts[6]
+    slide = prs.slides.add_slide(blank)
+
+    tx_t = slide.shapes.add_textbox(Inches(0.5), Inches(0.4), Inches(12.5), Inches(0.9))
+    p = tx_t.text_frame.paragraphs[0]
+    p.text = "As métricas que vamos reportar — todas públicas e estabelecidas"
+    p.font.size = Pt(26); p.font.bold = True; p.font.color.rgb = NAVY
+
+    line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.5), Inches(1.2), Inches(12.5), Inches(0.05))
+    line.fill.solid(); line.fill.fore_color.rgb = NAVY; line.line.fill.background()
+
+    metricas = [
+        ("F1 macro", "Média das pontuações nas 7 raças, tratando todas igualmente",
+         "van Rijsbergen 1979 (Information Retrieval)",
+         "Quanto maior, melhor. SOTA atual = 75% (FaceScanPaliGemma)."),
+        ("DR (Disparity Ratio)", "Razão entre a melhor e a pior raça",
+         "Hardt, Price & Srebro 2016 (NeurIPS) — Equal Opportunity",
+         "Mais perto de 1.0 = mais justo. Latinx vs Black atual = 60%/90% = 0.67."),
+        ("Worst-class F1", "Pontuação na raça em que o modelo se sai pior",
+         "Sagawa et al. 2020 (ICLR) — Group DRO. Métrica = min_g F1(g)",
+         "Atualmente = 60% (Latinx). Quanto maior, melhor o pior caso."),
+    ]
+
+    y = 1.45
+    for nome, definicao, ref, valor in metricas:
+        box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(y), Inches(12.1), Inches(1.45))
+        box.fill.solid(); box.fill.fore_color.rgb = GRAY_LT; box.line.fill.background()
+        tf = box.text_frame; tf.word_wrap = True
+        tf.margin_left = Inches(0.3); tf.margin_right = Inches(0.3); tf.margin_top = Inches(0.1)
+        p0 = tf.paragraphs[0]
+        r1 = p0.add_run(); r1.text = nome
+        r1.font.size = Pt(15); r1.font.bold = True; r1.font.color.rgb = NAVY
+        r2 = p0.add_run(); r2.text = "  —  " + definicao
+        r2.font.size = Pt(13); r2.font.color.rgb = GRAY_DK
+        p1 = tf.add_paragraph()
+        p1.text = "Referência: " + ref
+        p1.font.size = Pt(11); p1.font.color.rgb = GRAY_MD; p1.font.italic = True
+        p2 = tf.add_paragraph()
+        p2.text = valor
+        p2.font.size = Pt(12); p2.font.color.rgb = GRAY_DK
+        y += 1.6
+
+    # Teorema da impossibilidade
+    box_imp = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(y), Inches(12.1), Inches(0.95))
+    box_imp.fill.solid(); box_imp.fill.fore_color.rgb = WHITE
+    box_imp.line.color.rgb = ACCENT; box_imp.line.width = Pt(1.5)
+    tfi = box_imp.text_frame; tfi.word_wrap = True
+    tfi.margin_left = Inches(0.3); tfi.margin_right = Inches(0.3); tfi.margin_top = Inches(0.1)
+    pi0 = tfi.paragraphs[0]
+    pi0r1 = pi0.add_run(); pi0r1.text = "Por que 3 métricas e não uma?"
+    pi0r1.font.size = Pt(13); pi0r1.font.bold = True; pi0r1.font.color.rgb = ACCENT
+    pi1 = tfi.add_paragraph()
+    pi1.text = "Teorema da impossibilidade (Kleinberg, Mullainathan & Raghavan 2017, ITCS): não existe métrica única de fairness — reportar as 3 simultaneamente é a forma honesta de comunicar trade-offs."
+    pi1.font.size = Pt(12); pi1.font.color.rgb = GRAY_DK
+
+
 def _add_film_math_slide(prs: Presentation) -> None:
-    """Slide do FiLM com formulação matemática + receita prática."""
+    """Slide do FiLM como diagrama visual sem fórmulas — fácil de explicar."""
     blank = prs.slide_layouts[6]
     slide = prs.slides.add_slide(blank)
 
@@ -745,57 +784,88 @@ def _add_film_math_slide(prs: Presentation) -> None:
     line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.5), Inches(1.2), Inches(12.5), Inches(0.05))
     line.fill.solid(); line.fill.fore_color.rgb = NAVY; line.line.fill.background()
 
-    # Caixa 1 — Formulação matemática
-    box1 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(1.5), Inches(12.1), Inches(2.3))
-    box1.fill.solid(); box1.fill.fore_color.rgb = GRAY_LT; box1.line.fill.background()
-    tf1 = box1.text_frame; tf1.word_wrap = True
-    tf1.margin_left = Inches(0.3); tf1.margin_right = Inches(0.3); tf1.margin_top = Inches(0.15)
-    p1 = tf1.paragraphs[0]; p1.text = "Formulação matemática (Perez et al. 2018, AAAI)"
-    p1.font.size = Pt(14); p1.font.bold = True; p1.font.color.rgb = NAVY
-    p1b = tf1.add_paragraph()
-    p1b.text = "Dada uma feature map intermediária F do backbone e um vetor de contexto z (no nosso caso, vetor MST de 10 dimensões saído do SkinToneNet):"
-    p1b.font.size = Pt(15); p1b.font.color.rgb = GRAY_DK
-    p1c = tf1.add_paragraph()
-    p1c.text = "    FiLM(F | γ, β) = γ ⊙ F + β       onde γ = fγ(z) e β = fβ(z)"
-    p1c.font.size = Pt(17); p1c.font.color.rgb = NAVY; p1c.font.bold = True
-    p1d = tf1.add_paragraph()
-    p1d.text = "fγ e fβ são duas pequenas MLPs treináveis que mapeiam o contexto z para os parâmetros de modulação (γ, β) por canal. O símbolo ⊙ é multiplicação elemento-a-elemento."
-    p1d.font.size = Pt(14); p1d.font.color.rgb = GRAY_DK
+    # Subtítulo — em palavras simples
+    tx_sub = slide.shapes.add_textbox(Inches(0.6), Inches(1.4), Inches(12.1), Inches(0.7))
+    psub = tx_sub.text_frame.paragraphs[0]
+    psub.text = "Em palavras simples: uma camada que permite à rede de raça 'consultar' o tom de pele antes de decidir."
+    psub.font.size = Pt(16); psub.font.color.rgb = GRAY_DK; psub.font.italic = True
 
-    # Caixa 2 — Como aplicar na prática
-    box2 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(4.0), Inches(12.1), Inches(2.3))
-    box2.fill.solid(); box2.fill.fore_color.rgb = WHITE
-    box2.line.color.rgb = NAVY; box2.line.width = Pt(1.5)
-    tf2 = box2.text_frame; tf2.word_wrap = True
-    tf2.margin_left = Inches(0.3); tf2.margin_right = Inches(0.3); tf2.margin_top = Inches(0.15)
-    p2 = tf2.paragraphs[0]; p2.text = "Como aplicar no nosso pipeline (receita prática)"
-    p2.font.size = Pt(14); p2.font.bold = True; p2.font.color.rgb = NAVY
-    receita = [
-        "1. Extrair vetor MST z ∈ ℝ¹⁰ da imagem usando o SkinToneNet pré-treinado.",
-        "2. Para cada bloco residual do ConvNeXt-T, inserir um bloco FiLM que recebe z e produz (γ, β).",
-        "3. Modular as features intermediárias F do bloco: F' = γ ⊙ F + β.",
-        "4. Backbone e cabeça de classificação treinam normalmente; só os parâmetros das MLPs (fγ, fβ) são novos.",
-    ]
-    for ln in receita:
-        pln = tf2.add_paragraph()
-        pln.text = ln; pln.font.size = Pt(14); pln.font.color.rgb = GRAY_DK
-        pln.space_after = Pt(2)
+    # Diagrama visual em 3 blocos horizontais com setas
+    y_box = 2.3
+    box_h = 1.4
+    box_w = 3.5
+    gap = 0.6
+    x_start = 0.6
 
-    # Caixa 3 — Por que importa
-    box3 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(6.5), Inches(12.1), Inches(0.9))
-    box3.fill.solid(); box3.fill.fore_color.rgb = WHITE
-    box3.line.color.rgb = GREEN; box3.line.width = Pt(1.5)
-    tf3 = box3.text_frame; tf3.word_wrap = True
-    tf3.margin_left = Inches(0.3); tf3.margin_right = Inches(0.3); tf3.margin_top = Inches(0.1)
-    p3 = tf3.paragraphs[0]; p3.text = "Por que importa para a tese"
-    p3.font.size = Pt(13); p3.font.bold = True; p3.font.color.rgb = GREEN
-    p3b = tf3.add_paragraph()
-    p3b.text = "Sem FiLM, 'usar tom de pele como contexto' seria vaga. Com FiLM, é matemática e código concreto — qualquer revisor consegue reproduzir."
-    p3b.font.size = Pt(13); p3b.font.color.rgb = GRAY_DK
+    # Bloco 1: Foto + SkinToneNet
+    b1 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x_start), Inches(y_box), Inches(box_w), Inches(box_h))
+    b1.fill.solid(); b1.fill.fore_color.rgb = GRAY_LT; b1.line.color.rgb = NAVY; b1.line.width = Pt(1.5)
+    tfb1 = b1.text_frame; tfb1.word_wrap = True
+    tfb1.margin_left = Inches(0.2); tfb1.margin_right = Inches(0.2); tfb1.margin_top = Inches(0.15)
+    pb1 = tfb1.paragraphs[0]; pb1.text = "1.  Reconhecer tom de pele"
+    pb1.font.size = Pt(14); pb1.font.bold = True; pb1.font.color.rgb = NAVY
+    pb1b = tfb1.add_paragraph()
+    pb1b.text = "SkinToneNet olha para a foto e devolve um vetor de tom (MST 1 a 10)."
+    pb1b.font.size = Pt(12); pb1b.font.color.rgb = GRAY_DK
+
+    # Seta 1→2
+    a1 = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(x_start + box_w + 0.05), Inches(y_box + box_h/2 - 0.2), Inches(gap - 0.1), Inches(0.4))
+    a1.fill.solid(); a1.fill.fore_color.rgb = NAVY; a1.line.fill.background()
+
+    # Bloco 2: FiLM
+    x2 = x_start + box_w + gap
+    b2 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x2), Inches(y_box), Inches(box_w), Inches(box_h))
+    b2.fill.solid(); b2.fill.fore_color.rgb = NAVY; b2.line.fill.background()
+    tfb2 = b2.text_frame; tfb2.word_wrap = True
+    tfb2.margin_left = Inches(0.2); tfb2.margin_right = Inches(0.2); tfb2.margin_top = Inches(0.15)
+    pb2 = tfb2.paragraphs[0]; pb2.text = "2.  Camada FiLM"
+    pb2.font.size = Pt(14); pb2.font.bold = True; pb2.font.color.rgb = WHITE
+    pb2b = tfb2.add_paragraph()
+    pb2b.text = "Usa o vetor de tom para ajustar as features intermediárias da rede de raça."
+    pb2b.font.size = Pt(12); pb2b.font.color.rgb = GRAY_LT
+
+    # Seta 2→3
+    a2 = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(x2 + box_w + 0.05), Inches(y_box + box_h/2 - 0.2), Inches(gap - 0.1), Inches(0.4))
+    a2.fill.solid(); a2.fill.fore_color.rgb = NAVY; a2.line.fill.background()
+
+    # Bloco 3: Classificação
+    x3 = x2 + box_w + gap
+    b3 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x3), Inches(y_box), Inches(box_w), Inches(box_h))
+    b3.fill.solid(); b3.fill.fore_color.rgb = GRAY_LT; b3.line.color.rgb = NAVY; b3.line.width = Pt(1.5)
+    tfb3 = b3.text_frame; tfb3.word_wrap = True
+    tfb3.margin_left = Inches(0.2); tfb3.margin_right = Inches(0.2); tfb3.margin_top = Inches(0.15)
+    pb3 = tfb3.paragraphs[0]; pb3.text = "3.  Decidir a raça"
+    pb3.font.size = Pt(14); pb3.font.bold = True; pb3.font.color.rgb = NAVY
+    pb3b = tfb3.add_paragraph()
+    pb3b.text = "ConvNeXt-T decide entre as 7 raças do FairFace já com o tom como contexto."
+    pb3b.font.size = Pt(12); pb3b.font.color.rgb = GRAY_DK
+
+    # Analogia (caixa abaixo do diagrama)
+    box_a = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(4.4), Inches(12.1), Inches(1.3))
+    box_a.fill.solid(); box_a.fill.fore_color.rgb = WHITE
+    box_a.line.color.rgb = GREEN; box_a.line.width = Pt(1.5)
+    tfa = box_a.text_frame; tfa.word_wrap = True
+    tfa.margin_left = Inches(0.3); tfa.margin_right = Inches(0.3); tfa.margin_top = Inches(0.15)
+    pa = tfa.paragraphs[0]; pa.text = "Analogia"
+    pa.font.size = Pt(14); pa.font.bold = True; pa.font.color.rgb = GREEN
+    pab = tfa.add_paragraph()
+    pab.text = "Um médico fazendo diagnóstico. Antes de decidir, ele consulta um exame complementar (ECG, raio-X). FiLM faz isso para a rede de raça: antes de decidir, ela 'consulta' a saída do classificador de tom de pele."
+    pab.font.size = Pt(14); pab.font.color.rgb = GRAY_DK
+
+    # Por que importa (caixa final)
+    box_i = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(5.9), Inches(12.1), Inches(1.2))
+    box_i.fill.solid(); box_i.fill.fore_color.rgb = GRAY_LT; box_i.line.fill.background()
+    tfi = box_i.text_frame; tfi.word_wrap = True
+    tfi.margin_left = Inches(0.3); tfi.margin_right = Inches(0.3); tfi.margin_top = Inches(0.15)
+    pi = tfi.paragraphs[0]; pi.text = "Por que importa para a tese"
+    pi.font.size = Pt(14); pi.font.bold = True; pi.font.color.rgb = NAVY
+    pib = tfi.add_paragraph()
+    pib.text = "Sem FiLM, 'usar tom de pele como contexto' seria uma ideia vaga. Com FiLM, vira mecanismo concreto e reproduzível, validado em mais de 600 papers desde 2018 (Perez et al., AAAI 2018)."
+    pib.font.size = Pt(14); pib.font.color.rgb = GRAY_DK
 
 
 def _add_laftr_theory_slide(prs: Presentation) -> None:
-    """Slide do LAFTR com formalização teórica completa."""
+    """Slide do LAFTR como diagrama visual sem fórmulas."""
     blank = prs.slide_layouts[6]
     slide = prs.slides.add_slide(blank)
 
@@ -807,59 +877,87 @@ def _add_laftr_theory_slide(prs: Presentation) -> None:
     line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.5), Inches(1.2), Inches(12.5), Inches(0.05))
     line.fill.solid(); line.fill.fore_color.rgb = NAVY; line.line.fill.background()
 
-    # Caixa 1 — Formalização teórica
-    box1 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(1.5), Inches(12.1), Inches(2.4))
-    box1.fill.solid(); box1.fill.fore_color.rgb = GRAY_LT; box1.line.fill.background()
-    tf1 = box1.text_frame; tf1.word_wrap = True
-    tf1.margin_left = Inches(0.3); tf1.margin_right = Inches(0.3); tf1.margin_top = Inches(0.15)
-    p1 = tf1.paragraphs[0]; p1.text = "Formalização teórica (Madras et al. 2018, ICML)"
-    p1.font.size = Pt(14); p1.font.bold = True; p1.font.color.rgb = NAVY
-    teorico = [
-        "Encoder e: X → Z      mapeia entrada para representação latente Z",
-        "Classificador c: Z → Y      prediz a tarefa de interesse",
-        "Adversário a: Z → S      tenta prever atributo sensível S a partir de Z",
-        "Objetivo:    min_{e,c} max_a  [ L_clf(c(e(X)), Y)  +  λ · L_adv(a(e(X)), S) ]",
-        "Resultado teórico: se a falha (L_adv → 0), então Z é fair sob demographic parity / equalized odds.",
-    ]
-    for ln in teorico:
-        pln = tf1.add_paragraph()
-        pln.text = ln
-        pln.font.size = Pt(13); pln.font.color.rgb = GRAY_DK
-        if "Objetivo" in ln or "Resultado" in ln:
-            pln.font.bold = True; pln.font.color.rgb = NAVY
-        pln.space_after = Pt(2)
+    # Subtítulo
+    tx_sub = slide.shapes.add_textbox(Inches(0.6), Inches(1.4), Inches(12.1), Inches(0.7))
+    psub = tx_sub.text_frame.paragraphs[0]
+    psub.text = "Em palavras simples: se uma rede aprendeu a ser justa em uma tarefa, ela carrega essa propriedade para outras tarefas que usem a mesma representação interna."
+    psub.font.size = Pt(15); psub.font.color.rgb = GRAY_DK; psub.font.italic = True
 
-    # Caixa 2 — Garantia de transferência
-    box2 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(4.05), Inches(12.1), Inches(1.9))
-    box2.fill.solid(); box2.fill.fore_color.rgb = WHITE
-    box2.line.color.rgb = NAVY; box2.line.width = Pt(1.5)
-    tf2 = box2.text_frame; tf2.word_wrap = True
-    tf2.margin_left = Inches(0.3); tf2.margin_right = Inches(0.3); tf2.margin_top = Inches(0.15)
-    p2 = tf2.paragraphs[0]; p2.text = "Garantia de transferência (Teorema 1, Madras 2018)"
-    p2.font.size = Pt(14); p2.font.bold = True; p2.font.color.rgb = NAVY
-    p2b = tf2.add_paragraph()
-    p2b.text = "Para QUALQUER classificador downstream c' treinado sobre a mesma representação Z, a violação de fairness de c' é limitada superiormente pela violação de fairness em c. Em palavras simples: a propriedade fair é PROPRIEDADE DA REPRESENTAÇÃO Z, não da tarefa específica."
-    p2b.font.size = Pt(14); p2b.font.color.rgb = GRAY_DK
-    p2c = tf2.add_paragraph()
-    p2c.text = "Implicação: ao treinar fair em race classification (Cap 2), o backbone passa a Z fair. Reaproveitamos esse mesmo Z em face recognition (Cap 3) sem re-treinar fairness do zero."
-    p2c.font.size = Pt(13); p2c.font.color.rgb = GRAY_DK
+    # Diagrama: Treino fair em Cap 2 (esquerda) → Backbone fair → Cap 3 herda (direita)
+    y_box = 2.5
+    box_h = 1.6
 
-    # Caixa 3 — Evidência empírica
-    box3 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(6.1), Inches(12.1), Inches(1.3))
-    box3.fill.solid(); box3.fill.fore_color.rgb = WHITE
-    box3.line.color.rgb = GREEN; box3.line.width = Pt(1.5)
-    tf3 = box3.text_frame; tf3.word_wrap = True
-    tf3.margin_left = Inches(0.3); tf3.margin_right = Inches(0.3); tf3.margin_top = Inches(0.1)
-    p3 = tf3.paragraphs[0]; p3.text = "Evidência empírica complementar"
-    p3.font.size = Pt(13); p3.font.bold = True; p3.font.color.rgb = GREEN
-    p3b = tf3.add_paragraph()
-    p3b.text = "Aguirre & Dredze 2023 (arXiv:2305.12671) — confirmaram empiricamente que objetivos de fairness demográfico SE TRANSFEREM entre tarefas que compartilham representação (domínio NLP, mas princípio é independente da modalidade)."
-    p3b.font.size = Pt(13); p3b.font.color.rgb = GRAY_DK
+    # Cap 2 (esquerda)
+    b1 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(y_box), Inches(4.2), Inches(box_h))
+    b1.fill.solid(); b1.fill.fore_color.rgb = GRAY_LT; b1.line.color.rgb = NAVY; b1.line.width = Pt(1.5)
+    tfb1 = b1.text_frame; tfb1.word_wrap = True
+    tfb1.margin_left = Inches(0.2); tfb1.margin_right = Inches(0.2); tfb1.margin_top = Inches(0.15)
+    pb1 = tfb1.paragraphs[0]; pb1.text = "Cap 2 — Race classification"
+    pb1.font.size = Pt(14); pb1.font.bold = True; pb1.font.color.rgb = NAVY
+    pb1b = tfb1.add_paragraph()
+    pb1b.text = "Treinamos a rede com objetivo fair sobre tom de pele e raça. O backbone aprende uma representação que é, por construção, mais equilibrada entre grupos."
+    pb1b.font.size = Pt(12); pb1b.font.color.rgb = GRAY_DK
+
+    # Seta horizontal grande
+    arr = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(4.9), Inches(y_box + box_h/2 - 0.25), Inches(0.9), Inches(0.5))
+    arr.fill.solid(); arr.fill.fore_color.rgb = NAVY; arr.line.fill.background()
+
+    # Backbone fair (centro)
+    b2 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(5.9), Inches(y_box), Inches(2.4), Inches(box_h))
+    b2.fill.solid(); b2.fill.fore_color.rgb = NAVY; b2.line.fill.background()
+    tfb2 = b2.text_frame; tfb2.word_wrap = True
+    tfb2.margin_left = Inches(0.15); tfb2.margin_right = Inches(0.15); tfb2.margin_top = Inches(0.2)
+    pb2 = tfb2.paragraphs[0]; pb2.text = "Backbone fair"
+    pb2.font.size = Pt(14); pb2.font.bold = True; pb2.font.color.rgb = WHITE
+    pb2.alignment = PP_ALIGN.CENTER
+    pb2b = tfb2.add_paragraph()
+    pb2b.text = "A propriedade fair fica embutida AQUI."
+    pb2b.font.size = Pt(11); pb2b.font.color.rgb = GRAY_LT
+    pb2b.alignment = PP_ALIGN.CENTER
+
+    # Seta horizontal grande 2
+    arr2 = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(8.4), Inches(y_box + box_h/2 - 0.25), Inches(0.9), Inches(0.5))
+    arr2.fill.solid(); arr2.fill.fore_color.rgb = NAVY; arr2.line.fill.background()
+
+    # Cap 3 (direita)
+    b3 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(9.4), Inches(y_box), Inches(3.3), Inches(box_h))
+    b3.fill.solid(); b3.fill.fore_color.rgb = GRAY_LT; b3.line.color.rgb = NAVY; b3.line.width = Pt(1.5)
+    tfb3 = b3.text_frame; tfb3.word_wrap = True
+    tfb3.margin_left = Inches(0.2); tfb3.margin_right = Inches(0.2); tfb3.margin_top = Inches(0.15)
+    pb3 = tfb3.paragraphs[0]; pb3.text = "Cap 3 — Face recognition"
+    pb3.font.size = Pt(14); pb3.font.bold = True; pb3.font.color.rgb = NAVY
+    pb3b = tfb3.add_paragraph()
+    pb3b.text = "Reaproveitamos o mesmo backbone. Como ele já é fair, a tarefa nova herda essa propriedade — sem precisar re-treinar do zero."
+    pb3b.font.size = Pt(12); pb3b.font.color.rgb = GRAY_DK
+
+    # Caixa: o que Madras prova
+    box_t = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(4.3), Inches(12.1), Inches(1.5))
+    box_t.fill.solid(); box_t.fill.fore_color.rgb = WHITE
+    box_t.line.color.rgb = NAVY; box_t.line.width = Pt(1.5)
+    tft = box_t.text_frame; tft.word_wrap = True
+    tft.margin_left = Inches(0.3); tft.margin_right = Inches(0.3); tft.margin_top = Inches(0.15)
+    pt = tft.paragraphs[0]; pt.text = "O que Madras et al. 2018 (ICML) provam"
+    pt.font.size = Pt(14); pt.font.bold = True; pt.font.color.rgb = NAVY
+    ptb = tft.add_paragraph()
+    ptb.text = "A fairness é PROPRIEDADE DA REPRESENTAÇÃO INTERNA — não da tarefa específica. Qualquer classificador downstream que use a mesma representação herda um limite superior de injustiça. É essa garantia teórica que sustenta a extensão da nossa tese para face recognition (Cap 3)."
+    ptb.font.size = Pt(13); ptb.font.color.rgb = GRAY_DK
+
+    # Analogia
+    box_a = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(5.95), Inches(12.1), Inches(1.0))
+    box_a.fill.solid(); box_a.fill.fore_color.rgb = WHITE
+    box_a.line.color.rgb = GREEN; box_a.line.width = Pt(1.5)
+    tfa = box_a.text_frame; tfa.word_wrap = True
+    tfa.margin_left = Inches(0.3); tfa.margin_right = Inches(0.3); tfa.margin_top = Inches(0.1)
+    pa = tfa.paragraphs[0]; pa.text = "Analogia"
+    pa.font.size = Pt(13); pa.font.bold = True; pa.font.color.rgb = GREEN
+    pab = tfa.add_paragraph()
+    pab.text = "Aprender ética profissional em medicina geral nos torna mais éticos também quando nos especializamos em cardiologia. A 'ética' é uma propriedade do profissional, não da especialidade."
+    pab.font.size = Pt(13); pab.font.color.rgb = GRAY_DK
 
     tx_f = slide.shapes.add_textbox(Inches(0.5), Inches(7.05), Inches(12.5), Inches(0.4))
     pf = tx_f.text_frame.paragraphs[0]
     pf.text = "H5 em revisão após Pangelinan 2023 (Rodada 6): pixel info pode ser confounder adicional em FR — discussão na pauta"
-    pf.font.size = Pt(13); pf.font.color.rgb = GRAY_MD; pf.font.italic = True
+    pf.font.size = Pt(12); pf.font.color.rgb = GRAY_MD; pf.font.italic = True
 
 
 def _add_perguntas_slide(prs: Presentation) -> None:
@@ -941,47 +1039,61 @@ def _add_perguntas_slide(prs: Presentation) -> None:
     pf.font.size = Pt(13); pf.font.color.rgb = GRAY_MD; pf.font.italic = True
 
 
-def _add_paper_card_slide(prs: Presentation, title: str, citation: str, summary: str, impact: str, accent: RGBColor) -> None:
-    """Slide compacto de resumo de um paper: o que defende, por que entrou, impacto na tese."""
+def _add_paper_card_slide(
+    prs: Presentation,
+    title: str,
+    citation: str,
+    pergunta: str,
+    metodo: str,
+    resultados: str,
+    critica: str,
+    impacto: str,
+    accent: RGBColor,
+) -> None:
+    """Slide de ficha-resumo de um paper com 5 dimensões (estilo das fichas do corpus)."""
     blank = prs.slide_layouts[6]
     slide = prs.slides.add_slide(blank)
 
     # Título
-    tx_t = slide.shapes.add_textbox(Inches(0.5), Inches(0.4), Inches(12.5), Inches(0.9))
+    tx_t = slide.shapes.add_textbox(Inches(0.4), Inches(0.25), Inches(12.6), Inches(0.7))
     p = tx_t.text_frame.paragraphs[0]
     p.text = title
-    p.font.size = Pt(24); p.font.bold = True; p.font.color.rgb = NAVY
+    p.font.size = Pt(20); p.font.bold = True; p.font.color.rgb = NAVY
 
     # Citação
-    tx_c = slide.shapes.add_textbox(Inches(0.5), Inches(1.15), Inches(12.5), Inches(0.4))
+    tx_c = slide.shapes.add_textbox(Inches(0.4), Inches(0.85), Inches(12.6), Inches(0.35))
     pc = tx_c.text_frame.paragraphs[0]
     pc.text = citation
-    pc.font.size = Pt(14); pc.font.color.rgb = GRAY_MD; pc.font.italic = True
+    pc.font.size = Pt(12); pc.font.color.rgb = GRAY_MD; pc.font.italic = True
 
-    line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.5), Inches(1.6), Inches(12.5), Inches(0.05))
+    line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.4), Inches(1.25), Inches(12.6), Inches(0.04))
     line.fill.solid(); line.fill.fore_color.rgb = accent; line.line.fill.background()
 
-    # O que defende
-    box1 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(2.0), Inches(12.1), Inches(2.3))
-    box1.fill.solid(); box1.fill.fore_color.rgb = GRAY_LT
-    box1.line.fill.background()
-    tf1 = box1.text_frame; tf1.word_wrap = True
-    tf1.margin_left = Inches(0.3); tf1.margin_right = Inches(0.3); tf1.margin_top = Inches(0.15)
-    p1 = tf1.paragraphs[0]; p1.text = "O que defende"
-    p1.font.size = Pt(14); p1.font.bold = True; p1.font.color.rgb = NAVY
-    p1b = tf1.add_paragraph(); p1b.text = summary
-    p1b.font.size = Pt(16); p1b.font.color.rgb = GRAY_DK
+    secoes = [
+        ("Pergunta de pesquisa", pergunta, GRAY_LT, NAVY, False),
+        ("Metodologia", metodo, WHITE, NAVY, True),
+        ("Resultados principais", resultados, GRAY_LT, NAVY, False),
+        ("Crítica metodológica e limitações", critica, WHITE, GRAY_MD, True),
+        ("Impacto na nossa tese", impacto, WHITE, accent, True),
+    ]
 
-    # Impacto na tese
-    box2 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(4.5), Inches(12.1), Inches(2.4))
-    box2.fill.solid(); box2.fill.fore_color.rgb = WHITE
-    box2.line.color.rgb = accent; box2.line.width = Pt(1.5)
-    tf2 = box2.text_frame; tf2.word_wrap = True
-    tf2.margin_left = Inches(0.3); tf2.margin_right = Inches(0.3); tf2.margin_top = Inches(0.15)
-    p2 = tf2.paragraphs[0]; p2.text = "Impacto na nossa tese"
-    p2.font.size = Pt(14); p2.font.bold = True; p2.font.color.rgb = accent
-    p2b = tf2.add_paragraph(); p2b.text = impact
-    p2b.font.size = Pt(16); p2b.font.color.rgb = GRAY_DK
+    alturas = [1.05, 1.35, 1.25, 1.05, 1.15]
+    y = 1.45
+    for (label, conteudo, fill, border_color, has_border), h in zip(secoes, alturas):
+        box = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.4), Inches(y), Inches(12.6), Inches(h))
+        box.fill.solid(); box.fill.fore_color.rgb = fill
+        if has_border:
+            box.line.color.rgb = border_color
+            box.line.width = Pt(1)
+        else:
+            box.line.fill.background()
+        tf = box.text_frame; tf.word_wrap = True
+        tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25); tf.margin_top = Inches(0.08)
+        p_l = tf.paragraphs[0]; p_l.text = label
+        p_l.font.size = Pt(11); p_l.font.bold = True; p_l.font.color.rgb = border_color
+        p_c = tf.add_paragraph(); p_c.text = conteudo
+        p_c.font.size = Pt(12); p_c.font.color.rgb = GRAY_DK
+        y += h + 0.05
 
 
 def main() -> None:
