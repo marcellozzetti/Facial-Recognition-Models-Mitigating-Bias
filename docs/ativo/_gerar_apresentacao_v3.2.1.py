@@ -470,17 +470,17 @@ def build_presentation(out_path: Path) -> None:
 
     add_content_slide(
         prs,
-        "Big numbers da pesquisa atualmente",
+        "Triagem do corpus de pesquisa",
         [
-            "✓  29 fichas catalogadas no corpus (era 23 na semana passada)",
+            "Dos 57 papers avaliados, aprovamos 29 como fichas do corpus.",
             "",
-            "✓  ~57 papers avaliados ao todo (29 aprovados + 6 rejeitados explicitamente + outros descartados)",
+            "Aprovação seguiu os critérios de seleção acordados:",
+            ("Venue científico forte (top conferences ou journals peer-reviewed)", 1),
+            ("Citações acima do threshold do ano de publicação", 1),
+            ("Aplicabilidade direta a uma das 14 perguntas de pesquisa", 1),
+            ("Aprovação por exceção (cobertura única) com justificativa registrada", 1),
             "",
-            "✓  7 tracks temáticos cobertos (era 6; Track G NOVO: Mecanismos ML / Redes Neurais)",
-            "",
-            "✓  14 perguntas de pesquisa formalmente respondidas (Q01–Q14)",
-            "",
-            "✓  Cobertura temporal: 1972 a 2026 (54 anos de literatura, mediana 2020–2021)",
+            "Cada decisão (aprovado / standby / descartado) tem data e justificativa em _triagem.md.",
         ],
     )
 
@@ -518,37 +518,9 @@ def build_presentation(out_path: Path) -> None:
         footer="Classificador MST pré-treinado validado pela Rodada 6 (SkinToneNet, Pereira 2026)",
     )
 
-    add_explainer_slide(
-        prs,
-        "O que é FiLM (Feature-wise Linear Modulation)?",
-        "Uma técnica de redes neurais (Perez et al., AAAI 2018) que permite uma rede "
-        "‘consultar’ uma fonte de contexto extra ao tomar decisões. Tecnicamente: ela "
-        "modula as features intermediárias por uma transformação aprendida a partir do "
-        "contexto. Não muda a arquitetura — é uma camada que se adiciona.",
-        "É o mecanismo formal que torna nossa proposta operacional. Sem FiLM, a ideia "
-        "'usar tom de pele como contexto' seria vaga. Com FiLM, é matemática e código "
-        "concreto. Custo computacional: menos de 1% sobre o backbone.",
-        "Analogia: imagine um médico fazendo diagnóstico. Antes de decidir, ele consulta "
-        "o exame complementar (ECG, raio-X). FiLM faz isso para a rede de raça: antes de "
-        "decidir, ela 'consulta' a rede de tom de pele.",
-    )
+    _add_film_math_slide(prs)
 
-    add_explainer_slide(
-        prs,
-        "O que é fair transferência (LAFTR)?",
-        "Madras et al. (ICML 2018) provaram teoricamente e mostraram empiricamente que, "
-        "ao treinar uma rede para ser justa em uma tarefa A, essa propriedade de ser "
-        "justa é HERDADA por outras tarefas B que usem a mesma representação como ponto "
-        "de partida.",
-        "É o que sustenta a EXTENSÃO da nossa tese para face recognition. Se treinarmos "
-        "fairness na classificação racial (Cap 2), a propriedade fair se transfere para "
-        "reconhecimento facial (Cap 3) — não precisa re-treinar do zero. Esta é a "
-        "demonstração empírica que combinamos.",
-        "Analogia: aprender ética profissional em medicina geral nos torna mais éticos "
-        "também quando nos especializamos em cardiologia. A propriedade 'ética' não "
-        "depende da especialidade — está embutida no profissional.",
-        footer="Reforço empírico via Aguirre & Dredze 2023 (Rodada 6) — fair transfer em multi-task confirmado",
-    )
+    _add_laftr_theory_slide(prs)
 
     # Pipeline com analogia
     add_content_slide(
@@ -573,21 +545,24 @@ def build_presentation(out_path: Path) -> None:
 
     add_content_slide(
         prs,
-        "As métricas que vamos reportar — explicação simples",
+        "As métricas que vamos reportar — todas públicas e estabelecidas",
         [
-            "F1 macro — média das pontuações em todas as 7 raças, tratando todas igualmente.",
+            "F1 macro — média das pontuações nas 7 raças, tratando todas igualmente",
+            ("Referência: van Rijsbergen 1979 (livro Information Retrieval). Implementação: sklearn.metrics.f1_score(average='macro').", 1),
             ("Quanto maior, melhor. SOTA atual = 75% (FaceScanPaliGemma).", 1),
             "",
-            "DR (Disparity Ratio) — razão entre a melhor e a pior raça.",
-            ("Quanto mais perto de 1.0, mais justo. Latinx vs Black hoje = 60% / 90% = 0.67.", 1),
+            "DR (Disparity Ratio) — razão entre a melhor e a pior raça",
+            ("Referência: Hardt, Price & Srebro 2016 (NeurIPS) — Equal Opportunity / Equalized Odds.", 1),
+            ("Quanto mais perto de 1.0, mais justo. Latinx vs Black atualmente = 60% / 90% = 0.67.", 1),
             "",
-            "Worst-class F1 — pontuação na raça em que o modelo se sai pior.",
-            ("Hoje = 60% (Latinx). Quanto maior, melhor o pior caso.", 1),
+            "Worst-class F1 — pontuação na raça em que o modelo se sai pior",
+            ("Referência: Sagawa et al. 2020 (ICLR) — Group DRO. Métrica = min_g F1(g).", 1),
+            ("Atualmente = 60% (Latinx). Quanto maior, melhor o pior caso.", 1),
             "",
             "Por que 3 métricas e não uma?",
-            ("Teorema da impossibilidade (Kleinberg et al. 2017): não existe métrica única", 1),
-            ("de fairness. Reportar 3 simultaneamente é a forma honesta de comunicar trade-offs.", 1),
+            ("Teorema da impossibilidade (Kleinberg, Mullainathan & Raghavan 2017, ITCS): não existe métrica única de fairness — reportar as 3 é forma honesta de comunicar trade-offs.", 1),
         ],
+        footer="Todas as 3 métricas + teorema da impossibilidade já têm ficha catalogada no corpus",
     )
 
     add_table_slide(
@@ -607,6 +582,23 @@ def build_presentation(out_path: Path) -> None:
     # ==================== PARTE 4: PRÓXIMOS PASSOS ====================
     add_section_divider(prs, "4", "Próximos passos", "Plano experimental e calendário")
 
+    add_table_slide(
+        prs,
+        "Cronograma estimado",
+        ["Fase", "Duração", "O que será entregue"],
+        [
+            ["Aprovação conjunta da nova versão da tese", "Esta reunião", "Ajustes na tese se necessário"],
+            ["Submissão para qualificação", "+2 semanas após aprovação", "Documento de qualificação ao programa"],
+            ["Setup metodológico", "2 semanas", "Documentos com especificações detalhadas"],
+            ["Capítulo 1 — Classificador MST + matriz", "4 semanas", "Resultado de H3"],
+            ["Capítulo 2 — Race + condicionamento", "10–12 semanas", "Resultados de H1, H2, H4"],
+            ["Capítulo 3 — Face recognition", "6 semanas", "Resultado de H5"],
+            ["Síntese final", "4 semanas", "Decomposição do erro Latinx"],
+            ["Escrita dos capítulos", "8–12 semanas (paralelo)", "Texto final da dissertação"],
+            ["Defesa prevista", "~ Janeiro–Março de 2027", "Total: ~28–32 semanas ativas"],
+        ],
+    )
+
     add_content_slide(
         prs,
         "Os 3 capítulos experimentais",
@@ -625,22 +617,6 @@ def build_presentation(out_path: Path) -> None:
             ("Mesmo pipeline em RFW ou BFW (datasets que já estão catalogados)", 1),
             ("Foco em accuracy de Black/African", 1),
             ("Testa H5 (fair transferência funciona)", 1),
-        ],
-    )
-
-    add_table_slide(
-        prs,
-        "Cronograma estimado",
-        ["Fase", "Duração", "O que será entregue"],
-        [
-            ["Aprovação conjunta da nova versão da tese", "Esta reunião", "Ajustes na tese se necessário"],
-            ["Setup metodológico", "2 semanas", "Documentos com especificações detalhadas"],
-            ["Capítulo 1 — Classificador MST + matriz", "4 semanas", "Resultado de H3"],
-            ["Capítulo 2 — Race + condicionamento", "10–12 semanas", "Resultados de H1, H2, H4"],
-            ["Capítulo 3 — Face recognition", "6 semanas", "Resultado de H5"],
-            ["Síntese final", "4 semanas", "Decomposição do erro Latinx"],
-            ["Escrita dos capítulos", "8–12 semanas (paralelo)", "Texto final da dissertação"],
-            ["Defesa prevista", "~ Janeiro–Março de 2027", "Total: ~28–32 semanas ativas"],
         ],
     )
 
@@ -748,6 +724,136 @@ def build_presentation(out_path: Path) -> None:
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     prs.save(str(out_path))
+
+
+def _add_film_math_slide(prs: Presentation) -> None:
+    """Slide do FiLM com formulação matemática + receita prática."""
+    blank = prs.slide_layouts[6]
+    slide = prs.slides.add_slide(blank)
+
+    tx_t = slide.shapes.add_textbox(Inches(0.5), Inches(0.4), Inches(12.5), Inches(0.9))
+    p = tx_t.text_frame.paragraphs[0]
+    p.text = "O que é FiLM (Feature-wise Linear Modulation)?"
+    p.font.size = Pt(28); p.font.bold = True; p.font.color.rgb = NAVY
+
+    line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.5), Inches(1.2), Inches(12.5), Inches(0.05))
+    line.fill.solid(); line.fill.fore_color.rgb = NAVY; line.line.fill.background()
+
+    # Caixa 1 — Formulação matemática
+    box1 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(1.5), Inches(12.1), Inches(2.3))
+    box1.fill.solid(); box1.fill.fore_color.rgb = GRAY_LT; box1.line.fill.background()
+    tf1 = box1.text_frame; tf1.word_wrap = True
+    tf1.margin_left = Inches(0.3); tf1.margin_right = Inches(0.3); tf1.margin_top = Inches(0.15)
+    p1 = tf1.paragraphs[0]; p1.text = "Formulação matemática (Perez et al. 2018, AAAI)"
+    p1.font.size = Pt(14); p1.font.bold = True; p1.font.color.rgb = NAVY
+    p1b = tf1.add_paragraph()
+    p1b.text = "Dada uma feature map intermediária F do backbone e um vetor de contexto z (no nosso caso, vetor MST de 10 dimensões saído do SkinToneNet):"
+    p1b.font.size = Pt(15); p1b.font.color.rgb = GRAY_DK
+    p1c = tf1.add_paragraph()
+    p1c.text = "    FiLM(F | γ, β) = γ ⊙ F + β       onde γ = fγ(z) e β = fβ(z)"
+    p1c.font.size = Pt(17); p1c.font.color.rgb = NAVY; p1c.font.bold = True
+    p1d = tf1.add_paragraph()
+    p1d.text = "fγ e fβ são duas pequenas MLPs treináveis que mapeiam o contexto z para os parâmetros de modulação (γ, β) por canal. O símbolo ⊙ é multiplicação elemento-a-elemento."
+    p1d.font.size = Pt(14); p1d.font.color.rgb = GRAY_DK
+
+    # Caixa 2 — Como aplicar na prática
+    box2 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(4.0), Inches(12.1), Inches(2.3))
+    box2.fill.solid(); box2.fill.fore_color.rgb = WHITE
+    box2.line.color.rgb = NAVY; box2.line.width = Pt(1.5)
+    tf2 = box2.text_frame; tf2.word_wrap = True
+    tf2.margin_left = Inches(0.3); tf2.margin_right = Inches(0.3); tf2.margin_top = Inches(0.15)
+    p2 = tf2.paragraphs[0]; p2.text = "Como aplicar no nosso pipeline (receita prática)"
+    p2.font.size = Pt(14); p2.font.bold = True; p2.font.color.rgb = NAVY
+    receita = [
+        "1. Extrair vetor MST z ∈ ℝ¹⁰ da imagem usando o SkinToneNet pré-treinado.",
+        "2. Para cada bloco residual do ConvNeXt-T, inserir um bloco FiLM que recebe z e produz (γ, β).",
+        "3. Modular as features intermediárias F do bloco: F' = γ ⊙ F + β.",
+        "4. Backbone e cabeça de classificação treinam normalmente; só os parâmetros das MLPs (fγ, fβ) são novos.",
+    ]
+    for ln in receita:
+        pln = tf2.add_paragraph()
+        pln.text = ln; pln.font.size = Pt(14); pln.font.color.rgb = GRAY_DK
+        pln.space_after = Pt(2)
+
+    # Caixa 3 — Por que importa
+    box3 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(6.5), Inches(12.1), Inches(0.9))
+    box3.fill.solid(); box3.fill.fore_color.rgb = WHITE
+    box3.line.color.rgb = GREEN; box3.line.width = Pt(1.5)
+    tf3 = box3.text_frame; tf3.word_wrap = True
+    tf3.margin_left = Inches(0.3); tf3.margin_right = Inches(0.3); tf3.margin_top = Inches(0.1)
+    p3 = tf3.paragraphs[0]; p3.text = "Por que importa para a tese"
+    p3.font.size = Pt(13); p3.font.bold = True; p3.font.color.rgb = GREEN
+    p3b = tf3.add_paragraph()
+    p3b.text = "Sem FiLM, 'usar tom de pele como contexto' seria vaga. Com FiLM, é matemática e código concreto — qualquer revisor consegue reproduzir."
+    p3b.font.size = Pt(13); p3b.font.color.rgb = GRAY_DK
+
+
+def _add_laftr_theory_slide(prs: Presentation) -> None:
+    """Slide do LAFTR com formalização teórica completa."""
+    blank = prs.slide_layouts[6]
+    slide = prs.slides.add_slide(blank)
+
+    tx_t = slide.shapes.add_textbox(Inches(0.5), Inches(0.4), Inches(12.5), Inches(0.9))
+    p = tx_t.text_frame.paragraphs[0]
+    p.text = "O que é fair transferência (LAFTR)?"
+    p.font.size = Pt(28); p.font.bold = True; p.font.color.rgb = NAVY
+
+    line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.5), Inches(1.2), Inches(12.5), Inches(0.05))
+    line.fill.solid(); line.fill.fore_color.rgb = NAVY; line.line.fill.background()
+
+    # Caixa 1 — Formalização teórica
+    box1 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(1.5), Inches(12.1), Inches(2.4))
+    box1.fill.solid(); box1.fill.fore_color.rgb = GRAY_LT; box1.line.fill.background()
+    tf1 = box1.text_frame; tf1.word_wrap = True
+    tf1.margin_left = Inches(0.3); tf1.margin_right = Inches(0.3); tf1.margin_top = Inches(0.15)
+    p1 = tf1.paragraphs[0]; p1.text = "Formalização teórica (Madras et al. 2018, ICML)"
+    p1.font.size = Pt(14); p1.font.bold = True; p1.font.color.rgb = NAVY
+    teorico = [
+        "Encoder e: X → Z      mapeia entrada para representação latente Z",
+        "Classificador c: Z → Y      prediz a tarefa de interesse",
+        "Adversário a: Z → S      tenta prever atributo sensível S a partir de Z",
+        "Objetivo:    min_{e,c} max_a  [ L_clf(c(e(X)), Y)  +  λ · L_adv(a(e(X)), S) ]",
+        "Resultado teórico: se a falha (L_adv → 0), então Z é fair sob demographic parity / equalized odds.",
+    ]
+    for ln in teorico:
+        pln = tf1.add_paragraph()
+        pln.text = ln
+        pln.font.size = Pt(13); pln.font.color.rgb = GRAY_DK
+        if "Objetivo" in ln or "Resultado" in ln:
+            pln.font.bold = True; pln.font.color.rgb = NAVY
+        pln.space_after = Pt(2)
+
+    # Caixa 2 — Garantia de transferência
+    box2 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(4.05), Inches(12.1), Inches(1.9))
+    box2.fill.solid(); box2.fill.fore_color.rgb = WHITE
+    box2.line.color.rgb = NAVY; box2.line.width = Pt(1.5)
+    tf2 = box2.text_frame; tf2.word_wrap = True
+    tf2.margin_left = Inches(0.3); tf2.margin_right = Inches(0.3); tf2.margin_top = Inches(0.15)
+    p2 = tf2.paragraphs[0]; p2.text = "Garantia de transferência (Teorema 1, Madras 2018)"
+    p2.font.size = Pt(14); p2.font.bold = True; p2.font.color.rgb = NAVY
+    p2b = tf2.add_paragraph()
+    p2b.text = "Para QUALQUER classificador downstream c' treinado sobre a mesma representação Z, a violação de fairness de c' é limitada superiormente pela violação de fairness em c. Em palavras simples: a propriedade fair é PROPRIEDADE DA REPRESENTAÇÃO Z, não da tarefa específica."
+    p2b.font.size = Pt(14); p2b.font.color.rgb = GRAY_DK
+    p2c = tf2.add_paragraph()
+    p2c.text = "Implicação: ao treinar fair em race classification (Cap 2), o backbone passa a Z fair. Reaproveitamos esse mesmo Z em face recognition (Cap 3) sem re-treinar fairness do zero."
+    p2c.font.size = Pt(13); p2c.font.color.rgb = GRAY_DK
+
+    # Caixa 3 — Evidência empírica
+    box3 = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.6), Inches(6.1), Inches(12.1), Inches(1.3))
+    box3.fill.solid(); box3.fill.fore_color.rgb = WHITE
+    box3.line.color.rgb = GREEN; box3.line.width = Pt(1.5)
+    tf3 = box3.text_frame; tf3.word_wrap = True
+    tf3.margin_left = Inches(0.3); tf3.margin_right = Inches(0.3); tf3.margin_top = Inches(0.1)
+    p3 = tf3.paragraphs[0]; p3.text = "Evidência empírica complementar"
+    p3.font.size = Pt(13); p3.font.bold = True; p3.font.color.rgb = GREEN
+    p3b = tf3.add_paragraph()
+    p3b.text = "Aguirre & Dredze 2023 (arXiv:2305.12671) — confirmaram empiricamente que objetivos de fairness demográfico SE TRANSFEREM entre tarefas que compartilham representação (domínio NLP, mas princípio é independente da modalidade)."
+    p3b.font.size = Pt(13); p3b.font.color.rgb = GRAY_DK
+
+    tx_f = slide.shapes.add_textbox(Inches(0.5), Inches(7.05), Inches(12.5), Inches(0.4))
+    pf = tx_f.text_frame.paragraphs[0]
+    pf.text = "H5 em revisão após Pangelinan 2023 (Rodada 6): pixel info pode ser confounder adicional em FR — discussão na pauta"
+    pf.font.size = Pt(13); pf.font.color.rgb = GRAY_MD; pf.font.italic = True
 
 
 def _add_perguntas_slide(prs: Presentation) -> None:
