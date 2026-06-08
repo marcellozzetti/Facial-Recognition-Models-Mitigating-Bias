@@ -342,7 +342,7 @@ def build_presentation(out_path: Path) -> None:
             "Parte 2 — O que avancei nesta semana",
             ("Resposta direta aos 4 pedidos: ampliar venues, revisar método, validar SOTA, reformular tese", 1),
             "Parte 3 — Como a tese está sendo construída agora",
-            ("Linguagem clara: cada conceito explicado antes de usar", 1),
+            ("Embasamento metodológico e científico para cada decisão", 1),
             "Parte 4 — Próximos passos",
             ("O que preciso decidir nesta reunião", 1),
         ],
