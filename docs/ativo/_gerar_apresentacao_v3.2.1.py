@@ -359,7 +359,13 @@ def build_presentation(out_path: Path) -> None:
             "",
             "“O limite atual de 75% F1 em classificação racial sobre o FairFace não é só problema de arquitetura nem só problema de método. Tem um componente fenotípico irredutível: as raças se sobrepõem em tom de pele, especialmente Latinx. A dissertação ia construir a primeira matriz pública dessa sobreposição e quantificar o que dá para reduzir vs o que é estrutural.”",
             "",
-            "Corpus naquele momento: 23 fichas catalogadas, 6 tracks temáticos.",
+            "Corpus naquele momento: 23 fichas catalogadas em 6 tracks temáticos:",
+            ("Track A — Race classification (alvo direto da dissertação)", 1),
+            ("Track B — Face recognition fairness (paralelo)", 1),
+            ("Track C — Skin tone como dimensão alternativa", 1),
+            ("Track D — Mitigação algorítmica (técnicas)", 1),
+            ("Track E — Auditoria e metodologia", 1),
+            ("Track F — Fundamentação científica de raça e tom de pele", 1),
         ],
     )
 
