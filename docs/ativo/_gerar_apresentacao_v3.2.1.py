@@ -9,7 +9,7 @@ Estrutura em 4 partes:
 Princípios:
 - Linguagem narrativa, não tabular dense
 - Cada termo técnico explicado ANTES do uso
-- Voz direta ao orientador ("você validou", "você pediu")
+- Voz coletiva em 1ª pessoa do plural ("validamos", "combinamos")
 - Analogias para conceitos complexos
 - Máximo 5-6 bullets por slide
 """
@@ -353,7 +353,7 @@ def build_presentation(out_path: Path) -> None:
 
     add_content_slide(
         prs,
-        "O que você validou na reunião",
+        "O que validamos na última reunião",
         [
             "✓  Concordou que a evolução metodológica melhorou significativamente",
             "",
@@ -367,13 +367,13 @@ def build_presentation(out_path: Path) -> None:
 
     add_content_slide(
         prs,
-        "Os 4 pedidos que você fez",
+        "Os 4 pedidos que combinamos",
         [
             "1. Revisar o método em profundidade de cada artigo selecionado",
-            ("Quer enxergar não só o resultado, mas o rigor metodológico", 1),
+            ("Queremos enxergar não só o resultado, mas o rigor metodológico", 1),
             "",
             "2. Ampliar a pesquisa para venues de ML, Redes Neurais e temas relacionados",
-            ("Sentiu falta de papers fundadores destes campos", 1),
+            ("Identificamos lacuna de papers fundadores destes campos", 1),
             "",
             "3. Double-check do SOTA (75.7% F1)",
             ("Garantir que não emergiu competidor recente", 1),
@@ -418,7 +418,7 @@ def build_presentation(out_path: Path) -> None:
             ("(e) Conexão com o que aprendi na Rodada 5", 1),
             "",
             "Adicionada nas 10 fichas centrais (lista de leitura prioritária).",
-            "Vou expandir para as outras 19 após sua aprovação da nova versão da tese.",
+            "Vamos expandir para as outras 19 após aprovação conjunta da nova versão da tese.",
         ],
     )
 
@@ -541,15 +541,15 @@ def build_presentation(out_path: Path) -> None:
         prs,
         "O que é fair transferência (LAFTR)?",
         "Madras et al. (ICML 2018) provaram teoricamente e mostraram empiricamente que, "
-        "se você treina uma rede para ser justa em uma tarefa A, essa propriedade de ser "
+        "ao treinar uma rede para ser justa em uma tarefa A, essa propriedade de ser "
         "justa é HERDADA por outras tarefas B que usem a mesma representação como ponto "
         "de partida.",
         "É o que sustenta a EXTENSÃO da nossa tese para face recognition. Se treinarmos "
         "fairness na classificação racial (Cap 2), a propriedade fair se transfere para "
         "reconhecimento facial (Cap 3) — não precisa re-treinar do zero. Esta é a "
-        "demonstração empírica que você pediu.",
-        "Analogia: aprender ética profissional em medicina geral te torna mais ético "
-        "também quando você se especializa em cardiologia. A propriedade 'ética' não "
+        "demonstração empírica que combinamos.",
+        "Analogia: aprender ética profissional em medicina geral nos torna mais éticos "
+        "também quando nos especializamos em cardiologia. A propriedade 'ética' não "
         "depende da especialidade — está embutida no profissional.",
     )
 
@@ -635,7 +635,7 @@ def build_presentation(out_path: Path) -> None:
         "Cronograma estimado",
         ["Fase", "Duração", "O que será entregue"],
         [
-            ["Aprovação da nova versão da tese com você", "Esta reunião", "Ajustes na tese se necessário"],
+            ["Aprovação conjunta da nova versão da tese", "Esta reunião", "Ajustes na tese se necessário"],
             ["Setup metodológico", "2 semanas", "Documentos com especificações detalhadas"],
             ["Capítulo 1 — Classificador MST + matriz", "4 semanas", "Resultado de H3"],
             ["Capítulo 2 — Race + condicionamento", "10–12 semanas", "Resultados de H1, H2, H4"],
@@ -666,20 +666,20 @@ def build_presentation(out_path: Path) -> None:
 
     add_content_slide(
         prs,
-        "O que preciso decidir nesta reunião",
+        "O que precisamos decidir nesta reunião",
         [
             "1. Aprovação da nova versão da tese (prescritiva, pipeline integrado)?",
-            ("Se aprovar, sigo para o detalhamento metodológico.", 1),
-            ("Se quiser ajustes, faço e te mostro antes de prosseguir.", 1),
+            ("Se aprovarmos, seguimos para o detalhamento metodológico.", 1),
+            ("Se houver ajustes, fazemos e revisamos juntos antes de prosseguir.", 1),
             "",
             "2. Alguma das 5 hipóteses precisa ser reformulada?",
             ("São o esqueleto da dissertação — se uma estiver mal formulada, melhor descobrir agora.", 1),
             "",
             "3. Escolha definitiva entre RFW e BFW para o Capítulo 3?",
-            ("Tenho preferência por RFW (mais escala, mais histórico) — mas quero sua opinião.", 1),
+            ("Temos preferência por RFW (mais escala, mais histórico) — precisamos validar essa escolha juntos.", 1),
             "",
             "4. Alguma nova frente de literatura que ficou faltando?",
-            ("Posso fazer Rodada 6 se necessário, mas o corpus já está consistente.", 1),
+            ("Podemos fazer Rodada 6 se necessário, mas o corpus já está consistente.", 1),
         ],
     )
 
