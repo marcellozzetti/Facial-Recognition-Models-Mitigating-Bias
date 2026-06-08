@@ -66,7 +66,6 @@ def add_title_slide(prs: Presentation) -> None:
         ("Orientador:", "Prof. Marcos Quiles"),
         ("Programa:", "Mestrado em Ciência da Computação — Unifesp / ICT"),
         ("Reunião:", "Junho de 2026 (segunda reunião do mês)"),
-        ("Versão da tese:", "v3.2 — agora prescritiva, conforme feedback"),
     ]
     for i, (k, v) in enumerate(rows):
         p = mf.paragraphs[0] if i == 0 else mf.add_paragraph()
@@ -320,26 +319,25 @@ def build_presentation(out_path: Path) -> None:
 
     add_content_slide(
         prs,
-        "O que vamos cobrir hoje",
+        "Principais alinhamentos e decisões",
         [
             "Parte 1 — Onde paramos na última reunião",
-            ("Recap da v3.1 e dos seus pedidos", 1),
+            ("Recap da última reunião e orientações", 1),
             "Parte 2 — O que avancei nesta semana",
             ("Resposta direta aos 4 pedidos: ampliar venues, revisar método, validar SOTA, reformular tese", 1),
-            "Parte 3 — Como a tese está sendo construída agora (v3.2)",
+            "Parte 3 — Como a tese está sendo construída agora",
             ("Linguagem clara: cada conceito explicado antes de usar", 1),
             "Parte 4 — Próximos passos",
             ("O que preciso decidir nesta reunião", 1),
         ],
-        footer="Material derivado da pesquisa em docs/ativo/ — todos os arquivos no GitHub",
     )
 
     # ==================== PARTE 1: ONDE PARAMOS ====================
-    add_section_divider(prs, "1", "Onde paramos na última reunião", "Recap da v3.1 e dos seus pedidos")
+    add_section_divider(prs, "1", "Onde paramos na última reunião", "Recap da última reunião e orientações")
 
     add_content_slide(
         prs,
-        "Como a tese estava na última reunião (v3.1)",
+        "Como a tese estava na última reunião",
         [
             "A tese era DIAGNÓSTICA — focada em explicar por que o erro existe:",
             "",
@@ -351,7 +349,6 @@ def build_presentation(out_path: Path) -> None:
             "",
             "Corpus naquele momento: 23 fichas catalogadas, 6 tracks temáticos.",
         ],
-        footer="07_thesis_statement.md mantém histórico de versões (v3.0, v3.1, v3.2)",
     )
 
     add_content_slide(
@@ -364,9 +361,8 @@ def build_presentation(out_path: Path) -> None:
             "",
             "✓  Entendeu e validou a linha de pesquisa proposta",
             "",
-            "Estas 3 validações são a base sobre a qual estou construindo a v3.2.",
+            "Estas 3 validações são a base sobre a qual estou construindo a nova versão da tese.",
         ],
-        footer="Registrado em docs/historico/reuniao_2026-06/README.md",
     )
 
     add_content_slide(
@@ -404,9 +400,8 @@ def build_presentation(out_path: Path) -> None:
             ("• Zhang, Lemoine & Mitchell (AIES 2018) — adversarial debiasing", 1),
             ("• Kleinberg, Mullainathan & Raghavan (ITCS 2017) — teorema da impossibilidade", 1),
             "",
-            "Cada um destes é base de algum baseline ou mecanismo do pipeline v3.2.",
+            "Cada um destes é base de algum baseline ou mecanismo do pipeline.",
         ],
-        footer="Detalhes em docs/ativo/04_pesquisa_bibliografica/_triagem.md (Rodada 5)",
     )
 
     add_content_slide(
@@ -423,9 +418,8 @@ def build_presentation(out_path: Path) -> None:
             ("(e) Conexão com o que aprendi na Rodada 5", 1),
             "",
             "Adicionada nas 10 fichas centrais (lista de leitura prioritária).",
-            "Vou expandir para as outras 19 após sua aprovação da v3.2.",
+            "Vou expandir para as outras 19 após sua aprovação da nova versão da tese.",
         ],
-        footer="Exemplo concreto: ficha do FSCL (Park 2022) ganhou ~50 linhas de análise crítica",
     )
 
     add_content_slide(
@@ -444,14 +438,13 @@ def build_presentation(out_path: Path) -> None:
             "Bônus: validação cruzada confirmou também o baseline ResNet-34 = 72%",
             ("Reportado por AlDahoul (2024/26) E por Lin (FairGRAPE 2022) independentemente", 1),
         ],
-        footer="Detalhes em _triagem.md, seção Rodada 2.6",
     )
 
     add_content_slide(
         prs,
         "Resposta ao pedido 4: reformular para PRESCRITIVA",
         [
-            "Tese v3.2 escrita e disponível em 07_thesis_statement.md.",
+            "Nova versão da tese escrita e disponível.",
             "",
             "Mudança central: deixa de ser ‘decompor o erro’ e passa a ser",
             "‘construir um pipeline que melhora fairness em race classification",
@@ -460,7 +453,7 @@ def build_presentation(out_path: Path) -> None:
             "Q04 (mitigação) e Q10 (matriz tom × raça) deixam de ser capítulos",
             "paralelos e viram pipeline UNIFICADO.",
             "",
-            "Vou detalhar a v3.2 na Parte 3 desta apresentação.",
+            "Vou detalhar a nova tese na Parte 3 desta apresentação.",
         ],
     )
 
@@ -480,15 +473,14 @@ def build_presentation(out_path: Path) -> None:
             "",
             "✓  Autoria verificada em fonte primária: 29 de 29 (100%)",
         ],
-        footer="Arquivo permanente em _metricas_corpus.md — atualizo a cada nova rodada",
     )
 
     # ==================== PARTE 3: COMO A TESE ESTÁ SENDO CONSTRUÍDA ====================
-    add_section_divider(prs, "3", "Como a tese está sendo construída", "v3.2 — agora prescritiva, com conceitos explicados")
+    add_section_divider(prs, "3", "Como a tese está sendo construída", "Agora prescritiva, com conceitos explicados")
 
     add_thesis_slide(
         prs,
-        "A tese em uma frase clara (v3.2)",
+        "A tese em uma frase clara",
         "Treinar uma rede neural para reconhecer o tom de pele de uma foto, "
         "e usar essa informação como contexto extra ao treinar uma rede de "
         "classificação racial, melhora as métricas de fairness (a paridade "
@@ -501,8 +493,8 @@ def build_presentation(out_path: Path) -> None:
 
     add_table_slide(
         prs,
-        "Comparação: v3.1 (semana passada) vs v3.2 (agora)",
-        ["Dimensão", "v3.1 (diagnóstica)", "v3.2 (prescritiva, ATUAL)"],
+        "Comparação: antes (semana passada) vs agora",
+        ["Dimensão", "Antes (diagnóstica)", "Agora (prescritiva)"],
         [
             ["Postura", "Explicar por que o erro existe", "Construir um pipeline que reduz o erro"],
             ["Saída prática", "Análise post-hoc", "Modelo treinado deployável"],
@@ -510,7 +502,7 @@ def build_presentation(out_path: Path) -> None:
             ["Q04 e Q10", "Capítulos paralelos", "Pipeline unificado"],
             ["Critério de sucesso", "Decomposição irredutível vs redutível", "Melhora mensurável em métricas concretas"],
         ],
-        footer="Aprovação da v3.2 é o item principal desta reunião",
+        footer="Aprovação da nova versão é o item principal desta reunião",
     )
 
     # Conceitos explicados (3 slides) — ANTES do pipeline
@@ -643,7 +635,7 @@ def build_presentation(out_path: Path) -> None:
         "Cronograma estimado",
         ["Fase", "Duração", "O que será entregue"],
         [
-            ["Aprovação da v3.2 com você", "Esta reunião", "Ajustes na tese se necessário"],
+            ["Aprovação da nova versão da tese com você", "Esta reunião", "Ajustes na tese se necessário"],
             ["Setup metodológico", "2 semanas", "Documentos com especificações detalhadas"],
             ["Capítulo 1 — Classificador MST + matriz", "4 semanas", "Resultado de H3"],
             ["Capítulo 2 — Race + condicionamento", "10–12 semanas", "Resultados de H1, H2, H4"],
@@ -676,7 +668,7 @@ def build_presentation(out_path: Path) -> None:
         prs,
         "O que preciso decidir nesta reunião",
         [
-            "1. Aprovação da tese v3.2 (prescritiva, pipeline integrado)?",
+            "1. Aprovação da nova versão da tese (prescritiva, pipeline integrado)?",
             ("Se aprovar, sigo para o detalhamento metodológico.", 1),
             ("Se quiser ajustes, faço e te mostro antes de prosseguir.", 1),
             "",
@@ -710,7 +702,7 @@ def build_presentation(out_path: Path) -> None:
     p.alignment = PP_ALIGN.CENTER
 
     p2 = tf.add_paragraph()
-    p2.text = "Aprovação da tese v3.2 — decidir os 4 itens acima"
+    p2.text = "Aprovação da nova versão da tese — decidir os 4 itens acima"
     p2.font.size = Pt(22)
     p2.font.color.rgb = GRAY_LT
     p2.alignment = PP_ALIGN.CENTER
