@@ -155,7 +155,7 @@ def add_content_slide(prs: Presentation, title: str, bullets: list, footer: str 
         pf.font.italic = True
 
 
-def add_explainer_slide(prs: Presentation, title: str, simple_def: str, why_matters: str, concrete: str = "") -> None:
+def add_explainer_slide(prs: Presentation, title: str, simple_def: str, why_matters: str, concrete: str = "", footer: str = "") -> None:
     """Slide explicativo: 'O que é X?' — definição simples + por que importa + exemplo concreto."""
     blank = prs.slide_layouts[6]
     slide = prs.slides.add_slide(blank)
@@ -229,8 +229,16 @@ def add_explainer_slide(prs: Presentation, title: str, simple_def: str, why_matt
         p3b.font.size = Pt(17)
         p3b.font.color.rgb = GRAY_DK
 
+    if footer:
+        tx_f = slide.shapes.add_textbox(Inches(0.5), Inches(7.05), Inches(12.5), Inches(0.4))
+        pf = tx_f.text_frame.paragraphs[0]
+        pf.text = footer
+        pf.font.size = Pt(14)
+        pf.font.color.rgb = GRAY_MD
+        pf.font.italic = True
 
-def add_thesis_slide(prs: Presentation, title: str, statement: str) -> None:
+
+def add_thesis_slide(prs: Presentation, title: str, statement: str, footer: str = "") -> None:
     blank = prs.slide_layouts[6]
     slide = prs.slides.add_slide(blank)
 
@@ -256,6 +264,14 @@ def add_thesis_slide(prs: Presentation, title: str, statement: str) -> None:
     p.font.size = Pt(20)
     p.font.color.rgb = NAVY
     p.alignment = PP_ALIGN.LEFT
+
+    if footer:
+        tx_f = slide.shapes.add_textbox(Inches(0.5), Inches(7.05), Inches(12.5), Inches(0.4))
+        pf = tx_f.text_frame.paragraphs[0]
+        pf.text = footer
+        pf.font.size = Pt(14)
+        pf.font.color.rgb = GRAY_MD
+        pf.font.italic = True
 
 
 def add_table_slide(prs: Presentation, title: str, headers: list, rows: list, footer: str = "") -> None:
@@ -455,10 +471,7 @@ def build_presentation(out_path: Path) -> None:
             ("4. Comparar fairness COM vs SEM tom de pele, contra 6 baselines", 1),
             ("5. Aplicar pipeline a face recognition (RFW ou BFW)", 1),
             ("6. Medir melhora em Black/African e decomposição Latinx", 1),
-            "",
-            "Q04 (mitigação) e Q10 (matriz tom × raça) viram pipeline UNIFICADO.",
         ],
-        footer="Cada etapa será detalhada com conceitos explicados na Parte 3",
     )
 
     add_content_slide(
@@ -474,8 +487,6 @@ def build_presentation(out_path: Path) -> None:
             "✓  14 perguntas de pesquisa formalmente respondidas (Q01–Q14)",
             "",
             "✓  Cobertura temporal: 1972 a 2026 (54 anos de literatura, mediana 2020–2021)",
-            "",
-            "✓  Autoria verificada em fonte primária: 29 de 29 (100%)",
         ],
     )
 
@@ -495,20 +506,6 @@ def build_presentation(out_path: Path) -> None:
         "de raça precisa ter explicitamente — não pode descobrir sozinho.",
     )
 
-    add_table_slide(
-        prs,
-        "Comparação: antes (semana passada) vs agora",
-        ["Dimensão", "Antes (diagnóstica)", "Agora (prescritiva)"],
-        [
-            ["Postura", "Explicar por que o erro existe", "Construir um pipeline que reduz o erro"],
-            ["Saída prática", "Análise post-hoc", "Modelo treinado deployável"],
-            ["Tarefa", "Apenas classification", "Classification + Face recognition"],
-            ["Q04 e Q10", "Capítulos paralelos", "Pipeline unificado"],
-            ["Critério de sucesso", "Decomposição irredutível vs redutível", "Melhora mensurável em métricas concretas"],
-        ],
-        footer="Aprovação da nova versão é o item principal desta reunião",
-    )
-
     # Conceitos explicados (3 slides) — ANTES do pipeline
     add_explainer_slide(
         prs,
@@ -524,6 +521,7 @@ def build_presentation(out_path: Path) -> None:
         "A Fitzpatrick (1975) tem só 6 tons, sendo 3 deles para variações de 'pele "
         "considerada branca'. Um terço dos próprios dermatologistas confunde Fitzpatrick "
         "com classificação racial — erro categorial endêmico.",
+        footer="Classificador MST pré-treinado validado pela Rodada 6 (SkinToneNet, Pereira 2026)",
     )
 
     add_explainer_slide(
@@ -555,6 +553,7 @@ def build_presentation(out_path: Path) -> None:
         "Analogia: aprender ética profissional em medicina geral nos torna mais éticos "
         "também quando nos especializamos em cardiologia. A propriedade 'ética' não "
         "depende da especialidade — está embutida no profissional.",
+        footer="Reforço empírico via Aguirre & Dredze 2023 (Rodada 6) — fair transfer em multi-task confirmado",
     )
 
     # Pipeline com analogia
@@ -575,6 +574,7 @@ def build_presentation(out_path: Path) -> None:
             "Etapa 6 — Medir se Black/African melhora especificamente",
             ("Métrica: TAR @ FAR fixo por raça", 1),
         ],
+        footer="Etapas 1, 4 e 5 reforçadas pela Rodada 6 (SkinToneNet, Adversarial debiasing, fair transfer empírico)",
     )
 
     add_content_slide(
@@ -607,7 +607,7 @@ def build_presentation(out_path: Path) -> None:
             ["H4", "A maior parte dos erros do Latinx é por sobreposição de tom?", "≥50% dos erros estão em zonas de overlap"],
             ["H5", "A melhoria transfere para reconhecimento facial?", "Black/African melhora ≥+3pp em RFW ou BFW"],
         ],
-        footer="H1, H4 e H5 são as hipóteses centrais. Plano B documentado caso refutadas.",
+        footer="H5 em revisão após Pangelinan 2023 (Rodada 6): pixel info pode ser confounder — discussão na pauta",
     )
 
     # ==================== PARTE 4: PRÓXIMOS PASSOS ====================
