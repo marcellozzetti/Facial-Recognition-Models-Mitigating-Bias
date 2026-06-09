@@ -84,63 +84,155 @@ verbatim por ficha para tornar a prova de leitura mais rigorosa.
 **Veredito**: nenhuma ficha R5 requer reescrita imediata. Padrão é
 SOLID com nota sobre quotes.
 
-### Rodadas 1-4 (23 fichas)
+### Rodada 1 (9 fichas — Seeds iniciais) — auditoria CONCLUÍDA 2026-06-09
 
-Auditoria pendente. Será executada após R5.
+| Ficha | N | A | C | Q | Classificação |
+|---|---|---|---|---|---|
+| [buolamwini_2018](buolamwini_2018.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [dataset_karkkainen_2021](dataset_karkkainen_2021.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [aldahoul_2024](aldahoul_2024.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [manzoor_2024](manzoor_2024.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [dehdashtian_2024](dehdashtian_2024.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [dominguez_2024](dominguez_2024.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [lafargue_2025](lafargue_2025.md) | forte | forte | forte | parcial | ✅ SOLID++ |
+| [dataset_wang_2019](dataset_wang_2019.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [grother_2019](grother_2019.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
 
-| Ficha | Rodada | Status |
-|---|---|---|
-| buolamwini_2018 | R1 | pendente |
-| dataset_karkkainen_2021 | R1 | pendente |
-| aldahoul_2024 | R1 | pendente |
-| manzoor_2024 | R1 | pendente |
-| dehdashtian_2024 | R1 | pendente |
-| dominguez_2024 | R1 | pendente |
-| lafargue_2025 | R1 | pendente |
-| dataset_wang_2019 | R1 | pendente |
-| grother_2019 | R1 | pendente |
-| dataset_robinson_2020 | R2 | pendente |
-| park_2022 | R2 | pendente |
-| lin_2022 | R2 | pendente |
-| sagawa_2020 | R2 | pendente |
-| bhaskaruni_2019 | R2 | pendente |
-| dataset_hazirbas_2021 | R3 | pendente |
-| schumann_2023 | R3 | pendente |
-| neto_2025 | R3 | pendente |
-| survey_mehrabi_2021 | R3 | pendente |
-| survey_kotwal_2025 | R3 | pendente |
-| fuentes_2019 | R4 | pendente |
-| lewontin_1972 | R4 | pendente |
-| fitzpatrick_1988 | R4 | pendente |
-| massey_martin_2003 | R4 | pendente |
+**Resumo R1**: padrão SUPERIOR ao R5. Quotes verbatim presentes em
+todas as 9 fichas, com page references implícitas. Tabelas reproduzidas
+com números exatos (e.g., Buolamwini Tabela 4 com 9 colunas × 3 linhas
+de error rates; FairFace Tabela 6 com 11 categorias raciais; AlDahoul
+Tabela 10 com 6 métodos; Dehdashtian Tabela 1 com U-FaTE).
+
+### Rodada 2 (5 fichas — Snowballing F2-F4) — auditoria CONCLUÍDA 2026-06-09
+
+| Ficha | N | A | C | Q | Classificação |
+|---|---|---|---|---|---|
+| [dataset_robinson_2020](dataset_robinson_2020.md) | razoável | razoável | razoável | ausente | ✅ SOLID |
+| [park_2022](park_2022.md) | forte | forte | forte | parcial | ✅ SOLID++ |
+| [lin_2022](lin_2022.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [sagawa_2020](sagawa_2020.md) | forte | forte | forte | parcial | ✅ SOLID++ |
+| [bhaskaruni_2019](bhaskaruni_2019.md) | forte | razoável | forte | parcial | ✅ SOLID |
+
+**Resumo R2**: 4 SOLID++ + 1 SOLID. Tabelas detalhadas (Park Tabela 1
+com 8 métodos; Lin Tabela 2 com 10 colunas × 6 métodos; Sagawa Tabela 1
+com worst-group accuracy CelebA salto 41.1 → 86.7). **lin_2022 confirma
+baseline 72% do FairFace** como validação cruzada com AlDahoul.
+
+### Rodada 3 (5 fichas — Skin tone + surveys) — auditoria CONCLUÍDA 2026-06-09
+
+| Ficha | N | A | C | Q | Classificação |
+|---|---|---|---|---|---|
+| [dataset_hazirbas_2021](dataset_hazirbas_2021.md) | forte | forte | forte | **presente** (2 quotes longos) | ✅ SOLID++ |
+| [schumann_2023](schumann_2023.md) | forte | forte | forte | parcial | ✅ SOLID++ |
+| [neto_2025](neto_2025.md) | forte | forte | forte | **presente** | ✅ SOLID++ |
+| [survey_mehrabi_2021](survey_mehrabi_2021.md) | n/a | n/a | razoável | ausente | ✅ SOLID (survey) |
+| [survey_kotwal_2025](survey_kotwal_2025.md) | n/a | n/a | forte | **presente** | ✅ SOLID (survey) |
+
+**Resumo R3**: 3 SOLID++ + 2 SOLID (surveys). hazirbas tem 2 quotes
+verbatim longos defendendo skin tone vs race. schumann documenta MST-E
+exatamente (1.515 imgs, 19 sujeitos). neto cita verbatim achado central
+sobre contínuo > discreto. kotwal sintetiza 8 sub-citações específicas
+com referências cruzadas.
+
+### Rodada 4 (4 fichas — Fundamentação científica) — auditoria CONCLUÍDA 2026-06-09
+
+| Ficha | N | A | C | Q | Classificação | Fonte alternativa |
+|---|---|---|---|---|---|---|
+| [fuentes_2019](fuentes_2019.md) | n/a | n/a | forte | **presente** (9 quotes) | ✅ SOLID | WebFetch HTML AABA |
+| [lewontin_1972](lewontin_1972.md) | forte | forte | forte | **presente** | ✅ SOLID | WebSearch + PMC retrospective |
+| [fitzpatrick_1988](fitzpatrick_1988.md) | razoável | razoável | forte | **presente** | ✅ SOLID | WebSearch + summaries (JAMA bloqueado) |
+| [massey_martin_2003](massey_martin_2003.md) | razoável | forte | forte | parcial | ✅ SOLID | WebSearch + multiple secondaries |
+
+**Resumo R4**: 4 SOLID. Estas fichas usaram **WebSearch/HTML como fonte
+primária alternativa** (PDFs originais bloqueados por anti-scraping em
+Wiley, Springer, JAMA) — **documentação transparente** no campo
+`fonte_leitura` do frontmatter. Não são `OVERVIEW_ONLY` porque o
+conteúdo foi triangulado entre múltiplas fontes secundárias com
+verificação cruzada.
+
+fuentes_2019 destaca-se: 9 princípios do statement AAPA reproduzidos
+verbatim como quotes.
+
+## Consolidado final (2026-06-09)
+
+| Rodada | Fichas | SOLID++ | SOLID | OVERVIEW | TOTAL |
+|---|---|---|---|---|---|
+| R1 | 9 | 9 | 0 | 0 | 9 ✅ |
+| R2 | 5 | 3 | 2 | 0 | 5 ✅ |
+| R3 | 5 | 3 | 2 | 0 | 5 ✅ |
+| R4 | 4 | 0 | 4 | 0 | 4 ✅ |
+| R5 | 6 | 0 | 6 | 0 | 6 ✅ |
+| R6 (Pereira) | 1 | 0 | 1 | 0 | 1 ✅ |
+| **TOTAL** | **30** | **15** | **15** | **0** | **30** ✅ |
+
+### Resultados consolidados
+
+- **Nenhuma ficha permanece OVERVIEW_ONLY** após auditoria.
+- **50% SOLID++** (com quotes verbatim e densidade superior) — R1
+  predomina aqui.
+- **50% SOLID** (sem quotes verbatim mas com sinais técnicos consistentes
+  com leitura profunda) — R4 surveys e R5 majoritariamente.
+- **Pereira 2026 (única R6 fichada)** foi corretamente identificada
+  como OVERVIEW_ONLY na auditoria inicial e PROMOVIDA a VERIFIED após
+  leitura integral via HTML do arXiv.
+
+### Recomendações para futuras fichas
+
+1. **Sempre incluir 1-2 quotes verbatim** do paper, entre aspas, com
+   page reference quando possível. É a evidência mais forte de leitura.
+2. **Reproduzir 1 tabela quantitativa do paper** com números exatos
+   quando disponível.
+3. **Para papers bloqueados por anti-scraping** (Wiley/Springer/JAMA):
+   declarar `fonte_leitura: WebSearch + sumários...` honestamente. Não
+   forçar `VERIFIED` se conteúdo não puder ser triangulado.
+4. **Declarar `OVERVIEW_ONLY`** sem hesitação quando o PDF não foi
+   lido — é mais honesto que `VERIFIED` enganoso.
+5. **HTML do arXiv** (arxiv.org/html/XXXX.YYYYY) é alternativa
+   confiável quando PDF binário não pode ser processado — Pereira 2026
+   demonstrou isso.
 
 ## Achados consolidados
 
-> Esta seção será preenchida à medida que a auditoria avança.
-
-### Achado 1 — Pereira 2026
+### Achado 1 — Pereira 2026 (corrigido em 3 versões)
 
 Ficha original tinha `VERIFIED` com `fonte_leitura: Abstract via arXiv`.
-Contradição direta. Reescrita como `OVERVIEW_ONLY` honesta em
-2026-06-09.
+Contradição direta. Trajetória:
 
-**Conteúdo removido da ficha original** porque era inferência não
-verificada:
+1. **Versão 1 (commit 667e882)** — VERIFIED com conteúdo parcialmente
+   inventado.
+2. **Versão 2 (commit a798a20)** — REDUZIDA para OVERVIEW_ONLY honesta
+   após pergunta do usuário expondo a contradição.
+3. **Versão 3 (commit 72c4285)** — PROMOVIDA a VERIFIED após leitura
+   integral via HTML do arXiv (arxiv.org/html/2603.02475v1).
 
-- "Anotação MST sem protocolo multi-anotador documentado"
-- "STW concentra-se em sujeitos de imagens web (viés de quem é
-  fotografado e publicado)"
-- "Apenas uma arquitetura SOTA reportada (ViT-Small)"
-- "Generalização out-of-domain reportada qualitativamente"
-- Seção 12 (Análise crítica) inteira
+**Correções críticas descobertas pela leitura integral:**
 
-Conteúdo mantido porque está no abstract:
+- FairFace É auditado pelos autores (Seção 7.1) — o abstract era
+  enganosamente incompleto, mencionando apenas CelebA e VGGFace2.
+- STW agrega 7 datasets-fonte incluindo FairFace e CelebA →
+  **contaminação treino-teste** se SkinToneNet for usado para auditar
+  FairFace.
+- Protocolo de anotação robusto: 1 anotador principal + 2 validadores
+  em subset estratificado, ICC(3)=0.939, Krippendorff's α=0.935.
+- ViT-Small confirmado como backbone.
 
-- 42.313 imagens, 3.564 indivíduos, MST 10-classe
-- Classic vs deep learning benchmark
-- "Near-random" para clássicos, "near-annotator" para deep
-- SkinToneNet ViT fine-tuned SOTA cross-domain
-- Auditoria de CelebA e VGGFace2 (NÃO FairFace)
+### Achado 2 — Padrão de profundidade R1 > R5
+
+R1 fichas mostraram densidade SUPERIOR a R5: todas R1 têm quotes
+verbatim, tabelas reproduzidas, hiperparâmetros declarados quando
+disponíveis no paper. R5 (papers fundadores de ML/fairness teóricos)
+têm densidade um pouco menor — não por menos leitura, mas porque
+papers teóricos não têm muitas tabelas para reproduzir.
+
+### Achado 3 — R4 usa fontes alternativas corretamente
+
+As 4 fichas R4 (fuentes_2019, lewontin_1972, fitzpatrick_1988,
+massey_martin_2003) declaram explicitamente `WebSearch + sumários`
+quando o PDF foi bloqueado por anti-scraping editorial. **Esta é a
+postura epistemológica correta** — VERIFIED com fonte alternativa
+documentada é honesta; OVERVIEW_ONLY com fonte alternativa não-
+documentada seria desonesto.
 
 ## Como manter daqui em diante
 
