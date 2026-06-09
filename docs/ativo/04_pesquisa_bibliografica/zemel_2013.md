@@ -161,3 +161,60 @@ fundamenta:
   Realizado por Madras 2018, Park 2022, e outros.
 - **Combinar individual + group fairness** rigorosamente. ⚠ Direção
   teórica aberta.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Mapeamento probabilístico X → Z** com decomposição em K protótipos
+  — clareza matemática.
+- **Loss composta** (L_z + L_x + L_y) com hiperparâmetros explícitos
+  controlando trade-off.
+- **Garantia Lipschitz** para individual fairness — operacionaliza
+  Dwork 2012.
+- **Test-of-Time Award ICML 2023** = forte endosso da comunidade.
+- **Limitação**: statistical parity é métrica pré-Hardt (limitações
+  teóricas conhecidas).
+
+### (b) Reprodutibilidade
+
+- ✅ Datasets tabulares públicos (German Credit, Adult, Heritage
+  Health).
+- ⚠ K (número de protótipos) é hyperparameter sem prescrição.
+- ⚠ Sem reportar multi-seed ou IC.
+- ✅ Adoção ampla em literatura subsequente — método replicado.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Paradigma fundador** de Fair Representation Learning — nossa
+  abordagem com FiLM-conditioning está conceitualmente na linhagem
+  Zemel.
+- **Conditional architecture (FiLM)** é mais flexível que
+  representational pura — evolução metodológica.
+- **Statistical parity como métrica** é limitada — usamos DR + EOD
+  generalizados.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Representation learning intermediário | ✅ Justificada — paradigma fundador |
+| Statistical parity como métrica | ⚠ Pré-Hardt — limitação conceitual |
+| K protótipos discretos | ⚠ Choice — limita capacidade representacional |
+| Garantia Lipschitz | ✅ Justificada — operacionaliza individual fairness |
+| Tabular only | ✅ Choice — escopo histórico |
+| Hiperparâmetros A_z, A_x, A_y | ✅ Justificada — controle explícito do trade-off |
+
+### (e) Conexão com R5/R6
+
+- [[hardt_2016]]: critica statistical parity que Zemel usa. Evolução
+  metodológica.
+- [[madras_2018]] LAFTR: evolução adversarial direta de Zemel.
+- [[park_2022]] FSCL+: evolução contrastive direta de Zemel.
+- [[dehdashtian_2024]] U-FaTE: formaliza o trade-off accuracy ↔
+  fairness que Zemel propôs implicitamente.
+- [[perez_2018]] FiLM: mecanismo alternativo (conditional) ao
+  representational puro de Zemel.
+- **Implicação para v3.2**: Zemel é **citação fundamental** para
+  contextualização teórica. Nossa abordagem (FiLM-conditioning) é
+  evolução conditional do paradigma representational.

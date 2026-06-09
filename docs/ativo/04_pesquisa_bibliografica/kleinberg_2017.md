@@ -150,3 +150,64 @@ qual prioridade cada uma reflete é a postura correta.
   pela comunidade em classification, recommendation, ranking.
 - **Causal fairness** como possível alternativa que escapa
   impossibilidade. ⚠ Direção paralela (Pearl, Kusner).
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Paper teórico puro**: Teorema 1.1 com prova matemática formal.
+- **Três condições de fairness** matematicamente claras (calibration,
+  balance positive, balance negative).
+- **Impossibilidade matemática** demonstrada exceto em casos
+  trivialmente restritos.
+- **Limitação reconhecida**: resultado é assintótico — em datasets
+  finitos pode haver aproximações.
+
+### (b) Reprodutibilidade
+
+- ✅ Paper teórico — provas verificáveis matematicamente.
+- ✅ Conferência ITCS (theoretical CS top venue), LIPIcs open access.
+- ⚠ COMPAS discussão é narrativa — não experimental.
+- ✅ Adoção ampla pela comunidade de fair ML como princípio
+  fundamental.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Justifica triangulação de métricas**: nossa pesquisa reporta DR +
+  worst-class F1 + CV simultaneamente — instância prática do
+  princípio de Kleinberg.
+- **Limitação para race 7-class**: teorema é binário; generalização
+  para multi-classe via one-vs-rest ou worst-case.
+- **Calibra expectativas**: não há "fairness universal" — escolha de
+  métrica é decisão de design.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Três condições escolhidas | ✅ Justificada — representativas da literatura |
+| Risk scores (output contínuo) | ⚠ Choice — generalização para classificação via derivação |
+| Y, A binários | ⚠ Limitação reconhecida |
+| Assume taxas-base diferentes | ⚠ Pressuposto — caso comum |
+| Discussão COMPAS narrativa | ⚠ Choice — paper teórico |
+| Sem proposta de solução prática | ✅ Choice — escopo teórico deliberado |
+
+### (e) Conexão com R5/R6
+
+- [[hardt_2016]]: paper paralelo, mesma época, mesma motivação
+  (COMPAS). Hardt propõe definição (EO_h); Kleinberg prova
+  impossibilidade de combinar definições.
+- [[zemel_2013]]: Kleinberg restringe quantas fairness Zemel pode
+  satisfazer.
+- [[madras_2018]] LAFTR: a tradução de objetivo adversarial → noção
+  de fairness de Madras opera sob a sombra de Kleinberg.
+- [[dehdashtian_2024]] U-FaTE: quantifica empiricamente o trade-off
+  que Kleinberg prova matematicamente.
+- [[mehrabi_2021]] survey: cita o teorema na Seção 4 das
+  definições.
+- [[fuentes_2019]]: combinação Kleinberg matemática + Fuentes
+  sociológica = dupla incompatibilidade conceitual da fairness sob
+  taxonomia racial.
+- **Implicação para v3.2**: Kleinberg é **citação obrigatória** na
+  discussão sobre escolha de métrica. Nossa triangulação (DR +
+  worst-class + CV) é resposta ao teorema, não tentativa de evadi-lo.

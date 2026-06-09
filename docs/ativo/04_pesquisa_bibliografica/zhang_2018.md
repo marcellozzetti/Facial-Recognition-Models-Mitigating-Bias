@@ -156,3 +156,58 @@ o Capítulo 2 da v3.2, ao lado de FSCL+ ([[park_2022]]) e Group DRO
 - **Investigar fairness em pipelines de produção**. ✅ Adoção em
   Google interno e outras companhias (BAIR Berkeley, IBM AIF360 inclui
   Zhang 2018 como implementação canônica).
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Framework adversarial mínimo** matematicamente claro: predictor
+  + adversary com objetivos opostos.
+- **Insight chave**: estrutura do adversary controla qual noção de
+  fairness é satisfeita — paralelo ao Teorema central de Madras.
+- **Projeção ortogonal do gradiente** é crítica para estabilidade —
+  sem ela, treinamento colapsa.
+- **Limitação**: heurística operacional, não teorema formal.
+
+### (b) Reprodutibilidade
+
+- ✅ Implementação canônica em AIF360 (IBM) — adoção ampla.
+- ✅ Word embeddings + UCI Adult são datasets padrão.
+- ⚠ Sensibilidade a hiperparâmetros (learning rates ratio entre
+  predictor e adversary) reconhecida.
+- ⚠ Sem multi-seed reportado.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Candidato a baseline forte** de mitigação algorítmica para Cap 2.
+- **Mais simples de implementar** que LAFTR (Madras 2018) — adversary
+  atua sobre Ŷ, não features.
+- **Limitação**: não cobre conditional architectures — combinação
+  com FiLM seria mecanismo novo.
+- **Multi-class adversarial frágil** para race 7-class — mitigação
+  via one-vs-rest.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Adversary recebe Ŷ (não features) | ✅ Justificada — simplicidade operacional |
+| 3 estruturas para 3 noções de fairness | ✅ Justificada — analogia a Madras |
+| Projeção ortogonal do gradiente | ✅ Justificada — empíricamente crítica |
+| Word embeddings + UCI tabular | ✅ Choice — escopo histórico |
+| A binário | ❌ Limitação reconhecida |
+| Sem teste em imagens | ⚠ Limitação de escopo (2018) |
+
+### (e) Conexão com R5/R6
+
+- [[madras_2018]] LAFTR: paralelo teórico. Zhang é mais simples e
+  operacional; Madras mais formal.
+- [[hardt_2016]]: estruturas de adversary de Zhang implementam
+  Demographic Parity, EO, EOD de Hardt.
+- [[zemel_2013]]: ambos são pós-Zemel; Zhang adota paradigma
+  adversarial vs representational de Zemel.
+- [[perez_2018]] FiLM: ortogonal — FiLM modula features, Zhang
+  modula output. Combinação testável.
+- [[park_2022]] FSCL+: alternativa contrastive não-adversarial.
+- **Implicação para v3.2**: Zhang é **candidato a baseline** de
+  Cap 2. Implementação via AIF360 simplifica adoção.

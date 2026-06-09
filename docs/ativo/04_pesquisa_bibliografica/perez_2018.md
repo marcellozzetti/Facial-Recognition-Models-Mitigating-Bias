@@ -178,3 +178,61 @@ Imagem → CNN (ResNet/ConvNeXt)
 - **Generalizar para multi-step reasoning**. ❌ Fora do escopo.
 - **Aplicar a fairness**: NÃO mencionado pelos autores — direção
   **original** se adotarmos em v3.2.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **FiLM matematicamente simples e clara**: F' = γ ⊙ F + β por canal,
+  com γ, β derivados do contexto via MLPs.
+- **Generalização de Conditional Batch Norm** (de Vries 2017) —
+  conexão teórica estabelecida.
+- **Validação empírica em CLEVR**: error 3.3% → 1.5% — magnitude
+  significativa.
+- **Limitação**: pontos ótimos de inserção determinados
+  empiricamente, sem prova de optimalidade.
+
+### (b) Reprodutibilidade
+
+- ✅ Código original público: github.com/ethanjperez/film.
+- ✅ Hiperparâmetros principais declarados (ResNet-101 com FiLM após
+  cada bloco residual).
+- ✅ CLEVR é benchmark padrão.
+- ⚠ Pontos de inserção FiLM em diferentes arquiteturas exigem
+  tuning específico.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Mecanismo central da Etapa 3 do pipeline**: condicionar race
+  classifier com saída do MST classifier.
+- **Custo paramétrico baixo** (~1% sobre backbone) torna adoção
+  defensável.
+- **Compatibilidade com BackBoneNorm**: substitui parâmetros γ, β
+  do BatchNorm/LayerNorm por γ, β condicionais.
+- **Crítica importante**: FiLM nunca foi aplicado a fairness na
+  literatura — direção original.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Transformação afim por canal | ✅ Justificada — expressivo + eficiente |
+| f_γ, f_β como MLPs simples | ✅ Justificada — interpretabilidade + custo baixo |
+| Inserção após blocos residuais | ⚠ Empírica — sem prova de optimalidade |
+| Contexto z como vetor | ✅ Justificada — flexibilidade (texto, classe, embedding) |
+| CLEVR como benchmark | ✅ Justificada — VQA padrão |
+| Não testar em fairness | ✅ Choice — fora do escopo original |
+
+### (e) Conexão com R5/R6
+
+- [[madras_2018]] LAFTR: FiLM é conditional, LAFTR é representational.
+  Combinação não testada na literatura.
+- [[zhang_2018]] Adversarial: FiLM modula features; Zhang modula
+  output. Mecanismos distintos.
+- [[pereira_2026]] SkinToneNet: provê o classificador cuja saída é
+  contexto z para FiLM.
+- [[hardt_2016]]: FiLM não impõe diretamente EO_h, mas
+  empiricamente pode reduzir disparidade.
+- **Implicação para v3.2**: FiLM é **mecanismo central** da nossa
+  contribuição. Aplicação a fairness em race classification é
+  direção **original** desta dissertação.

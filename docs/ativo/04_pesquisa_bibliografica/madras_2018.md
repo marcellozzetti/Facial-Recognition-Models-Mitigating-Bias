@@ -161,3 +161,62 @@ LAFTR é o **paradigma representational** que precede a abordagem
   em curso na comunidade — adoção de variantes não-adversariais
   (contrastive, conditional) é uma resposta.
 - **Conectar com causal fairness**. ⚠ Direção paralela.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Formulação min-max** matematicamente clara: 3 componentes
+  (encoder, classifier, adversary) treinados conjuntamente.
+- **Teorema central** conecta escolha de L_adv a noção de fairness:
+  cross-entropy → DP, group-balanced → EOD, conditional → EO_h.
+  **Contribuição teórica importante.**
+- **Garantia de transferência** (Teorema 1) — limite superior
+  herdado por classificadores downstream.
+- **Worst-case guarantees** com prova matemática.
+- **Limitação**: treinamento adversarial inerentemente instável
+  (problema GAN clássico).
+
+### (b) Reprodutibilidade
+
+- ✅ Código público: github.com/VectorInstitute/laftr.
+- ✅ Datasets públicos (Adult, Heritage Health Prize).
+- ⚠ Tabular only — generalização para imagens não no paper original.
+- ⚠ Hiperparâmetros de α (peso adversarial) exigem tuning.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Esqueleto teórico para Cap 3** (face recognition): Teorema 1
+  fundamenta extensão race classification → FR.
+- **Mecanismo conditional (FiLM)** é alternativo a representational
+  monolítico de LAFTR.
+- **Adversarial debiasing como baseline** (Zhang 2018 é alternativa
+  operacional).
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Adversarial vs alternativas | ✅ Justificada — generaliza Zemel |
+| 3 escolhas de L_adv | ✅ Teoricamente justificadas (Teorema 1) |
+| Tabular datasets | ⚠ Choice — escopo histórico |
+| A binário | ❌ Limitação reconhecida |
+| Transferência via encoder freeze | ✅ Justificada — Teorema 1 |
+| Stabilidade adversarial | ⚠ Limitação reconhecida |
+
+### (e) Conexão com R5/R6
+
+- [[zemel_2013]] LFR: predecessor direto. LAFTR é evolução adversarial.
+- [[hardt_2016]] EO_h/EOD: Madras conecta formalmente objetivos
+  adversariais a estas noções.
+- [[zhang_2018]] Adversarial debiasing: paralelo metodológico,
+  Madras é mais teórico, Zhang mais operacional.
+- [[park_2022]] FSCL+: alternativa contrastive (não-adversarial) com
+  estabilidade superior.
+- [[perez_2018]] FiLM: mecanismo conditional alternativo ao
+  representational. Combinação não testada na literatura.
+- [[aguirre_2023]] (R6, ficha pendente): demonstra empíricamente
+  fair transfer em multi-task NLP — confirma princípio de LAFTR.
+- **Implicação para v3.2**: LAFTR é **fundamentação teórica** da
+  transferência fair classification → FR (Cap 3). Cita-se como
+  referência canônica de fair representation learning adversarial.

@@ -153,3 +153,59 @@ multi-classe (triangulação DR + worst-class F1 + CV proposta em Q05).
   ❌ Fora do escopo (Mehrabi 2021 também cita).
 - **Aplicar a classifiers complexos** (deep networks). ✅ **Alinhado
   com toda nossa pesquisa** — feito amplamente desde 2016.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Definições EO_h e EOD matematicamente claras**: igualdade de
+  TPR condicional a Y entre grupos demográficos.
+- **Post-hoc fix com derived predictor** tem prova formal de
+  otimalidade dentro do espaço de soluções threshold-based.
+- **Limitação fundamental**: formulação Y, A binários. Generalização
+  para multi-classe não trivial.
+- **Crítica a demographic parity** é matematicamente sólida — força
+  desvio de Bayes-optimal mesmo com GT uniforme.
+
+### (b) Reprodutibilidade
+
+- ✅ Demonstração FICO score com dados públicos.
+- ✅ Closed-form post-hoc adjustment — implementação direta.
+- ⚠ Single dataset (FICO) — generalização para imagens não testada
+  no paper original.
+- ✅ Código de referência amplamente disponível (AIF360, Fairlearn).
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Fonte direta das nossas métricas**: DR (max/min F1 por classe) é
+  generalização multi-classe de EO_h.
+- **Justifica reportar TPR/FPR por classe** em vez de apenas average
+  accuracy.
+- **Limitação para race 7-class**: EO_h padrão é binário; nossa DR
+  e worst-class F1 são adaptações pragmáticas.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| EO_h sobre demographic parity | ✅ Justificada — evita desvio de Bayes-optimal |
+| EOD como extensão (TPR + FPR) | ✅ Justificada — mais restritivo |
+| Post-hoc threshold-based fix | ✅ Justificada — closed-form, não exige re-treino |
+| Y, A binários | ❌ Limitação — generalização não trivial |
+| FICO como dataset demonstration | ✅ Justificada — alta visibilidade |
+| Não causal | ✅ Choice — escopo deliberado |
+
+### (e) Conexão com R5/R6
+
+- [[zemel_2013]]: predecessor paradigmático em fair representation.
+  Hardt formaliza métricas que Zemel optimizava implicitamente.
+- [[kleinberg_2017]]: teorema da impossibilidade restringe quantas
+  fairness Hardt pode satisfazer simultaneamente.
+- [[madras_2018]] LAFTR: usa Hardt definitions para conectar
+  objetivos adversariais a noções específicas de fairness.
+- [[park_2022]] FSCL: reporta EO usando definições Hardt.
+- [[sagawa_2020]] Group DRO: relacionado mas distinto (worst-group
+  vs EO).
+- [[zhang_2018]]: adversarial debiasing também adota Hardt como base.
+- **Implicação para v3.2**: Hardt é **fonte canônica** das nossas
+  métricas. Cita-se obrigatoriamente em apresentação metodológica.
