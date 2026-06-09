@@ -1,13 +1,13 @@
 # INDEX — Pesquisa Bibliográfica
 
-> Navegação central das **29 fichas consolidadas** do corpus + **8 candidatos
+> Navegação central das **30 fichas consolidadas** do corpus + **7 candidatos
 > aprovados em Rodada 6** (a fichar). Para conteúdo integral do paper
-> consultar PDF local. Para resumo estruturado em 11 seções consultar
+> consultar PDF local. Para resumo estruturado em 11–12 seções consultar
 > ficha `.md`.
 >
-> Atualizado: 2026-06-06 (Rodada 6 — validação científica do pipeline v3.2,
-> 8 candidatos aprovados, ver [_triagem.md](_triagem.md#rodada-6) e
-> [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md)).
+> Atualizado: 2026-06-09 (Rodada 6 — primeira ficha R6 fichada:
+> [pereira_2026](pereira_2026.md) — SkinToneNet + STW. Análise completa
+> em [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md)).
 
 ## Ordem de leitura recomendada
 
@@ -99,12 +99,19 @@ com surveys + papers críticos.
 | [Fitzpatrick 1988](fitzpatrick_1988.md) | Origem dermatológica Fitzpatrick (PUVA) |
 | [Massey & Martin 2003](massey_martin_2003.md) | NIS Skin Color Scale (precedente MST) |
 
-### Track H — Validação científica do pipeline v3.2 (NOVO Rodada 6, candidatos aprovados — fichas pendentes)
+### Track H — Validação científica do pipeline v3.2 (Rodada 6)
+
+#### Fichas catalogadas
+
+| Paper | Foco | Relevância v3.2 |
+|---|---|---|
+| [Pereira et al. 2026](pereira_2026.md) — SkinToneNet + STW | Classificador MST SOTA (ViT) + dataset STW (42k imgs) com auditoria de CelebA/VGGFace2 | **Insumo direto da Etapa 1**: usar SkinToneNet pré-treinado. NÃO audita FairFace — nossa C2 segue original |
+
+#### Candidatos aprovados — fichas pendentes (criar pós-reunião)
 
 | Paper | Foco | Relevância v3.2 |
 |---|---|---|
 | Pangelinan et al. 2023 (arXiv:2304.07175) | Causas de variação demográfica em FR accuracy | **Refutação potencial de H5**: pixel info > skin tone |
-| Pereira et al. 2026 (arXiv:2603.02475) — SkinToneNet | MST classifier ViT-Small + STW dataset (42k imgs) | Overlap parcial C2: auditou FairFace mas não publicou matriz cruzada |
 | Dooley et al. 2022/23 (arXiv:2210.09943) | Fairer architectures (NAS) make for fairer FR | Reforça H2: arquitetura por si só importa; valida ConvNeXt-T |
 | Aguirre & Dredze 2023/24 (arXiv:2305.12671) | Multi-task fairness transfer com demographic info limitada | Reforça princípio teórico do pipeline (etapas 3 e 5) |
 | Kolla & Savadamuthu 2022/23 WACVW (arXiv:2211.14498) | Impacto da distribuição racial no treino de FR | Balanceamento NÃO basta; justifica mecanismo arquitetural |
