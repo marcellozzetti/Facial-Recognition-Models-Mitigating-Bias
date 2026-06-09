@@ -87,3 +87,8 @@ htmlcov/
 # rastreabilidade acadêmica. Apenas arquivos de texto extraído ficam
 # ignorados (são derivados dos PDFs via pypdf, podem ser regenerados).
 docs/ativo/04_pesquisa_bibliografica/pdfs/*.txt
+
+# --- Microsoft Office lock files ---
+# Arquivos temporários criados pelo Office (Word, PowerPoint, Excel)
+# enquanto o arquivo está aberto. Não devem ser versionados.
+~$*
