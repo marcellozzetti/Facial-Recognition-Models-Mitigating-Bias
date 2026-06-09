@@ -46,7 +46,7 @@ Para cada ficha, eu:
 
 | Ficha | Classificação | Ação |
 |---|---|---|
-| [pereira_2026](pereira_2026.md) | ❌ OVERVIEW | **Corrigida 2026-06-09** — reescrita como `OVERVIEW_ONLY` honesta com avisos por seção. Pendente leitura PDF para promover a VERIFIED. |
+| [pereira_2026](pereira_2026.md) | ✅ **SOLID (PROMOVIDA 2026-06-09)** | **Reescrita 2x em 2026-06-09**: primeiro como `OVERVIEW_ONLY` honesta, depois **promovida a VERIFIED** após leitura integral via HTML arXiv (arxiv.org/html/2603.02475v1). Detectou-se 3 correções críticas: FairFace É auditado (Seção 7.1), STW agrega FairFace + CelebA (contaminação treino-teste), ViT-Small confirmado com IAA ICC=0.939 / Krippendorff α=0.935. |
 
 ### Rodada 5 (6 fichas — Mecanismos ML / Redes Neurais) — auditoria CONCLUÍDA 2026-06-09
 

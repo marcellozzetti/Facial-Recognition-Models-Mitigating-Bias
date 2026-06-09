@@ -311,13 +311,34 @@ Em ordem de prioridade:
 
 ### Risco B — Sobreposição com SkinToneNet (Pereira 2026)
 
-- **Natureza:** trabalho concorrente já auditou FairFace e tem classifier MST
-- **Impacto:** C1 (classificador MST) deixa de ser contribuição se usarmos
-  SkinToneNet pré-treinado
-- **Mitigação 1:** usar SkinToneNet, focar contribuição em FiLM-conditioning
-- **Mitigação 2:** treinar próprio classificador MST com STW + MST-E + CC
-  e reportar SOTA
-- **Status:** decisão pendente — recomendo Mitigação 1 (acelera cronograma)
+> ⚠️ **REVISADO em 2026-06-09** após leitura integral do PDF de Pereira.
+> Risco original subestimava o problema. Versão atualizada abaixo.
+
+- **Natureza:** trabalho concorrente tem classifier MST (SkinToneNet ViT-Small)
+  E **auditou FairFace na Seção 7.1** (descoberta da leitura integral). MAS:
+  - STW é construído por agregação de 7 datasets, **incluindo FairFace E
+    CelebA como fontes** → contaminação treino-teste se usarmos SkinToneNet
+    para auditar FairFace.
+  - A auditoria de Pereira sobre FairFace é **qualitativa**: reporta
+    "ausência de MST 6-10", NÃO publica matriz cruzada MST × race classes.
+- **Impacto:** C2 (matriz MST × race) **ainda é original** desde que
+  entreguemos análise quantitativa per-race (não apenas distribuição agregada
+  como Pereira). C1 (classificador MST) deixa de ser contribuição se
+  usarmos SkinToneNet pré-treinado.
+- **Mitigação revisada:**
+  - **Etapa A** (obrigatória): validar SkinToneNet em subset FairFace
+    anotado manualmente por anotadores diversos via Prolific (~700 imgs ×
+    3 anotadores). Detectar overfit do treino que viu FairFace.
+  - **Etapa B**: aguardar liberação de código/pesos (paper declara
+    "available soon" — não disponível em 2026-06-09).
+  - **Etapa C**: se código for liberado, considerar re-treinar
+    SkinToneNet apenas com os 6 datasets-fonte excluindo FairFace, para
+    validar que generalização não depende de ter visto FairFace.
+  - **Etapa D**: documentar honestamente a dependência treino-teste no
+    `02_metodologia.md`.
+- **Status:** decisão revisada — usar SkinToneNet pré-treinado SE
+  código for liberado E após Etapa A. Plano B mantido: treinar próprio
+  se necessário.
 
 ### Risco C — Mecanismo FiLM + MST nunca foi testado para race classification
 

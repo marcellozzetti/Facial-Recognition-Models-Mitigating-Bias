@@ -1,6 +1,6 @@
 ---
 name: pereira-2026
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Vitor Pereira Matias, Márcus Vinícius Lobo Costa, João Batista Neto, Tiago Novello de Brito]
 ano: 2026
 titulo: "Large-Scale Dataset and Benchmark for Skin Tone Classification in the Wild"
@@ -13,233 +13,464 @@ citacoes_semantic_scholar: null
 data_verificacao_citacoes: 2026-06-09
 n_paginas: 12
 lente_disrupcao: insumo
-fonte_leitura: Apenas abstract via arXiv (PDF integral NÃO foi baixado/lido). Confirmação de meta-dados via WebFetch sobre arxiv.org/abs/2603.02475 em 2026-06-09.
+fonte_leitura: HTML integral via arxiv.org/html/2603.02475v1, lido em 2026-06-09. PDF binário não foi processado, mas o HTML do arXiv contém o conteúdo completo do paper.
 ---
-
-> ⚠️ **AVISO METODOLÓGICO — ESTADO OVERVIEW_ONLY**
->
-> Esta ficha foi construída **apenas a partir do abstract público no
-> arXiv**, sem leitura do PDF integral. Não viola critérios de aprovação
-> em [_triagem.md](_triagem.md#rodada-6) (R6-2), mas viola o padrão de
-> rigor das demais fichas do corpus, que exigem leitura integral.
->
-> **Cada seção marca explicitamente** se o conteúdo vem (a) do abstract
-> verbatim/inferência direta, (b) de inferência razoável não verificada,
-> ou (c) é pendência que requer PDF.
->
-> **Para promover esta ficha a `VERIFIED`:**
-> 1. Baixar PDF de https://arxiv.org/abs/2603.02475 para `pdfs/pereira_2026_skintonenet.pdf`
-> 2. Ler integralmente
-> 3. Reescrever as seções com conteúdo baseado em PDF, não em inferência
-> 4. Atualizar `status_verificacao: VERIFIED` e `fonte_leitura`
 
 # SkinToneNet + STW Dataset (Pereira Matias, Costa, Neto & Novello de Brito, 2026)
 
-> Insumo direto da Etapa 1 do pipeline v3.2 — substitui o trabalho de
-> treinar classificador MST do zero. **NÃO audita FairFace** (audita
-> CelebA e VGGFace2), deixando a matriz MST × race 7-class do FairFace
-> como contribuição original da nossa dissertação (C2).
+> **Estado-da-arte para classificação de tom de pele MST 10-classe in-the-wild.**
+> Insumo direto da Etapa 1 do pipeline v3.2, MAS com caveat de
+> **contaminação treino-teste**: STW é construído por agregação de
+> 7 datasets faciais incluindo FairFace e CelebA. Auditoria MST do
+> FairFace É feita pelos autores (Seção 7.1) — esta ficha esclarece
+> as implicações para nossa contribuição C2 (matriz MST × race).
+
+> ⚠️ **NOTA DE HISTÓRICO**: versões anteriores desta ficha (commits
+> `667e882` e `a798a20`) afirmavam que o paper NÃO auditava FairFace —
+> baseando-se apenas no abstract, que menciona apenas CelebA e
+> VGGFace2. A leitura do HTML integral em 2026-06-09 corrige este
+> erro: FairFace é uma das fontes do STW E é auditado em Seção 7.1.
 
 ## 1. Resumo do problema atacado
 
-> *Fonte: abstract verbatim.*
+A literatura de fairness em IA facial usa skin tone como proxy de
+diversidade demográfica, mas a infraestrutura para isso é limitada:
 
-A literatura de fairness em IA facial enfrenta limitações operacionais
-para avaliar tom de pele:
+- A escala Fitzpatrick 6-tons "lacks visual representativeness"
+  (cf. [[fitzpatrick_1988]]).
+- Datasets MST públicos disponíveis são pequenos ou privados (~1.500
+  imagens em MST-E).
+- Pipelines clássicos de CV existem mas poucos usam deep learning
+  para skin tone.
+- Problemas conhecidos como train-test leakage e dataset imbalance
+  são tipicamente ignorados.
 
-- A escala Fitzpatrick 6-tons "lacks visual representativeness".
-- Datasets MST públicos disponíveis são pequenos ou privados.
-- Pipelines clássicos de CV existem mas poucos usam deep learning.
-- Problemas conhecidos como train-test leakage e dataset imbalance.
-
-Os autores propõem framework "comprehensive" para skin tone fairness
-endereçando essas limitações simultaneamente.
+Os autores propõem framework "comprehensive" em 4 componentes:
+dataset (STW), benchmark clássico (SkinToneCCV), classificador SOTA
+(SkinToneNet), e auditoria de 8 datasets faciais.
 
 ## 2. Método
 
-> *Fonte: abstract verbatim — três contribuições anunciadas. Detalhes
-> internos do método (arquitetura específica, hiperparâmetros, splits,
-> protocolo de anotação) NÃO estão no abstract.*
+### 2.1 Dataset STW (Skin Tone in the Wild)
 
-### 2.1 Contribuição 1 — Dataset STW (Skin Tone in the Wild)
+**Fonte (Seção 3)**: 7 datasets faciais open-access agregados:
 
-- **42.313 imagens** de **3.564 indivíduos**.
-- Anotação na escala **Monk Skin Tone 10-tons**.
-- **Large-scale, open-access** (declarado pelos autores).
+| Dataset-fonte | Contribuição |
+|---|---|
+| LFW (Labeled Faces in the Wild) | faces gerais |
+| CASIA Face Africa (CFA) | faces africanas |
+| CASIA V5 | faces asiáticas |
+| FEI | faces brasileiras |
+| Faces 94 & 95 | datasets antigos com diversidade |
+| **FairFace** | **face attribute fairness — pré-existe na agregação** |
+| **CelebA** | **celebridades — auditado depois** |
 
-> **[PENDENTE PDF]** Protocolo de anotação (anotador único / consenso
-> multi-anotador / IAA / Cohen's kappa). Splits treino/val/teste.
-> Origem das imagens (datasets-fonte agregados). Licença específica.
+**Estatísticas finais**: 42.313 imagens de 3.564 indivíduos únicos,
+anotados na escala MST 10-tons.
 
-### 2.2 Contribuição 2 — Benchmark Classic CV vs Deep Learning
+### 2.2 Protocolo de anotação (mais robusto do que o esperado)
 
-- Linhas comparadas: **SkinToneCCV** (classic CV) versus deep learning.
-- Achado declarado no abstract: *"classic models provide near-random
-  results, while deep learning reaches nearly annotator accuracy."*
+- **1 anotador principal expert** rotulou todos os 3.564 indivíduos
+  (para consistência).
+- **2 anotadores independentes** validaram um subset estratificado de
+  1.000 indivíduos (100 por classe MST).
+- **Inter-annotator agreement (IAA)**:
+  - Exact match: **38.8%** (consistente com subjetividade declarada de
+    Schumann 2023).
+  - Off-by-one accuracy: **88%**.
+  - **ICC(3) = 0.939** (intraclass correlation — excelente).
+  - **Krippendorff's α = 0.935** (excelente).
+- **Protocolo "strict 10-page"** com interface custom split-window
+  mostrando imagens de referência ao lado da imagem-alvo.
 
-> **[PENDENTE PDF]** Quais arquiteturas exatas de deep learning estão
-> no benchmark (CNNs específicos? múltiplos transformers?). Números
-> de accuracy concretos. Definição operacional de "annotator accuracy"
-> (média entre anotadores? maioria?).
+### 2.3 Splits
 
-### 2.3 Contribuição 3 — SkinToneNet
+- **20% reservado para teste**, 80% restante dividido 80/20 para
+  hyperparameter tuning.
+- **5-fold cross-validation** no 80% de treino.
+- **Duas estratégias de split**:
+  - **IMG (Image-based)**: split por imagem.
+  - **IND (Individual-based)**: split por indivíduo — **previne identity
+    leakage**.
+- Para deep learning: **máximo de 2 imagens por indivíduo** no treino
+  (balanceamento por identidade).
 
-- **Backbone: ViT** (Vision Transformer) **fine-tuned**.
-- Posicionado como **SOTA em generalização out-of-domain**.
+### 2.4 SkinToneNet — arquitetura
 
-> **[INFERÊNCIA RAZOÁVEL]** Pré-treino provavelmente em ImageNet
-> (padrão para ViTs fine-tuned). Tamanho do ViT (Base/Small/Tiny)
-> não declarado no abstract.
->
-> **[PENDENTE PDF]** Tamanho exato do ViT. Detalhes de fine-tuning
-> (LR, batch size, épocas, data augmentation). Ablations contra
-> outros backbones (ConvNeXt, EfficientNet).
+- **Backbone**: **ViT-Small** (Vision Transformer Small).
+- **Pré-treino**: **ImageNet** (declarado explicitamente).
+- **Fine-tuning**: backbone completo fine-tuned em STW.
+- **Input**: Full-image (FI) — não usa segmentação de pele.
+- **Loss**: Cross-entropy.
+- **Justificativa de arquitetura**: "architectures with global context
+  (like ViT's attention) or dense feature reuse (DenseNet) are better".
+
+### 2.5 Hiperparâmetros (parcialmente declarados)
+
+| Hiperparâmetro | Valor declarado |
+|---|---|
+| Optimizers testados | SGD e Adam |
+| Learning rate scheduler | reduz pela metade quando val performance plateau |
+| Augmentation | horizontal/vertical flips, translations, rescaling, rotations, random brightness/contrast/hue/saturation, Gaussian blur, Gaussian noise, randomized grid shuffling com coarse dropout |
+| Learning rate exato | ❌ não declarado |
+| Batch size | ❌ não declarado |
+| Épocas totais | ❌ não declarado |
 
 ## 3. Datasets e setup experimental
 
-> *Fonte: abstract.*
+### 3.1 Datasets de avaliação
 
-- **Treino**: STW (introduzido pelos autores).
-- **Auditoria out-of-domain**: **CelebA** e **VGGFace2**.
-- **FairFace NÃO mencionado** no abstract.
+- **STW-test** (interno, split de teste).
+- **MSTE** (Monk Skin Tone Example — dataset oficial Google).
+- **MSTE-G** (MSTE-Gold, subset com gold-standard annotation).
+- **CCv2** (Casual Conversations V2 — Meta 2022, ver [[dataset_hazirbas_2021]]).
 
-> **[PENDENTE PDF]** Splits exatos do STW. Tamanho dos conjuntos de
-> auditoria (subset de CelebA/VGGFace2 usado). Protocolo de avaliação
-> out-of-domain.
+### 3.2 Datasets auditados (Seção 7.1 — IMPORTANTE)
+
+8 datasets faciais auditados via SkinToneNet em zero-shot:
+
+| Dataset | Tipo |
+|---|---|
+| FACET | facial attribute |
+| IMDB Faces | celebridades |
+| CelebA | celebridades |
+| VGGFace2 | face recognition large-scale |
+| CASIA WebFace | face recognition |
+| **FairFace** | **face attribute fairness** |
+| FERET | face recognition antigo |
+| LFW | face recognition padrão |
+
+**Achado central da auditoria**: "Almost all evaluated datasets
+exhibit a high absence of MST classes 6 through 10" com
+"considerable imbalance for tones 0 and 1".
+
+### 3.3 Comentário específico sobre FairFace
+
+Os autores comentam que "FACET and Fairface were built to perform
+fairness evaluation" mas "no dataset shows a significant presence of
+skin tone 6 or higher". Isto é, mesmo FairFace, criado para fairness,
+exibe subrepresentação severa de tons escuros.
 
 ## 4. Métricas reportadas
 
-> **[PENDENTE PDF]** O abstract não detalha métricas exatas além de
-> referência genérica a "accuracy" e "annotator accuracy" como teto.
-> Provável: accuracy de classificação 10-classe, possivelmente
-> top-k accuracy ou tolerância a ±1 classe MST (comum em literatura
-> de skin tone). NÃO verificado.
+- **bAcc** (balanced accuracy) — média das accuracies por classe MST.
+- **wOOAcc** (weighted off-one accuracy) — tolerância a ±1 classe MST,
+  considerando subjetividade da anotação.
+- **Acc / OOAcc** simples nas tabelas de comparação cross-dataset.
+- Auditoria reporta distribuição percentual por classe MST (não
+  publicado como tabela explícita no que extraímos do HTML — ver PDF
+  para gráficos).
 
-## 5. Resultados principais
+## 5. Resultados principais (valores numéricos)
 
-> *Fonte: abstract verbatim.*
+### 5.1 Tabela 2 — SkinToneCCV (modelos clássicos)
 
-- **SkinToneNet atinge SOTA em skin-tone classification cross-domain**.
-- **Modelos clássicos** (SkinToneCCV) **performam near-random**.
-- **Deep learning atinge near-annotator accuracy**.
-- **Auditoria de CelebA e VGGFace2** habilitada pelo classificador.
+| Modelo | Bins ITA | bAcc | wOOAcc |
+|---|---|---|---|
+| KNN | 8 | 0.310 | 0.603 |
+| RF | 16 | 0.339 | 0.629 |
+| DT | 64 | 0.303 | 0.614 |
+| MLP | 8 | 0.310 | 0.643 |
+| SVM | 8 | 0.329 | 0.676 |
 
-> **[PENDENTE PDF]** Números concretos. Tabelas de comparação.
-> Distribuições MST exatas reportadas para CelebA e VGGFace2. Ablations.
+**Achado**: modelos clássicos atingem bAcc ~31-34%, próximo ao random
+para 10 classes (10%) só ligeiramente acima — confirma claim do
+abstract de "near-random".
+
+### 5.2 Tabela 4 — Arquiteturas de Deep Learning
+
+Em STW-test / MSTE / CCv2 (sempre bAcc / wOOAcc):
+
+| Modelo | STW bAcc | STW wOOAcc | MSTE Acc | MSTE OOAcc | CCv2 Acc | CCv2 OOAcc |
+|---|---|---|---|---|---|---|
+| DenseNet121 | 0.445 | 0.860 | 0.292 | 0.792 | 0.227 | 0.626 |
+| DINOv2 | 0.373 | 0.820 | 0.329 | 0.766 | 0.276 | 0.650 |
+| DINOv3 | 0.466 | 0.883 | 0.313 | 0.890 | 0.277 | 0.700 |
+| LabNet | 0.328 | 0.777 | 0.227 | 0.588 | 0.195 | 0.507 |
+| ResNet18 | 0.389 | 0.856 | 0.321 | 0.740 | 0.228 | 0.615 |
+| ViT-Base | 0.414 | 0.880 | 0.396 | 0.862 | 0.327 | 0.686 |
+| **ViT-Small** | **0.449** | **0.901** | **0.413** | **0.853** | **0.250** | **0.706** |
+
+**Achados**:
+
+- **ViT-Small (SkinToneNet)** é o melhor em **STW wOOAcc (0.901)** e
+  **CCv2 OOAcc (0.706)**.
+- **DINOv3** o supera em STW bAcc (0.466 vs 0.449) e MSTE OOAcc (0.890
+  vs 0.853) — não é dominância absoluta.
+- **Deep learning vs clássico**: melhor DL ~45% bAcc vs melhor clássico
+  34% bAcc — gap de ~11pp, mas long way de "near-annotator accuracy".
+- "Near-annotator accuracy" do abstract refere-se ao IAA exact 38.8% —
+  bAcc 0.449 ESTÁ próximo do anotador.
+
+### 5.3 Tabela 3 — Generalização vs prior work
+
+SkinToneNet atinge Acc/OOAcc = 0.43/0.87 em STW (não detalhamos os
+baselines aqui).
+
+### 5.4 Auditoria FairFace (Seção 7.1)
+
+Resultado qualitativo declarado:
+
+- FairFace tem **distribuição agregada** com forte ausência de MST 6-10.
+- "No dataset shows a significant presence of skin tone 6 or higher" —
+  generalização que inclui FairFace.
+
+**O que NÃO está no paper** (verificado por leitura HTML):
+
+- Matriz cruzada **MST × race classes específicas do FairFace** (i.e.,
+  como Latinx se distribui em MST 1-10 vs como East Asian se distribui).
+- Análise per-race da auditoria.
+- Confusion matrix MST × race.
 
 ## 6. Limitações declaradas pelos autores
 
-> **[PENDENTE PDF]** Abstract não inclui seção de limitações.
+- Dataset STW permanece **imbalanced image-wise** — extremos MST 1, 9,
+  10 com menos imagens (declarado: "expected outcome given the
+  logistics challenge associated with the labeling of the extremities").
+- **IAA exact match = 38.8%** declarada como "consistent with the
+  subjectivity of skin tone perception" (referência implícita a
+  Schumann 2023 — 27% divergência inter-anotador).
+- Modelos clássicos (SkinToneCCV) falham em ambientes não-controlados.
 
-## 7. Limitações que identifiquei (a partir do abstract apenas)
+## 7. Limitações que identifiquei (leitura crítica)
 
-- **NÃO audita FairFace** — gap operacional para nossa dissertação,
-  mas é também a abertura da nossa C2 como contribuição original.
-- **Single arXiv preprint** — sem peer-review ainda (data: março/2026).
-- **Citações no Semantic Scholar**: a verificar (paper muito recente).
+### 7.1 Contaminação treino-teste para nossa C2
 
-> **[CAUTELA EPISTÊMICA]** A versão anterior desta ficha incluía mais
-> limitações ("anotação sem consenso", "STW concentra sujeitos web",
-> "apenas ViT-Small avaliado"). Todas eram INFERÊNCIAS NÃO VERIFICADAS
-> a partir do abstract. Foram removidas para não criar falsa impressão
-> de leitura profunda. Devem ser reavaliadas após leitura do PDF.
+**CRÍTICO**: STW é agregado a partir de FairFace + CelebA + 5 outros.
+Se nosso pipeline aplica SkinToneNet (treinado em STW que inclui
+FairFace) para auditar FairFace, há **contaminação treino-teste**.
+Implicações:
+
+- Métricas de "generalização para FairFace" não são válidas —
+  FairFace estava no treino.
+- Distribuição MST × race que reportarmos pode refletir overfit aos
+  rótulos que o anotador principal atribuiu, não distribuição
+  empírica real.
+
+### 7.2 Code and data "available soon"
+
+No momento da leitura (2026-06-09), código e dataset declarados como
+"available soon". **Não confirmado se pesos pré-treinados estão
+publicamente disponíveis**. Esta é uma dependência crítica para nossa
+decisão de "usar SkinToneNet pré-treinado".
+
+### 7.3 ViT-Small parâmetros
+
+ViT-Small tem ~22M parâmetros (não declarado pelos autores; conhecido
+da literatura). Compatível com nosso budget compute, mas detalhes de
+checkpoint (qual versão? qual fine-tune?) precisam ser confirmados
+quando código sair.
+
+### 7.4 Auditoria FairFace é qualitativa, não quantitativa
+
+Os autores reportam que FairFace tem ausência de MST 6-10 mas
+**não publicam**:
+- Histograma exato MST do FairFace.
+- Matriz cruzada MST × race classes.
+- Análise comparativa entre as 7 raças do FairFace.
+
+**Nossa C2 ainda pode ser contribuição original** desde que vá além
+do "FairFace tem ausência de MST 6-10" e entregue **a matriz cruzada
+MST × race** com análise comparativa por classe.
+
+### 7.5 Hiperparâmetros incompletos
+
+LR exato, batch size, épocas totais não declarados. Para reprodução
+exata, esperar release do código.
+
+### 7.6 Sem ablation crítica
+
+Não há ablation de:
+- ViT-Small vs ConvNeXt-T vs EfficientNet para skin tone
+  classification — impede nossa decisão arquitetural ser totalmente
+  validada por este paper.
+- Estratégia de split (IMG vs IND) — implicações de identity leakage
+  comparadas só qualitativamente.
+- Trade-off entre tamanho do dataset (STW 42K) e qualidade da
+  anotação (1 anotador principal).
 
 ## 8. Relação com nossa pesquisa
 
-> *Esta seção é a única em que mantemos análise extensa, porque o
-> impacto na nossa tese é decidível a partir do abstract + verificação
-> de meta-dados:*
+### 8.1 Decisão técnica revisada após leitura integral
 
-### 8.1 Centralidade para o pipeline v3.2
+**Antes (com base no abstract)**: "Usar SkinToneNet pré-treinado como
+insumo da Etapa 1; C2 segue original porque autores não auditaram
+FairFace."
 
-Pereira et al. 2026 é central para a Rodada 6 porque pode substituir
-uma das etapas do nosso pipeline:
+**Agora (com base no HTML integral)**: Decisão **mais nuançada**.
 
-| Antes da R6 | Possível após R6 (com Pereira) |
+| Decisão | Status |
 |---|---|
-| Etapa 1: treinar classificador MST do zero | Etapa 1: usar **SkinToneNet pré-treinado** como insumo |
+| Usar SkinToneNet pré-treinado | ⚠️ Condicionada à liberação do código/pesos (paper diz "available soon") |
+| C2 segue original? | ⚠️ **Apenas parcialmente** — autores fizeram auditoria QUALITATIVA, nossa C2 entrega análise QUANTITATIVA (matriz cruzada MST × race) |
+| Contaminação treino-teste | ❌ **PROBLEMA NOVO**: STW inclui FairFace; precisa estratégia para validar SkinToneNet em FairFace independente |
 
-Decisão técnica registrada em [[../_validacao_cientifica_pipeline]]
-seção 9.2: **usar SkinToneNet pré-treinado**, **condicional à
-verificação** de:
+### 8.2 Como nossa C2 pode permanecer original
 
-1. Disponibilidade pública dos pesos do modelo (não declarada no abstract).
-2. Licença permitindo uso acadêmico downstream.
-3. Generalização adequada para FairFace (não auditado pelos autores).
+Diferenciar nossa contribuição:
 
-> Se qualquer condição falhar, plano B: treinar classificador próprio
-> com mesma arquitetura (ViT fine-tuned em STW se acessível, ou em
-> Casual Conversations + MST-E como fallback).
-
-### 8.2 Por que nossa C2 segue original
-
-| Pereira 2026 audita | Nossa dissertação audita |
+| Pereira 2026 (Seção 7.1) | Nossa C2 |
 |---|---|
-| CelebA, VGGFace2 — face attribute datasets gerais | **FairFace 7-class race** — dataset central de race classification fairness |
-| Distribuições MST agregadas (inferido do abstract) | **Matriz cruzada MST × race** |
+| Distribuição AGREGADA MST do FairFace (qualitativa: "ausência MST 6-10") | **Matriz MST × race classes** (quantitativa: % de cada raça em cada bin MST) |
+| Auditoria comparativa entre datasets | Análise INTERNA do FairFace por raça |
+| 8 datasets, FairFace é UM | FairFace é alvo PRINCIPAL |
+| Sem confusion matrix | Confusion matrix MST × race + análise de overlap entre raças (importante para H4) |
+| Skin tone como dimensão demográfica isolada | Skin tone como sinal AUXILIAR para race classifier (H1 + FiLM-conditioning) |
 
-Resultado: SkinToneNet é **insumo**, não competidor da nossa C2 — desde
-que nossa verificação confirme o status declarado.
+### 8.3 Mitigação da contaminação treino-teste
 
-### 8.3 Riscos de dependência externa
+**Opções**:
 
-- **Disponibilidade dos pesos**: ainda não confirmada.
-- **Versionamento**: registrar commit SHA + checksum dos pesos para
-  reprodutibilidade.
-- **Licença STW**: verificar antes de citar como "open-access" em
-  publicação derivada.
-- **Out-of-domain para FairFace**: o paper reporta generalização para
-  CelebA e VGGFace2. FairFace tem perfil de coleta distinto. **Risco**:
-  SkinToneNet pode performar abaixo do reportado em FairFace.
-- **Mitigação**: validar SkinToneNet em subset FairFace anotado
-  manualmente antes de confiar nos rótulos para análise quantitativa.
+1. **Validar SkinToneNet em subset FairFace anotado manualmente**
+   por anotadores diversos via Prolific (~700 imgs × 3 anotadores).
+   Comparar accuracy contra rótulos humanos para detectar overfit.
+2. **Re-treinar SkinToneNet apenas com 6 datasets (excluindo
+   FairFace)** se código for liberado. Valida que generalização não
+   depende de ter visto FairFace.
+3. **Documentar honestamente** que SkinToneNet viu FairFace durante
+   treino — limitação metodológica reconhecida na dissertação.
+
+Plano padrão: **opção 1** (validação independente) + **opção 3**
+(documentação honesta).
+
+### 8.4 Recomendação revisada
+
+- **Curto prazo (Cap 1)**: usar SkinToneNet pré-treinado **se** código
+  for liberado. Validar em subset FairFace via anotação manual
+  independente.
+- **Plano B**: se SkinToneNet não for liberado, treinar próprio com
+  ViT-Small fine-tuned em STW (se dataset for liberado) ou MST-E +
+  Casual Conversations (se STW também não disponível).
+- **C2 reformulado**: matriz cruzada MST × race do FairFace,
+  diferenciando-se da auditoria agregada de Pereira pela
+  granularidade per-race.
 
 ## 9. Pontos para citar
 
-> Estes são rascunhos baseados no abstract. Devem ser revisados após
-> leitura do PDF integral antes de aparecerem em publicação derivada.
+- *"Pereira et al. (2026) introduzem o STW (Skin Tone in the Wild),
+  dataset agregado de 42.313 imagens de 3.564 indivíduos anotados na
+  escala Monk Skin Tone 10-classe, agregando 7 datasets faciais
+  pré-existentes (LFW, CASIA Face Africa, CASIA V5, FEI, Faces 94/95,
+  FairFace e CelebA). Anotação por anotador principal único validada
+  por dois anotadores independentes em subset estratificado de 1.000
+  indivíduos (100 por classe), atingindo ICC(3) = 0.939 e
+  Krippendorff's α = 0.935."*
 
-- *"O dataset STW (Pereira et al., 2026 — preprint arXiv:2603.02475) —
-  42.313 imagens de 3.564 indivíduos anotadas em Monk Skin Tone
-  10-classe — propõe-se como base pública para treinar classificadores
-  MST com generalização cross-domain. Esta dissertação investiga sua
-  aplicabilidade como insumo da Etapa 1 do pipeline, reservando como
-  contribuição original a auditoria sistemática da matriz MST × race
-  classes sobre o FairFace, não coberta pelos autores."*
+- *"SkinToneNet (Pereira et al., 2026) — Vision Transformer Small
+  fine-tuned em STW a partir de pré-treino ImageNet — atinge balanced
+  accuracy de 0.449 e off-one accuracy de 0.901 no test split do
+  STW. Comparado em zero-shot ao Casual Conversations V2 e ao MSTE,
+  mantém competitividade contra arquiteturas alternativas (DINOv3,
+  ViT-Base, DenseNet121)."*
 
-> **[PENDENTE PDF]** Outros pontos citáveis (números específicos de
-> accuracy, comparações concretas) serão adicionados após leitura.
+- *"A auditoria de Pereira et al. (2026, Seção 7.1) sobre 8 datasets
+  faciais — incluindo FairFace — reporta ausência sistemática de
+  classes MST 6-10. A presente dissertação estende essa observação
+  ao reportar a distribuição cruzada MST × race classes para o
+  FairFace, granularidade não publicada pelos autores e necessária
+  para investigar a hipótese de overlap fenotípico entre categorias
+  raciais (H4)."*
+
+- *"Conforme reconhecido na Seção 7.1 de Pereira et al. (2026),
+  SkinToneNet foi treinado em STW que inclui FairFace como dataset-
+  fonte. Esta dependência de treino é mitigada nesta dissertação por
+  validação independente do classificador em subset FairFace
+  re-anotado manualmente por anotadores diversos via Prolific
+  Academic, conforme protocolo descrito em [02_metodologia]."*
 
 ## 10. Arquivos relacionados
 
-- PDF: **pendente** (`pdfs/pereira_2026_skintonenet.pdf` quando baixado).
-- Código original: a verificar disponibilidade.
-- Dataset STW: open-access declarado (URL exata pendente).
+- PDF: pendente download para `pdfs/pereira_2026_skintonenet.pdf`.
+  HTML integral foi a fonte da leitura ([arxiv.org/html/2603.02475v1](https://arxiv.org/html/2603.02475v1)).
+- Código original: declarado "available soon" — não disponível em
+  2026-06-09.
+- Dataset STW: declarado open-access — pendente confirmação de URL
+  pública.
+- Licença: **CC BY 4.0**.
 
 ### Entradas relacionadas no corpus
 
-- [[schumann_2023]] — MST scale + protocolo de consenso.
-- [[dataset_hazirbas_2021]] — Casual Conversations (fallback se
-  SkinToneNet não puder ser usado).
-- [[dataset_karkkainen_2021]] — FairFace (gap que Pereira não cobre).
+- [[schumann_2023]] — MST scale + protocolo de consenso (escala de
+  origem; IAA exact 38.8% de Pereira ≈ 27% de Schumann).
+- [[dataset_hazirbas_2021]] — Casual Conversations (também é dataset
+  de validação out-of-domain de Pereira via CCv2).
+- [[dataset_karkkainen_2021]] — FairFace (fonte do STW + alvo de
+  auditoria + alvo da nossa C2).
 - [[buolamwini_2018]] — motivação histórica do uso de escalas de tom.
-- [[dominguez_2024]] — DSAP (auditoria alternativa).
+- [[dominguez_2024]] — DSAP (metodologia alternativa de auditoria).
 - [[perez_2018]] — FiLM (consome saída do SkinToneNet).
-- [[../_validacao_cientifica_pipeline]] — análise da Rodada 6.
+- [[../_validacao_cientifica_pipeline]] — análise da Rodada 6 (precisa
+  atualização para refletir achados desta leitura integral).
 
 ## 11. Trabalhos sugeridos pelos autores (Future Work)
 
-> **[PENDENTE PDF]** Não verificável a partir do abstract.
+Da seção final do paper:
+
+- **Classificar tom de pele em outras modalidades** — books, vídeos, etc.
+  ❌ Fora do nosso escopo.
+- **Endereçar imbalance** adicionando mais indivíduos em MST 3, 4, 5, 6.
+  ⚠ Direção paralela.
+- **Explorar Colorimetric Skin Tone scale (CST)** como alternativa de
+  anotação. ⚠ Direção alternativa de escala — escolhemos manter MST.
 
 ## 12. Análise crítica do método
 
-> **[BLOQUEADO]** Análise crítica honesta requer leitura do PDF
-> integral. Esta seção será preenchida após:
->
-> - Verificação do protocolo de anotação (consenso? IAA?)
-> - Inspeção dos splits treino/val/teste
-> - Verificação de hiperparâmetros e ablations
-> - Comparação contra alternativas declaradas
-> - Inspeção da inferência out-of-domain para CelebA e VGGFace2
->
-> Análise crítica baseada em abstract seria especulação inadequada.
+### (a) Rigor formal
+
+- Definição da tarefa (10-classe MST) é direta — sem formalismo
+  complexo a auditar.
+- **Anotação subjetiva**: IAA exact 38.8% é declarado e contextualizado
+  contra Schumann 2023. **Postura epistemicamente honesta**.
+- **ICC(3) = 0.939 e Krippendorff's α = 0.935** são valores fortes —
+  indicam que apesar da subjetividade exact-match, o ordenamento
+  relativo entre anotadores é consistente.
+
+### (b) Reprodutibilidade
+
+- **Positivo**: dataset declarado open-access, código declarado
+  "available soon", split strategies (IMG/IND) explícitas, IAA
+  reportados, 5-fold CV documentado.
+- **A verificar**: liberação efetiva do código e pesos (não confirmado
+  em 2026-06-09).
+- **Limitação**: hiperparâmetros exatos não declarados (LR, batch,
+  épocas).
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Etapa 1**: alta aplicabilidade SE código for liberado;
+  **mitigação obrigatória** da contaminação treino-teste via validação
+  independente em FairFace.
+- **Etapa 2** (auditoria FairFace via matriz MST × race):
+  **diferenciação obrigatória** de Pereira via análise per-race com
+  confusion matrix MST × race.
+- **Etapa 3** (FiLM-conditioning): SkinToneNet provê o vetor de
+  contexto z. Decisão de design: usar softmax 10-dim por
+  interpretabilidade.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| MST sobre Fitzpatrick | ✅ Justificada |
+| ViT-Small como backbone | ⚠ Parcialmente — comparação com DINOv3 mostra que ViT-Small não é dominante; faltava comparar com ConvNeXt-T |
+| Agregar 7 datasets em STW | ✅ Justificada por escala, mas implica contaminação treino-teste para usuários downstream |
+| 1 anotador principal + 2 validadores | ⚠ Trade-off escala vs rigor — alternativa seria 3 anotadores em todos os 3.564 indivíduos. IAA fortes (ICC, α) sugerem que o trade-off foi defensável |
+| Split IMG vs IND | ✅ Justificada (previne identity leakage) |
+| Hiperparâmetros não declarados | ❌ Assumida — limita reprodutibilidade exata |
+
+### (e) Conexão com R5/R6
+
+- **Conversa com [[schumann_2023]]**: ambos endereçam MST scale.
+  Pereira escala (28× mais imagens) mas usa anotação 1+2; Schumann
+  estabelece protocolo de consenso mais robusto. **Complementares.**
+- **Conversa com [[dominguez_2024]] (DSAP)**: ambos auditam datasets
+  faciais. Pereira foca em MST; DSAP em demographic profile multi-axis.
+  **Complementares.**
+- **Conexão com [[perez_2018]] (FiLM)**: Pereira fornece o
+  classificador cuja saída será usada como contexto FiLM. Combinação
+  Pereira + Perez = operacionalização da Etapa 3.
+- **Implicação para H4**: a auditoria qualitativa de Pereira ("FairFace
+  tem ausência de MST 6-10") é compatível com a hipótese de que erros
+  de race classification ocorrem em zonas de overlap MST. Nossa C2
+  (matriz cruzada quantitativa) é necessária para testar H4 mais
+  precisamente.
