@@ -157,13 +157,29 @@ fichas), abrir `05_landscape.md` e cruzar achados por:
 
 ## 5. Template de ficha por paper
 
+### 5.0 Estados de verificação
+
+- **`VERIFIED`** — ficha construída a partir de **leitura integral do
+  PDF** (ou da fonte primária mais próxima quando o PDF é inacessível,
+  como o caso de papers antigos sem digitalização aberta). É o padrão
+  exigido para fichas do corpus consolidado.
+- **`CONTENT-TO-VERIFY`** — ficha construída mas com pontos específicos
+  marcados que precisam de re-leitura ou consulta a fonte adicional.
+- **`OVERVIEW_ONLY`** — ficha construída **apenas a partir do abstract**
+  ou de fonte secundária (resenha, news release). Cada seção precisa
+  marcar explicitamente o que vem do abstract verbatim, o que é
+  inferência razoável e o que está pendente do PDF integral. **Ficha
+  com este estado NÃO pode ser citada como fonte em publicação
+  derivada sem promover para VERIFIED antes.** Utilizada para registrar
+  decisões temporárias enquanto o PDF não está disponível.
+
 Cada ficha deve seguir esta estrutura, salva como
 `<primeiro_autor_minusculo>_<ano>.md`:
 
 ```markdown
 ---
 name: <primeiro_autor>-<ano>
-status_verificacao: VERIFIED   # VERIFIED | CONTENT-TO-VERIFY
+status_verificacao: VERIFIED   # VERIFIED | CONTENT-TO-VERIFY | OVERVIEW_ONLY
 autores: [Lista, Completa, Aqui]
 ano: YYYY
 titulo: "Título exato do paper"
