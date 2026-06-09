@@ -239,3 +239,57 @@ Extraído de Section 6 (Challenges and Opportunities):
   vs ML clássico. ✅ **Alinhada com Q04**.
 - **Fairness sem demographic labels** (privacy-preserving). ⚠
   Direção emergente.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Survey, não método empírico** — rigor avalia-se em comprehensiveness,
+  taxonomia, e fidelidade às fontes.
+- **Taxonomia canônica** de 10 fairness definitions é referência
+  padrão na comunidade.
+- **Limitação**: estilo descritivo, não crítico. Apresenta abordagens
+  sem hierarquizar robustez em settings específicos.
+
+### (b) Reprodutibilidade
+
+- ✅ Survey publicado em ACM CSur (peer-reviewed top venue).
+- ✅ Citações bem documentadas (170+ referências).
+- ⚠ Snapshot temporal — papers pós-2021 não cobertos. FaceScanPaliGemma
+  (2024/26), Manzoor (2024), Pereira (2026) ausentes.
+- ⚠ Cobertura desigual por domínio: NLP > visão computacional.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Referência teórica obrigatória** para contextualização da nossa
+  pesquisa.
+- **Categorias pre-/in-/post-processing** dão vocabulário padrão para
+  descrever nossa metodologia.
+- **Não cobre race classification facial específica** (foco geral) —
+  nosso gap é específico ao domínio.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| 6 seções organizadas (bias → fairness → mitigation) | ✅ Justificada — estrutura padrão de survey |
+| 10 definições de fairness apresentadas | ✅ Justificada — taxonomia completa |
+| Taxonomia bias por ciclo D-A-U | ✅ Justificada — sistema didático |
+| Estilo descritivo, não crítico | ⚠ Choice — limita guidance prático |
+| Snapshot 2021 sem updates | ❌ Limitação temporal — datado pós-2022 |
+| Cobertura desigual por domínio | ⚠ Reconhecida — NLP overweighted |
+
+### (e) Conexão com R5/R6
+
+- [[buolamwini_2018]]: caso real citado no survey como motivação.
+- [[hardt_2016]]: definições EO_h/EOD do Hardt são fonte canônica
+  citada por Mehrabi (Definitions 1 e 2 da Tabela 1).
+- [[kleinberg_2017]]: impossibilidade citada como princípio
+  fundamental.
+- [[zemel_2013]]: Fair Representation Learning é instância de pre-
+  processing na taxonomia Mehrabi.
+- [[sagawa_2020]] Group DRO: instância de in-processing.
+- [[bhaskaruni_2019]]: ensemble citado como instância de mitigação.
+- **Implicação para v3.2**: nossa pesquisa cita Mehrabi como
+  referência canônica de **taxonomia**; conteúdo experimental
+  específico vem de papers mais recentes.

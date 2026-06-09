@@ -228,3 +228,57 @@ Extraído de Section V (Conclusion):
   Técnico, não direcional.
 - **Testar em datasets faciais** — autores não testam. ✅ **Alinhada
   com Q04** — direção CENTRAL.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **AdaBoost-fair com reweighting de unfair instances** é heurística
+  bem definida — formalização clara via δ_i e ε_t.
+- **k-NN situation testing** para identificar unfair predictions
+  segue precedente teórico (Luong et al.).
+- **Não é Pareto-efficient** — trade-off explícito accuracy-fairness.
+- **Refutação empírica de Nina et al. 2017** (bagging melhora
+  fairness) é contribuição negativa importante.
+
+### (b) Reprodutibilidade
+
+- ⚠ **Hiperparâmetros não declarados**: k (vizinhos), r (threshold),
+  m (ensemble size) — paper curto (5 páginas ICTAI).
+- ✅ **50 random trials** com média + std reportados.
+- ✅ 2 datasets UCI públicos (Credit Default, Community Crime).
+- ⚠ Sem código público.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Tabular fair ML clássico**, não deep learning facial — aplicabilidade
+  indireta.
+- **Lição metodológica**: deep ensemble naive de 3 seeds pode não
+  melhorar fairness — precisa **reweighting demográfico** explícito.
+- **Trade-off accuracy-fairness reportado quantitativamente** (error
+  1.16 → 1.60 quando SD cai 4×) — referência para esperar trade-offs.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Logistic Regression como base | ⚠ Choice — limita aplicabilidade DL |
+| k-NN situation testing | ✅ Justificada (Luong et al.) |
+| Reweighting unfair (não misclassified) | ✅ Justificada — adaptação AdaBoost-fair |
+| Sensitive attribute binarizado | ❌ Assumida — não trata multi-class |
+| Sem comparação contra deep ensemble | ❌ Limitação de escopo histórico (2019 vs 2024+) |
+| Trade-off accuracy×fairness aceito | ⚠ Reconhecida — não busca Pareto-efficient |
+
+### (e) Conexão com R5/R6
+
+- [[park_2022]] FSCL+: 3 anos depois, resolve trade-off acccuracy-
+  fairness (Pareto-efficient). Bhaskaruni é precedente histórico.
+- [[manzoor_2024]] FineFACE: também Pareto-efficient, via cross-layer
+  attention.
+- [[sagawa_2020]] Group DRO: alternativa worst-group; ambos atacam
+  fairness em loss/training.
+- [[hardt_2016]]: SD e EO são variantes de demographic parity / EO_h.
+- [[madras_2018]] LAFTR: adversarial alternativo ao AdaBoost-fair.
+- **Implicação para v3.2**: nossa pesquisa usa Bhaskaruni como
+  referência negativa: "bagging naive não funciona, precisa
+  estratégia explícita".

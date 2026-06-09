@@ -209,3 +209,60 @@ Extraído de Section VII (Open Challenges):
   (S10 já em standby).
 - **Datasets com self-identification em escala** — referência implícita
   ao Casual Conversations. ✅ **Alinhada com Q01**.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Survey específico de FR** (vs Mehrabi 2021 mais geral) — mais
+  focado e atualizado.
+- **Síntese de 180+ referências** com consenso emergente claramente
+  declarado.
+- **Quote verbatim de achado central** disponível ("the role of
+  balancedness of training data is limited").
+- **Limitação**: aceita literatura como dada, sem questionar
+  paradigmas profundamente (e.g., taxonomia discreta — Neto 2025 vai
+  além).
+
+### (b) Reprodutibilidade
+
+- ✅ Survey publicado em IEEE TBIOM (peer-reviewed top venue
+  biométrica).
+- ✅ 180+ referências bem documentadas.
+- ⚠ Recente demais para acumular citações (2025).
+- ⚠ Não disponível no Semantic Scholar com métricas ainda.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Referência canônica e mais atualizada** para FR fairness.
+- **Validação convergente do achado "balanceamento não basta"** —
+  sintetiza 8+ referências independentes.
+- **Insight Gwilliam** (skewed-toward-African > balanced) é
+  contraintuitivo e merece menção.
+- **Insight Muthukumar** (structural features > skin-tone) sustenta
+  Q10.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Foco em FR (não classification) | ✅ Justificada — escopo claro |
+| 180+ referências sintetizadas | ✅ Justificada — comprehensiveness |
+| Aceitar taxonomia discreta da literatura | ⚠ Limitação — Neto 2025 questiona |
+| ISO/IEC 19795-10 como standard | ✅ Justificada — referência regulatória |
+| Sem auditoria experimental nova | ✅ Choice — survey por natureza |
+
+### (e) Conexão com R5/R6
+
+- [[grother_2019]] NIST: NISTIR 8280 é referência central citada.
+- [[dataset_wang_2019]] RFW: dataset central em FR fairness.
+- [[lafargue_2025]]: mesma instituição (Idiap, Sébastien Marcel) —
+  track record convergente.
+- [[neto_2025]]: precede Kotwal cronologicamente; Neto questiona
+  paradigma que Kotwal sintetiza.
+- [[survey_mehrabi_2021]]: survey paralelo mais amplo. Kotwal é
+  mais específico para nossa pesquisa.
+- [[buolamwini_2018]]: citado como precursor histórico.
+- **Implicação para v3.2**: Kotwal 2025 é **referência canônica
+  obrigatória** para FR fairness. Cita-se como evidência da
+  literatura mais atualizada.

@@ -130,3 +130,56 @@ Extraído de Conclusion:
 - **Cross-disciplinary work com ciência social e direito** — viés
   algorítmico tem implicações jurídicas. ❌ Fora do nosso escopo
   experimental.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Threshold adaptativo** é proposta operacionalmente clara —
+  thresholds subgrupo-específicos via stratified distribution.
+- **Métricas FR padrão** (FNR, FPR, EER) bem definidas.
+- **Avaliação humana paralela** é metodologicamente sólida (NIH
+  certificada).
+- **Limitação**: paper workshop CVPRW (5 páginas), análise menos
+  profunda que main conference.
+
+### (b) Reprodutibilidade
+
+- ✅ Código + dataset públicos: github.com/visionjo/facerec-bias-bfw.
+- ✅ Pares 921 379 (240K positivos + 681K negativos) — protocolo claro.
+- ⚠ Dataset pequeno (800 sujeitos) limita generalização estatística.
+- ⚠ Hiperparâmetros de threshold adaptativo não detalhados extensivamente.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **FR verification 1:1**, não classification 7-class — não diretamente
+  aplicável.
+- **Threshold adaptativo per-subgroup** é conceitualmente interessante
+  mas inaplicável em softmax classification (argmax, não threshold).
+- **BFW útil como dataset alternativo de validação** para H5 (Cap 3) —
+  comparar com RFW.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| 8 subgrupos (4 race × 2 gender) | ✅ Justificada — intersectional analysis |
+| Sample de VGGFace2 | ⚠ Herda viés do upstream |
+| 100 sujeitos × 25 faces | ⚠ Choice — pequeno mas controlado |
+| Threshold adaptativo per-subgroup | ✅ Justificada — boost simultâneo |
+| NIH human evaluation | ✅ Justificada — diferencia bias humano vs algorítmico |
+| Workshop venue (CVPRW) | ⚠ Limitação de profundidade vs CVPR main |
+
+### (e) Conexão com R5/R6
+
+- [[buolamwini_2018]]: BFW segue mesma linhagem de auditoria, mas
+  para FR não classification.
+- [[dataset_wang_2019]] RFW: alternativa em FR com mais identidades
+  (12K vs 800). Complementares.
+- [[neto_2025]]: usa BFW como benchmark de teste; questiona
+  discretização.
+- [[hardt_2016]]: thresholds adaptativos per-subgroup violam
+  fairness through unawareness mas satisfazem demographic parity
+  por construção.
+- [[grother_2019]] NIST: escala industrial maior, BFW é versão
+  acadêmica multi-subgrupo.
