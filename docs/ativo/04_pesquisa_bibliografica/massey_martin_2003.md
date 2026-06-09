@@ -173,3 +173,58 @@ continua:
 
 - **Cruzar escala Massey-Martin (ou MST) com classificadores
   faciais** modernos — Q10 ✅ **GAP CENTRAL**.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Escala de 11 pontos (0-10) com imagens de mãos** — instrumento
+  metodologicamente claro.
+- **Protocolo de anotação** sofisticado: entrevistadores memorizam,
+  respondente não vê, treinamento prévio, anonimato do próprio
+  ponto da escala.
+- **Inter-rater reliability validada** por Hersch (2008).
+- **Correlação com outcomes sociais** (colorism) — programa de
+  pesquisa empiricamente robusto.
+
+### (b) Reprodutibilidade
+
+- ⚠ **Documento técnico do NIS**, não paper acadêmico tradicional —
+  ficha construída via WebSearch + múltiplas fontes secundárias
+  (NSF PAR, Survey Practice, ANES 2012, ResearchGate).
+- ✅ Escala adotada em múltiplos estudos longitudinais (NIS, NLSY97,
+  GSS, Fragile Families, ANES) — robustez por replicação ampla.
+- ⚠ Imagens originais não publicamente baixáveis em alta resolução.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Não é técnica computacional** — é precedente histórico-
+  metodológico para MST.
+- **Protocolo de anotação treinada** com avaliação cega é template
+  para Fase 2 do Q10 (validação manual MST em FairFace).
+- **Evidência empírica colorism vs racism** sustenta nossa frente
+  Q10 (skin tone × race como variáveis independentes).
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| 11 pontos (0-10) | ✅ Justificada — trade-off granularidade × IAA |
+| Mãos como proxy de tom | ⚠ Limitação — rosto pode diferir |
+| Entrevistador anota (não autoreporte) | ✅ Justificada — mitiga viés de auto-classificação |
+| Respondente não vê escala | ✅ Justificada — evita priming |
+| Treinamento prévio + cegueira do próprio ponto | ✅ Justificada — minimiza anchoring effect |
+| Sem validação para ML/biometria | ✅ Choice — escopo sociológico deliberado |
+
+### (e) Conexão com R5/R6
+
+- [[fitzpatrick_1988]]: alternativa dermatológica de 6 pontos. NIS é
+  sociológica de 11.
+- [[schumann_2023]] MST: descendente moderno. Lineage Felix von
+  Luschan (36) → Massey-Martin 2003 (11) → MST 2023 (10).
+- [[buolamwini_2018]] Gender Shades: adopter de Fitzpatrick, não NIS.
+- [[fuentes_2019]]: AAPA statement sustenta colorism como variável
+  independente de raça.
+- **Implicação para v3.2**: Massey-Martin é **precedente histórico**
+  para MST. Cita-se como referência da linhagem; instrumento
+  operacional na dissertação é MST.

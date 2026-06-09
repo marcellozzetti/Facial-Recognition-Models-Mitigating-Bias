@@ -187,3 +187,61 @@ implícitas:
   pele clara. ❌ Fora do escopo computacional.
 - **NÃO sugere** uso para classificação racial — uso indevido
   posterior. ❌ Refutação implícita do uso comum em ML fairness.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Escala de validação clínica**, não classificação formal —
+  Fitzpatrick é instrumento operacional para dosimetria PUVA.
+- **6 tipos via autoreporte de queimadura + bronzeamento** — método
+  simples, defensável no contexto clínico original.
+- **Limitação fundamental**: escala foi validada apenas no propósito
+  original (UV/PUVA). Uso em ML fairness é apropriação fora de escopo.
+- **Tipos V-VI adicionados depois** — admissão de inadequação inicial
+  para skin of color.
+
+### (b) Reprodutibilidade
+
+- ⚠ **PDF original via JAMA Network bloqueado** por anti-scraping —
+  ficha construída via WebSearch + sumários secundários (declarado
+  honestamente em `fonte_leitura`).
+- ✅ Escala bem documentada em literatura dermatológica subsequente.
+- ⚠ Inter-rater agreement variável entre dermatologistas, não-
+  especialistas, autoreporte (Schumann 2023 documenta padrão).
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Não é técnica computacional** — é fundamento histórico para
+  escolha de MST sobre Fitzpatrick.
+- **Esclarece o erro categorial** que permeia literatura de ML
+  fairness: Fitzpatrick não é taxonomia racial, é dosimetria UV.
+- **Justifica adoção de MST** (Schumann 2023) em vez de Fitzpatrick
+  para Q10: MST foi desenhada para fairness research.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| 6 tipos (I-VI) | ⚠ Histórico — V/VI adicionados depois |
+| Autoreporte de queimadura como variável | ✅ Justificada no contexto clínico |
+| Fenótipos correlatos (cabelo, olhos) como proxy | ⚠ Justificada como triagem rápida |
+| Validação clínica em pacientes PUVA | ✅ Justificada — propósito original |
+| Não testar uso fora da dermatologia | ✅ Choice — escopo deliberado |
+| Não advertir contra uso racial | ❌ Omissão — uso indevido posterior |
+
+### (e) Conexão com R5/R6
+
+- [[buolamwini_2018]] Gender Shades: adopter principal em ML fairness
+  apesar do propósito original divergente.
+- [[dataset_hazirbas_2021]] Casual Conversations: também adota
+  Fitzpatrick (justificadamente como precedente de Gender Shades).
+- [[lafargue_2025]]: adota Fitzpatrick com 5 classes (III-IV merged
+  por IAA baixo).
+- [[schumann_2023]] MST: sucessor moderno explicitamente desenhado
+  para fairness research — supera Fitzpatrick em 3 dimensões.
+- [[massey_martin_2003]]: alternativa sociológica de 11 pontos —
+  precede MST com lógica similar de cognitive load.
+- **Implicação para v3.2**: Fitzpatrick é **referência histórica**
+  e **objeto de crítica metodológica**, não instrumento adotado
+  pela nossa pesquisa. Adotamos MST.
