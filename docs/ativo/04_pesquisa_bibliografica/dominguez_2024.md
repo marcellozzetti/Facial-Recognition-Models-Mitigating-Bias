@@ -253,3 +253,59 @@ Extraído de Section VI (Conclusions):
   snapshot).
 - **Combinar DSAP com bias mitigation techniques** — auditoria sem
   ação é incompleta. ✅ **Alinhada com Q04**.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Renkonen similarity** matematicamente bem definida (limite [0,1],
+  equivalente a Sørensen-Dice e Brainerd-Robinson).
+- **Decomposição em DSR/DSE/DSS** formaliza três tipos de viés
+  separadamente — clarifica análise.
+- **Correlação com métricas clássicas** R² 0.82-0.98 valida que DSAP
+  captura o mesmo sinal — convergência empírica forte.
+- **Limitação**: Renkonen é insensível a grupos ausentes (paper
+  reconhece). Para datasets faciais com classes raciais completamente
+  ausentes, DS subestima dissimilaridade real.
+
+### (b) Reprodutibilidade
+
+- ✅ Código público: github.com/irisdominguez/DSAP.
+- ✅ 20 datasets FER auditados — escala suficiente para validação
+  cruzada.
+- ⚠ Modelo auxiliar específico não declarado com detalhes — qual
+  classifier de race exato? Inferência via GitHub.
+- ⚠ Sem multi-seed na análise de correlação — R² reportados como
+  pontuais.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Ferramenta de auditoria de dataset**, não técnica de mitigação.
+- **Aplicável a auditoria do FairFace**: comparar split train/val/test
+  contra distribuição mundial via correção de target population.
+- **Circularidade**: auditar FairFace usando classifier treinado em
+  FairFace gera bias circular. Mitigação requer subset com ground
+  truth manual.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Renkonen sobre alternativas (Jaccard, KL) | ✅ Justificada — range unificado [0,1] |
+| Inspiração em ecologia (β-diversity) | ✅ Justificada — analogia produtiva |
+| Auxiliary model para profiling | ⚠ Justificada por necessidade; risco circularidade reconhecido |
+| 20 datasets FER apenas | ⚠ Tarefa-específica — generalização para race/gender não testada |
+| 3 variantes (DSR/DSE/DSS) | ✅ Justificada — captura tipos distintos de viés |
+
+### (e) Conexão com R5/R6
+
+- [[buolamwini_2018]]: DSAP poderia auditar PPB e quantificar exatamente
+  o desbalanceamento documentado por Gender Shades.
+- [[dataset_karkkainen_2021]] FairFace: candidato natural para DSAP
+  auditing. Nossa C2 (matriz MST × race) é forma específica de
+  auditoria conceitualmente próxima.
+- [[pereira_2026]] SkinToneNet: ambos auditam datasets, mas Pereira
+  foca em MST classifier; DSAP em perfil demográfico multi-axis.
+  **Complementares.**
+- [[hardt_2016]]: DSAP não é fairness do modelo, é fairness do
+  dataset — eixo distinto mas pré-requisito.

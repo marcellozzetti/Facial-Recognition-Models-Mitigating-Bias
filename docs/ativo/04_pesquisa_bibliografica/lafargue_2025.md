@@ -264,3 +264,59 @@ Extraído de Section 7 (Conclusion) + Discussion:
 - **Incorporar Monk Skin Tone Scale** — paper menciona MST mas adota
   Fitzpatrick por simplicidade. ✅ **Alinhada com Q10** —
   MST > Fitzpatrick em granularidade.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Pipeline bem definido em 2 fases** (extração + teste estatístico).
+- **Teste uncertainty-aware é contribuição metodológica original**:
+  formaliza como tratar erro do classifier auxiliar em testes
+  estatísticos clássicos (χ², CLT, Wasserstein).
+- **Limitação**: assume erro do classifier é aleatório. Erros
+  sistemáticos (e.g., erro maior em Latinx) subestimam viés real.
+- **Mediana de p-values sobre N simulações** é heurística defensável
+  mas sem prova de convergência formal.
+
+### (b) Reprodutibilidade
+
+- ✅ Código público: github.com/ValentinLafargue/FairnessDetails.
+- ✅ Datasets de teste pequenos (10K + 1.5K) → executável em hardware
+  modesto.
+- ⚠ Pool de anotadores manuais (3 não-especialistas) específico do
+  estudo — não replicável sem acesso a Prolific ou equivalente.
+- ⚠ Hiperparâmetros do pipeline (threshold de mask, número de
+  simulações N) não detalhados explicitamente.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Não é técnica experimental direta** para nosso pipeline.
+- **Lição metodológica importante**: nossa razão de disparidade DR
+  também sofre de erro do classifier; reportar IC via bootstrap seria
+  importação direta dessa lição.
+- **EU AI Act como motivação institucional**: contexto regulatório
+  para nossa pesquisa, útil em introdução/contexto ético.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Fitzpatrick sobre MST/Census | ✅ Justificada (Section 2) — estabilidade conceitual |
+| 5 classes Fitzpatrick (III-IV merged) | ✅ Justificada — IAA baixo em III/IV separados |
+| Anotação 3 não-especialistas | ⚠ Choice — dermatologista seria mais rigoroso |
+| Skin segmentation alternativas | ✅ Justificada — testa 3 abordagens (full image, no bg, only skin) |
+| Datasets sintéticos (Generated Photos) | ❌ Assumida — validação em real seria mais convincente |
+| Uncertainty-aware via permutation aleatória | ⚠ Pressuposto de erro aleatório — limitação reconhecida na §7 |
+
+### (e) Conexão com R5/R6
+
+- [[buolamwini_2018]]: Lafargue adota Fitzpatrick seguindo precedente
+  de Gender Shades. Mesma escolha conceitual.
+- [[fitzpatrick_1988]]: justifica adoção apesar de origem dermatológica.
+- [[schumann_2023]] MST: paper menciona MST mas opta por Fitzpatrick
+  — escolha que nossa pesquisa inverte (MST > Fitzpatrick).
+- [[dominguez_2024]] DSAP: ambos auditam datasets mas via metodologias
+  distintas. DSAP usa similaridade unificada; Lafargue usa testes
+  estatísticos. **Complementares.**
+- [[survey_kotwal_2025]]: mesma instituição (Idiap, Sébastien Marcel)
+  produz Lafargue e Kotwal. Track record forte.

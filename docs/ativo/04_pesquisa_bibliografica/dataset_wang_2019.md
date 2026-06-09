@@ -260,3 +260,62 @@ Extraído de Conclusion:
 - **Validar IMAN em settings com mais raças** — paper foca em
   Caucasian → other races. Generalização não testada. ❌ Fora do
   escopo (RFW é 4-class).
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Construção do RFW bem documentada** com 2 fontes de race
+  (FreeBase + Face++) e verificação manual de baixa confiança.
+- **Método IMAN** matematicamente definido (MI-loss explícita: H(O|X)
+  − γ H(O)).
+- **Limitação**: race assignment via Face++ introduz **circularidade**
+  (Face++ é um dos sistemas auditados).
+- **Difficult pairs via cosine similarity** introduz viés (pares são
+  difíceis para ArcFace específico).
+
+### (b) Reprodutibilidade
+
+- ✅ Dataset RFW público.
+- ✅ Protocolo de avaliação clear (LFW-like 6K pares).
+- ⚠ ROC sobre 50M negativos não tabulado no excerto disponível —
+  fica no supplementary.
+- ⚠ Hiperparâmetros de IMAN training não detalhados completamente.
+- ⚠ Sem multi-seed reportado.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **RFW é dataset de FR verification (1:1)**, não classification 7-class.
+- **Triangulação útil**: razão de erro African/Caucasian ~2× estabelece
+  magnitude de gap demográfico, contextualiza nossa DR em classification.
+- **Conclusão "race-balanced não basta"** é evidência convergente com
+  FairFace (Latino .247) — reforça motivação para mitigação
+  algorítmica além de balanceamento.
+- **Taxonomia 4-class** não mapeia diretamente às 7 do FairFace —
+  citação contextual, não experimental.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| 4 categorias raciais (Caucasian, Asian, Indian, African) | ⚠ Limitação reconhecida — sem Middle East, Latinx, SE Asian |
+| Source de MS-Celeb-1M | ✅ Justificada — escala disponível |
+| Race assignment via Face++ | ❌ Circular — Face++ é sistema auditado |
+| Verificação manual de baixa confiança | ✅ Justificada — mitigação parcial da circularidade |
+| Difficult pairs via cosine similarity | ⚠ Choice — viés via classifier de seleção |
+| IMAN como UDA não-supervisionado | ✅ Justificada — labels não compartilháveis entre raças |
+
+### (e) Conexão com R5/R6
+
+- [[buolamwini_2018]]: RFW estende auditoria de gender (PPB) para
+  recognition. Mesma linhagem de auditoria.
+- [[dataset_karkkainen_2021]] FairFace: paralelo em classification.
+  RFW + FairFace são complementares.
+- [[grother_2019]] NIST FRVT: escala industrial muito maior; RFW é
+  versão acadêmica.
+- [[dataset_robinson_2020]] BFW: alternativa em FR com 8 subgrupos
+  (race × gender). Cobertura menor que RFW (800 vs 12K identidades).
+- [[neto_2025]]: usa RFW + BFW; argumenta contra discretização racial.
+- **Implicação para v3.2**: RFW e BFW são datasets de **validação
+  cruzada** para H5 (transferência para FR). Nossa pesquisa pode
+  citar IMAN como precedente de mitigação UDA mas não replicá-lo.

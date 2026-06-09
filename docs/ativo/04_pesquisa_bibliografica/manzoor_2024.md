@@ -297,3 +297,59 @@ geralmente inferido):
 - **Sem mencionar uso de demographic annotations no treino**, mas
   exigem no eval — possível direção: fairness sem demographic labels.
   ⚠ Direção paralela emergente (SensitiveNets).
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Reformulação como fine-grained classification** é insight original.
+- **Cross-layer mutual attention** matematicamente bem definida via CAM
+  + upsample + min-max normalize.
+- **Mutual learning entre experts** justificada empiricamente, sem
+  prova de convergência teórica.
+- **Métrica Max-Min ratio** é razão simples mas dominada por extremos
+  — CV ou Gini seriam mais robustos (mencionado em §7).
+
+### (b) Reprodutibilidade
+
+- ✅ **Hiperparâmetros completos declarados**: SGD momentum 0.9, weight
+  decay 5e-4, batch 16, lr 0.002 com cosine annealing, image 448×448,
+  3 experts, t=0.5. **Raro na literatura.**
+- ✅ Código público: github.com/VCBSL-Fairness/FineFACE.
+- ⚠ Single seed reportado — sem multi-trial e desvio padrão.
+- ⚠ Multi-step training (5 passos por iteração) é complexo de
+  reproduzir sem código.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Alvo é gender, não race** — adaptação para race 7-class não
+  trivial mas mecanicamente possível.
+- **Cross-layer attention transponível** para race classification se
+  trabalho futuro investigar fine-grained features para classes
+  próximas (East vs Southeast Asian).
+- **Hiperparâmetros declarados servem como referência comparativa**
+  para protocolos da nossa pesquisa.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Reformular como fine-grained classification | ✅ Justificada — viés-variância decomposition |
+| ResNet50 + 3 experts | ⚠ Assumida — sem ablation de N experts |
+| Image 448×448 (2× padrão) | ❌ Assumida — sem ablation de resolução |
+| Sem demographic labels no treino | ✅ Justificada — vantagem operacional |
+| Max-Min ratio + DoB como métricas | ⚠ Trade-off escolhido — CV/Gini seriam alternativas |
+| Multi-step training (5 passos) | ⚠ Heurística — sem ablation de número de passos |
+
+### (e) Conexão com R5/R6
+
+- [[buolamwini_2018]]: FineFACE confirma achados de Gender Shades em
+  CelebA (Black female é o subgrupo mais afetado pelo baseline).
+- [[dataset_karkkainen_2021]] FairFace: usado para treino de gender mas
+  raça aparece só como protected attribute, não como alvo.
+- [[park_2022]] FSCL+: ambos buscam Pareto-efficient em fairness;
+  FineFACE via arquitetura, FSCL+ via loss. **Mecanismos
+  complementares.**
+- [[hardt_2016]]: Max-Min ratio é variante de EO_h log-ratio.
+- [[lin_2022]] FairGRAPE: outra abordagem arquitetural (pruning).
+  Ambas mostram que arquitetura importa para fairness.

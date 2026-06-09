@@ -263,3 +263,59 @@ Extraído de Section 7 (Concluding Remarks):
   ✅ **Alinhada com Q04**.
 - **Aplicar a FairFace race 7-class** — autores testam sex em
   FairFace mas não race. Extensão direta. ✅ **GAP CENTRAL — Q04**.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **DST e LST formalmente definidos** como minimização sob restrição
+  de dependência estatística — definições matemáticas claras.
+- **Solver em closed-form** para o último layer (inspirado em K-TOpt
+  de Sadeghi 2022) — derivação reproduzível.
+- **Limitação**: a métrica de dependência usada é "universal" mas
+  hiperparametrizável; sensibilidade a essa escolha não totalmente
+  caracterizada.
+
+### (b) Reprodutibilidade
+
+- ✅ Avaliação massiva: 100+ modelos zero-shot do OpenCLIP + 900+
+  supervisionados do timm — escala única que reforça a generalidade
+  dos achados.
+- ⚠ Hiperparâmetros do sweep λ ∈ [0, 1) não detalhados em todos os
+  experimentos.
+- ⚠ Sem multi-seed reportado para cada ponto da curva — variância
+  ilustrada como sombra mas sem IC formal.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Esqueleto teórico para nossa pesquisa**: justifica reportar
+  accuracy E disparidade simultaneamente (não basta otimizar uma).
+- **Limitação metodológica registrada**: U-FaTE é binário; race
+  7-class exigiria adaptação não trivial.
+- **Achado "no trade-off em sex/FairFace"** sugere que mitigação de
+  viés em FairFace pode não impor penalidade forte sobre utility —
+  alinha com nossa expectativa para H1.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Duas trade-offs (DST + LST) em vez de uma | ✅ Justificada — gap LST-DST mede informação ausente |
+| Closed-form solver (não SGD adversarial) | ✅ Justificada — estabilidade superior |
+| Avaliação em 1000+ modelos pré-treinados | ✅ Justificada — generalidade do framework |
+| Apenas Y, S binários | ⚠ Limitação reconhecida, não justificada como escolha |
+| Single seed por ponto | ❌ Assumida — sem justificativa de custo |
+
+### (e) Conexão com R5/R6
+
+- [[hardt_2016]]: U-FaTE generaliza para DPV/EOD/EOOD — três noções
+  conectam-se diretamente ao framework de Hardt.
+- [[zemel_2013]]: U-FaTE é **descendente** do Fair Representation
+  Learning — formaliza o trade-off que Zemel apenas observou.
+- [[madras_2018]] LAFTR: U-FaTE substitui adversarial training por
+  closed-form solver — estabilidade superior.
+- [[kleinberg_2017]]: U-FaTE quantifica o trade-off que Kleinberg
+  prova matematicamente — instância empírica do teorema.
+- **Implicação para v3.2**: nossa pesquisa **não estima DST/LST** para
+  FairFace 7-class, mas o framework U-FaTE é referência conceitual
+  para "qual é o limite achievable?".

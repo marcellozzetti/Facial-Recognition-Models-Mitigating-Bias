@@ -287,3 +287,61 @@ Extraído de Sections 8 e 9 do relatório:
   identification — fora do escopo do paper. ❌ Fora do nosso escopo.
 - **Continuação periódica da FRVT** — sugestão institucional, não
   acadêmica. ❌ Fora do escopo.
+
+## 12. Análise crítica do método
+
+### (a) Rigor formal
+
+- **Escala única**: 189 algoritmos × 18M imagens × 8.5M pessoas é
+  ordem de magnitude superior a qualquer auditoria acadêmica.
+- **Métricas formais (FMR/FNMR/FPIR/FNIR)** bem definidas via
+  protocolos ISO/IEC 19794-5 e ICAO 9303.
+- **Decisão "threshold fixo"** é defensável operacionalmente,
+  expõe differentials que reporting "FNMR @ fixed FPR" esconde.
+- **Country-of-birth como proxy de raça** é limitação reconhecida —
+  dilui sinal mas mitiga risco legal.
+
+### (b) Reprodutibilidade
+
+- ❌ **Dados governamentais não-públicos** — impossível replicar.
+- ✅ **Protocolo bem documentado** — outros pesquisadores podem
+  replicar com seus próprios dados.
+- ✅ **189 algoritmos listados** no anexo (1200+ páginas de breakdowns).
+- ⚠ **Comparação temporal difícil** — desenvolvedores evoluíram
+  algoritmos sem versionamento documentado.
+
+### (c) Aplicabilidade ao pipeline v3.2
+
+- **Não cobre classification** — NISTIR 8280 é sobre recognition (1:1, 1:N).
+- **Evidência indireta industry-wide** estabelece que viés demográfico
+  é problema sistêmico, justifica nossa pesquisa.
+- **Magnitudes 10×-100× FPR entre raças** estabelece limite superior;
+  nossa razão DR ~1.1-1.5 em classification é métrica mais branda.
+- **Recomendação "report por subgrupo"** já adotada em nosso protocolo.
+
+### (d) Design choices justificadas vs assumidas
+
+| Decisão | Justificada? |
+|---|---|
+| Threshold fixo (não FNMR @ FPR) | ✅ Justificada — reflete uso operacional |
+| Country-of-birth como proxy | ⚠ Limitação reconhecida — única opção viável legalmente |
+| 4 datasets governamentais | ✅ Justificada — escala única |
+| Não testar classification | ✅ Choice — escopo deliberado para recognition |
+| Sem reproducibilidade pública | ❌ Choice imposta por legislação |
+| Reporting algorithm-by-algorithm em anexos | ✅ Justificada — transparência total |
+
+### (e) Conexão com R5/R6
+
+- [[buolamwini_2018]]: NIST cita Gender Shades como motivação. NISTIR
+  é a resposta institucional para a "indictment" de Buolamwini.
+- [[dataset_wang_2019]] RFW: análogo acadêmico em verification.
+- [[dataset_karkkainen_2021]] FairFace: domínio de classification —
+  complemento ao recognition do NIST.
+- [[hardt_2016]]: FMR/FNMR são variantes de FPR/FNR — formalização
+  Hardt aplica-se aos achados NIST.
+- [[kleinberg_2017]]: differential ratios 10×-100× são instância
+  empírica do teorema da impossibilidade — não há "FR sem viés"
+  matematicamente, NIST quantifica magnitude.
+- **Implicação para v3.2**: NISTIR 8280 é **referência regulatória**
+  obrigatória em contexto ético/social. Nossa pesquisa cita como
+  evidência industry-wide do problema.
