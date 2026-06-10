@@ -1,13 +1,14 @@
 # INDEX — Pesquisa Bibliográfica
 
-> Navegação central das **30 fichas consolidadas** do corpus + **7 candidatos
-> aprovados em Rodada 6** (a fichar). Para conteúdo integral do paper
-> consultar PDF local. Para resumo estruturado em 11–12 seções consultar
-> ficha `.md`.
+> Navegação central das **37 fichas do corpus** (R1-R6 completas).
+> Para conteúdo integral do paper consultar PDF local. Para resumo
+> estruturado em 11–12 seções consultar ficha `.md`.
 >
-> Atualizado: 2026-06-09 (Rodada 6 — primeira ficha R6 fichada:
-> [pereira_2026](pereira_2026.md) — SkinToneNet + STW. Análise completa
-> em [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md)).
+> Atualizado: 2026-06-10 (Rodada 6 COMPLETA — 8 fichas R6 fichadas:
+> [pereira_2026](pereira_2026.md) e [aguirre_2023](aguirre_2023.md)
+> como VERIFIED; demais 6 como OVERVIEW_ONLY pendentes leitura PDF
+> integral. Análise R6 completa em
+> [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md)).
 
 ## Ordem de leitura recomendada
 
@@ -99,27 +100,28 @@ com surveys + papers críticos.
 | [Fitzpatrick 1988](fitzpatrick_1988.md) | Origem dermatológica Fitzpatrick (PUVA) |
 | [Massey & Martin 2003](massey_martin_2003.md) | NIS Skin Color Scale (precedente MST) |
 
-### Track H — Validação científica do pipeline v3.2 (Rodada 6)
+### Track H — Validação científica do pipeline v3.2 (Rodada 6 COMPLETA)
 
-#### Fichas catalogadas
-
-| Paper | Foco | Relevância v3.2 |
-|---|---|---|
-| [Pereira et al. 2026](pereira_2026.md) — SkinToneNet + STW | Classificador MST SOTA (ViT) + dataset STW (42k imgs) com auditoria de CelebA/VGGFace2 | **Insumo direto da Etapa 1**: usar SkinToneNet pré-treinado. NÃO audita FairFace — nossa C2 segue original |
-
-#### Candidatos aprovados — fichas pendentes (criar pós-reunião)
+#### Fichas VERIFIED (leitura integral)
 
 | Paper | Foco | Relevância v3.2 |
 |---|---|---|
-| Pangelinan et al. 2023 (arXiv:2304.07175) | Causas de variação demográfica em FR accuracy | **Refutação potencial de H5**: pixel info > skin tone |
-| Dooley et al. 2022/23 (arXiv:2210.09943) | Fairer architectures (NAS) make for fairer FR | Reforça H2: arquitetura por si só importa; valida ConvNeXt-T |
-| Aguirre & Dredze 2023/24 (arXiv:2305.12671) | Multi-task fairness transfer com demographic info limitada | Reforça princípio teórico do pipeline (etapas 3 e 5) |
-| Kolla & Savadamuthu 2022/23 WACVW (arXiv:2211.14498) | Impacto da distribuição racial no treino de FR | Balanceamento NÃO basta; justifica mecanismo arquitetural |
-| Liu et al. 2025 FAccT (arXiv:2505.01699) — BNMR | Bayesian Network meta-learning sample reweighting | Baseline competitivo recente para Cap 2 |
-| Ramachandran & Rattani 2024 IJCB (arXiv:2407.10104) | SSL pipeline para fair facial attribute classification | Baseline competitivo SSL em FairFace + CelebA |
-| Raumanns et al. 2024 FAIMI (arXiv:2407.17543) | Single vs multi-task fairness em skin lesion | Cautela contra multi-task naive; adversarial > reinforce |
+| [Pereira et al. 2026](pereira_2026.md) — SkinToneNet + STW | Classificador MST SOTA (ViT-Small) + dataset STW (42k imgs) auditando 8 datasets faciais incluindo FairFace | **Insumo direto da Etapa 1**: SkinToneNet pré-treinado. Contaminação treino-teste: STW agrega FairFace |
+| [Aguirre & Dredze 2023](aguirre_2023.md) — Multi-task fair transfer | MTL-fair + ε-DEO; 15-44% redução de bias mantendo F1; demonstração empírica de fair transfer | Reforço empírico do LAFTR. Justifica etapas 3 e 5 |
+
+#### Fichas OVERVIEW_ONLY (pendentes leitura PDF integral)
+
+| Paper | Foco | Relevância v3.2 |
+|---|---|---|
+| [Pangelinan et al. 2023](pangelinan_2023.md) | Causas de variação demográfica em FR accuracy | **Refutação potencial de H5**: pixel info > skin tone. Motivou H6 nova |
+| [Dooley et al. 2022](dooley_2022.md) — Fairer architectures | NAS bi-objective fairness+accuracy | Reforça H2: arquitetura importa; valida ConvNeXt-T |
+| [Kolla & Savadamuthu 2022](kolla_2022.md) | Impacto da distribuição racial no treino de FR | Balanceamento NÃO basta; "racial gradation" novo |
+| [Liu et al. 2025 FAccT](liu_2025.md) — BNMR | Bayesian Network meta-learning + face component fairness | Baseline competitivo recente; surrogate fairness alinhada |
+| [Ramachandran & Rattani 2024 IJCB](ramachandran_2024.md) | SSL pipeline para fair facial attribute | Baseline SSL em FairFace + CelebA |
+| [Raumanns et al. 2024 FAIMI](raumanns_2024.md) | Single vs multi-task fairness em skin lesion | Cautela contra multi-task naive; adversarial > reinforce |
 
 Detalhes em [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md).
+Auditoria de leitura em [_auditoria_fichas.md](_auditoria_fichas.md).
 
 ### Track G — Mecanismos ML / Redes Neurais (NOVO Rodada 5)
 

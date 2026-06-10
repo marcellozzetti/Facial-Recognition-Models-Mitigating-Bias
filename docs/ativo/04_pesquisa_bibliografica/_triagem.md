@@ -220,6 +220,25 @@ pipeline-step × evidência em 5 áreas críticas. Documento síntese em
   - Área 5 (Black/African FR): R6-1, R6-3, R6-5
 - **Total corpus após R6: 37 fichas** (29 + 8 aprovados).
 
+### 6.4 Status de fichamento (atualizado 2026-06-10)
+
+Todas as 8 fichas R6 criadas:
+
+| # | Paper | Estado da ficha |
+|---|---|---|
+| R6-1 | Pangelinan 2023 | [OVERVIEW_ONLY](pangelinan_2023.md) — leitura PDF pendente |
+| R6-2 | Pereira 2026 SkinToneNet | [VERIFIED](pereira_2026.md) — HTML integral lido |
+| R6-3 | Dooley 2022 NAS | [OVERVIEW_ONLY](dooley_2022.md) — leitura PDF pendente |
+| R6-4 | Aguirre & Dredze 2023 | [VERIFIED](aguirre_2023.md) — HTML integral lido |
+| R6-5 | Kolla & Savadamuthu 2022 | [OVERVIEW_ONLY](kolla_2022.md) — leitura PDF pendente |
+| R6-6 | Liu 2025 BNMR | [OVERVIEW_ONLY](liu_2025.md) — leitura PDF pendente |
+| R6-7 | Ramachandran & Rattani 2024 | [OVERVIEW_ONLY](ramachandran_2024.md) — leitura PDF pendente |
+| R6-8 | Raumanns 2024 | [OVERVIEW_ONLY](raumanns_2024.md) — leitura PDF pendente |
+
+Promoção OVERVIEW_ONLY → VERIFIED requer download de PDF e leitura
+integral. 6 papers pendentes; priorizar Pangelinan (refutação H5)
+e Dooley (validação ConvNeXt-T) primeiro.
+
 ### 6.4 Impacto na tese (v3.2 → v3.3)
 
 R6 abre **5 riscos críticos** que motivam revisão da v3.2 para v3.3:
