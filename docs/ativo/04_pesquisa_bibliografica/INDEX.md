@@ -1,14 +1,14 @@
 # INDEX — Pesquisa Bibliográfica
 
-> Navegação central das **37 fichas do corpus** (R1-R6 completas).
+> Navegação central das **55 fichas do corpus** (R1-R7 primeira leva).
 > Para conteúdo integral do paper consultar PDF local. Para resumo
 > estruturado em 11–12 seções consultar ficha `.md`.
 >
-> Atualizado: 2026-06-10 (Rodada 6 COMPLETA — 8 fichas R6 fichadas:
-> [pereira_2026](pereira_2026.md) e [aguirre_2023](aguirre_2023.md)
-> como VERIFIED; demais 6 como OVERVIEW_ONLY pendentes leitura PDF
-> integral. Análise R6 completa em
-> [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md)).
+> Atualizado: 2026-06-10 (Rodada 7 primeira leva — 18 novas fichas
+> OVERVIEW_ONLY incorporando 2 novos Tracks: I (VLM/CLIP/BLIP
+> fairness, 11 fichas) e J (conditioning moderno LoRA/adapter/ViT,
+> 6 fichas). **META 20+ artigos 2025-2026 ATENDIDA** (atual: 20).
+> Análise R7 em [_rodada_07_candidatos.md](../_rodada_07_candidatos.md)).
 
 ## Ordem de leitura recomendada
 
@@ -122,6 +122,44 @@ com surveys + papers críticos.
 
 Detalhes em [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md).
 Auditoria de leitura em [_auditoria_fichas.md](_auditoria_fichas.md).
+
+### Track I — Vision-Language Model fairness (NOVO Rodada 7, 11 fichas)
+
+VLMs e debiasing — endereça recomendação do orientador de comparar
+FiLM com mecanismos modernos baseados em CLIP/BLIP.
+
+| Paper | Foco | Aplicação v3.2 |
+|---|---|---|
+| [Luo et al. 2024 CVPR — FairCLIP](luo_2024_fairclip.md) | Sinkhorn distance + Harvard-FairVLMed | Cap 2 ablation FiLM vs CLIP |
+| [Dehdashtian et al. 2024 ICLR — FairerCLIP](dehdashtian_2024_fairerclip.md) | RKHS-based debiasing | Baseline VLM lightweight |
+| [Joint VL Bias Removal 2024](joint_vl_2024.md) | Alignment + counterfactual | Baseline |
+| [Lin et al. 2025 CVPR — AI-Face](lin_2025_aiface.md) | Million-scale dataset | Dataset complementar |
+| [GRAS Benchmark 2025](gras_2025.md) | 2.5M queries multi-eixo | Evidência problema |
+| [Unified Debiasing VLMs 2024](unified_debiasing_vlm_2024.md) | Framework cross-modal | Referência conceitual |
+| [Evaluating LVLM Fairness 2024 EMNLP](evaluating_lvlm_2024.md) | FACET+UTKFace audit | Evidência |
+| [BendVLM 2024](bendvlm_2024.md) | Test-time debiasing | Baseline lightweight |
+| [Debiasing CLIP Neural Interventions 2025](debiasing_neural_interventions_2025.md) | Attention heads | Paralelo FiLM |
+
+### Track J — Conditioning moderno (NOVO Rodada 7, 6 fichas)
+
+LoRA, adapters, ViT-specific — endereça recomendação do orientador.
+
+| Paper | Foco | Aplicação v3.2 |
+|---|---|---|
+| [Zhao et al. 2025 CVPR — AIM-Fair](zhao_2025_aimfair.md) | Selective fine-tuning | Baseline Cap 2 |
+| [Bian et al. 2025 ICCV — LoRA-FAIR](bian_2025_lorafair.md) | Federated LoRA fairness | Ablation arquitetural |
+| [FairLoRA 2024](fairlora_2024.md) | Fairness-driven LoRA vision | Direct competitor FiLM |
+| [On Fairness of LoRA 2024](fairness_lora_2024.md) | LoRA não enviesa per se | Validação metodológica |
+| [Tian et al. 2024 ECCV — FairViT](tian_2024_fairvit.md) | Adaptive masking ViT | Backbone alternativo |
+
+### Track auxiliar — Skin tone + race + SSL (Rodada 7, 4 fichas)
+
+| Paper | Foco | Aplicação v3.2 |
+|---|---|---|
+| [Porgali et al. 2023 CVPRW — Casual Conversations v2](porgali_2023_ccv2.md) | 7 países + Fitzpatrick+MST | Validação cross-domain MST |
+| [Reliable Demographic Inference 2025](reliable_demo_inference_2025.md) | DAI pipeline modular | Etapa 2 protocolo |
+| [Demographic-Agnostic Fairness 2025](demographic_agnostic_2025.md) | Fairness sem labels | Direção futura |
+| [Provable Adversarial SSL 2024](provable_adversarial_ssl_2024.md) | SSL fair com garantias | Baseline SSL |
 
 ### Track G — Mecanismos ML / Redes Neurais (NOVO Rodada 5)
 

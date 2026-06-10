@@ -178,6 +178,84 @@ e Cap 2 (Q04) podem reportar contra baseline 72% (ResNet-34) e SOTA
 75.7% (FaceScanPaliGemma) como **dois números canônicos** sem risco
 de obsolescência durante a dissertação.
 
+## Rodada 7 — Expansão pós-reunião (2026-06-10, primeira leva)
+
+**Motivação:** Reunião com Prof. Quiles em 2026-06-08 aprovou
+pipeline v3.2 e recomendou:
+- Corpus ≥ 100 artigos (filtros menos restritivos)
+- ≥ 20 artigos aprovados de 2025/2026
+- Adicionar CLIP/BLIP como mecanismo alternativo de conditioning
+- Incluir capítulo metodológico avaliando modelos pré-treinados
+
+### 7.1 Critérios revisados
+
+| Critério | R1-R6 | **R7 (revisado)** |
+|---|---|---|
+| Venue | Top conferences + journals | **+ workshops + preprints ≤18 meses** |
+| Citações 2024 | ≥ 20 | **≥ 10** |
+| Citações 2025 | ≥ 10 | **≥ 3** |
+| Citações 2026 | sem threshold | mantido |
+| Aplicabilidade | Direta | **+ adjacente** (VLM bias geral) |
+| Cobertura única | Caso especial | mantido |
+
+### 7.2 Buscas executadas (5 lotes, 12 queries)
+
+- Lote 1: VLM/CLIP/BLIP fairness — 13 candidatos
+- Lote 2: skin tone moderno — 5 candidatos
+- Lote 3: race classification SOTA 2025-2026 — 6 candidatos
+- Lote 4: conditioning moderno LoRA/adapter — 8 candidatos
+- Lote 5: SSL + multi-task — 5 candidatos
+
+### 7.3 Primeira leva — 18 fichas APROVADAS imediatamente
+
+**Track I — VLM/CLIP/BLIP fairness (NOVO, 11 fichas):**
+- R7-1 Luo et al. 2024 CVPR — FairCLIP (Sinkhorn + Harvard-FairVLMed)
+- R7-2 Dehdashtian et al. 2024 ICLR — FairerCLIP (RKHS zero-shot)
+- R7-3 Joint VL Bias Removal 2024 (alignment + counterfactual)
+- R7-4 Lin et al. 2025 CVPR — AI-Face Million-Scale
+- R7-5 GRAS 2025 — VLM bias benchmark 2.5M queries
+- R7-6 Unified Debiasing VLMs 2024 (cross-modal framework)
+- R7-7 Evaluating LVLM 2024 Findings EMNLP 2025
+- R7-8 BendVLM 2024 (test-time debiasing)
+- R7-9 Debiasing CLIP Neural Interventions 2025 Springer
+- (2 mais a aprovar em batch futuro: AIM-Fair, Reliable Demo Inference)
+
+**Track J — Conditioning moderno (NOVO, 6 fichas):**
+- R7-10 Zhao et al. 2025 CVPR — AIM-Fair (selective fine-tuning)
+- R7-11 Bian et al. 2025 ICCV — LoRA-FAIR (federated)
+- R7-12 FairLoRA 2024 (fairness-driven LoRA)
+- R7-13 On Fairness of LoRA 2024 (análise fundamental)
+- R7-14 Tian et al. 2024 ECCV — FairViT (adaptive masking)
+
+**Track auxiliar — skin tone + race + SSL (4 fichas):**
+- R7-15 Porgali et al. 2023 CVPRW — Casual Conversations v2
+- R7-16 Reliable Demographic Inference 2025
+- R7-17 Demographic-Agnostic Fairness 2025
+- R7-18 Provable Adversarial Fair SSL 2024
+
+### 7.4 Standbys (14 candidatos)
+
+Aguardando triagem detalhada: Reproducibility FairCLIP, Wang FairCLIP,
+Prompt Array, JAAD MST dermatology, Skin Segmentation MST, Skin Tone
+Estimation Lighting, Enhancing Fairness MST, Bahiru 2025, Dong 2025
+(buscar), Fair Verification Demographic, FairViT debiased self-attention,
+S-Adapter (descartável), SSL w/o Demographics, NTKMTL, etc.
+
+### 7.5 Descartes (2)
+
+- FairQueue (text-to-image generation — fora do escopo)
+- S-Adapter ViT Anti-Spoofing (anti-spoofing, não fairness)
+
+### 7.6 Resumo Rodada 7 primeira leva
+
+- **18 aprovados imediatos** + 14 standby + 2 descartes = 34 verificados
+- **Total corpus após R7 leva 1: 55 fichas** (era 37)
+- **2025-2026 atendido: 20 fichas** (era 5) ✅
+- **2 novos Tracks**: I (VLM fairness) e J (conditioning moderno)
+- **Gap remanescente para meta 100**: −45 fichas
+  → próximos lotes R7 atacarão surveys recentes, workshop papers,
+  papers fundadores faltantes (ArcFace, FaceNet, CosFace)
+
 ## Rodada 6 — Validação científica do pipeline v3.2 (2026-06-06)
 
 **Motivação:** após v3.2 escrita e PPTX v3.2.1 entregue, usuário

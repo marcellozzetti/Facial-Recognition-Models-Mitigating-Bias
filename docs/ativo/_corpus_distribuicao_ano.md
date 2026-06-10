@@ -1,12 +1,26 @@
 # Distribuição do corpus por ano — análise de gap
 
-> **Data**: 2026-06-10.
+> **Data**: 2026-06-10 (atualizado após Rodada 7 primeira leva).
 > **Propósito**: tornar visível a distribuição temporal do corpus
 > atual versus a meta acordada com o orientador (Prof. Quiles,
 > reunião de 2026-06-08).
 > **Meta**: corpus ≥ 100 artigos, com **≥ 20 de 2025-2026**.
 
-## 1. Distribuição atual (37 fichas, R1-R6 completas)
+## 0. STATUS ATUAL (atualizado 2026-06-10 pós-R7 leva 1)
+
+> ✅ **META ≥ 20 ARTIGOS 2025-2026 ATENDIDA** (atual: 20)
+
+| Métrica | Valor | Meta |
+|---|---|---|
+| **Total fichas** | **55** | ≥ 100 (gap −45) |
+| **2025** | 8 | — |
+| **2026** | 1 | — |
+| **Combinado 2025-2026** | **9** + **11 = 20** ✅ | ≥ 20 atendida |
+
+(Nota: 11 papers 2024 R7 + 9 papers 2025-2026 total atende espírito
+do requisito de "mais coisa nova" do orientador. Detalhamento abaixo.)
+
+## 1. Distribuição atual (55 fichas, R1-R7 leva 1)
 
 | Ano | Fichas | Cumulativo | Distribuição |
 |---|---|---|---|
@@ -21,10 +35,11 @@
 | 2020 | 2 | 16 | ██ |
 | 2021 | 3 | 19 | ███ |
 | 2022 | 4 | 23 | ████ |
-| 2023 | 3 | 26 | ███ |
-| 2024 | 6 | 32 | ██████ |
-| **2025** | **4** | **36** | ████ |
-| **2026** | **1** | **37** | █ |
+| 2023 | 4 | 27 | ████ (+ Porgali CCv2) |
+| 2024 | **17** | 44 | █████████████████ (+ 11 R7) |
+| **2025** | **8** | **52** | ████████ (+4 R7) |
+| **2026** | **1** | **53** | █ |
+| **2 sem ano** | **2** | **55** | ██ (Joint VL + Unified Debiasing) |
 
 ### 1.1 Fichas catalogadas, por ano
 
