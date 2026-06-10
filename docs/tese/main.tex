@@ -1,0 +1,59 @@
+% Documento principal de qualificação — esqueleto genérico
+% Adaptar ao template Unifesp/ICT no Overleaf
+
+\documentclass[12pt,a4paper]{article}
+
+% ========== PACOTES ==========
+\usepackage[utf8]{inputenc}
+\usepackage[brazilian]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{csquotes}
+\usepackage{enumitem}
+\usepackage{geometry}
+\geometry{a4paper,margin=2.5cm}
+
+% Bibliografia
+\usepackage[backend=biber,style=numeric,maxbibnames=99]{biblatex}
+\addbibresource{referencias.bib}
+
+% Hyperref
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  citecolor=green!50!black,
+  urlcolor=blue!70!black
+}
+
+% ========== METADADOS ==========
+\title{Mitigação de Viés Racial em Classificação Facial via\\
+       Condicionamento por Tom de Pele em Arquiteturas Profundas\\
+       \large{Qualificação de Mestrado}}
+\author{Marcello Ozzetti\\
+        Orientador: Prof. Marcos Quiles\\
+        Mestrado em Ciência da Computação --- Unifesp/ICT}
+\date{Julho de 2026}
+
+% ========== DOCUMENTO ==========
+\begin{document}
+
+\maketitle
+
+\input{capitulos/00_resumo}
+
+\tableofcontents
+\newpage
+
+\input{capitulos/01_introducao}
+\input{capitulos/02_revisao_literatura}
+\input{capitulos/03_objetivos}
+\input{capitulos/04_metodologia}
+\input{capitulos/05_cronograma}
+
+\printbibliography
+
+\end{document}

@@ -1,0 +1,19 @@
+\begin{abstract}
+\noindent\textbf{Contexto.} Sistemas de reconhecimento facial estão em uso massivo em aplicações cotidianas e críticas, desde catracas biométricas em academias até identificação policial em vias públicas. A literatura científica documenta, desde 2018, que esses sistemas apresentam disparidade demográfica significativa em accuracy entre grupos raciais --- mesmo quando treinados em datasets explicitamente balanceados.
+
+\noindent\textbf{Problema.} O estado-da-arte atual em classificação racial em sete classes sobre o FairFace (FaceScanPaliGemma, \citeauthor{aldahoul2026}, \citeyear{aldahoul2026}) atinge F1 macro de 75\%, mas com disparidade severa entre classes raciais: 90\% para Black, 80\% para White e apenas 60\% para Latinx/Hispanic --- gap de trinta pontos percentuais. Balanceamento de dados não resolve, conforme evidência convergente em FairFace, RFW e auditoria industrial NISTIR 8280.
+
+\noindent\textbf{Objetivo.} Esta dissertação propõe desenvolver e avaliar um pipeline de classificação racial em imagens faciais que incorpora tom de pele (escala Monk Skin Tone, dez pontos) como sinal auxiliar condicionante via mecanismo arquitetural, com o propósito de mitigar viés racial demonstrável no estado-da-arte. A contribuição principal é a primeira instância empírica documentada do uso de tom de pele explícito como contexto arquitetural para race classification multi-classe.
+
+\noindent\textbf{Método.} Pipeline em seis etapas: classificador MST pré-treinado (SkinToneNet), auditoria fenotípica do FairFace (matriz MST $\times$ race), race classifier ConvNeXt-T condicionado via FiLM, comparação contra seis baselines, fair transferência para face recognition (RFW/BFW), síntese decompositiva. Triangulação de métricas (Disparity Ratio + worst-class F1 + Equal Opportunity por classe).
+
+\noindent\textbf{Palavras-chave:} reconhecimento facial, fairness, viés racial, Monk Skin Tone, Feature-wise Linear Modulation, FairFace.
+\end{abstract}
+
+\vspace{1em}
+
+\begin{abstract}
+\noindent[English abstract to be added before submission --- mirror the Portuguese version.]
+\end{abstract}
+
+\newpage

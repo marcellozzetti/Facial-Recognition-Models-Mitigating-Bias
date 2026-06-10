@@ -1,0 +1,56 @@
+\section{Objetivos, Hipóteses e Contribuições}
+\label{sec:objetivos}
+
+\subsection{Objetivo geral}
+\label{sec:obj_geral}
+
+Esta dissertação tem como objetivo \textbf{desenvolver e avaliar um pipeline de classificação racial em imagens faciais que incorpora tom de pele (escala Monk Skin Tone, dez pontos) como sinal auxiliar condicionante via mecanismo arquitetural}, com o propósito de mitigar viés racial demonstrável no estado-da-arte atual --- particularmente a disparidade severa entre classes raciais bem representadas (Black, F1 $\approx$ 90\%) e classes sub-representadas (Latinx/Hispanic, F1 $\approx$ 60\%) documentada em modelos como FaceScanPaliGemma sobre o dataset FairFace. A contribuição principal é a \textbf{primeira instância empírica documentada do uso de tom de pele explícito como contexto arquitetural para race classification multi-classe}, com avaliação rigorosa via triangulação de métricas multi-classe e demonstração de fair transferência do mecanismo para downstream face recognition.
+
+\subsection{Objetivos específicos}
+\label{sec:obj_especificos}
+
+\begin{description}[font=\bfseries\sffamily]
+\item[OE1.] Quantificar a distribuição cruzada Monk Skin Tone $\times$ race classes sobre o FairFace via SkinToneNet pré-treinado, com validação humana em subset, entregando a primeira matriz pública desta distribuição. \textit{(Cap. 1, Hipótese H3)}
+
+\item[OE2.] Conduzir avaliação metodológica comparativa de modelos pré-treinados disponíveis para classificação MST e justificar a escolha do modelo adotado com critérios de desempenho, generalização e disponibilidade. \textit{(Cap. 1, metodológico)}
+
+\item[OE3.] Implementar e avaliar pipeline SkinToneNet $\rightarrow$ ConvNeXt-T + conditioning $\rightarrow$ race classifier sobre FairFace, comparando contra seis baselines de mitigação, com ablation arquitetural FiLM \textit{versus} CLIP-conditioning. \textit{(Cap. 2, Hipóteses H1, H2, H4)}
+
+\item[OE4.] Demonstrar empiricamente que o backbone fair-treinado no Capítulo 2 transfere a propriedade fair para tarefa downstream de face recognition (RFW ou BFW), com controle explícito de pixel information como confounder. \textit{(Cap. 3, Hipóteses H5, H6)}
+
+\item[OE5.] Decompor o erro de classificação racial Latinx em componente fenotípico (irredutível pelo overlap MST) versus componente algorítmico (mitigável), quantificando a fronteira estrutural de classificação multi-classe. \textit{(Cap. 4, síntese)}
+\end{description}
+
+\subsection{Hipóteses de pesquisa}
+\label{sec:hipoteses}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{p{0.5cm}p{5.5cm}p{4cm}p{4cm}}
+\toprule
+\textbf{ID} & \textbf{Hipótese} & \textbf{Confirmação} & \textbf{Refutação} \\
+\midrule
+H1 & Pipeline com tom de pele como contexto supera baseline ResNet-34 em F1 macro $\geq +2$pp e reduz DR $\geq 20\%$ & Ambos simultâneos & Qualquer um abaixo \\
+H2 & ConvNeXt-T sem conditioning ganha +2 a +5pp F1 sobre ResNet-34; Latinx permanece em $\approx 60\%$ ($\pm 3$pp) & Ganho no range E Latinx invariante & Fora do range ou Latinx muda \\
+H3 & Latinx exibe spread MST em $\geq 5$ das 10 classes & Spread $\geq 5$ & Spread $< 5$ \\
+H4 & $\geq 50\%$ das misclassificações Latinx do baseline estão em zonas MST de sobreposição & $\geq 50\%$ em overlap & $< 50\%$ \\
+H5 & Condicionamento MST melhora fairness em FR \textbf{quando pixel info é controlada} & Black/African $\geq +3$pp em RFW/BFW & $< +3$pp \\
+H6 & Disparity residual em FR é explicada predominantemente por pixel info \autocite{pangelinan2023} & $\geq 70\%$ variance pixel info & $< 70\%$ \\
+\bottomrule
+\end{tabular}
+\caption{Hipóteses de pesquisa com critérios formais de confirmação e refutação.}
+\end{table}
+
+\subsection{Contribuições científicas previstas}
+\label{sec:contribuicoes}
+
+\begin{description}[font=\bfseries\sffamily]
+\item[C1.] Avaliação metodológica comparativa de modelos pré-treinados de skin tone classification, com protocolo de escolha justificado.
+\item[C2.] Matriz pública Monk Skin Tone $\times$ race classes sobre o FairFace validation set.
+\item[C3.] Primeira aplicação documentada de FiLM-conditioning \autocite{perez2018film} a fairness facial em race classification multi-classe.
+\item[C4.] Triangulação de métricas multi-classe --- Disparity Ratio + worst-class F1 + Equal Opportunity por classe + Equalized Odds por classe --- fundamentada no Teorema da Impossibilidade \autocite{kleinberg2017}.
+\item[C5.] Demonstração empírica de fair transferência classification $\rightarrow$ face recognition em CV facial.
+\item[C6.] Decomposição quantitativa do erro Latinx em componente fenotípico irredutível versus algorítmico mitigável.
+\item[C7.] Comparativo arquitetural FiLM-conditioning versus CLIP-conditioning para fairness facial.
+\end{description}

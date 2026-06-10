@@ -1,0 +1,63 @@
+\section{Revisão de Literatura}
+\label{sec:rl}
+
+A literatura científica de fairness em sistemas faciais tem atacado o problema por seis frentes principais. Apresenta-se a seguir um panorama estruturado, baseado no corpus de 55 artigos catalogados desta dissertação (Rodadas 1 a 7 de triagem bibliográfica).
+
+\subsection{Datasets balanceados como mitigação de primeiro estágio}
+\label{sec:rl_datasets}
+
+A primeira geração de respostas ao problema foram \textbf{datasets balanceados por design}. O FairFace \autocite{karkkainen2021fairface} balanceia sete categorias raciais. O Racial Faces in-the-Wild \autocite{wang2019rfw} balanceia quatro categorias em verificação 1:1. O Balanced Faces in the Wild \autocite{robinson2020bfw} cobre oito subgrupos race $\times$ gender. Mais recentemente, o Casual Conversations \autocite{hazirbas2021casual} e sua expansão v2 \autocite{porgali2023ccv2} cobrindo sete países introduziram self-reported gender e age com Fitzpatrick e Monk Skin Tone anotados por treinados.
+
+A persistência da disparidade Latinx no FairFace, apesar do balanceamento, demonstrou que esta primeira geração não foi suficiente.
+
+\subsection{Mitigação algorítmica via loss functions e arquiteturas}
+\label{sec:rl_mitigacao}
+
+Em paralelo aos datasets, surgiu uma família de técnicas de mitigação algorítmica. \citeauthor{park2022fscl} \autocite{park2022fscl} propuseram Fair Supervised Contrastive Learning, demonstrando formalmente que SupCon padrão incentiva encoders a aprenderem informação demográfica em datasets enviesados. \citeauthor{sagawa2020groupdro} \autocite{sagawa2020groupdro} formalizaram distributionally robust optimization sobre grupos. \citeauthor{manzoor2024fineface} \autocite{manzoor2024fineface} propuseram cross-layer mutual attention learning (FineFACE), atingindo operação Pareto-eficiente em CelebA.
+
+Mais recentemente, \citeauthor{liu2025bnmr} \autocite{liu2025bnmr} em ACM FAccT propuseram Bayesian Network-informed Meta Reweighting, introduzindo a noção de face component fairness como surrogate para demographic fairness. \citeauthor{lin2022fairgrape} \autocite{lin2022fairgrape} introduziram FairGRAPE, técnica de pruning fairness-aware, e documentaram independentemente o baseline canônico de 72\% accuracy ResNet-34 sobre FairFace race 7-class in-domain.
+
+\subsection{Vision-language models como novo paradigma}
+\label{sec:rl_vlm}
+
+Uma terceira frente emergiu com vision-language models. \citeauthor{aldahoul2026} \autocite{aldahoul2026} reformularam classificação racial como Visual Question Answering sobre PaliGemma fine-tuned, atingindo o atual estado-da-arte (FaceScanPaliGemma, 75,7\% accuracy). Para fairness em VLMs especificamente, \citeauthor{luo2024fairclip} \autocite{luo2024fairclip} em CVPR propuseram FairCLIP, primeiro fair vision-language dataset médico, introduzindo abordagem baseada em distância de Sinkhorn. Trabalhos subsequentes como FairerCLIP \autocite{dehdashtian2024fairerclip}, BendVLM \autocite{bendvlm2024} e debiasing via neural interventions \autocite{debiasingni2025} oferecem variações metodológicas.
+
+VLMs trouxeram desempenho superior mas também novas formas de viés. Vision-language models são quatro a sete vezes mais propensos a classificar incorretamente indivíduos com pele escura segundo o benchmark GRAS \autocite{gras2025}. CLIP especificamente apresenta taxa de classificação errada de 14\% em faces Black versus menos de 8\% em outros grupos.
+
+\subsection{Skin tone como dimensão alternativa à raça}
+\label{sec:rl_skintone}
+
+Desde o estudo Gender Shades \autocite{buolamwini2018gendershades}, tom de pele tem sido proposto como \textbf{dimensão alternativa de auditoria de fairness}, mais estável conceitualmente que categoria racial. \citeauthor{fitzpatrick1988} \autocite{fitzpatrick1988} originalmente desenvolveu escala de seis tipos para fototerapia dermatológica, posteriormente adotada em fairness research apesar de seu viés caucasiano-cêntrico.
+
+Em 2023, \citeauthor{schumann2023mst} \autocite{schumann2023mst} estabeleceram a \textbf{Monk Skin Tone Scale}, escala de dez pontos desenvolvida em parceria entre Ellis Monk (sociólogo, Harvard) e Google, designed especificamente para auditoria de fairness em IA. Em 2026, \citeauthor{pereira2026skintonenet} \autocite{pereira2026skintonenet} introduziram o \textbf{SkinToneNet} --- Vision Transformer Small fine-tuned em STW (42.313 imagens de 3.564 indivíduos), atingindo SOTA em classificação MST cross-domain.
+
+\subsection{Fair representation learning e teoria da transferência}
+\label{sec:rl_fairrep}
+
+Uma linhagem teórica importante foi inaugurada por \citeauthor{zemel2013lfr} \autocite{zemel2013lfr}, com o paradigma de \textbf{Learning Fair Representations} (Test-of-Time Award ICML 2023). \citeauthor{madras2018laftr} \autocite{madras2018laftr} estenderam o paradigma com LAFTR, provando o Teorema 1 de transferência: se a representação Z é fair em uma tarefa, qualquer classificador downstream sobre Z herda um limite superior de violação de fairness.
+
+\citeauthor{aguirre2023mtl} \autocite{aguirre2023mtl} demonstraram empíricamente, em domínio NLP, que objetivos de fairness demográfico transferem entre tarefas em framework multi-task, com reduções de 15 a 44\% em $\varepsilon$-DEO mantendo F1. \citeauthor{hardt2016eqopp} \autocite{hardt2016eqopp} estabeleceram as métricas formais Equal Opportunity e Equalized Odds que toda esta literatura subsequente adota como referência.
+
+\subsection{Auditoria de datasets, mecanismos arquiteturais e conditioning moderno}
+\label{sec:rl_arquit}
+
+Em paralelo, \citeauthor{dominguez2024dsap} \autocite{dominguez2024dsap} propuseram DSAP --- framework unificado de auditoria de datasets via Renkonen similarity. \citeauthor{lafargue2025} \autocite{lafargue2025} propuseram pipeline de auditoria com testes estatísticos uncertainty-aware. \citeauthor{dooley2022nas} \autocite{dooley2022nas} demonstraram via Neural Architecture Search que biases são inerentes a arquiteturas neurais.
+
+Quanto a mecanismos arquiteturais de conditioning, \citeauthor{perez2018film} \autocite{perez2018film} propuseram FiLM --- Feature-wise Linear Modulation. FiLM é parameter-efficient e amplamente adotado, mas \textbf{nunca foi testado em fairness facial até a presente dissertação}. Alternativas modernas incluem LoRA-based approaches \autocite{fairlora2024,fairnesslora2024}, AIM-Fair \autocite{zhao2025aimfair} e Vision Transformers fairness-aware como FairViT \autocite{tian2024fairvit}. Estas alternativas serão investigadas como ablation arquitetural no Capítulo de metodologia.
+
+\subsection{Lacunas científicas identificadas}
+\label{sec:rl_gaps}
+
+A análise sistemática do corpus revela cinco gaps científicos não cobertos pela literatura atual:
+
+\begin{enumerate}[label=\textbf{G\arabic*}.]
+\item \textbf{Matriz pública MST $\times$ race classes do FairFace}: apesar do MST como padrão moderno desde 2023 e do SkinToneNet pré-treinado em 2026, nenhum trabalho publicou a distribuição cruzada. Pereira et al. auditam datasets reportando distribuições agregadas, sem cross-tabulation per-race.
+
+\item \textbf{Skin tone como sinal condicionante arquitetural em race classification multi-classe}: a literatura testa contrastive learning, distributionally robust optimization e adversarial debiasing, mas \textbf{nenhuma testa explicitamente o uso de tom de pele como sinal auxiliar condicionante via mecanismo arquitetural}.
+
+\item \textbf{Decomposição fenotípico (irredutível) vs algorítmico (mitigável)}: \citeauthor{lewontin1972} \autocite{lewontin1972} demonstrou que 85\% da variação humana é intra-populacional. A AAPA Statement \autocite{fuentes2019} consolidou institucionalmente que ``race does not provide an accurate representation of human biological variation''. Mas a literatura computacional não decompõe o erro de race classification em componente fenotípico irredutível versus componente algorítmico mitigável.
+
+\item \textbf{Fair transferência empírica de classification para face recognition em CV facial}: LAFTR é teórico; Aguirre é NLP. Não existe demonstração empírica equivalente em computer vision facial.
+
+\item \textbf{Triangulação de métricas para race classification multi-classe}: EO e EOD são originalmente binárias. Para race 7-class, adaptações são fragmentadas. Não há protocolo consensual.
+\end{enumerate}

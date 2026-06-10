@@ -1,0 +1,55 @@
+\section{Cronograma e Próximos Passos}
+\label{sec:cronograma}
+
+\subsection{Cronograma de execução}
+\label{sec:cron_exec}
+
+O cronograma de execução da pesquisa abrange aproximadamente 28 a 32 semanas após a aprovação desta qualificação:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{p{5cm}p{3cm}p{6cm}}
+\toprule
+\textbf{Fase} & \textbf{Target} & \textbf{Entrega} \\
+\midrule
+Aprovação da qualificação & Julho 2026 & Ajustes na proposta se necessário \\
+Setup metodológico & Agosto 2026 & Documentos com especificações detalhadas \\
+Cap. 1 --- Auditoria MST $\times$ race & Setembro 2026 & Resultado de H3 + protocolo OE2 \\
+Cap. 2 --- Pipeline condicionado + ablation FiLM vs CLIP & Dezembro 2026 & Resultados H1, H2, H4 + C3, C7 \\
+Cap. 3 --- Fair transferência para FR & Fevereiro 2027 & Resultados H5, H6 + C5 \\
+Cap. 4 --- Síntese decompositiva & Março 2027 & Decomposição C6 \\
+Escrita final & Em paralelo (Set 2026 -- Mar 2027) & Texto final da dissertação \\
+Defesa & Abril 2027 & --- \\
+\bottomrule
+\end{tabular}
+\caption{Cronograma de execução da pesquisa.}
+\end{table}
+
+\subsection{Riscos identificados e mitigações}
+\label{sec:riscos}
+
+\begin{description}[font=\bfseries\sffamily]
+\item[Risco 1.] Alguma hipótese pode ser refutada. \\
+\textbf{Mitigação:} Plano B documentado por hipótese; observação negativa é resultado científico válido.
+
+\item[Risco 2.] Recrutamento de anotadores diversos para validação manual MST. \\
+\textbf{Mitigação:} Prolific Academic com filtros regionais; custo estimado \$1.400 para 700 imagens $\times$ 3 anotadores.
+
+\item[Risco 3.] Refutação de H5 por Pangelinan 2023 (pixel info $>$ skin tone em FR). \\
+\textbf{Mitigação:} H5 reformulada com controle explícito de pixel info; H6 nova decompõe variância. Refutação parcial torna-se contribuição quantitativa.
+
+\item[Risco 4.] Compute. \\
+\textbf{Mitigação:} ConvNeXt-T é leve (28M parâmetros), aproximadamente 200--400 GPU-horas para o Capítulo 2 completo.
+\end{description}
+
+\subsection{Próximos passos imediatos pós-qualificação}
+\label{sec:proximos}
+
+\begin{enumerate}
+\item Confirmar disponibilidade pública dos pesos do SkinToneNet \autocite{pereira2026skintonenet}; plano B: re-treinar ViT-Small em STW se necessário.
+\item Recrutar anotadores via Prolific para validação manual MST em subset do FairFace.
+\item Iniciar treinamento do Capítulo 1 (auditoria MST $\times$ race).
+\item Implementar pipeline FiLM-conditioning sobre ConvNeXt-T \autocite{liu2022convnext}.
+\item Implementar ablation arquitetural CLIP-conditioning \autocite{luo2024fairclip,radford2021clip}.
+\end{enumerate}

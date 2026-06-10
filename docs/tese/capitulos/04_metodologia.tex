@@ -1,0 +1,87 @@
+\section{Metodologia}
+\label{sec:metodologia}
+
+\subsection{Pipeline experimental em seis etapas}
+\label{sec:pipeline}
+
+O pipeline metodológico aprovado pelo orientador estrutura-se em seis etapas sequenciais:
+
+\begin{enumerate}
+\item \textbf{Etapa 1 --- Classificador de tom de pele MST}: usar SkinToneNet pré-treinado \autocite{pereira2026skintonenet} como insumo, mediante validação independente em subset FairFace anotado manualmente.
+
+\item \textbf{Etapa 2 --- Auditoria FairFace}: aplicar SkinToneNet sobre FairFace validation set e construir a matriz pública MST $\times$ race classes (Contribuição C2).
+
+\item \textbf{Etapa 3 --- Race classifier com conditioning}: treinar ConvNeXt-T fine-tuned em FairFace train, com camadas FiLM por estágio recebendo vetor MST como contexto.
+
+\item \textbf{Etapa 4 --- Comparação contra baselines}: avaliar o pipeline contra seis baselines de mitigação, reportando triangulação completa de métricas (Contribuição C4).
+
+\item \textbf{Etapa 5 --- Fair transferência}: aplicar o backbone fair em face recognition downstream (RFW ou BFW), com controle de pixel information.
+
+\item \textbf{Etapa 6 --- Síntese decompositiva}: combinar resultados de C2 e C5 para quantificar componente fenotípico versus algorítmico do erro Latinx (Contribuição C6).
+\end{enumerate}
+
+\subsection{Datasets}
+\label{sec:datasets}
+
+\begin{description}[font=\bfseries\sffamily]
+\item[Treino race]: FairFace train split (86.744 imagens, sete classes raciais) \autocite{karkkainen2021fairface}.
+\item[Validação MST]: STW \autocite{pereira2026skintonenet} e Casual Conversations v2 \autocite{porgali2023ccv2}.
+\item[Teste race]: FairFace test split (10.954 imagens) \autocite{karkkainen2021fairface}.
+\item[Teste fair transfer]: RFW \autocite{wang2019rfw} e/ou BFW \autocite{robinson2020bfw}.
+\end{description}
+
+\subsection{Baselines}
+\label{sec:baselines}
+
+Comparação contra seis baselines de mitigação algorítmica:
+\begin{enumerate}
+\item ResNet-34 (canônico FairFace) \autocite{karkkainen2021fairface,aldahoul2026};
+\item ConvNeXt-T puro (controle arquitetural moderno);
+\item FSCL+ \autocite{park2022fscl};
+\item Group DRO \autocite{sagawa2020groupdro};
+\item FineFACE \autocite{manzoor2024fineface};
+\item Adversarial debiasing \autocite{zhang2018adversarial}.
+\end{enumerate}
+
+\subsection{Mecanismo de conditioning FiLM}
+\label{sec:film}
+
+Para cada estágio do ConvNeXt-T, insere-se uma camada FiLM \autocite{perez2018film} que recebe o vetor MST $z \in \mathbb{R}^{10}$ (saída softmax do SkinToneNet pré-treinado) e produz parâmetros de modulação $(\gamma_i, \beta_i)$ por canal, aplicados como transformação afim:
+
+\begin{equation}
+\mathrm{FiLM}(F_i \mid \gamma_i, \beta_i) = \gamma_i \odot F_i + \beta_i
+\end{equation}
+
+onde $F_i$ é a feature map intermediária do estágio $i$ e $\odot$ denota multiplicação elemento-a-elemento. As funções $f_\gamma$ e $f_\beta$ são duas pequenas MLPs treináveis com aproximadamente 380.000 parâmetros adicionais ($\approx 1\%$ de overhead sobre o backbone de 28 milhões de parâmetros).
+
+\subsection{Ablation arquitetural --- FiLM versus CLIP-conditioning}
+\label{sec:ablation}
+
+Endereçando a recomendação registrada na reunião de orientação de 2026-06-08, será conduzida ablation arquitetural comparando FiLM \autocite{perez2018film} contra abordagem CLIP-based \autocite{luo2024fairclip,radford2021clip}, esta última empregando embeddings de CLIP pré-treinado como contexto alternativo via cross-attention.
+
+\subsection{Triangulação de métricas}
+\label{sec:metricas}
+
+Fundamentada no Teorema da Impossibilidade \autocite{kleinberg2017}, a triangulação envolve dois cenários:
+
+\paragraph{Cenário A --- Protocolo principal (race apenas).}
+\begin{itemize}
+\item F1 macro \autocite{vanrijsbergen1979};
+\item Disparity Ratio: $\mathrm{DR} = \min_c \mathrm{F1}_c / \max_c \mathrm{F1}_c$ \autocite{hardt2016eqopp};
+\item Worst-class F1 \autocite{sagawa2020groupdro}.
+\end{itemize}
+
+\paragraph{Cenário B --- Ablation intersectional (race $\times$ gender).}
+\begin{itemize}
+\item Equal Opportunity por classe: para cada raça $c$, gap entre $\mathrm{TPR}_c^{M}$ e $\mathrm{TPR}_c^{F}$ \autocite{hardt2016eqopp};
+\item Equalized Odds por classe: gap simultâneo em TPR e FPR \autocite{hardt2016eqopp}.
+\end{itemize}
+
+\subsection{Rigor estatístico}
+\label{sec:rigor}
+
+\begin{itemize}
+\item Três seeds independentes (42, 1, 2) com média $\pm$ desvio padrão;
+\item Comparação pareada contra baselines;
+\item Intervalos de confiança via bootstrap.
+\end{itemize}

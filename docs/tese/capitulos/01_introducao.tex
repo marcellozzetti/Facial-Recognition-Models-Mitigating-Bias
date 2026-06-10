@@ -1,0 +1,33 @@
+\section{Introdução}
+
+\subsection{Contexto}
+\label{sec:contexto}
+
+Sistemas de reconhecimento facial deixaram de ser uma tecnologia restrita a laboratórios para se tornar parte cotidiana da infraestrutura social. Aplicações vão de \textbf{catracas biométricas em academias e empresas}, passando por \textbf{desbloqueio de aparelhos pessoais}, \textbf{autenticação bancária e identidade digital}, até \textbf{controle de fronteira em aeroportos} e \textbf{identificação policial em vias públicas}. Em escala global, o National Institute of Standards and Technology auditou em 2019 cento e oitenta e nove algoritmos de reconhecimento facial sobre dezoito milhões de imagens de oito milhões e meio de pessoas, na maior auditoria pública já realizada em biometria facial \autocite{grother2019nistir}.
+
+A literatura científica acompanhou essa expansão. Modelos modernos combinam grandes datasets faciais (FairFace, VGGFace2, MS-Celeb-1M) com arquiteturas neurais profundas (ResNet, ConvNeXt, Vision Transformers) e técnicas avançadas de loss (ArcFace, CosFace), atingindo desempenhos próximos ao humano em condições controladas. Em paralelo, vision-language models como CLIP \autocite{radford2021clip} e PaliGemma criaram nova categoria de classificadores faciais via reformulação como Visual Question Answering --- o estado da arte atual em classificação racial multi-classe sobre FairFace é o \textbf{FaceScanPaliGemma}, com 75,7\% de acurácia e F1 macro de 75\% \autocite{aldahoul2026}.
+
+Esta dissertação se insere nesta interseção entre maturidade tecnológica e responsabilidade social. O reconhecimento facial funciona para a maioria das pessoas --- mas a documentação científica mostra que não funciona igualmente bem para todas.
+
+\subsection{Problemas existentes}
+\label{sec:problema}
+
+O problema central que motiva esta dissertação é simples de enunciar e tecnicamente difícil de resolver: \textbf{sistemas de reconhecimento facial apresentam disparidade demográfica significativa em accuracy entre grupos raciais, mesmo quando treinados em datasets explicitamente balanceados}.
+
+\subsubsection{Disparidade documentada no estado-da-arte}
+
+O estado-da-arte atual em classificação racial em sete classes sobre o FairFace, o FaceScanPaliGemma \autocite{aldahoul2026}, atinge F1 macro de 75\%. Mas o detalhamento por classe racial revela disparidade severa: F1 de 90\% para faces Black, 80\% para White, 60\% para Latinx/Hispanic e 67\% para Southeast Asian. \textbf{A pior classe (Latinx) tem F1 trinta pontos percentuais abaixo da melhor classe (Black)}.
+
+Esta disparidade não é artefato de um único modelo. O baseline ResNet-34 originalmente treinado por \citeauthor{karkkainen2021fairface} \autocite{karkkainen2021fairface} sobre o FairFace mostra padrão semelhante: 72\% de accuracy geral, mas apenas 59,6\% em Hispanic versus 83,2\% em Black \autocite{lin2022fairgrape}. A hierarquia de dificuldade entre raças é \textbf{estável across métodos}, sugerindo um problema estrutural, não algorítmico contingente.
+
+\subsubsection{Balanceamento de dados não resolve}
+
+A solução intuitiva --- balancear o dataset por raça --- é insuficiente. O próprio FairFace foi construído com este propósito \autocite{karkkainen2021fairface}, distribuindo 108.501 imagens aproximadamente igual entre sete categorias raciais. Mesmo assim, a disparidade Latinx versus White persiste.
+
+\citeauthor{kolla2022racial} \autocite{kolla2022racial} conduziram dezesseis experimentos com proporções variáveis de raças no treino, concluindo explicitamente que ``distribuição uniforme de raças nos dados de treino não garante face recognition livre de viés''. \citeauthor{wang2019rfw} \autocite{wang2019rfw}, ao introduzir o dataset RFW (Racial Faces in-the-Wild), observaram que ``algumas raças permanecem intrinsecamente mais difíceis de reconhecer, mesmo com dados de treinamento balanceados''. Em escala industrial, o relatório NISTIR 8280 documentou diferenciais de falso positivo de dez a cem vezes maiores entre grupos raciais em algoritmos comerciais \autocite{grother2019nistir}.
+
+\subsubsection{Implicações sociais}
+
+A disparidade tem consequências concretas. Quando um sistema de reconhecimento facial é utilizado em catraca biométrica, autenticação financeira ou identificação policial, \textbf{a probabilidade de erro depende do rosto da pessoa}. Casos documentados de prisão errada por falso match em sistemas comerciais de FR já levaram a litígios e moratórias regulatórias. O European AI Act de 2024 incluiu auditoria de fairness como requisito formal para sistemas de IA classificados como alto risco \autocite{lafargue2025}.
+
+A questão científica deixou de ser ``existe viés?'' --- está documentado há quase uma década, desde o estudo seminal Gender Shades \autocite{buolamwini2018gendershades}. A questão atual é: \textbf{qual é o mecanismo gerador desse viés residual mesmo em datasets balanceados, e como mitigá-lo de forma eficaz?}
