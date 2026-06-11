@@ -6,19 +6,30 @@
 > reunião de 2026-06-08).
 > **Meta**: corpus ≥ 100 artigos, com **≥ 20 de 2025-2026**.
 
-## 0. STATUS ATUAL (atualizado 2026-06-10 pós-R7 leva 1)
+## 0. STATUS FINAL (atualizado 2026-06-10 pós-R7 COMPLETA)
 
-> ✅ **META ≥ 20 ARTIGOS 2025-2026 ATENDIDA** (atual: 20)
+> 🎯 **AMBAS METAS DO ORIENTADOR SUPER-ATENDIDAS**
 
-| Métrica | Valor | Meta |
-|---|---|---|
-| **Total fichas** | **55** | ≥ 100 (gap −45) |
-| **2025** | 8 | — |
-| **2026** | 1 | — |
-| **Combinado 2025-2026** | **9** + **11 = 20** ✅ | ≥ 20 atendida |
+| Métrica | Valor | Meta | Status |
+|---|---|---|---|
+| **Total fichas** | **105** | ≥ 100 | ✅ +5 |
+| **2025** | ~20 | — | — |
+| **2026** | ~13 | — | — |
+| **Combinado 2025-2026** | **~33** | ≥ 20 | ✅✅ +13 |
 
-(Nota: 11 papers 2024 R7 + 9 papers 2025-2026 total atende espírito
-do requisito de "mais coisa nova" do orientador. Detalhamento abaixo.)
+### Resumo Rodada 7 (entregue em 2026-06-10)
+
+A Rodada 7 adicionou **~68 fichas** distribuídas em 3 levas:
+
+- **Leva 1** (18 fichas): VLM fairness Track I novo + conditioning
+  moderno Track J novo + papers complementares
+- **Leva 2** (29 fichas): papers fundadores FR (FaceNet, CosFace,
+  ArcFace, MagFace, AdaFace) + surveys recentes + causal + datasets
+  emergentes + 2025-2026 focus
+- **Leva 3** (~21 fichas): federated, long-tail, cross-domain,
+  post-hoc, surveys auxiliares
+
+Tracks ampliados: 8 → 10 (I e J novos).
 
 ## 1. Distribuição atual (55 fichas, R1-R7 leva 1)
 

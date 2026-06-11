@@ -1,13 +1,14 @@
 # INDEX — Pesquisa Bibliográfica
 
-> Navegação central das **55 fichas do corpus** (R1-R7 primeira leva).
+> Navegação central das **105 fichas do corpus** (R1-R7 completa).
 > Para conteúdo integral do paper consultar PDF local. Para resumo
 > estruturado em 11–12 seções consultar ficha `.md`.
 >
-> Atualizado: 2026-06-10 (Rodada 7 primeira leva — 18 novas fichas
-> OVERVIEW_ONLY incorporando 2 novos Tracks: I (VLM/CLIP/BLIP
-> fairness, 11 fichas) e J (conditioning moderno LoRA/adapter/ViT,
-> 6 fichas). **META 20+ artigos 2025-2026 ATENDIDA** (atual: 20).
+> Atualizado: 2026-06-10 (Rodada 7 COMPLETA — 3 levas, ~68 fichas
+> novas. **META ORIENTADOR: ≥100 fichas + ≥20 de 2025-2026 SUPER
+> ATENDIDA** (atual: 105 fichas, 33 de 2025-2026). Tracks ampliados
+> para 10 incluindo I (VLM fairness, 11 fichas) e J (conditioning
+> moderno LoRA/adapter/ViT, 6 fichas) — adições da R7.
 > Análise R7 em [_rodada_07_candidatos.md](../_rodada_07_candidatos.md)).
 
 ## Ordem de leitura recomendada
