@@ -1,20 +1,20 @@
 ---
 name: fuentes-2019
 status_verificacao: VERIFIED
-autores: [Rebecca Ackermann, Sheela Athreya, Deborah Bolnick, Agustín Fuentes, Tina Lasisi, Sang-Hee Lee, Shay-Akil McLean, Robin Nelson]
+autores: [Agustín Fuentes (Notre Dame, primeiro autor), Rebecca Rogers Ackermann (UCT), Sheela Athreya (Texas A&M), Deborah Bolnick (UConn), Tina Lasisi (Penn State), Sang-Hee Lee (UC Riverside), Shay-Akil McLean (Univ Illinois Urbana-Champaign), Robin Nelson (Santa Clara)]
 ano: 2019
 titulo: "AAPA Statement on Race and Racism"
-venue: "American Journal of Physical Anthropology, vol 169, no 3, pp. 400-402"
+venue: "American Journal of Physical Anthropology, vol 169, no 3, pp. 400-402 (COMMENTARY)"
 tipo_publicacao: journal
 arxiv_id: null
 doi: "10.1002/ajpa.23882"
 url_primario: https://onlinelibrary.wiley.com/doi/10.1002/ajpa.23882
 citacoes_google_scholar: null
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-05-25
+data_verificacao_citacoes: 2026-06-15
 n_referencias_paper: ~30 (estimado)
 lente_disrupcao: paradigma
-fonte_leitura: WebFetch sobre bioanth.org/about/aaba-statement-on-race-racism/ (HTML oficial AABA). PDF integral via Wiley bloqueado por anti-scraping; conteúdo central capturado.
+fonte_leitura: PDF integral baixado manualmente pelo Marcello via VPN institucional (pdfs/fuentes_2019.pdf). Validação Nível 2 (Camada 2) em 2026-06-15 — Executive Summary e seções principais lidos via pdftotext. Autoria de Agustín Fuentes confirmada como primeiro autor (não apenas membro do Committee on Diversity como nota anterior sugeria).
 ---
 
 # AAPA Statement on Race and Racism (Fuentes et al. para o Committee on Diversity, 2019)
@@ -154,6 +154,8 @@ Statement explicitamente reconhece:
 
 ## 10. Arquivos relacionados
 
+- PDF integral: `pdfs/fuentes_2019.pdf` (baixado via VPN Unifesp em
+  2026-06-15).
 - HTML oficial AABA: https://bioanth.org/about/aaba-statement-on-race-racism/
 - DOI: 10.1002/ajpa.23882
 - Entradas relacionadas: [[lewontin_1972]] (evidência genética
