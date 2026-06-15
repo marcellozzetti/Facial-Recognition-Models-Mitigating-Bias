@@ -449,7 +449,7 @@ def build_presentation() -> Presentation:
             ["2", "22-28/jun", "Capítulo 2 (Revisão — 11 tracks)", "Pente fino do corpus e 101 fichas"],
             ["3", "29/jun-05/jul", "Capítulo 3 (Objetivos) e Capítulo 4 (Ampliação e busca de novas técnicas)", "Pipeline de 6 etapas validado"],
             ["4", "06-12/jul", "Capítulo 5 (Cronograma) e revisão final", "Integração e ABNT"],
-            ["Folga", "13-15/jul", "Ajustes finais e entrega ao orientador", "Primeira revisão"],
+            ["Target", "13-15/jul", "Ajustes finais e entrega ao orientador", "Primeira revisão"],
         ],
         col_widths=[1.0, 2.4, 5.0, 4.6],
         highlight_rows=[0],
