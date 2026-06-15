@@ -39,18 +39,18 @@ def add_title_slide(prs: Presentation) -> None:
     tf = tx.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Evolucao da Semana"
+    p.text = "Evolução da semana"
     p.font.size = Pt(40)
     p.font.bold = True
     p.font.color.rgb = NAVY
 
     p2 = tf.add_paragraph()
-    p2.text = "Corpus consolidado (101 fichas) + analise CLIP vs FiLM"
+    p2.text = "Corpus consolidado (101 fichas) e análise CLIP vs FiLM"
     p2.font.size = Pt(22)
     p2.font.color.rgb = GRAY_DK
 
     p3 = tf.add_paragraph()
-    p3.text = "Pos pente fino critico do corpus e resposta a sugestao do orientador"
+    p3.text = "Pente fino crítico do corpus e resposta à sugestão do orientador"
     p3.font.size = Pt(16)
     p3.font.color.rgb = GRAY_MD
     p3.font.italic = True
@@ -61,8 +61,8 @@ def add_title_slide(prs: Presentation) -> None:
     rows = [
         ("Mestrando:", "Marcello Ozzetti"),
         ("Orientador:", "Prof. Marcos Quiles"),
-        ("Programa:", "Mestrado em Ciencia da Computacao - Unifesp / ICT"),
-        ("Reuniao:", "15 de junho de 2026"),
+        ("Programa:", "Mestrado em Ciência da Computação — Unifesp / ICT"),
+        ("Reunião:", "15 de junho de 2026"),
     ]
     for i, (k, v) in enumerate(rows):
         p = mf.paragraphs[0] if i == 0 else mf.add_paragraph()
@@ -153,7 +153,7 @@ def add_bullets(prs: Presentation, title: str, bullets: list, footer: str = "") 
             run2.font.size = Pt(16)
             run2.font.color.rgb = GRAY_DK
         else:
-            p.text = "- " + item
+            p.text = "— " + item
             p.font.size = Pt(16)
             p.font.color.rgb = GRAY_DK
         p.space_after = Pt(8)
@@ -218,54 +218,53 @@ def build_presentation() -> Presentation:
     # 2. Agenda
     add_bullets(
         prs,
-        "Agenda da reuniao",
+        "Agenda da reunião",
         [
-            ("1.", "Status das 8 decisoes da reuniao anterior (08/jun)"),
-            ("2.", "Corpus consolidado: 101 fichas em 11 tracks tematicos"),
-            ("3.", "Pente fino critico do corpus (classificacao por impacto)"),
-            ("4.", "Resposta a sugestao do orientador: CLIP (Contrastive Language-Image Pre-training)"),
-            ("5.", "FiLM em fairness: gap na literatura como contribuicao original"),
-            ("6.", "Proposta: Contribuicao C7 - ablation arquitetural"),
-            ("7.", "Roadmap LaTeX 30 dias ate qualificacao"),
-            ("8.", "Discussao e proximos passos"),
+            ("1.", "Status das decisões da reunião anterior (08/jun)"),
+            ("2.", "Corpus consolidado: 101 fichas em 11 tracks temáticos"),
+            ("3.", "Pente fino crítico do corpus (classificação por impacto)"),
+            ("4.", "Resposta à sugestão do orientador: CLIP (Contrastive Language-Image Pre-training)"),
+            ("5.", "FiLM em fairness: lacuna na literatura como contribuição original"),
+            ("6.", "Proposta: Contribuição C7 — ablation arquitetural"),
+            ("7.", "Plano de escrita e decisões a alinhar"),
         ],
-        footer="Tempo estimado: 12-15 min de apresentacao + Q&A",
+        footer="Tempo estimado: 12-15 min de apresentação + discussão",
     )
 
-    # SECAO 1 - Status decisoes
-    add_section_divider(prs, "1", "Status das 8 decisoes", "Reuniao anterior - 08/jun/2026")
+    # SEÇÃO 1 — Status decisões
+    add_section_divider(prs, "1", "Status das decisões", "Reunião anterior — 08/jun/2026")
 
     add_table_slide(
         prs,
-        "Decisoes da reuniao anterior - status",
-        ["#", "Decisao", "Status", "Observacoes"],
+        "Decisões da reunião anterior — status",
+        ["#", "Decisão", "Status", "Observações"],
         [
             ["1", "Pipeline 6 etapas aprovado", "OK", "Validado e detalhado por etapa"],
-            ["2", "SkinToneNet pre-treinado", "OK", "Leitura integral concluida"],
-            ["3", "Corpus >=100 artigos", "OK 101", "+46 fichas na ultima rodada"],
-            ["4", ">=20 artigos 2025-2026", "OK 25", "Meta superada"],
-            ["5", "Adicionar CLIP conditioning", "OK Track I", "14 fichas + analise tecnica"],
-            ["6", "Submissao qualificacao 15/jul/2026", "Em curso", "LaTeX em andamento"],
+            ["2", "SkinToneNet pré-treinado", "OK", "Leitura integral concluída"],
+            ["3", "Corpus ≥100 artigos", "OK — 101", "+46 fichas na última rodada"],
+            ["4", "≥20 artigos 2025-2026", "OK — 25", "Meta superada"],
+            ["5", "Adicionar CLIP conditioning", "OK — Track I", "14 fichas + análise técnica"],
+            ["6", "Submissão qualificação 15/jul/2026", "Em curso", "Escrita em andamento"],
         ],
         col_widths=[0.5, 4.8, 1.8, 5.4],
         highlight_rows=[5],
-        footer="4 itens fechados + 1 com track dedicada + 1 em execucao conforme planejado",
+        footer="5 itens fechados e 1 em execução conforme planejado",
     )
 
-    # SECAO 2 - Corpus 101 fichas
-    add_section_divider(prs, "2", "Corpus consolidado", "101 fichas / 11 tracks tematicos")
+    # SEÇÃO 2 — Corpus 101 fichas
+    add_section_divider(prs, "2", "Corpus consolidado", "101 fichas em 11 tracks temáticos")
 
     add_bullets(
         prs,
         "Marco atingido: 101 fichas em 11 tracks",
         [
-            ("Total:", "101 fichas distribuidas em 11 tracks tematicos"),
-            ("Meta 2025-2026:", "25 fichas (meta era >=20) - ATINGIDA"),
-            ("Crescimento:", "+46 fichas em 3 levas da Rodada 7 (55 -> 101)"),
-            ("Novos tracks:", "I, J, K criados em resposta a recomendacoes"),
-            ("Track I:", "VLM/CLIP fairness (14 fichas) - resposta direta ao orientador"),
-            ("Track J:", "Conditioning moderno LoRA/ViT (5 fichas)"),
-            ("Track K:", "FR fundadores ArcFace/FaceNet/AdaFace (6 fichas) - gap fix"),
+            ("Total:", "101 fichas distribuídas em 11 tracks temáticos"),
+            ("Meta 2025-2026:", "25 fichas (meta era ≥20) — atingida"),
+            ("Crescimento:", "+46 fichas na ampliação recente do corpus (55 → 101)"),
+            ("Novos tracks:", "I, J, K criados em resposta a recomendações"),
+            ("Track I:", "VLM / CLIP em fairness (14 fichas) — resposta direta ao orientador"),
+            ("Track J:", "Conditioning moderno LoRA / ViT (5 fichas)"),
+            ("Track K:", "Fundadores de FR — ArcFace, FaceNet, AdaFace (6 fichas)"),
         ],
         footer="",
     )
@@ -275,223 +274,221 @@ def build_presentation() -> Presentation:
         "Justificativa de cada track (por que existe)",
         ["Track", "Tema", "Fichas", "Papel na tese"],
         [
-            ["A", "Race classification 7-class", "4", "Tarefa central"],
+            ["A", "Race classification 7 classes", "4", "Tarefa central"],
             ["B", "FR fairness", "16", "Paradigma dominante"],
             ["C", "Skin tone (MST)", "7", "Sinal auxiliar do pipeline"],
-            ["D", "Mitigacao algoritmica", "10", "Baselines a superar"],
-            ["E", "Auditoria & surveys", "14", "Infraestrutura intelectual"],
-            ["F", "Fundamentacao etica", "3", "Posicionamento da tese"],
-            ["G", "Mecanismos ML paradigmaticos", "9", "Esqueleto teorico (FiLM, LAFTR)"],
-            ["I (R7)", "VLM/CLIP fairness", "14", "Resposta ao orientador"],
-            ["J (R7)", "Conditioning moderno (LoRA, ViT)", "5", "Alternativas ao FiLM"],
-            ["K (R7)", "FR fundadores (ArcFace, FaceNet)", "6", "Preenche gap obvio"],
-            ["L", "Auxiliar / complementar", "13", "Direcoes adjacentes"],
+            ["D", "Mitigação algorítmica", "10", "Baselines a superar"],
+            ["E", "Auditoria e surveys", "14", "Infraestrutura intelectual"],
+            ["F", "Fundamentação ética", "3", "Posicionamento da tese"],
+            ["G", "Mecanismos ML paradigmáticos", "9", "Esqueleto teórico (FiLM, LAFTR)"],
+            ["I", "VLM / CLIP em fairness", "14", "Resposta direta ao orientador"],
+            ["J", "Conditioning moderno (LoRA, ViT)", "5", "Alternativas ao FiLM"],
+            ["K", "Fundadores de FR (ArcFace, FaceNet)", "6", "Preenche lacuna óbvia"],
+            ["L", "Auxiliar / complementar", "13", "Direções adjacentes"],
         ],
         col_widths=[1.0, 4.0, 0.8, 6.7],
         highlight_rows=[7, 8, 9],
-        footer="Tracks I, J, K criados na Rodada 7 - destacados para discussao",
+        footer="Tracks I, J, K são os novos tracks da ampliação recente — destacados para discussão",
     )
 
-    # SECAO 3 - Pente fino
-    add_section_divider(prs, "3", "Pente fino", "Classificacao por impacto na tese")
+    # SEÇÃO 3 — Pente fino
+    add_section_divider(prs, "3", "Pente fino", "Classificação por impacto na tese")
 
     add_table_slide(
         prs,
-        "Classificacao critica das 101 fichas",
-        ["Categoria", "Fichas", "%", "Implicacao para a tese"],
+        "Classificação crítica das 101 fichas",
+        ["Categoria", "Fichas", "%", "Implicação para a tese"],
         [
-            ["Forte favoravel", "12", "11.9%", "Fundamentam etapas/contribuicoes diretamente"],
-            ["Favoravel", "38", "37.6%", "Suporte / alinhadas ao argumento"],
-            ["Neutra / contextual", "18", "17.8%", "Background, nao influenciam decisoes"],
-            ["Caminho alternativo", "26", "25.7%", "Cobertos via Contribuicao C7 (ablation)"],
-            ["Conflito moderado", "5", "5.0%", "Endereçaveis - resposta defensiva mapeada"],
-            ["Conflito forte", "2", "2.0%", "Pangelinan (via H6), Neto (limitacao reconhecida)"],
+            ["Forte favorável", "12", "11.9%", "Fundamentam etapas e contribuições diretamente"],
+            ["Favorável", "38", "37.6%", "Suporte / alinhadas ao argumento"],
+            ["Neutra / contextual", "18", "17.8%", "Background, não influenciam decisões"],
+            ["Caminho alternativo", "26", "25.7%", "Cobertos pela Contribuição C7 (ablation)"],
+            ["Conflito moderado", "5", "5.0%", "Endereçáveis — resposta defensiva mapeada"],
+            ["Conflito forte", "2", "2.0%", "Pangelinan (via H6); Neto (limitação reconhecida)"],
         ],
         col_widths=[3.2, 1.0, 1.0, 7.3],
         highlight_rows=[0, 5],
-        footer="Apenas 2 conflitos fortes - ambos com resposta defensiva pronta. Nenhuma refutacao categorica sem resposta.",
+        footer="Apenas 2 conflitos fortes — ambos com resposta defensiva pronta. Nenhuma refutação categórica sem resposta.",
     )
 
     add_bullets(
         prs,
-        "Conclusao do pente fino",
+        "Conclusão do pente fino",
         [
-            ("Resumo:", "68 fichas (67.3%) alinhadas ou neutras / 26 caminho alternativo / 7 conflitos"),
-            ("Conflito forte 1:", "Pangelinan 2023 - 'pixel info' explica disparidades -> endereçado via Hipotese H6"),
-            ("Conflito forte 2:", "Neto 2025 - balanceamento nao basta -> reconhecido como limitacao + parte do framing"),
-            ("Caminho alternativo:", "26 fichas (VLM, CLIP) cobertos via C7 - ablation arquitetural"),
-            ("Pontos fortes:", "12 fichas forte favoravel fundamentam etapas 1-5 do pipeline"),
+            ("Resumo:", "68 fichas (67,3%) alinhadas ou neutras / 26 caminho alternativo / 7 conflitos"),
+            ("Conflito forte 1:", "Pangelinan 2023 — 'pixel info' explica disparidades, endereçado pela Hipótese H6"),
+            ("Conflito forte 2:", "Neto 2025 — balanceamento não basta, reconhecido como limitação e parte do framing"),
+            ("Caminho alternativo:", "26 fichas (VLM, CLIP) cobertas pela Contribuição C7 (ablation arquitetural)"),
+            ("Pontos fortes:", "12 fichas forte favorável fundamentam as etapas 1-5 do pipeline"),
             ("", ""),
-            ("Decisao:", "Corpus esta solido para sustentar a qualificacao"),
+            ("Decisão:", "Corpus está sólido para sustentar a qualificação"),
         ],
         footer="",
     )
 
-    # SECAO 4 - CLIP
+    # SEÇÃO 4 — CLIP
     add_section_divider(prs, "4", "Resposta ao orientador",
                         "CLIP = Contrastive Language-Image Pre-training (Radford et al., ICML 2021)")
 
     add_bullets(
         prs,
-        "O que e o CLIP - confirmando referencia",
+        "O que é o CLIP — confirmando a referência",
         [
-            ("Paper original:", "Radford et al. - 'Learning Transferable Visual Models From Natural Language Supervision' ICML 2021"),
-            ("Mecanismo:", "Dois encoders (vision + text) treinados via contrastive loss em 400M pares (imagem, texto)"),
-            ("Resultado:", "Espaco de embedding compartilhado - imagens e textos relacionados ficam proximos"),
-            ("Capacidade central:", "Zero-shot classification - basta descricao textual, sem fine-tuning"),
-            ("Adocao em fairness:", "CLIP virou espinha dorsal da pesquisa em vision-language fairness desde 2022"),
+            ("Paper original:", "Radford et al. — 'Learning Transferable Visual Models From Natural Language Supervision', ICML 2021"),
+            ("Mecanismo:", "Dois encoders (visão e texto) treinados via contrastive loss em 400M pares (imagem, texto)"),
+            ("Resultado:", "Espaço de embedding compartilhado — imagens e textos relacionados ficam próximos"),
+            ("Capacidade central:", "Classificação zero-shot — basta uma descrição textual, sem fine-tuning"),
+            ("Adoção em fairness:", "CLIP virou espinha dorsal da pesquisa em vision-language fairness desde 2022"),
             ("", ""),
-            ("No contexto da tese:", "CLIP produz EMBEDDINGS; FiLM e MECANISMO de injecao - sao complementares, nao substitutos"),
+            ("No contexto da tese:", "CLIP produz EMBEDDINGS; FiLM é MECANISMO de injeção — são complementares, não substitutos"),
         ],
-        footer="Radford et al. 2021 - arxiv.org/abs/2103.00020 - >10k citacoes",
+        footer="Radford et al., ICML 2021 — arxiv.org/abs/2103.00020 — mais de 10 mil citações",
     )
 
     add_table_slide(
         prs,
         "Estudos de CLIP em fairness no corpus (Track I)",
-        ["Paper", "Venue", "Abordagem", "Aplicacao na tese"],
+        ["Paper", "Venue", "Abordagem", "Aplicação na tese"],
         [
-            ["FairCLIP (Luo 2024)", "CVPR 2024", "Optimal transport / Sinkhorn", "Baseline principal C7"],
-            ["FairerCLIP (Dehdashtian 2024)", "ICLR 2024", "Debias zero-shot via RKHS", "Baseline leve C7"],
-            ["BendVLM (2024)", "arXiv", "Test-time debiasing", "Alternativa sem retraining"],
-            ["LoRA-FAIR (Bian 2025)", "ICCV 2025", "LoRA + fairness aggregation", "Track J - C7 ablation"],
-            ["FaceScanPaliGemma (AlDahoul 2024)", "Nature SR 2026", "VLM fine-tuned FairFace", "Baseline SOTA 7-class 75.7%"],
-            ["FairViT (Tian 2024)", "ECCV 2024", "Adaptive attention masking", "Backbone alternativo"],
-            ["Closed-form debias (2026)", "arXiv", "Analitico", "Alternativa eficiente"],
-            ["Bias subspace VLM (2025)", "arXiv", "Projecao subspace", "Mecanismo alternativo"],
-            ["Survey multimodal fairness (2024)", "arXiv", "Survey", "Contexto Cap 2"],
+            ["FairCLIP (Luo, 2024)", "CVPR 2024", "Optimal transport / Sinkhorn", "Baseline principal da C7"],
+            ["FairerCLIP (Dehdashtian, 2024)", "ICLR 2024", "Debias zero-shot via RKHS", "Baseline leve da C7"],
+            ["BendVLM (2024)", "arXiv", "Debiasing em test-time", "Alternativa sem retraining"],
+            ["LoRA-FAIR (Bian, 2025)", "ICCV 2025", "LoRA + agregação fair", "Track J — ablation da C7"],
+            ["FaceScanPaliGemma (AlDahoul, 2024)", "Nature SR 2026", "VLM fine-tuned no FairFace", "Baseline SOTA 7-class (75,7%)"],
+            ["FairViT (Tian, 2024)", "ECCV 2024", "Adaptive attention masking", "Backbone alternativo"],
+            ["Closed-form debias (2026)", "arXiv", "Solução analítica", "Alternativa eficiente"],
+            ["Bias subspace VLM (2025)", "arXiv", "Projeção em subespaço", "Mecanismo alternativo"],
+            ["Survey multimodal fairness (2024)", "arXiv", "Survey", "Contexto para o Capítulo 2"],
         ],
         col_widths=[3.3, 1.8, 3.2, 4.2],
         highlight_rows=[0, 1, 4],
-        footer="14 fichas no total na Track I + paper original CLIP (Radford 2021).",
+        footer="14 fichas no total na Track I, além do paper original de CLIP (Radford 2021).",
     )
 
-    # SECAO 5 - FiLM
+    # SEÇÃO 5 — FiLM
     add_section_divider(prs, "5", "FiLM em fairness",
-                        "Achado critico: gap na literatura = contribuicao original")
+                        "Achado crítico: lacuna na literatura = contribuição original")
 
     add_bullets(
         prs,
         "Estudos de FiLM em fairness",
         [
-            ("Paper FiLM original:", "Perez et al. 2018 (AAAI) - VERIFIED no corpus"),
-            ("Aplicacao em fairness pelos autores:", "ZERO - paper nao aborda fairness"),
-            ("Adocao em fairness na literatura:", "RARA - busca extensiva confirma escassez"),
-            ("Mecanismos analogos no corpus:", ""),
-            ("  - LAFTR (Madras 2018)", "adversarial conditioning (nao FiLM)"),
-            ("  - FairViT (Tian 2024)", "adaptive masking em attention (ViT)"),
-            ("  - LoRA-FAIR (Bian 2025)", "low-rank weight modulation"),
+            ("Paper FiLM original:", "Perez et al., AAAI 2018 — verificado no corpus"),
+            ("Aplicação em fairness pelos autores:", "Nenhuma — paper não aborda fairness"),
+            ("Adoção em fairness na literatura:", "Rara — busca extensiva confirma a escassez"),
+            ("Mecanismos análogos no corpus:", ""),
+            ("  — LAFTR (Madras, 2018)", "adversarial conditioning (não é FiLM)"),
+            ("  — FairViT (Tian, 2024)", "adaptive masking em attention (ViT)"),
+            ("  — LoRA-FAIR (Bian, 2025)", "low-rank weight modulation"),
             ("", ""),
-            ("Implicacao:", "FiLM aplicado a fairness em race classification e DIRECAO ORIGINAL"),
+            ("Implicação:", "FiLM aplicado a fairness em classificação racial é uma direção original"),
         ],
-        footer="Perez et al. 2018 (AAAI) - paper original nao discute fairness nem na Future Work.",
+        footer="Perez et al., AAAI 2018 — paper original não discute fairness nem na seção de Future Work.",
     )
 
     add_bullets(
         prs,
-        "FiLM vs CLIP - esclarecimento conceitual",
+        "FiLM vs CLIP — esclarecimento conceitual",
         [
-            ("Confusao categorial:", "FiLM e CLIP NAO sao objetos comparaveis no mesmo nivel"),
-            ("FiLM (Perez 2018):", "MECANISMO / camada que modula features via gamma*x + beta"),
-            ("CLIP (Radford 2021):", "MODELO que produz embeddings 512-dim de texto e imagem"),
-            ("Relacao real:", "CLIP fornece o SINAL; FiLM (ou cross-attn) e UMA forma de injetar esse sinal"),
+            ("Confusão categorial:", "FiLM e CLIP não são objetos comparáveis no mesmo nível"),
+            ("FiLM (Perez, 2018):", "MECANISMO / camada que modula features via γ·x + β"),
+            ("CLIP (Radford, 2021):", "MODELO que produz embeddings 512-dim de texto e imagem"),
+            ("Relação real:", "CLIP fornece o SINAL; FiLM (ou cross-attention) é uma forma de injetar esse sinal"),
             ("Cronologia:", "FaceNet 2015, ArcFace 2019, FiLM 2018, CLIP 2021, LoRA 2021"),
-            ("Status 2024-2026:", "TODOS continuam padrao na literatura - idade nao implica obsolescencia"),
+            ("Status em 2024-2026:", "Todos continuam padrão na literatura — idade não implica obsolescência"),
             ("", ""),
-            ("Combinacao valida:", "Stable Diffusion = CLIP embeddings + cross-attention. Analogo: CLIP + FiLM e possivel"),
+            ("Combinação válida:", "Stable Diffusion = CLIP embeddings + cross-attention. Análogo: CLIP + FiLM é possível"),
         ],
         footer="",
     )
 
-    # SECAO 6 - Proposta C7
+    # SEÇÃO 6 — Proposta C7
     add_section_divider(prs, "6", "Proposta",
-                        "Contribuicao C7 - ablation arquitetural no Cap 2")
+                        "Contribuição C7 — ablation arquitetural no Capítulo 2")
 
     add_table_slide(
         prs,
-        "C7 - 5 configuracoes comparadas",
+        "C7 — 5 configurações comparadas",
         ["Config", "Arquitetura", "Mecanismo de conditioning", "Origem"],
         [
             ["A", "ConvNeXt-T baseline", "Sem conditioning", "Controle"],
-            ["B (proposta)", "ConvNeXt-T + FiLM", "MST 10-dim -> gamma, beta", "Nossa contribuicao central"],
-            ["C", "ConvNeXt-T + FiLM", "CLIP-text embedding -> gamma, beta", "Hibrido CLIP+FiLM"],
-            ["D", "ConvNeXt-T + cross-attn", "CLIP-text embedding via attention", "FairCLIP-style"],
-            ["E", "ConvNeXt-T + LoRA-FAIR", "Low-rank weight modulation", "LoRA-FAIR (Bian 2025)"],
+            ["B (proposta)", "ConvNeXt-T + FiLM", "MST 10-dim → γ, β", "Nossa contribuição central"],
+            ["C", "ConvNeXt-T + FiLM", "Embedding CLIP-text → γ, β", "Híbrido CLIP + FiLM"],
+            ["D", "ConvNeXt-T + cross-attention", "Embedding CLIP-text via attention", "Estilo FairCLIP"],
+            ["E", "ConvNeXt-T + LoRA-FAIR", "Low-rank weight modulation", "LoRA-FAIR (Bian, 2025)"],
         ],
         col_widths=[1.0, 3.0, 4.5, 4.5],
         highlight_rows=[1],
-        footer="Se CLIP superar FiLM -> reportamos como informacao util (nao invalidacao). Honra recomendacao do orientador.",
+        footer="Se CLIP superar FiLM, reportamos como informação útil — não como invalidação. Honra a recomendação do orientador.",
     )
 
     add_bullets(
         prs,
         "Justificativa para manter FiLM como mecanismo central",
         [
-            ("Adequacao a baixa-dim:", "MST e vetor 10-dim - FiLM e o sweet spot"),
-            ("Custo parametrico:", "~1% sobre backbone (vs ~3% cross-attention equivalente)"),
-            ("Interpretabilidade:", "gamma e beta sao por canal e visualizaveis"),
-            ("Compatibilidade:", "Substitui parametros do BatchNorm - 'conditional BatchNorm'"),
-            ("Compatibilidade C7:", "Ablation limpa - liga/desliga FiLM mantendo backbone fixo"),
+            ("Adequação a baixa dimensão:", "MST é vetor 10-dim — FiLM é o ponto ótimo"),
+            ("Custo paramétrico:", "~1% sobre o backbone (vs. ~3% de cross-attention equivalente)"),
+            ("Interpretabilidade:", "γ e β são por canal e podem ser visualizados"),
+            ("Compatibilidade:", "Substitui parâmetros do BatchNorm — 'conditional BatchNorm'"),
+            ("Compatibilidade com a C7:", "Ablation limpa — liga ou desliga o FiLM mantendo o backbone fixo"),
             ("", ""),
-            ("Argumento de originalidade:", "FiLM em fairness e direcao nao explorada - vira contribuicao"),
+            ("Argumento de originalidade:", "FiLM em fairness é direção pouco explorada — vira contribuição"),
         ],
-        footer="Perez et al. 2018 (AAAI) + Schumann 2023 (MST) + Pereira 2026 (SkinToneNet) ancoragem direta",
+        footer="Perez et al. (AAAI 2018) + Schumann (2023, MST) + Pereira (2026, SkinToneNet) — ancoragem direta",
     )
 
-    # SECAO 7 - Roadmap
-    add_section_divider(prs, "7", "Roadmap LaTeX", "30 dias ate 15/jul/2026")
+    # SEÇÃO 7 — Plano de escrita e decisões
+    add_section_divider(prs, "7", "Plano de escrita e decisões",
+                        "Cronograma das 4 semanas e pontos a alinhar")
 
     add_table_slide(
         prs,
-        "Cronograma de execucao - 4 semanas",
-        ["Semana", "Periodo", "Entregavel", "Observacoes"],
+        "Plano de escrita — 4 semanas até 15/jul/2026",
+        ["Semana", "Período", "Entregável", "Observações"],
         [
-            ["1", "15-21/jun (esta)", "Setup Overleaf + Cap 1 (Introducao)", "Narrativa pre-qualificacao consolidada"],
-            ["2", "22-28/jun", "Cap 2 (Revisao - 11 tracks)", "Pente fino do corpus + 101 fichas"],
-            ["3", "29/jun-05/jul", "Cap 3 (Objetivos) + Cap 4 (Metodologia)", "Pipeline 6 etapas validado"],
-            ["4", "06-12/jul", "Cap 5 (Cronograma) + revisao final", "Integracao + ABNT"],
-            ["Buffer", "13-15/jul", "Ajustes finais + submissao", "-"],
+            ["1", "15-21/jun (esta)", "Setup do ambiente + Capítulo 1 (Introdução)", "Narrativa pré-qualificação consolidada"],
+            ["2", "22-28/jun", "Capítulo 2 (Revisão — 11 tracks)", "Pente fino do corpus e 101 fichas"],
+            ["3", "29/jun-05/jul", "Capítulo 3 (Objetivos) e Capítulo 4 (Metodologia)", "Pipeline de 6 etapas validado"],
+            ["4", "06-12/jul", "Capítulo 5 (Cronograma) e revisão final", "Integração e ABNT"],
+            ["Folga", "13-15/jul", "Ajustes finais e submissão", "—"],
         ],
         col_widths=[1.0, 2.4, 5.0, 4.6],
         highlight_rows=[0],
         footer="",
     )
 
-    # SECAO 8 - Discussao
-    add_section_divider(prs, "8", "Discussao", "Pontos para alinhamento hoje")
-
     add_bullets(
         prs,
-        "Perguntas ao orientador",
+        "Decisões a alinhar hoje",
         [
-            ("1.", "Concorda com manter FiLM central + CLIP-conditioning como C7 (ablation)?"),
-            ("2.", "11 tracks bem cobertos? Algum precisa de mais fichas?"),
-            ("3.", "Esclarecimento conceitual CLIP (modelo) vs FiLM (mecanismo) faz sentido?"),
-            ("4.", "Tem template Overleaf Unifesp/ICT ou usamos padrao?"),
-            ("5.", "Co-orientador - ja podemos formalizar?"),
-            ("6.", "Sugestoes para banca preliminar?"),
+            ("1.", "Concorda em manter FiLM como mecanismo central e CLIP-conditioning como C7 (ablation)?"),
+            ("2.", "Os 11 tracks estão bem cobertos? Algum precisa de mais fichas?"),
+            ("3.", "O esclarecimento conceitual CLIP (modelo) vs FiLM (mecanismo) faz sentido?"),
+            ("4.", "Há template institucional para a escrita ou seguimos com o padrão?"),
+            ("5.", "Co-orientador — já podemos formalizar?"),
+            ("6.", "Sugestões para a banca preliminar?"),
         ],
         footer="",
     )
 
     add_bullets(
         prs,
-        "Proximos passos imediatos (proxima semana)",
+        "Próximos passos imediatos",
         [
-            ("1.", "Setup Overleaf com template institucional"),
-            ("2.", "Gerar .bib consolidado a partir das 101 fichas"),
-            ("3.", "Escrever Cap 1 - Introducao usando narrativa pre-qualificacao"),
-            ("4.", "Importar imagens ja produzidas (FiLM pipeline, ConvNeXt-T, metricas Hardt)"),
-            ("5.", "Promover fichas OVERVIEW_ONLY para VERIFIED nas 12 forte favoravel"),
+            ("1.", "Setup do ambiente de escrita com template institucional"),
+            ("2.", "Consolidar bibliografia a partir das 101 fichas"),
+            ("3.", "Escrever Capítulo 1 (Introdução) usando a narrativa pré-qualificação"),
+            ("4.", "Incorporar as imagens já produzidas (pipeline FiLM, ConvNeXt-T, métricas de Hardt)"),
+            ("5.", "Aprofundar a leitura das 12 fichas forte favorável"),
             ("", ""),
-            ("Entrega proxima reuniao:", "Cap 1 escrito em LaTeX + bibliografia consolidada"),
+            ("Entrega para a próxima reunião:", "Capítulo 1 escrito e bibliografia consolidada"),
         ],
-        footer="30 dias contados ate 15/jul/2026 - margem confortavel sem folga para retrabalho",
+        footer="",
     )
 
     # Slide final
     add_section_divider(prs, "", "Obrigado",
-                        "Discussao livre - duvidas e ajustes antes do LaTeX")
+                        "Discussão livre — dúvidas e ajustes antes da escrita")
 
     return prs
 
