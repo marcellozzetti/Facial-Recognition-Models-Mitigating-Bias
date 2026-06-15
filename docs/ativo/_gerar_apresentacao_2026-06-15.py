@@ -1,10 +1,5 @@
 """Gera apresentacao PowerPoint da reuniao 2026-06-15.
 
-Conteudo derivado de:
-- _reuniao_2026-06-15_evolucao.md (apresentacao tecnica)
-- _reuniao_2026-06-15_cola.md (roteiro de fala)
-- _revisao_critica_corpus_v2.md (pente fino + CLIP vs FiLM)
-
 Uso:
     python _gerar_apresentacao_2026-06-15.py
     -> produz: docs/ativo/material_reuniao_orientador_2026-06-15.pptx
@@ -67,8 +62,7 @@ def add_title_slide(prs: Presentation) -> None:
         ("Mestrando:", "Marcello Ozzetti"),
         ("Orientador:", "Prof. Marcos Quiles"),
         ("Programa:", "Mestrado em Ciencia da Computacao - Unifesp / ICT"),
-        ("Reuniao:", "15 de junho de 2026 (7 dias apos reuniao anterior)"),
-        ("Status:", "30 dias restantes ate qualificacao (15/jul/2026)"),
+        ("Reuniao:", "15 de junho de 2026"),
     ]
     for i, (k, v) in enumerate(rows):
         p = mf.paragraphs[0] if i == 0 else mf.add_paragraph()
@@ -243,21 +237,19 @@ def build_presentation() -> Presentation:
 
     add_table_slide(
         prs,
-        "8 decisoes da reuniao anterior - status",
-        ["#", "Decisao", "Status", "Evidencia"],
+        "Decisoes da reuniao anterior - status",
+        ["#", "Decisao", "Status", "Observacoes"],
         [
-            ["1", "Pipeline 6 etapas aprovado", "OK", "_validacao_cientifica_pipeline.md"],
-            ["2", "SkinToneNet pre-treinado", "OK", "pereira_2026.md (VERIFIED)"],
-            ["3", "Corpus >=100 artigos", "OK 101", "+46 fichas na R7"],
-            ["4", ">=20 artigos 2025-2026", "OK 25", "_corpus_distribuicao_ano.md"],
-            ["5", "Adicionar CLIP/BLIP conditioning", "OK Track I", "14 fichas + analise tecnica"],
-            ["6", "Submissao qualificacao 15/jul/2026", "Em curso", "30 dias restantes"],
-            ["7", "Usar LaTeX em Overleaf", "Skeleton OK", "docs/tese/ pronto"],
-            ["8", "Storytelling Contexto -> Metodo", "OK", "_pre_qualificacao_narrativa.md ~5500 palavras"],
+            ["1", "Pipeline 6 etapas aprovado", "OK", "Validado e detalhado por etapa"],
+            ["2", "SkinToneNet pre-treinado", "OK", "Leitura integral concluida"],
+            ["3", "Corpus >=100 artigos", "OK 101", "+46 fichas na ultima rodada"],
+            ["4", ">=20 artigos 2025-2026", "OK 25", "Meta superada"],
+            ["5", "Adicionar CLIP conditioning", "OK Track I", "14 fichas + analise tecnica"],
+            ["6", "Submissao qualificacao 15/jul/2026", "Em curso", "LaTeX em andamento"],
         ],
         col_widths=[0.5, 4.8, 1.8, 5.4],
-        highlight_rows=[5, 6],
-        footer="6 itens fechados + 2 em execucao conforme planejado",
+        highlight_rows=[5],
+        footer="4 itens fechados + 1 com track dedicada + 1 em execucao conforme planejado",
     )
 
     # SECAO 2 - Corpus 101 fichas
@@ -271,11 +263,11 @@ def build_presentation() -> Presentation:
             ("Meta 2025-2026:", "25 fichas (meta era >=20) - ATINGIDA"),
             ("Crescimento:", "+46 fichas em 3 levas da Rodada 7 (55 -> 101)"),
             ("Novos tracks:", "I, J, K criados em resposta a recomendacoes"),
-            ("Track I:", "VLM/CLIP/BLIP fairness (14 fichas) - resposta direta ao orientador"),
+            ("Track I:", "VLM/CLIP fairness (14 fichas) - resposta direta ao orientador"),
             ("Track J:", "Conditioning moderno LoRA/ViT (5 fichas)"),
             ("Track K:", "FR fundadores ArcFace/FaceNet/AdaFace (6 fichas) - gap fix"),
         ],
-        footer="Detalhes em _corpus_analise_consolidada.md e _corpus_distribuicao_ano.md",
+        footer="",
     )
 
     add_table_slide(
@@ -290,7 +282,7 @@ def build_presentation() -> Presentation:
             ["E", "Auditoria & surveys", "14", "Infraestrutura intelectual"],
             ["F", "Fundamentacao etica", "3", "Posicionamento da tese"],
             ["G", "Mecanismos ML paradigmaticos", "9", "Esqueleto teorico (FiLM, LAFTR)"],
-            ["I (R7)", "VLM/CLIP/BLIP fairness", "14", "Resposta ao orientador"],
+            ["I (R7)", "VLM/CLIP fairness", "14", "Resposta ao orientador"],
             ["J (R7)", "Conditioning moderno (LoRA, ViT)", "5", "Alternativas ao FiLM"],
             ["K (R7)", "FR fundadores (ArcFace, FaceNet)", "6", "Preenche gap obvio"],
             ["L", "Auxiliar / complementar", "13", "Direcoes adjacentes"],
@@ -332,7 +324,7 @@ def build_presentation() -> Presentation:
             ("", ""),
             ("Decisao:", "Corpus esta solido para sustentar a qualificacao"),
         ],
-        footer="Detalhamento completo em _revisao_critica_corpus_v2.md",
+        footer="",
     )
 
     # SECAO 4 - CLIP
@@ -356,7 +348,7 @@ def build_presentation() -> Presentation:
 
     add_table_slide(
         prs,
-        "Pedido 1: estudos de CLIP em fairness no corpus (Track I)",
+        "Estudos de CLIP em fairness no corpus (Track I)",
         ["Paper", "Venue", "Abordagem", "Aplicacao na tese"],
         [
             ["FairCLIP (Luo 2024)", "CVPR 2024", "Optimal transport / Sinkhorn", "Baseline principal C7"],
@@ -371,7 +363,7 @@ def build_presentation() -> Presentation:
         ],
         col_widths=[3.3, 1.8, 3.2, 4.2],
         highlight_rows=[0, 1, 4],
-        footer="14 fichas no total na Track I + paper original CLIP (Radford 2021). Detalhes na Tabela completa em _revisao_critica_corpus_v2.md",
+        footer="14 fichas no total na Track I + paper original CLIP (Radford 2021).",
     )
 
     # SECAO 5 - FiLM
@@ -380,7 +372,7 @@ def build_presentation() -> Presentation:
 
     add_bullets(
         prs,
-        "Pedido 1 (parte 2): estudos de FiLM em fairness",
+        "Estudos de FiLM em fairness",
         [
             ("Paper FiLM original:", "Perez et al. 2018 (AAAI) - VERIFIED no corpus"),
             ("Aplicacao em fairness pelos autores:", "ZERO - paper nao aborda fairness"),
@@ -392,7 +384,7 @@ def build_presentation() -> Presentation:
             ("", ""),
             ("Implicacao:", "FiLM aplicado a fairness em race classification e DIRECAO ORIGINAL"),
         ],
-        footer="Documentado em perez_2018.md Secao 11 - 'Aplicar a fairness: NAO mencionado pelos autores - direcao original'",
+        footer="Perez et al. 2018 (AAAI) - paper original nao discute fairness nem na Future Work.",
     )
 
     add_bullets(
@@ -408,7 +400,7 @@ def build_presentation() -> Presentation:
             ("", ""),
             ("Combinacao valida:", "Stable Diffusion = CLIP embeddings + cross-attention. Analogo: CLIP + FiLM e possivel"),
         ],
-        footer="Detalhes em _revisao_critica_corpus_v2.md Secao 3",
+        footer="",
     )
 
     # SECAO 6 - Proposta C7
@@ -452,17 +444,17 @@ def build_presentation() -> Presentation:
     add_table_slide(
         prs,
         "Cronograma de execucao - 4 semanas",
-        ["Semana", "Periodo", "Entregavel", "Base"],
+        ["Semana", "Periodo", "Entregavel", "Observacoes"],
         [
-            ["1", "15-21/jun (esta)", "Setup Overleaf + Cap 1 (Introducao)", "_pre_qualificacao_narrativa.md"],
-            ["2", "22-28/jun", "Cap 2 (Revisao - 11 tracks)", "_revisao_critica_corpus_v2.md + 101 fichas"],
+            ["1", "15-21/jun (esta)", "Setup Overleaf + Cap 1 (Introducao)", "Narrativa pre-qualificacao consolidada"],
+            ["2", "22-28/jun", "Cap 2 (Revisao - 11 tracks)", "Pente fino do corpus + 101 fichas"],
             ["3", "29/jun-05/jul", "Cap 3 (Objetivos) + Cap 4 (Metodologia)", "Pipeline 6 etapas validado"],
             ["4", "06-12/jul", "Cap 5 (Cronograma) + revisao final", "Integracao + ABNT"],
             ["Buffer", "13-15/jul", "Ajustes finais + submissao", "-"],
         ],
         col_widths=[1.0, 2.4, 5.0, 4.6],
         highlight_rows=[0],
-        footer="Roadmap detalhado em _reuniao_2026-06-15_evolucao.md secao 4.3",
+        footer="",
     )
 
     # SECAO 8 - Discussao
@@ -479,7 +471,7 @@ def build_presentation() -> Presentation:
             ("5.", "Co-orientador - ja podemos formalizar?"),
             ("6.", "Sugestoes para banca preliminar?"),
         ],
-        footer="Cola de bolso completa em _reuniao_2026-06-15_cola.md",
+        footer="",
     )
 
     add_bullets(
