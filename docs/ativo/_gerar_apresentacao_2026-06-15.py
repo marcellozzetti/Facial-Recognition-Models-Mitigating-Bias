@@ -239,16 +239,16 @@ def build_presentation() -> Presentation:
         "Decisões da reunião anterior — status",
         ["#", "Decisão", "Status", "Observações"],
         [
-            ["1", "Pipeline 6 etapas validado", "OK", "Detalhado etapa por etapa"],
-            ["2", "SkinToneNet pré-treinado", "OK", "Leitura integral concluída"],
-            ["3", "Corpus ≥100 artigos", "OK — 101", "+46 fichas na última rodada"],
-            ["4", "≥20 artigos 2025-2026", "OK — 25", "Meta superada"],
-            ["5", "Adicionar CLIP conditioning", "OK — Track I", "14 fichas + análise técnica"],
-            ["6", "Primeira revisão ao orientador em 15/jul/2026", "Em curso", "Estrutura sendo organizada — LaTeX ainda não iniciado"],
+            ["1", "Pipeline 6 etapas validado", "Concluído", "Detalhado etapa por etapa"],
+            ["2", "SkinToneNet pré-treinado", "Concluído", "Leitura integral concluída"],
+            ["3", "Corpus ≥100 artigos", "Concluído", "101 fichas (+46 na última rodada)"],
+            ["4", "≥20 artigos 2025-2026", "Concluído", "25 fichas em 2025-2026"],
+            ["5", "Adicionar CLIP conditioning", "Concluído", "Track I criada — 14 fichas + análise técnica"],
+            ["6", "Primeira revisão ao orientador em 15/jul/2026", "Em andamento", "Estrutura sendo organizada — LaTeX ainda não iniciado"],
         ],
-        col_widths=[0.5, 4.8, 1.8, 5.4],
+        col_widths=[0.5, 4.6, 2.0, 5.4],
         highlight_rows=[5],
-        footer="5 itens fechados e 1 em execução conforme planejado",
+        footer="5 itens concluídos e 1 em andamento conforme planejado",
     )
 
     # SEÇÃO 2 — Corpus 101 fichas
@@ -256,15 +256,15 @@ def build_presentation() -> Presentation:
 
     add_bullets(
         prs,
-        "Cobertura do corpus ampliada: 101 fichas em 11 tracks",
+        "Como o corpus foi ampliado: 55 → 101 fichas em 11 tracks",
         [
-            ("Total:", "101 fichas distribuídas em 11 tracks temáticos"),
-            ("Ampliação:", "+46 fichas adicionadas na rodada mais recente (55 → 101)"),
-            ("Cobertura 2025-2026:", "25 fichas — corpus mais atualizado e amplo"),
-            ("Novos tracks:", "I, J, K criados em resposta a recomendações"),
-            ("Track I:", "VLM / CLIP em fairness (14 fichas) — resposta direta ao orientador"),
-            ("Track J:", "Conditioning moderno LoRA / ViT (5 fichas)"),
-            ("Track K:", "Fundadores de FR — ArcFace, FaceNet, AdaFace (6 fichas)"),
+            ("Critérios da busca:", "Top venues (CVPR, ICCV, ICLR, ECCV, Nature SR) com filtros menos restritivos"),
+            ("Recorte temporal:", "Foco em 2025-2026 para refletir o estado da arte mais recente"),
+            ("Fontes consultadas:", "arXiv, OpenAccess (CVPR/ICCV), Semantic Scholar e busca direta por DOI"),
+            ("Estratégia em 3 levas:", "Top venues recentes → fundadores de FR → temas complementares"),
+            ("Reorganização temática:", "3 novos tracks criados a partir dos achados (I, J, K)"),
+            ("", ""),
+            ("Resultado:", "+46 fichas / 25 fichas em 2025-2026 / 3 tracks novos"),
         ],
         footer="",
     )
@@ -287,8 +287,7 @@ def build_presentation() -> Presentation:
             ["L", "Auxiliar / complementar", "Direções adjacentes (federated, synthetic, post-hoc)", "Salvador (FairCal) 2021, FairImagen 2025, VoIDFace 2025", "13"],
         ],
         col_widths=[0.7, 2.1, 3.4, 5.6, 0.7],
-        highlight_rows=[7, 8, 9],
-        footer="Tracks I, J e K são os novos tracks da ampliação recente do corpus — destacados para discussão",
+        footer="Tracks I, J e K são os novos tracks da ampliação recente do corpus",
     )
 
     # SEÇÃO 3 — Pente fino
@@ -448,7 +447,7 @@ def build_presentation() -> Presentation:
         [
             ["1", "15-21/jun (esta)", "Estrutura no repositório + Capítulo 1 (Introdução)", "Narrativa de abertura consolidada"],
             ["2", "22-28/jun", "Capítulo 2 (Revisão — 11 tracks)", "Pente fino do corpus e 101 fichas"],
-            ["3", "29/jun-05/jul", "Capítulo 3 (Objetivos) e Capítulo 4 (Metodologia)", "Pipeline de 6 etapas validado"],
+            ["3", "29/jun-05/jul", "Capítulo 3 (Objetivos) e Capítulo 4 (Ampliação e busca de novas técnicas)", "Pipeline de 6 etapas validado"],
             ["4", "06-12/jul", "Capítulo 5 (Cronograma) e revisão final", "Integração e ABNT"],
             ["Folga", "13-15/jul", "Ajustes finais e entrega ao orientador", "Primeira revisão"],
         ],
