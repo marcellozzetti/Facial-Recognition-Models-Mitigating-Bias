@@ -1,7 +1,7 @@
 ---
 name: unified-debiasing-vlm-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Hoin Jung (Purdue University), Taeuk Jang (Purdue), Xiaoqian Wang (Purdue)]
 ano: 2024
 titulo: "A Unified Debiasing Approach for Vision-Language Models across Modalities and Tasks"
 venue: "arXiv preprint (a verificar venue final)"

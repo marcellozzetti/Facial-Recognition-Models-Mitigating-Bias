@@ -1,7 +1,7 @@
 ---
 name: indicfairface-2026
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Aarish Shah Mohsin (Aligarh Muslim University), Mohammed Tayyab Ilyas Khan (Aligarh Muslim University), Mohammad Nadeem (Aligarh Muslim University), Shahab Saquib Sohail (Jamia Hamdard), Erik Cambria (Nanyang Technological University Singapore), Jiechao Gao]
 ano: 2026
 titulo: "IndicFairFace: Balanced Indian Face Dataset for Auditing and Mitigating Geographical Bias in Vision-Language Models"
 venue: "arXiv preprint (fev 2026)"

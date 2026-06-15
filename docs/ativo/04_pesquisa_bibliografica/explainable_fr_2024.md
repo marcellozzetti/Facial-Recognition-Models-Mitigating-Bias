@@ -1,7 +1,7 @@
 ---
 name: explainable-fr-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Yuhang Lu (EPFL Switzerland), Zewei Xu (EPFL), Touradj Ebrahimi (EPFL)]
 ano: 2024
 titulo: "Towards A Comprehensive Visual Saliency Explanation Framework for AI-based Face Recognition Systems"
 venue: "arXiv preprint (jul 2024)"

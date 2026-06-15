@@ -1,7 +1,7 @@
 ---
 name: score-normalization-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Yu Linghu (University of Zurich), Tiago de Freitas Pereira (ams OSRAM), Christophe Ecabert (Idiap Research Institute), Sébastien Marcel (Idiap), Manuel Günther (University of Zurich)]
 ano: 2024
 titulo: "Score Normalization for Demographic Fairness in Face Recognition"
 venue: "IEEE Winter Conference on Applications of Computer Vision (WACV 2024)"

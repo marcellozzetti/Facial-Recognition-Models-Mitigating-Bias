@@ -1,7 +1,7 @@
 ---
 name: frcsyn-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Ivan DeAndres-Tame (UAM Madrid), Ruben Tolosana (UAM), Pietro Melzi (UAM), Ruben Vera-Rodriguez (UAM), Minchul Kim (MSU), Christian Rathgeb (Hochschule Darmstadt), Xiaoming Liu (MSU), Aythami Morales (UAM), Julian Fierrez (UAM), Javier Ortega-Garcia (UAM), et al.]
 ano: 2024
 titulo: "Second Edition FRCSyn Challenge at CVPR 2024: Face Recognition Challenge in the Era of Synthetic Data"
 venue: "IEEE/CVF CVPR 2024 Workshops"

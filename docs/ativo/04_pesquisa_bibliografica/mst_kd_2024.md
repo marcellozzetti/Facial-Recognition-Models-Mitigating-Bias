@@ -1,7 +1,7 @@
 ---
 name: mst-kd-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Eduarda Caldeira (INESC TEC + University of Porto), Jaime S. Cardoso (INESC TEC + Univ. Porto), Ana F. Sequeira (INESC TEC + Univ. Porto), Pedro C. Neto (INESC TEC + Univ. Porto)]
 ano: 2024
 titulo: "MST-KD: Multiple Specialized Teachers Knowledge Distillation for Fair Face Recognition"
 venue: "arXiv preprint (ago 2024)"

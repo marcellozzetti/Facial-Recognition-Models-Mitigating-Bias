@@ -1,7 +1,7 @@
 ---
 name: bendvlm-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Walter Gerych (MIT), Haoran Zhang (MIT), Kimia Hamidieh (MIT), Eileen Pan (MIT), Maanas Sharma (MIT), Thomas Hartvigsen (University of Virginia), Marzyeh Ghassemi (MIT)]
 ano: 2024
 titulo: "BendVLM: Test-Time Debiasing of Vision-Language Embeddings"
 venue: "arXiv preprint (a verificar venue final)"

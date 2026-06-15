@@ -1,7 +1,7 @@
 ---
 name: biopro-2025
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Yujie Lin (Xiamen University), Jiayao Ma (Xiamen), Qingguo Hu (Xiamen), Derek F. Wong (University of Macau), Jinsong Su (Xiamen)]
 ano: 2025
 titulo: "BioPro: On Difference-Aware Gender Fairness for Vision-Language Models"
 venue: "arXiv preprint (dez 2025)"

@@ -1,7 +1,7 @@
 ---
 name: joint-vl-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Haoyu Zhang (National University of Singapore), Yangyang Guo (NUS), Mohan Kankanhalli (NUS)]
 ano: 2024
 titulo: "Joint Vision-Language Social Bias Removal for CLIP"
 venue: "arXiv preprint (a verificar venue final)"

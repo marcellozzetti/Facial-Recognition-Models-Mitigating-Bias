@@ -1,7 +1,7 @@
 ---
 name: fairness-lora-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Zhoujie Ding (Stanford), Ken Ziyu Liu (Stanford), Pura Peetathawatchai (Stanford), Berivan Isik (Stanford), Sanmi Koyejo (Stanford)]
 ano: 2024
 titulo: "On Fairness of Low-Rank Adaptation of Large Models"
 venue: "arXiv preprint (a verificar venue final)"

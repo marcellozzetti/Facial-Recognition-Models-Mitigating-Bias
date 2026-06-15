@@ -1,7 +1,7 @@
 ---
 name: occlusion-bias-2024
 status_verificacao: VERIFIED
-autores: [a verificar nome principal]
+autores: [Rafael M. Mamede (University of Porto + INESC TEC), Pedro C. Neto (Univ. Porto + INESC TEC), Ana F. Sequeira (Univ. Porto + INESC TEC)]
 ano: 2024
 titulo: "Fairness Under Cover: Evaluating the Impact of Occlusions on Demographic Bias in Facial Recognition"
 venue: "Springer Nature 2025 (arXiv 2024)"

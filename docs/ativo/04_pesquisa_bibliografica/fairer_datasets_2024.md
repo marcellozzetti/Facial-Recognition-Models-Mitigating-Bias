@@ -1,7 +1,7 @@
 ---
 name: fairer-datasets-2024
 status_verificacao: VERIFIED
-autores: [a verificar nome principal]
+autores: [Alexandre Fournier-Montgieux (Université Paris-Saclay, CEA, LIST), Michael Soumm (Paris-Saclay CEA LIST), Adrian Popescu (Paris-Saclay CEA LIST), Bertrand Luvison (Paris-Saclay CEA LIST), Hervé Le Borgne (Paris-Saclay CEA LIST)]
 ano: 2024
 titulo: "Toward Fairer Face Recognition Datasets"
 venue: "arXiv preprint (jun 2024)"

@@ -1,7 +1,7 @@
 ---
 name: fair-sight-2025
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Arya Fayyazi (University of Southern California), Mehdi Kamal (USC), Massoud Pedram (USC)]
 ano: 2025
 titulo: "FAIR-SIGHT: Fairness Assurance in Image Recognition via Simultaneous Conformal Thresholding and Dynamic Output Repair"
 venue: "arXiv preprint (abr 2025)"

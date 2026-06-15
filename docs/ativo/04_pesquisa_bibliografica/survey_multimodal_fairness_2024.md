@@ -1,7 +1,7 @@
 ---
 name: survey-multimodal-fairness-2024
 status_verificacao: VERIFIED
-autores: [a verificar nome principal]
+autores: [Tosin Adewumi (LTU Sweden), Lama Alkhaled (LTU), Namrata Gurung (QualityMinds GmbH Germany), Goya van Boven (Utrecht University Netherlands), Irene Pagliai (University of Göttingen)]
 ano: 2024
 titulo: "Fairness and Bias in Multimodal AI: A Survey"
 venue: "arXiv preprint (jun 2024)"

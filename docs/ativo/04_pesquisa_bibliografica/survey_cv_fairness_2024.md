@@ -1,7 +1,7 @@
 ---
 name: survey-cv-fairness-2024
 status_verificacao: VERIFIED
-autores: [a verificar nome principal]
+autores: [Sepehr Dehdashtian, Ruozhen He, Yi Li, Guha Balakrishnan, Nuno Vasconcelos (Fellow IEEE), Vicente Ordonez (Member IEEE), Vishnu Naresh Boddeti (Member IEEE)]
 ano: 2024
 titulo: "Fairness and Bias Mitigation in Computer Vision: A Survey"
 venue: "arXiv preprint (ago 2024)"

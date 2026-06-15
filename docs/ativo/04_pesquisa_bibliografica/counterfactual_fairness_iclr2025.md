@@ -1,7 +1,7 @@
 ---
 name: counterfactual-fairness-iclr2025
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Bowei Tian (University of Maryland), Ziyao Wang (UMD), Shwai He (UMD), Wanghao Ye (UMD), Guoheng Sun (UMD), Yucong Dai (Clemson University), Yongkai Wu (Clemson), Ang Li (UMD)]
 ano: 2025
 titulo: "Towards Counterfactual Fairness"
 venue: "International Conference on Learning Representations (ICLR 2025)"

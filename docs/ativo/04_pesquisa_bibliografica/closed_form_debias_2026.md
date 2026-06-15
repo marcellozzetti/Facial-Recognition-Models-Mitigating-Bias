@@ -1,7 +1,7 @@
 ---
 name: closed-form-debias-2026
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Tangzheng Lian (King's College London), Guanyu Hu (Queen Mary University of London), Yijing Ren (King's College London), Dimitrios Kollias (Queen Mary), Oya Celiktutan (King's College London)]
 ano: 2026
 titulo: "A Closed-Form Solution for Debiasing Vision-Language Models with Utility Guarantees Across Modalities and Tasks"
 venue: "arXiv preprint (mar 2026)"

@@ -1,7 +1,7 @@
 ---
 name: fair-residuals-vlm-2025
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Jian Lan (LMU Munich + MCML, corresponding), Udo Schlegel (LMU + MCML), Gengyuan Zhang (LMU + MCML), Tanveer Hannan (LMU + MCML), Haokun Chen (LMU), Thomas Seidl (LMU + MCML)]
 ano: 2025
 titulo: "My Answer Is NOT 'Fair': Mitigating Social Bias in Vision-Language Models via Fair and Biased Residuals"
 venue: "arXiv preprint (mai 2025)"

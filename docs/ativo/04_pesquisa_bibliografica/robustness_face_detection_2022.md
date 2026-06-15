@@ -1,7 +1,7 @@
 ---
 name: robustness-face-detection-2022
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Samuel Dooley (University of Maryland), George Z. Wei (University of Massachusetts Amherst), Tom Goldstein (UMD), John P. Dickerson (UMD)]
 ano: 2022
 titulo: "Robustness Disparities in Face Detection"
 venue: "arXiv preprint (nov 2022)"

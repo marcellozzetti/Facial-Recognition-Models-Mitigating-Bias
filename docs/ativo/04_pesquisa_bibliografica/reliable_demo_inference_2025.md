@@ -1,7 +1,7 @@
 ---
 name: reliable-demo-inference-2025
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Alexandre Fournier-Montgieux (Université Paris-Saclay, CEA, LIST), Hervé Le Borgne (Paris-Saclay CEA LIST), Adrian Popescu (Paris-Saclay CEA LIST), Bertrand Luvison (Paris-Saclay CEA LIST)]
 ano: 2025
 titulo: "Reliable and Reproducible Demographic Inference for Fairness in Face Analysis"
 venue: "arXiv preprint (out 2025)"

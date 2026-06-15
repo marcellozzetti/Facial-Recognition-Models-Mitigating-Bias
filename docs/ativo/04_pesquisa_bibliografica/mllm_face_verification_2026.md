@@ -1,7 +1,7 @@
 ---
 name: mllm-face-verification-2026
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Ünsal Öztürk (Idiap Research Institute Switzerland), Hatef Otroshi Shahreza (Idiap), Sébastien Marcel (Idiap)]
 ano: 2026
 titulo: "Demographic Fairness in Multimodal LLMs: A Benchmark of Gender and Ethnicity Bias in Face Verification"
 venue: "arXiv preprint (mar 2026)"

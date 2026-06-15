@@ -1,7 +1,7 @@
 ---
 name: bias-subspace-2025
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Dachuan Zhao (Harvard), Weiyue Li (Harvard), Zhenda Shen (Harvard), Yushu Qiu (Harvard), Bowen Xu (Harvard), Haoyu Chen (Harvard), Yongchao Chen (MIT + Harvard)]
 ano: 2025
 titulo: "Bias Is a Subspace, Not a Coordinate: A Geometric Rethinking of Post-hoc Debiasing in Vision-Language Models"
 venue: "arXiv preprint (nov 2025)"

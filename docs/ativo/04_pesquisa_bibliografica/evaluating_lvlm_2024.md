@@ -1,7 +1,7 @@
 ---
 name: evaluating-lvlm-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Xuyang Wu (Santa Clara University), Yuan Wang (Santa Clara), Hsin-Tai Wu (DOCOMO Innovations), Zhiqiang Tao (Rochester Institute of Technology), Yi Fang (Santa Clara University)]
 ano: 2024
 titulo: "Evaluating Fairness in Large Vision-Language Models Across Diverse Demographic Attributes and Prompts"
 venue: "Findings of EMNLP 2025 (publicado em ACL Anthology)"

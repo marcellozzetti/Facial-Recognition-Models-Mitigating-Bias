@@ -1,7 +1,7 @@
 ---
 name: demographic-agnostic-2025
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Zhongteng Cai (Ohio State University), Mohammad Mahdi Khalili (OSU), Xueru Zhang (OSU)]
 ano: 2025
 titulo: "Demographic-Agnostic Fairness without Harm"
 venue: "arXiv preprint (set 2025)"

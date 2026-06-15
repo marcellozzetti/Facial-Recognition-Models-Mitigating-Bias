@@ -1,7 +1,7 @@
 ---
 name: fairlora-2024
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Rohan Sukumaran (Mila + Université de Montréal), Aarash Feizi (Mila + McGill), Adriana Romero-Soriano (Mila + McGill), Golnoosh Farnadi (Mila + UdeM)]
 ano: 2024
 titulo: "FairLoRA: Unpacking Bias Mitigation in Vision Models with Fairness-Driven Low-Rank Adaptation"
 venue: "arXiv preprint (a verificar venue final)"

@@ -1,7 +1,7 @@
 ---
 name: benchmark-lvlm-2026
 status_verificacao: VERIFIED
-autores: [a verificar]
+autores: [Xuwei Tan (Ohio State University), Ziyu Hu (Stevens Institute of Technology), Xueru Zhang (Ohio State University)]
 ano: 2026
 titulo: "Benchmarking Bias Mitigation Toward Fairness Without Harm from Vision to LVLMs"
 venue: "arXiv preprint (fev 2026)"
