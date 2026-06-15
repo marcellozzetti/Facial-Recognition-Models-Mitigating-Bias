@@ -225,10 +225,10 @@ def build_presentation() -> Presentation:
             ("3.", "Pente fino crítico do corpus (classificação por impacto)"),
             ("4.", "Resposta à sugestão do orientador: CLIP (Contrastive Language-Image Pre-training)"),
             ("5.", "FiLM em fairness: lacuna na literatura como contribuição original"),
-            ("6.", "Proposta: Contribuição C7 — ablation arquitetural"),
+            ("6.", "Proposta: estudo comparativo de mecanismos de conditioning"),
             ("7.", "Plano de escrita e decisões a alinhar"),
         ],
-        footer="Tempo estimado: 12-15 min de apresentação + discussão",
+        footer="",
     )
 
     # SEÇÃO 1 — Status decisões
@@ -301,7 +301,7 @@ def build_presentation() -> Presentation:
             ["Forte favorável", "12", "11.9%", "Fundamentam etapas e contribuições diretamente"],
             ["Favorável", "38", "37.6%", "Suporte / alinhadas ao argumento"],
             ["Neutra / contextual", "18", "17.8%", "Background, não influenciam decisões"],
-            ["Caminho alternativo", "26", "25.7%", "Cobertos pela Contribuição C7 (ablation)"],
+            ["Caminho alternativo", "26", "25.7%", "Cobertos pelo estudo comparativo de mecanismos de conditioning"],
             ["Conflito moderado", "5", "5.0%", "Endereçáveis — resposta defensiva mapeada"],
             ["Conflito forte", "2", "2.0%", "Pangelinan (via H6); Neto (limitação reconhecida)"],
         ],
@@ -317,7 +317,7 @@ def build_presentation() -> Presentation:
             ("Resumo:", "68 fichas (67,3%) alinhadas ou neutras / 26 caminho alternativo / 7 conflitos"),
             ("Conflito forte 1:", "Pangelinan 2023 — 'pixel info' explica disparidades, endereçado pela Hipótese H6"),
             ("Conflito forte 2:", "Neto 2025 — balanceamento não basta, reconhecido como limitação e parte do framing"),
-            ("Caminho alternativo:", "26 fichas (VLM, CLIP) cobertas pela Contribuição C7 (ablation arquitetural)"),
+            ("Caminho alternativo:", "26 fichas (VLM, CLIP) cobertas pelo estudo comparativo de mecanismos de conditioning"),
             ("Pontos fortes:", "12 fichas forte favorável fundamentam as etapas 1-5 do pipeline"),
             ("", ""),
             ("Decisão:", "Corpus está sólido para sustentar a primeira versão da escrita"),
@@ -349,10 +349,10 @@ def build_presentation() -> Presentation:
         "Estudos de CLIP em fairness no corpus (Track I)",
         ["Paper", "Venue", "Abordagem", "Aplicação na tese"],
         [
-            ["FairCLIP (Luo, 2024)", "CVPR 2024", "Optimal transport / Sinkhorn", "Baseline principal da C7"],
-            ["FairerCLIP (Dehdashtian, 2024)", "ICLR 2024", "Debias zero-shot via RKHS", "Baseline leve da C7"],
+            ["FairCLIP (Luo, 2024)", "CVPR 2024", "Optimal transport / Sinkhorn", "Baseline principal do estudo comparativo"],
+            ["FairerCLIP (Dehdashtian, 2024)", "ICLR 2024", "Debias zero-shot via RKHS", "Baseline leve do estudo comparativo"],
             ["BendVLM (2024)", "arXiv", "Debiasing em test-time", "Alternativa sem retraining"],
-            ["LoRA-FAIR (Bian, 2025)", "ICCV 2025", "LoRA + agregação fair", "Track J — ablation da C7"],
+            ["LoRA-FAIR (Bian, 2025)", "ICCV 2025", "LoRA + agregação fair", "Entra no estudo comparativo (Track J)"],
             ["FaceScanPaliGemma (AlDahoul, 2024)", "Nature SR 2026", "VLM fine-tuned no FairFace", "Baseline SOTA 7-class (75,7%)"],
             ["FairViT (Tian, 2024)", "ECCV 2024", "Adaptive attention masking", "Backbone alternativo"],
             ["Closed-form debias (2026)", "arXiv", "Solução analítica", "Alternativa eficiente"],
@@ -401,13 +401,13 @@ def build_presentation() -> Presentation:
         footer="",
     )
 
-    # SEÇÃO 6 — Proposta C7
-    add_section_divider(prs, "6", "Proposta",
-                        "Contribuição C7 — ablation arquitetural no Capítulo 2")
+    # SEÇÃO 6 — Estudo comparativo de mecanismos
+    add_section_divider(prs, "6", "Estudo comparativo de mecanismos de conditioning",
+                        "FiLM, CLIP-conditioning e LoRA aplicados a race classification")
 
     add_table_slide(
         prs,
-        "C7 — 5 configurações comparadas",
+        "5 configurações de conditioning comparadas",
         ["Config", "Arquitetura", "Mecanismo de conditioning", "Origem"],
         [
             ["A", "ConvNeXt-T baseline", "Sem conditioning", "Controle"],
@@ -429,7 +429,7 @@ def build_presentation() -> Presentation:
             ("Custo paramétrico:", "~1% sobre o backbone (vs. ~3% de cross-attention equivalente)"),
             ("Interpretabilidade:", "γ e β são por canal e podem ser visualizados"),
             ("Compatibilidade:", "Substitui parâmetros do BatchNorm — 'conditional BatchNorm'"),
-            ("Compatibilidade com a C7:", "Ablation limpa — liga ou desliga o FiLM mantendo o backbone fixo"),
+            ("Compatibilidade com o estudo comparativo:", "Ablation limpa — liga ou desliga o FiLM mantendo o backbone fixo"),
             ("", ""),
             ("Argumento de originalidade:", "FiLM em fairness é direção pouco explorada — vira contribuição"),
         ],
@@ -460,7 +460,7 @@ def build_presentation() -> Presentation:
         prs,
         "Decisões a alinhar hoje",
         [
-            ("1.", "Concorda em manter FiLM como mecanismo central e CLIP-conditioning como C7 (ablation)?"),
+            ("1.", "Concorda em manter FiLM como mecanismo central e incluir CLIP-conditioning no estudo comparativo?"),
             ("2.", "Os 11 tracks estão bem cobertos? Algum precisa de mais fichas?"),
             ("3.", "O esclarecimento conceitual CLIP (modelo) vs FiLM (mecanismo) faz sentido?"),
             ("4.", "Co-orientador — já podemos formalizar?"),
