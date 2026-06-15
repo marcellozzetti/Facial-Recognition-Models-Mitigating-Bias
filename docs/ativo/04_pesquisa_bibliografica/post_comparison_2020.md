@@ -1,6 +1,6 @@
 ---
 name: post-comparison-2020
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Philipp Terhörst, et al.]
 ano: 2020
 titulo: "Post-Comparison Mitigation of Demographic Bias in Face Recognition Using Fair Score Normalization"
@@ -10,13 +10,12 @@ arxiv_id: "2002.03592"
 doi: null
 url_primario: https://arxiv.org/abs/2002.03592
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Busca web.
+fonte_leitura: PDF baixado de arXiv/OpenAccess (pdfs/post_comparison_2020.pdf). Validacao Nivel 2 (Camada 2) em 2026-06-15 - abstract e tabelas-chave lidos via pdftotext; ficha alinhada com pente fino do corpus.
 ---
 
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # Post-Comparison Score Normalization (Terhörst et al., 2020)
 

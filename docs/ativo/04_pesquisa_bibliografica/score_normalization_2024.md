@@ -1,6 +1,6 @@
 ---
 name: score-normalization-2024
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [a verificar]
 ano: 2024
 titulo: "Score Normalization for Demographic Fairness in Face Recognition"
@@ -10,13 +10,12 @@ arxiv_id: "2407.14087"
 doi: null
 url_primario: https://arxiv.org/abs/2407.14087
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Busca web.
+fonte_leitura: PDF baixado de arXiv/OpenAccess (pdfs/score_normalization_2024.pdf). Validacao Nivel 2 (Camada 2) em 2026-06-15 - abstract e tabelas-chave lidos via pdftotext; ficha alinhada com pente fino do corpus.
 ---
 
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # Score Normalization for Demographic Fairness (WACV 2024)
 

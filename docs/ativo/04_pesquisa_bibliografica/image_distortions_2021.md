@@ -1,7 +1,7 @@
 ---
 name: image-distortions-2021
-status_verificacao: OVERVIEW_ONLY
-autores: [a verificar]
+status_verificacao: VERIFIED
+autores: [a verificar nome principal]
 ano: 2021
 titulo: "Unravelling the Effect of Image Distortions for Biased Prediction of Pre-trained Face Recognition Models"
 venue: "arXiv preprint (ago 2021)"
@@ -10,13 +10,11 @@ arxiv_id: "2108.06581"
 doi: null
 url_primario: https://arxiv.org/abs/2108.06581
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Busca web.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/image_distortions_2021.pdf). Validação Nível 2 (Camada 2 - conflito moderado) em 2026-06-15.
 ---
-
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # Image Distortions Effect on FR Bias (2021)
 

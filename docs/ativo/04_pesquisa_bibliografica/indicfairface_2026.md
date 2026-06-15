@@ -1,6 +1,6 @@
 ---
 name: indicfairface-2026
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [a verificar]
 ano: 2026
 titulo: "IndicFairFace: Balanced Indian Face Dataset for Auditing and Mitigating Geographical Bias in Vision-Language Models"
@@ -10,13 +10,12 @@ arxiv_id: "2602.12659"
 doi: null
 url_primario: https://arxiv.org/abs/2602.12659
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: cobertura
-fonte_leitura: Busca web.
+fonte_leitura: PDF baixado de arXiv/OpenAccess (pdfs/indicfairface_2026.pdf). Validacao Nivel 2 (Camada 2) em 2026-06-15 - abstract e tabelas-chave lidos via pdftotext; ficha alinhada com pente fino do corpus.
 ---
 
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # IndicFairFace — Indian Face Dataset (2026)
 

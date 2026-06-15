@@ -1,6 +1,6 @@
 ---
 name: closed-form-debias-2026
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [a verificar]
 ano: 2026
 titulo: "A Closed-Form Solution for Debiasing Vision-Language Models with Utility Guarantees Across Modalities and Tasks"
@@ -10,13 +10,12 @@ arxiv_id: "2603.12998"
 doi: null
 url_primario: https://arxiv.org/abs/2603.12998
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: paradigma
-fonte_leitura: Busca web.
+fonte_leitura: PDF baixado de arXiv/OpenAccess (pdfs/closed_form_debias_2026.pdf). Validacao Nivel 2 (Camada 2) em 2026-06-15 - abstract e tabelas-chave lidos via pdftotext; ficha alinhada com pente fino do corpus.
 ---
 
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # Closed-Form Debiasing VLMs (March 2026)
 

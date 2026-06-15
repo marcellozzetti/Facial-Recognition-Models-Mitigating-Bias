@@ -1,26 +1,20 @@
 ---
 name: dooley-2022
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Samuel Dooley, Rhea Sanjay Sukthanker, John P. Dickerson, Colin White, Frank Hutter, Micah Goldblum]
 ano: 2022
 titulo: "Rethinking Bias Mitigation: Fairer Architectures Make for Fairer Face Recognition"
-venue: "arXiv preprint 2210.09943 (versão final dez 2023)"
-tipo_publicacao: preprint
+venue: "NeurIPS 2023 (arXiv 2210.09943 — versão final dez 2023)"
+tipo_publicacao: conference
 arxiv_id: "2210.09943"
 doi: null
 url_primario: https://arxiv.org/abs/2210.09943
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: paradigma
-fonte_leitura: Apenas abstract via arXiv (PDF integral pendente). Contexto adicional via [[../_validacao_cientifica_pipeline]] R6-3.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/dooley_2022.pdf). Validação Nível 2 (Camada 2 - conflito moderado) em 2026-06-15 — abstract e método NAS lidos via pdftotext.
 ---
-
-> ⚠️ **AVISO METODOLÓGICO — ESTADO OVERVIEW_ONLY**
->
-> Construída apenas a partir do abstract. PDF integral pendente.
-> Promover a VERIFIED requer leitura do PDF + reescrita das seções
-> de método, datasets, hiperparâmetros e resultados.
 
 # Fairer Architectures Make for Fairer FR (Dooley et al., 2022)
 

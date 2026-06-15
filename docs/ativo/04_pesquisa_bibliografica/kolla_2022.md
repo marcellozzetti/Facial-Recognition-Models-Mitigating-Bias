@@ -1,6 +1,6 @@
 ---
 name: kolla-2022
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Manideep Kolla, Aravinth Savadamuthu]
 ano: 2022
 titulo: "The Impact of Racial Distribution in Training Data on Face Recognition Bias: A Closer Look"
@@ -10,15 +10,11 @@ arxiv_id: "2211.14498"
 doi: null
 url_primario: https://arxiv.org/abs/2211.14498
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Apenas abstract via arXiv. Contexto adicional via [[../_validacao_cientifica_pipeline]] R6-5.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/kolla_2022.pdf). Validação Nível 2 (Camada 2 - conflito moderado) em 2026-06-15 — abstract e método dos 16 experimentos lidos via pdftotext.
 ---
-
-> ⚠️ **AVISO METODOLÓGICO — ESTADO OVERVIEW_ONLY**
->
-> Construída apenas a partir do abstract. PDF integral pendente.
 
 # Racial Distribution in Training Data (Kolla & Savadamuthu, 2022)
 

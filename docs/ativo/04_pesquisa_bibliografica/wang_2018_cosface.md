@@ -1,6 +1,6 @@
 ---
 name: wang-2018-cosface
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Hao Wang, Yitong Wang, Zheng Zhou, Xing Ji, Dihong Gong, Jingchao Zhou, Zhifeng Li, Wei Liu]
 ano: 2018
 titulo: "CosFace: Large Margin Cosine Loss for Deep Face Recognition"
@@ -10,13 +10,11 @@ arxiv_id: "1801.09414"
 doi: null
 url_primario: https://openaccess.thecvf.com/content_cvpr_2018/papers/Wang_CosFace_Large_Margin_CVPR_2018_paper.pdf
 citacoes_semantic_scholar: 3212
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: 10
 lente_disrupcao: paradigma
-fonte_leitura: Abstract + busca web.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/wang_2018_cosface.pdf) em 2026-06-15. Validação Nível 2 (Camada 2 - Track K FR fundadores) — abstract e seção LMCL lidos via pdftotext.
 ---
-
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # CosFace — Large Margin Cosine Loss (Wang et al., CVPR 2018)
 

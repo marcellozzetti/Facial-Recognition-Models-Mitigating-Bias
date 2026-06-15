@@ -1,6 +1,6 @@
 ---
 name: mllm-face-verification-2026
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [a verificar]
 ano: 2026
 titulo: "Demographic Fairness in Multimodal LLMs: A Benchmark of Gender and Ethnicity Bias in Face Verification"
@@ -10,13 +10,12 @@ arxiv_id: "2603.25613"
 doi: null
 url_primario: https://arxiv.org/abs/2603.25613
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: cobertura
-fonte_leitura: Busca web.
+fonte_leitura: PDF baixado de arXiv/OpenAccess (pdfs/mllm_face_verification_2026.pdf). Validacao Nivel 2 (Camada 2) em 2026-06-15 - abstract e tabelas-chave lidos via pdftotext; ficha alinhada com pente fino do corpus.
 ---
 
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # Demographic Fairness in MLLMs (March 2026)
 

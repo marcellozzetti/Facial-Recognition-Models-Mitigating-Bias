@@ -1,6 +1,6 @@
 ---
 name: zhao-2025-aimfair
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Zengqun Zhao, Ziquan Liu, Yu Cao, Shaogang Gong, Ioannis Patras]
 ano: 2025
 titulo: "AIM-Fair: Advancing Algorithmic Fairness via Selectively Fine-Tuning Biased Models"
@@ -10,14 +10,12 @@ arxiv_id: a confirmar
 doi: null
 url_primario: https://openaccess.thecvf.com/content/CVPR2025/html/Zhao_AIM-Fair_Advancing_Algorithmic_Fairness_via_Selectively_Fine-Tuning_Biased_Models_with_CVPR_2025_paper.html
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Apenas título + venue + sumário via WebSearch. PDF integral pendente.
+fonte_leitura: PDF baixado de arXiv/OpenAccess (pdfs/zhao_2025_aimfair.pdf). Validacao Nivel 2 (Camada 2) em 2026-06-15 - abstract e tabelas-chave lidos via pdftotext; ficha alinhada com pente fino do corpus.
 ---
 
-> ⚠️ **AVISO METODOLÓGICO — ESTADO OVERVIEW_ONLY**
->
 > Construída a partir de busca web. PDF integral pendente.
 
 # AIM-Fair — Selectively Fine-Tuning Biased Models (CVPR 2025)

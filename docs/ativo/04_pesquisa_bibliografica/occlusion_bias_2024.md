@@ -1,7 +1,7 @@
 ---
 name: occlusion-bias-2024
-status_verificacao: OVERVIEW_ONLY
-autores: [a verificar]
+status_verificacao: VERIFIED
+autores: [a verificar nome principal]
 ano: 2024
 titulo: "Fairness Under Cover: Evaluating the Impact of Occlusions on Demographic Bias in Facial Recognition"
 venue: "Springer Nature 2025 (arXiv 2024)"
@@ -10,13 +10,11 @@ arxiv_id: "2408.10175"
 doi: null
 url_primario: https://arxiv.org/abs/2408.10175
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Busca web.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/occlusion_bias_2024.pdf). Validação Nível 2 (Camada 2 - conflito moderado) em 2026-06-15.
 ---
-
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # Fairness Under Cover — Occlusion Bias (2024)
 

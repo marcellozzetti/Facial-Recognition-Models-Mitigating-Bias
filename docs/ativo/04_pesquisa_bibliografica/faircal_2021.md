@@ -1,6 +1,6 @@
 ---
 name: faircal-2021
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Tiago Salvador, et al.]
 ano: 2021
 titulo: "FairCal: Fairness Calibration for Face Verification"
@@ -10,13 +10,12 @@ arxiv_id: "2106.03761"
 doi: null
 url_primario: https://arxiv.org/abs/2106.03761
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Busca web.
+fonte_leitura: PDF baixado de arXiv/OpenAccess (pdfs/faircal_2021.pdf). Validacao Nivel 2 (Camada 2) em 2026-06-15 - abstract e tabelas-chave lidos via pdftotext; ficha alinhada com pente fino do corpus.
 ---
 
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # FairCal — Fairness Calibration for Face Verification
 

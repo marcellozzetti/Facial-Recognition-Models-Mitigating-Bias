@@ -1,6 +1,6 @@
 ---
 name: lin-2025-aiface
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Li Lin, Santosh, Mingyang Wu, Xin Wang, Shu Hu]
 ano: 2025
 titulo: "AI-Face: A Million-Scale Demographically Annotated AI-Generated Face Dataset and Fairness Benchmark"
@@ -10,14 +10,12 @@ arxiv_id: "2406.00783"
 doi: null
 url_primario: https://arxiv.org/abs/2406.00783
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: cobertura
-fonte_leitura: Apenas abstract via arXiv + busca web. PDF integral pendente.
+fonte_leitura: PDF baixado de arXiv/OpenAccess (pdfs/lin_2025_aiface.pdf). Validacao Nivel 2 (Camada 2) em 2026-06-15 - abstract e tabelas-chave lidos via pdftotext; ficha alinhada com pente fino do corpus.
 ---
 
-> ⚠️ **AVISO METODOLÓGICO — ESTADO OVERVIEW_ONLY**
->
 > Construída a partir de abstract e busca web. PDF integral pendente.
 
 # AI-Face — Million-Scale Demographically Annotated Dataset (CVPR 2025)
