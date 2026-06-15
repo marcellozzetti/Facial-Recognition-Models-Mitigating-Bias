@@ -1,0 +1,67 @@
+Total a baixar: 61
+
+[  1/61] aguirre_2023 (2305.12671) OK 378 KB
+[  2/61] benchmark_lvlm_2026 (2602.03895) OK 2956 KB
+[  3/61] bendvlm_2024 (2411.04420) OK 814 KB
+[  4/61] bias_subspace_2025 (2511.18123) OK 1014 KB
+[  5/61] biopro_2025 (2512.00807) OK 52607 KB
+[  6/61] closed_form_debias_2026 (2603.12998) OK 7637 KB
+[  7/61] dataset_hazirbas_2021 (2104.02821) OK 10682 KB
+[  8/61] dataset_karkkainen_2021 (1908.04913) OK 1954 KB
+[  9/61] dataset_robinson_2020 (2002.06483) OK 3157 KB
+[ 10/61] dataset_wang_2019 (1812.00194) OK 2462 KB
+[ 11/61] demographic_agnostic_2025 (2509.24077) OK 584 KB
+[ 12/61] deng_2019_arcface (1801.07698) OK 11186 KB
+[ 13/61] dooley_2022 (2210.09943) OK 1656 KB
+[ 14/61] enhancing_visual_attributes_2022 (2207.05727) OK 724 KB
+[ 15/61] evaluating_lvlm_2024 (2406.17974) OK 1705 KB
+[ 16/61] explainable_fr_2024 (2407.05983) OK 2695 KB
+[ 17/61] face4fairshifts_2025 (2509.00658) OK 5923 KB
+[ 18/61] fair_residuals_vlm_2025 (2505.23798) OK 2310 KB
+[ 19/61] fair_sight_2025 (2504.07395) OK 1756 KB
+[ 20/61] faircal_2021 (2106.03761) OK 2391 KB
+[ 21/61] fairdomain_2024 (2407.08813) OK 784 KB
+[ 22/61] fairer_datasets_2024 (2406.16592) OK 1959 KB
+[ 23/61] fairface_challenge_eccv2020 (2009.07838) OK 1812 KB
+[ 24/61] fairlora_2024 (2410.17358) OK 1477 KB
+[ 25/61] fairness_lora_2024 (2405.17512) OK 19995 KB
+[ 26/61] frcsyn_2024 (2404.10378) OK 4610 KB
+[ 27/61] gras_2025 (2508.18989) OK 9093 KB
+[ 28/61] image_distortions_2021 (2108.06581) OK 1451 KB
+[ 29/61] indicfairface_2026 (2602.12659) OK 13089 KB
+[ 30/61] joint_vl_2024 (2411.12785) OK 2471 KB
+[ 31/61] kim_2022_adaface (2204.00964) OK 6971 KB
+[ 32/61] kolla_2022 (2211.14498) OK 3008 KB
+[ 33/61] liu_2025 (2505.01699) OK 1479 KB
+[ 34/61] luo_2024_fairclip (2403.19949) OK 1276 KB
+[ 35/61] massively_annotated_2024 (2404.15234) OK 1053 KB
+[ 36/61] meng_2021_magface (2103.06627) OK 1388 KB
+[ 37/61] mllm_face_verification_2026 (2603.25613) OK 1284 KB
+[ 38/61] mst_kd_2024 (2408.16563) OK 886 KB
+[ 39/61] occlusion_bias_2024 (2408.10175) OK 1308 KB
+[ 40/61] pangelinan_2023 (2304.07175) OK 4074 KB
+[ 41/61] pereira_2026 (2603.02475) OK 6905 KB
+[ 42/61] porgali_2023_ccv2 (2303.04838) OK 3913 KB
+[ 43/61] post_comparison_2020 (2002.03592) OK 506 KB
+[ 44/61] provable_adversarial_ssl_2024 (2406.05686) OK 1309 KB
+[ 45/61] ramachandran_2024 (2407.10104) OK 1814 KB
+[ 46/61] range_loss_2016 (1611.08976) OK 4984 KB
+[ 47/61] raumanns_2024 (2407.17543) OK 189 KB
+[ 48/61] reliable_demo_inference_2025 (2510.20482) OK 659 KB
+[ 49/61] rethinking_assumptions_2021 (2109.03229) OK 32420 KB
+[ 50/61] robustness_face_detection_2022 (2211.15937) OK 2781 KB
+[ 51/61] schroff_2015_facenet (1503.03832) OK 4594 KB
+[ 52/61] score_normalization_2024 (2407.14087) OK 874 KB
+[ 53/61] survey_cv_fairness_2024 (2408.02464) OK 11815 KB
+[ 54/61] survey_face_recognition_2022 (2212.13038) OK 8355 KB
+[ 55/61] survey_mehrabi_2021 (1908.09635) OK 1672 KB
+[ 56/61] survey_multimodal_fairness_2024 (2406.19097) OK 820 KB
+[ 57/61] synthetic_face_2024 (2402.01472) OK 2238 KB
+[ 58/61] tian_2024_fairvit (2407.14799) OK 4956 KB
+[ 59/61] unified_debiasing_vlm_2024 (2410.07593) OK 20820 KB
+[ 60/61] variface_2024 (2412.06235) OK 3653 KB
+[ 61/61] voidface_2025 (2508.07960) OK 3314 KB
+
+=== Resultado ===
+Sucesso: 61
+Falha:   0
