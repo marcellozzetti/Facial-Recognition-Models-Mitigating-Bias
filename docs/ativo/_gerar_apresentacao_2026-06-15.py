@@ -315,12 +315,26 @@ def build_presentation() -> Presentation:
         "Conclusão do pente fino",
         [
             ("Resumo:", "68 fichas (67,3%) alinhadas ou neutras / 26 caminho alternativo / 7 conflitos"),
-            ("Conflito forte 1:", "Pangelinan 2023 — 'pixel info' explica disparidades, endereçado pela Hipótese H6"),
+            ("Conflito forte 1:", "Pangelinan 2023 — leitura integral confirmou: skin tone isolado não causa o gap; pixel info explica parcialmente o FNMR → endossa nossa Hipótese H6"),
             ("Conflito forte 2:", "Neto 2025 — balanceamento não basta, reconhecido como limitação e parte do framing"),
             ("Caminho alternativo:", "26 fichas (VLM, CLIP) cobertas pelo estudo comparativo de mecanismos de conditioning"),
             ("Pontos fortes:", "12 fichas forte favorável fundamentam as etapas 1-5 do pipeline"),
             ("", ""),
             ("Decisão:", "Corpus está sólido para sustentar a primeira versão da escrita"),
+        ],
+        footer="",
+    )
+
+    add_bullets(
+        prs,
+        "Status das leituras críticas",
+        [
+            ("Cobertura de PDFs:", "92 de 101 fichas (91 %) com PDF no repositório — 9 restantes em paywall institucional ou fontes históricas"),
+            ("Camada 1 (críticas):", "14 fichas — todas com leitura integral concluída e fichas em estado VERIFIED"),
+            ("Inclui:", "Pereira (SkinToneNet), Luo (FairCLIP), Pangelinan (refutação central), Hardt, Perez (FiLM), Madras (LAFTR), Schumann (MST), Karkkainen (FairFace), AlDahoul (SOTA)"),
+            ("Próximas leituras:", "Camada 2 — 38 fichas favoráveis para aprofundamento durante a escrita do Capítulo 2"),
+            ("", ""),
+            ("Achado novo (Pangelinan):", "imagens de pessoas do mesmo gênero são intrinsecamente mais similares — possível análogo intra-racial a investigar"),
         ],
         footer="",
     )
@@ -463,8 +477,9 @@ def build_presentation() -> Presentation:
             ("1.", "Concorda em manter FiLM como mecanismo central e incluir CLIP-conditioning no estudo comparativo?"),
             ("2.", "Os 11 tracks estão bem cobertos? Algum precisa de mais fichas?"),
             ("3.", "O esclarecimento conceitual CLIP (modelo) vs FiLM (mecanismo) faz sentido?"),
-            ("4.", "Co-orientador — já podemos formalizar?"),
-            ("5.", "Sugestões para a banca preliminar?"),
+            ("4.", "Pixel information (achado de Pangelinan) pode ser formalizado como objetivo específico (OE-6) com hipótese H6 quantitativa?"),
+            ("5.", "Co-orientador — já podemos formalizar?"),
+            ("6.", "Sugestões para a banca preliminar?"),
         ],
         footer="",
     )
