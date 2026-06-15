@@ -239,12 +239,12 @@ def build_presentation() -> Presentation:
         "Decisões da reunião anterior — status",
         ["#", "Decisão", "Status", "Observações"],
         [
-            ["1", "Pipeline 6 etapas aprovado", "OK", "Validado e detalhado por etapa"],
+            ["1", "Pipeline 6 etapas validado", "OK", "Detalhado etapa por etapa"],
             ["2", "SkinToneNet pré-treinado", "OK", "Leitura integral concluída"],
             ["3", "Corpus ≥100 artigos", "OK — 101", "+46 fichas na última rodada"],
             ["4", "≥20 artigos 2025-2026", "OK — 25", "Meta superada"],
             ["5", "Adicionar CLIP conditioning", "OK — Track I", "14 fichas + análise técnica"],
-            ["6", "Submissão qualificação 15/jul/2026", "Em curso", "Escrita em andamento"],
+            ["6", "Primeira revisão ao orientador em 15/jul/2026", "Em curso", "Escrita em andamento"],
         ],
         col_widths=[0.5, 4.8, 1.8, 5.4],
         highlight_rows=[5],
@@ -321,7 +321,7 @@ def build_presentation() -> Presentation:
             ("Caminho alternativo:", "26 fichas (VLM, CLIP) cobertas pela Contribuição C7 (ablation arquitetural)"),
             ("Pontos fortes:", "12 fichas forte favorável fundamentam as etapas 1-5 do pipeline"),
             ("", ""),
-            ("Decisão:", "Corpus está sólido para sustentar a qualificação"),
+            ("Decisão:", "Corpus está sólido para sustentar a primeira versão da escrita"),
         ],
         footer="",
     )
@@ -443,14 +443,14 @@ def build_presentation() -> Presentation:
 
     add_table_slide(
         prs,
-        "Plano de escrita — 4 semanas até 15/jul/2026",
+        "Plano de escrita — 4 semanas até a primeira revisão (15/jul/2026)",
         ["Semana", "Período", "Entregável", "Observações"],
         [
-            ["1", "15-21/jun (esta)", "Setup do ambiente + Capítulo 1 (Introdução)", "Narrativa pré-qualificação consolidada"],
+            ["1", "15-21/jun (esta)", "Setup do ambiente + Capítulo 1 (Introdução)", "Narrativa de abertura consolidada"],
             ["2", "22-28/jun", "Capítulo 2 (Revisão — 11 tracks)", "Pente fino do corpus e 101 fichas"],
             ["3", "29/jun-05/jul", "Capítulo 3 (Objetivos) e Capítulo 4 (Metodologia)", "Pipeline de 6 etapas validado"],
             ["4", "06-12/jul", "Capítulo 5 (Cronograma) e revisão final", "Integração e ABNT"],
-            ["Folga", "13-15/jul", "Ajustes finais e submissão", "—"],
+            ["Folga", "13-15/jul", "Ajustes finais e entrega ao orientador", "Primeira revisão"],
         ],
         col_widths=[1.0, 2.4, 5.0, 4.6],
         highlight_rows=[0],
@@ -477,7 +477,7 @@ def build_presentation() -> Presentation:
         [
             ("1.", "Setup do ambiente de escrita com template institucional"),
             ("2.", "Consolidar bibliografia a partir das 101 fichas"),
-            ("3.", "Escrever Capítulo 1 (Introdução) usando a narrativa pré-qualificação"),
+            ("3.", "Escrever Capítulo 1 (Introdução) usando a narrativa de abertura"),
             ("4.", "Incorporar as imagens já produzidas (pipeline FiLM, ConvNeXt-T, métricas de Hardt)"),
             ("5.", "Aprofundar a leitura das 12 fichas forte favorável"),
             ("", ""),
