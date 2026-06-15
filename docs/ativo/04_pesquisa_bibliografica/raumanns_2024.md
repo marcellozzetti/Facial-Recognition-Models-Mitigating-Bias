@@ -1,7 +1,7 @@
 ---
 name: raumanns-2024
-status_verificacao: OVERVIEW_ONLY
-autores: [Ralf Raumanns, Gerard Schouten, Josien P. W. Pluim, Veronika Cheplygina]
+status_verificacao: VERIFIED
+autores: [Ralf Raumanns (Fontys University of Applied Science, Eindhoven), Gerard Schouten, Josien P. W. Pluim (Eindhoven University of Technology), Veronika Cheplygina (IT University of Copenhagen)]
 ano: 2024
 titulo: "Dataset Distribution Impacts Model Fairness: Single vs. Multi-Task Learning"
 venue: "FAIMI EPIMI 2024 Workshop — Lecture Notes in Computer Science vol 15198"
@@ -10,15 +10,11 @@ arxiv_id: "2407.17543"
 doi: null
 url_primario: https://arxiv.org/abs/2407.17543
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Apenas abstract via arXiv. Contexto adicional via [[../_validacao_cientifica_pipeline]] R6-8.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/raumanns_2024.pdf). Validação Nível 2 (Camada 2) em 2026-06-15 — abstract com 5 observações lido via pdftotext.
 ---
-
-> ⚠️ **AVISO METODOLÓGICO — ESTADO OVERVIEW_ONLY**
->
-> Construída apenas a partir do abstract. PDF integral pendente.
 
 # Single vs Multi-Task Learning Fairness (Raumanns et al., 2024)
 

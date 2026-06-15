@@ -1,22 +1,20 @@
 ---
 name: provable-adversarial-ssl-2024
-status_verificacao: OVERVIEW_ONLY
-autores: [a verificar]
+status_verificacao: VERIFIED
+autores: [Qi Qi (University of Iowa), Quanqi Hu (Texas A&M), Qihang Lin (University of Iowa), Tianbao Yang (Texas A&M)]
 ano: 2024
 titulo: "Provable Optimization for Adversarial Fair Self-supervised Contrastive Learning"
-venue: "arXiv preprint (a verificar venue final)"
+venue: "arXiv preprint (jun 2024) — University of Iowa + Texas A&M"
 tipo_publicacao: preprint
 arxiv_id: "2406.05686"
 doi: null
 url_primario: https://arxiv.org/abs/2406.05686
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: paradigma
-fonte_leitura: Busca web.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/provable_adversarial_ssl_2024.pdf). Validação Nível 2 (Camada 2) em 2026-06-15 — abstract lido via pdftotext.
 ---
-
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # Provable Adversarial Fair SSL Contrastive (2024)
 
@@ -25,10 +23,17 @@ fonte_leitura: Busca web.
 
 ## 1-2. Resumo + método
 
-- **Self-supervised contrastive learning** com fairness loss
-  adversarial.
-- **Garantias formais de convergência** (provable optimization).
-- Generaliza Park 2022 (FSCL+) para SSL setting.
+- **Fair encoders em setting SSL**: todos os dados unlabeled, apenas
+  pequena porção anotada com atributo sensível.
+- **Adversarial fair representation learning** ideal para este
+  cenário: minimiza contrastive loss sobre unlabeled data E maximiza
+  adversarial loss de predição do atributo sensível sobre data com
+  atributo.
+- **Desafio matemático**: non-convex non-concave minimax game.
+- **Contribuição**: garantias formais de otimização (provable
+  convergence) para este minimax problem.
+- Generaliza Park 2022 (FSCL+) para SSL setting com bases teóricas
+  rigorosas.
 
 ## 7. Aplicação ao pipeline v3.2
 

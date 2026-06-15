@@ -1,7 +1,7 @@
 ---
 name: survey-multimodal-fairness-2024
-status_verificacao: OVERVIEW_ONLY
-autores: [a verificar]
+status_verificacao: VERIFIED
+autores: [a verificar nome principal]
 ano: 2024
 titulo: "Fairness and Bias in Multimodal AI: A Survey"
 venue: "arXiv preprint (jun 2024)"
@@ -10,13 +10,11 @@ arxiv_id: "2406.19097"
 doi: null
 url_primario: https://arxiv.org/abs/2406.19097
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: nenhuma
-fonte_leitura: Busca web.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/survey_multimodal_fairness_2024.pdf). Validação Nível 2 (Camada 2) em 2026-06-15 — abstract e índice lidos via pdftotext.
 ---
-
-> ⚠️ **OVERVIEW_ONLY** — survey, PDF pendente.
 
 # Survey: Fairness and Bias in Multimodal AI (2024)
 

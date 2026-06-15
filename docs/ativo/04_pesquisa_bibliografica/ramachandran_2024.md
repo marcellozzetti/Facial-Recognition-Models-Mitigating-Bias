@@ -1,7 +1,7 @@
 ---
 name: ramachandran-2024
-status_verificacao: OVERVIEW_ONLY
-autores: [Sreeraj Ramachandran, Ajita Rattani]
+status_verificacao: VERIFIED
+autores: [Sreeraj Ramachandran (Wichita State University), Ajita Rattani (University of North Texas)]
 ano: 2024
 titulo: "A Self-Supervised Learning Pipeline for Demographically Fair Facial Attribute Classification"
 venue: "IEEE International Joint Conference on Biometrics (IJCB 2024)"
@@ -10,15 +10,11 @@ arxiv_id: "2407.10104"
 doi: null
 url_primario: https://arxiv.org/abs/2407.10104
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Apenas abstract via arXiv. Contexto adicional via [[../_validacao_cientifica_pipeline]] R6-7.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/ramachandran_2024.pdf). Validação Nível 2 (Camada 2) em 2026-06-15 — abstract e introdução lidos via pdftotext.
 ---
-
-> ⚠️ **AVISO METODOLÓGICO — ESTADO OVERVIEW_ONLY**
->
-> Construída apenas a partir do abstract. PDF integral pendente.
 
 # SSL Pipeline for Fair Facial Attribute Classification (Ramachandran & Rattani, 2024)
 

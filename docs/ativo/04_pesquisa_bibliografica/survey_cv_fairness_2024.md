@@ -1,7 +1,7 @@
 ---
 name: survey-cv-fairness-2024
-status_verificacao: OVERVIEW_ONLY
-autores: [a verificar]
+status_verificacao: VERIFIED
+autores: [a verificar nome principal]
 ano: 2024
 titulo: "Fairness and Bias Mitigation in Computer Vision: A Survey"
 venue: "arXiv preprint (ago 2024)"
@@ -10,13 +10,11 @@ arxiv_id: "2408.02464"
 doi: null
 url_primario: https://arxiv.org/abs/2408.02464
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: nenhuma
-fonte_leitura: Abstract + busca web.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/survey_cv_fairness_2024.pdf, ~11.8 MB). Validação Nível 2 (Camada 2) em 2026-06-15 — abstract e índice lidos via pdftotext.
 ---
-
-> ⚠️ **OVERVIEW_ONLY** — survey, PDF pendente.
 
 # Survey: Fairness & Bias Mitigation in CV (2024)
 

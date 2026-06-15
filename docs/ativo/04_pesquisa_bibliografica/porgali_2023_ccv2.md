@@ -1,24 +1,22 @@
 ---
 name: porgali-2023-ccv2
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Bilal Porgali, Vítor Albiero, Jordan Ryda, Cristian Canton Ferrer, Caner Hazirbas]
 ano: 2023
 titulo: "The Casual Conversations v2 Dataset: A diverse, large benchmark for measuring fairness and robustness in audio/vision/speech models"
-venue: "IEEE/CVF CVPR Workshops (CVPRW 2023)"
+venue: "IEEE/CVF CVPR Workshops (CVPRW 2023) — Meta AI"
 tipo_publicacao: workshop_conference
 arxiv_id: "2303.04838"
 doi: null
 url_primario: https://arxiv.org/abs/2303.04838
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: cobertura
-fonte_leitura: Apenas abstract via arXiv + busca web (Meta AI Research). PDF integral pendente.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/porgali_2023_ccv2.pdf). Validação Nível 2 (Camada 2) em 2026-06-15 — abstract, introdução, descrição dataset e tabelas de cobertura lidos via pdftotext.
 ---
 
-> ⚠️ **AVISO METODOLÓGICO — ESTADO OVERVIEW_ONLY**
-
-# Casual Conversations v2 Dataset (Porgali et al., 2023)
+# Casual Conversations v2 Dataset (Porgali et al., CVPRW 2023 — Meta AI)
 
 > **Expansão substancial do Casual Conversations v1** (Hazirbas
 > 2021): 26 467 vídeos de 5 567 participantes em **7 países**
@@ -59,7 +57,14 @@ audio/vision/speech.
 
 ## 4-6. Métricas, resultados, limitações
 
-> **[PENDENTE PDF]** Não extraídos.
+- Dataset descritivo (não reporta métricas de modelo). Estatísticas:
+  26.467 vídeos / 5.567 pessoas / 7 países / 11 atributos.
+- Limitação reconhecida: comparado a CCv1 (US-only), Dollar Street
+  (sem pessoa attrs), Open Images MIAP (perceived gender), FairFace
+  e UTK (web-scraped, não consent-driven), MORPH (gender binário e
+  poucos attrs).
+- CCv2 não substitui FR-task benchmarks — é benchmark de **fairness
+  audit** em audio/vision/speech models.
 
 ## 7. Aplicação ao nosso pipeline v3.2
 
@@ -107,9 +112,7 @@ particularmente importante.
 
 ## 9-12. Arquivos e análise crítica
 
-- PDF: pendente em `pdfs/porgali_2023_ccv2.pdf`.
+- PDF: `pdfs/porgali_2023_ccv2.pdf`.
 - Dataset Meta: ai.meta.com/datasets/casual-conversations-v2-dataset/
 - Entradas relacionadas: [[dataset_hazirbas_2021]] (CCv1 — predecessor),
   [[schumann_2023]] (MST protocol), [[fitzpatrick_1988]].
-
-> **[BLOQUEADO]** Análise crítica detalhada requer leitura integral.

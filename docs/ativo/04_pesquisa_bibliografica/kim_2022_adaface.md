@@ -1,6 +1,6 @@
 ---
 name: kim-2022-adaface
-status_verificacao: OVERVIEW_ONLY
+status_verificacao: VERIFIED
 autores: [Minchul Kim, Anil K. Jain, Xiaoming Liu]
 ano: 2022
 titulo: "AdaFace: Quality Adaptive Margin for Face Recognition"
@@ -10,13 +10,11 @@ arxiv_id: "2204.00964"
 doi: null
 url_primario: https://openaccess.thecvf.com/content/CVPR2022/papers/Kim_AdaFace_Quality_Adaptive_Margin_for_Face_Recognition_CVPR_2022_paper.pdf
 citacoes_semantic_scholar: null
-data_verificacao_citacoes: 2026-06-10
+data_verificacao_citacoes: 2026-06-15
 n_paginas: a confirmar
 lente_disrupcao: metodologica
-fonte_leitura: Abstract + busca web.
+fonte_leitura: PDF integral baixado de arXiv (pdfs/kim_2022_adaface.pdf). Validação Nível 2 (Camada 2) em 2026-06-15 — abstract, introdução, motivação (Fig 1 sobre recognizability) e tabelas SOTA lidos via pdftotext.
 ---
-
-> ⚠️ **OVERVIEW_ONLY** — PDF pendente.
 
 # AdaFace — Quality Adaptive Margin (Kim et al., CVPR 2022 Oral)
 
@@ -26,12 +24,16 @@ fonte_leitura: Abstract + busca web.
 
 ## 1-2. Resumo + método
 
-- **Hipótese central**: margin deve ser adaptado por qualidade da
-  imagem.
-- **Feature norm** usado como proxy de quality (sem módulo
-  computacionalmente caro de IQA).
+- **Hipótese central**: a estratégia de enfatizar samples
+  misclassified (hard) deve **depender da qualidade da imagem**.
+  Imagens de alta qualidade hard são úteis; imagens de baixa
+  qualidade hard são impossíveis de reconhecer.
+- **Feature norm** usado como proxy de quality (sem módulo de IQA
+  caro). Validado por correlação empírica.
 - **Margin adaptativo**: enfatiza hard yet recognizable samples,
   de-enfatiza low-quality unidentifiable.
+- **Setup**: aplicado sobre baseline ArcFace; supera SOTA em IJB-B,
+  IJB-C, IJB-S e TinyFace (Tabelas no paper).
 
 ## 7. Aplicação ao pipeline v3.2
 
@@ -54,5 +56,9 @@ fonte_leitura: Abstract + busca web.
 
 ## 9-12.
 
-PDF pendente. Conexões: [[schroff_2015_facenet]], [[wang_2018_cosface]],
-[[deng_2019_arcface]], [[pangelinan_2023]].
+Arquivo PDF: `pdfs/kim_2022_adaface.pdf`. Avaliado em IJB-B, IJB-C,
+IJB-S, TinyFace (low-quality benchmarks). Conexões:
+[[schroff_2015_facenet]], [[wang_2018_cosface]],
+[[deng_2019_arcface]] (baseline ArcFace que AdaFace estende),
+[[meng_2021_magface]] (predecessor quality-aware),
+[[pangelinan_2023]] (motivação para quality control).
