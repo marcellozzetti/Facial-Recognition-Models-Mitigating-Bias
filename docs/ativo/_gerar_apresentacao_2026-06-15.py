@@ -256,11 +256,11 @@ def build_presentation() -> Presentation:
 
     add_bullets(
         prs,
-        "Marco atingido: 101 fichas em 11 tracks",
+        "Cobertura do corpus ampliada: 101 fichas em 11 tracks",
         [
             ("Total:", "101 fichas distribuídas em 11 tracks temáticos"),
-            ("Meta 2025-2026:", "25 fichas (meta era ≥20) — atingida"),
-            ("Crescimento:", "+46 fichas na ampliação recente do corpus (55 → 101)"),
+            ("Ampliação:", "+46 fichas adicionadas na rodada mais recente (55 → 101)"),
+            ("Cobertura 2025-2026:", "25 fichas — corpus mais atualizado e amplo"),
             ("Novos tracks:", "I, J, K criados em resposta a recomendações"),
             ("Track I:", "VLM / CLIP em fairness (14 fichas) — resposta direta ao orientador"),
             ("Track J:", "Conditioning moderno LoRA / ViT (5 fichas)"),
@@ -271,24 +271,24 @@ def build_presentation() -> Presentation:
 
     add_table_slide(
         prs,
-        "Justificativa de cada track (por que existe)",
-        ["Track", "Tema", "Fichas", "Papel na tese"],
+        "Densidade das fichas por Tracking",
+        ["Track", "Tema", "O que é o track", "Principais artigos", "Fichas"],
         [
-            ["A", "Race classification 7 classes", "4", "Tarefa central"],
-            ["B", "FR fairness", "16", "Paradigma dominante"],
-            ["C", "Skin tone (MST)", "7", "Sinal auxiliar do pipeline"],
-            ["D", "Mitigação algorítmica", "10", "Baselines a superar"],
-            ["E", "Auditoria e surveys", "14", "Infraestrutura intelectual"],
-            ["F", "Fundamentação ética", "3", "Posicionamento da tese"],
-            ["G", "Mecanismos ML paradigmáticos", "9", "Esqueleto teórico (FiLM, LAFTR)"],
-            ["I", "VLM / CLIP em fairness", "14", "Resposta direta ao orientador"],
-            ["J", "Conditioning moderno (LoRA, ViT)", "5", "Alternativas ao FiLM"],
-            ["K", "Fundadores de FR (ArcFace, FaceNet)", "6", "Preenche lacuna óbvia"],
-            ["L", "Auxiliar / complementar", "13", "Direções adjacentes"],
+            ["A", "Race classification", "Classificação racial em 7 categorias sobre o FairFace", "Kärkkäinen & Joo 2021, AlDahoul 2024, Lin (FairGRAPE) 2022", "4"],
+            ["B", "FR fairness", "Datasets, métricas e auditorias de viés em reconhecimento facial", "Buolamwini 2018, Grother (NIST) 2019, Wang (RFW) 2019", "16"],
+            ["C", "Skin tone (MST)", "Escalas e classificadores de tom de pele como sinal auxiliar", "Fitzpatrick 1988, Schumann 2023, Pereira (SkinToneNet) 2026", "7"],
+            ["D", "Mitigação algorítmica", "Algoritmos para reduzir viés (contrastive, DRO, arquitetural)", "Park (FSCL+) 2022, Sagawa (Group DRO) 2020, Manzoor 2024", "10"],
+            ["E", "Auditoria e surveys", "Auditorias sistêmicas e revisões da literatura", "Mehrabi 2021, Dominguez (DSAP) 2024, Buolamwini 2018", "14"],
+            ["F", "Fundamentação ética", "Validade conceitual de 'raça' como variável científica", "Lewontin 1972, Fuentes 2019, Neto 2025", "3"],
+            ["G", "Mecanismos ML paradigmáticos", "Mecanismos teóricos clássicos (métricas, conditioning)", "Hardt 2016, Perez (FiLM) 2018, Kleinberg 2017", "9"],
+            ["I", "VLM / CLIP em fairness", "Fairness em modelos vision-language (CLIP, BLIP)", "Luo (FairCLIP) 2024, Dehdashtian (FairerCLIP) 2024, BendVLM 2024", "14"],
+            ["J", "Conditioning moderno", "Adaptadores alternativos ao FiLM (LoRA, ViT-mask)", "Bian (LoRA-FAIR) 2025, Tian (FairViT) 2024, Zhao (AIM-Fair) 2025", "5"],
+            ["K", "Fundadores de FR", "Losses fundadoras de reconhecimento facial", "Schroff (FaceNet) 2015, Deng (ArcFace) 2019, Kim (AdaFace) 2022", "6"],
+            ["L", "Auxiliar / complementar", "Direções adjacentes (federated, synthetic, post-hoc)", "Salvador (FairCal) 2021, FairImagen 2025, VoIDFace 2025", "13"],
         ],
-        col_widths=[1.0, 4.0, 0.8, 6.7],
+        col_widths=[0.7, 2.1, 3.4, 5.6, 0.7],
         highlight_rows=[7, 8, 9],
-        footer="Tracks I, J, K são os novos tracks da ampliação recente — destacados para discussão",
+        footer="Tracks I, J e K são os novos tracks da ampliação recente do corpus — destacados para discussão",
     )
 
     # SEÇÃO 3 — Pente fino
