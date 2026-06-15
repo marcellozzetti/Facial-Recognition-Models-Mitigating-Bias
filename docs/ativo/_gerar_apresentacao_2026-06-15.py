@@ -446,7 +446,7 @@ def build_presentation() -> Presentation:
         "Plano de escrita — 4 semanas até a primeira revisão (15/jul/2026)",
         ["Semana", "Período", "Entregável", "Observações"],
         [
-            ["1", "15-21/jun (esta)", "Setup do ambiente + Capítulo 1 (Introdução)", "Narrativa de abertura consolidada"],
+            ["1", "15-21/jun (esta)", "Estrutura no repositório + Capítulo 1 (Introdução)", "Narrativa de abertura consolidada"],
             ["2", "22-28/jun", "Capítulo 2 (Revisão — 11 tracks)", "Pente fino do corpus e 101 fichas"],
             ["3", "29/jun-05/jul", "Capítulo 3 (Objetivos) e Capítulo 4 (Metodologia)", "Pipeline de 6 etapas validado"],
             ["4", "06-12/jul", "Capítulo 5 (Cronograma) e revisão final", "Integração e ABNT"],
@@ -454,7 +454,7 @@ def build_presentation() -> Presentation:
         ],
         col_widths=[1.0, 2.4, 5.0, 4.6],
         highlight_rows=[0],
-        footer="",
+        footer="LaTeX ainda não iniciado: estrutura sendo organizada no projeto base do GitHub. Migração para o Overleaf após consolidação.",
     )
 
     add_bullets(
@@ -464,7 +464,7 @@ def build_presentation() -> Presentation:
             ("1.", "Concorda em manter FiLM como mecanismo central e CLIP-conditioning como C7 (ablation)?"),
             ("2.", "Os 11 tracks estão bem cobertos? Algum precisa de mais fichas?"),
             ("3.", "O esclarecimento conceitual CLIP (modelo) vs FiLM (mecanismo) faz sentido?"),
-            ("4.", "Há template institucional para a escrita ou seguimos com o padrão?"),
+            ("4.", "Há template institucional Unifesp/ICT no Overleaf ou seguimos com o padrão?"),
             ("5.", "Co-orientador — já podemos formalizar?"),
             ("6.", "Sugestões para a banca preliminar?"),
         ],
@@ -475,11 +475,12 @@ def build_presentation() -> Presentation:
         prs,
         "Próximos passos imediatos",
         [
-            ("1.", "Setup do ambiente de escrita com template institucional"),
-            ("2.", "Consolidar bibliografia a partir das 101 fichas"),
-            ("3.", "Escrever Capítulo 1 (Introdução) usando a narrativa de abertura"),
-            ("4.", "Incorporar as imagens já produzidas (pipeline FiLM, ConvNeXt-T, métricas de Hardt)"),
-            ("5.", "Aprofundar a leitura das 12 fichas forte favorável"),
+            ("1.", "Consolidar a estrutura no repositório do GitHub (ainda não iniciei o LaTeX)"),
+            ("2.", "Migrar para o Overleaf assim que a estrutura estiver estável"),
+            ("3.", "Consolidar a bibliografia a partir das 101 fichas"),
+            ("4.", "Escrever Capítulo 1 (Introdução) usando a narrativa de abertura"),
+            ("5.", "Incorporar as imagens já produzidas (pipeline FiLM, ConvNeXt-T, métricas de Hardt)"),
+            ("6.", "Aprofundar a leitura das 12 fichas forte favorável"),
             ("", ""),
             ("Entrega para a próxima reunião:", "Capítulo 1 escrito e bibliografia consolidada"),
         ],
