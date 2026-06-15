@@ -1,15 +1,16 @@
 # INDEX — Pesquisa Bibliográfica
 
-> Navegação central das **105 fichas do corpus** (R1-R7 completa).
-> Para conteúdo integral do paper consultar PDF local. Para resumo
-> estruturado em 11–12 seções consultar ficha `.md`.
+> Navegação central das **101 fichas do corpus** distribuídas em
+> **11 tracks temáticos**. Para conteúdo integral do paper consultar
+> PDF local em `pdfs/`. Para resumo estruturado em 11–12 seções
+> consultar ficha `.md`.
 >
-> Atualizado: 2026-06-10 (Rodada 7 COMPLETA — 3 levas, ~68 fichas
-> novas. **META ORIENTADOR: ≥100 fichas + ≥20 de 2025-2026 SUPER
-> ATENDIDA** (atual: 105 fichas, 33 de 2025-2026). Tracks ampliados
-> para 10 incluindo I (VLM fairness, 11 fichas) e J (conditioning
-> moderno LoRA/adapter/ViT, 6 fichas) — adições da R7.
-> Análise R7 em [_rodada_07_candidatos.md](../_rodada_07_candidatos.md)).
+> Atualizado: 2026-06-15 (pós-reunião com orientador — corpus
+> consolidado, pente fino crítico concluído, 14 fichas Camada 1
+> todas VERIFIED). Estrutura final em 11 tracks: A-G (originais
+> R1-R5) + I, J, K (criados na ampliação recente do corpus) + L
+> (auxiliar). Track K (fundadores de FR) e Track L (auxiliar)
+> adicionados ao INDEX nesta atualização.
 
 ## Ordem de leitura recomendada
 
@@ -46,33 +47,61 @@ com surveys + papers críticos.
 
 ## Por track temático
 
-### Track A — Race classification (alvo direto da dissertação)
+> **11 tracks consolidados após pente fino crítico**. Distribuição
+> total: 101 fichas. Tracks A-G originais (R1-R5); Tracks I, J, K
+> criados na ampliação recente; Track L é o auxiliar/complementar.
 
-| Paper | Tipo |
+### Track A — Race classification multi-classe (4 fichas)
+
+Tarefa central da dissertação.
+
+| Paper | Foco |
 |---|---|
-| [Karkkainen & Joo 2021](dataset_karkkainen_2021.md) | Dataset central |
-| [AlDahoul et al. 2024/2026](aldahoul_2024.md) | SOTA |
-| [Lin et al. 2022](lin_2022.md) | Mitigação + validação |
+| [Karkkainen & Joo 2021](dataset_karkkainen_2021.md) | FairFace — dataset central |
+| [AlDahoul et al. 2024/2026](aldahoul_2024.md) | FaceScanPaliGemma — SOTA atual |
+| [Lin et al. 2022](lin_2022.md) | FairGRAPE — pruning + valida baseline 72% |
+| [Pereira et al. 2026](pereira_2026.md) | SkinToneNet + STW + auditoria FairFace |
 
-### Track B — Face recognition fairness (paralelo)
+### Track B — Face recognition fairness (16 fichas)
 
-| Paper | Tipo |
+Datasets, causas e crítica em FR fairness.
+
+| Paper | Foco |
 |---|---|
 | [Wang et al. 2019](dataset_wang_2019.md) | RFW |
 | [Robinson et al. 2020](dataset_robinson_2020.md) | BFW |
-| [Grother et al. 2019](grother_2019.md) | NIST FRVT |
-| [Neto et al. 2025](neto_2025.md) | Continuous labels |
+| [BUPT 2019](dataset_bupt_2019.md) | BUPT-CBFace |
+| [Grother et al. 2019](grother_2019.md) | NIST FRVT Part 3 |
+| [Pangelinan et al. 2023](pangelinan_2023.md) | Pixel info > skin tone (refutação central) |
+| [Kolla & Savadamuthu 2022](kolla_2022.md) | Distribuição racial no treino |
+| [Dooley et al. 2022](dooley_2022.md) | NAS bi-objective fairness+accuracy |
+| [Image Distortions 2021](image_distortions_2021.md) | Distortions e bias |
+| [Occlusion Bias 2024](occlusion_bias_2024.md) | Occlusion como confounder |
+| [Robustness Face Detection 2022](robustness_face_detection_2022.md) | Robustez vs fairness |
+| [Rethinking Assumptions 2021](rethinking_assumptions_2021.md) | Crítica metodológica |
+| [Fairer Datasets 2024](fairer_datasets_2024.md) | Construção de datasets fairer |
+| [Racial Bias Dataset 2017](racial_bias_dataset_2017.md) | Primeiro audit racial |
+| [MLLM Face Verification 2026](mllm_face_verification_2026.md) | MLLM para verificação |
+| [MST-KD 2024](mst_kd_2024.md) | Knowledge distillation MST |
+| [FairFace Challenge ECCV2020](fairface_challenge_eccv2020.md) | Challenge oficial |
 
-### Track C — Skin tone como dimensão alternativa
+### Track C — Skin tone alternativo (7 fichas)
 
-| Paper | Tipo |
+Escalas e classificadores de tom de pele.
+
+| Paper | Foco |
 |---|---|
-| [Buolamwini & Gebru 2018](buolamwini_2018.md) | Fitzpatrick (PPB) |
-| [Hazirbas et al. 2021](dataset_hazirbas_2021.md) | Casual Conversations |
-| [Schumann et al. 2023](schumann_2023.md) | MST scale |
+| [Fitzpatrick 1988](fitzpatrick_1988.md) | Origem dermatológica FST |
+| [Massey & Martin 2003](massey_martin_2003.md) | NIS Skin Color Scale (precedente MST) |
+| [Schumann et al. 2023](schumann_2023.md) | Monk Skin Tone (MST) scale |
+| [Hazirbas et al. 2021](dataset_hazirbas_2021.md) | Casual Conversations v1 |
+| [Porgali et al. 2023 CVPRW](porgali_2023_ccv2.md) | Casual Conversations v2 (Meta) |
+| [Buolamwini & Gebru 2018](buolamwini_2018.md) | Gender Shades — pioneiro |
 | [Lafargue et al. 2025](lafargue_2025.md) | Fitzpatrick + ITA |
 
-### Track D — Mitigação algorítmica (técnicas)
+### Track D — Mitigação algorítmica (10 fichas)
+
+Técnicas para reduzir viés.
 
 | Paper | Técnica |
 |---|---|
@@ -81,128 +110,164 @@ com surveys + papers críticos.
 | [Manzoor & Rattani 2024](manzoor_2024.md) | Cross-layer mutual attention (FineFACE) |
 | [Bhaskaruni et al. 2019](bhaskaruni_2019.md) | Ensemble AdaBoost-fair |
 | [Dehdashtian et al. 2024](dehdashtian_2024.md) | U-FaTE (estimador trade-off) |
-| [Lin et al. 2022](lin_2022.md) | FairGRAPE pruning |
+| [Ramachandran & Rattani 2024 IJCB](ramachandran_2024.md) | SSL para fair facial attribute |
+| [Provable Adversarial SSL 2024](provable_adversarial_ssl_2024.md) | SSL fair com garantias |
+| [Raumanns et al. 2024 FAIMI](raumanns_2024.md) | Single vs multi-task fairness |
+| [Liu et al. 2025 FAccT](liu_2025.md) | BNMR — Bayesian Network meta-learning |
+| [Enhancing Visual Attributes 2022](enhancing_visual_attributes_2022.md) | Atributos visuais fair |
 
-### Track E — Auditoria e metodologia
+### Track E — Auditoria e Surveys (14 fichas)
+
+Infraestrutura intelectual.
 
 | Paper | Foco |
 |---|---|
 | [Dominguez-Catena et al. 2024](dominguez_2024.md) | DSAP — auditoria de datasets |
-| [Lafargue et al. 2025](lafargue_2025.md) | Statistical tests uncertainty-aware |
-| [Mehrabi et al. 2021](survey_mehrabi_2021.md) | Survey geral ML |
-| [Kotwal & Marcel 2025](survey_kotwal_2025.md) | Survey específico FR |
+| [Reliable Demographic Inference 2025](reliable_demo_inference_2025.md) | DAI pipeline modular |
+| [Evaluating LVLM Fairness 2024 EMNLP](evaluating_lvlm_2024.md) | FACET+UTKFace audit |
+| [Benchmark LVLM 2026](benchmark_lvlm_2026.md) | Benchmark VLM fairness |
+| [Mehrabi et al. 2021](survey_mehrabi_2021.md) | Survey geral ML — taxonomia canônica |
+| [Kotwal & Marcel 2025](survey_kotwal_2025.md) | Survey específico FR fairness |
+| [Survey Racial Bias FR 2024](survey_racial_bias_fr_2024.md) | Survey racial bias |
+| [Survey Face Recognition 2022](survey_face_recognition_2022.md) | Survey FR geral |
+| [Survey CV Fairness 2024](survey_cv_fairness_2024.md) | Survey CV fairness |
+| [Survey LLM Bias 2024](survey_llm_bias_2024.md) | Survey LLM bias |
+| [Survey Multimodal Fairness 2024](survey_multimodal_fairness_2024.md) | Survey multimodal |
+| [Survey Fairness Vision-Language 2024](survey_fairness_vision_lang_2024.md) | Survey VL fairness |
+| [Survey Long-Tail 2022](survey_long_tail_2022.md) | Long-tail recognition |
+| [Federated Fairness Survey 2025](federated_fairness_survey_2025.md) | Survey federated fairness |
 
-### Track F — Fundamentação científica de raça e tom de pele (Rodada 4)
+### Track F — Fundamentação científica e ética (3 fichas)
+
+Posição da tese sobre raça como construto.
 
 | Paper | Foco |
 |---|---|
 | [Fuentes et al. 2019](fuentes_2019.md) | AAPA Statement — race ≠ biology |
 | [Lewontin 1972](lewontin_1972.md) | Apportionment 85/6/8 — refutação genética |
-| [Fitzpatrick 1988](fitzpatrick_1988.md) | Origem dermatológica Fitzpatrick (PUVA) |
-| [Massey & Martin 2003](massey_martin_2003.md) | NIS Skin Color Scale (precedente MST) |
+| [Neto et al. 2025](neto_2025.md) | Continuous labels — questiona discretização |
 
-### Track H — Validação científica do pipeline v3.2 (Rodada 6 COMPLETA)
+### Track G — Mecanismos ML paradigmáticos (9 fichas)
 
-#### Fichas VERIFIED (leitura integral)
+Esqueleto teórico — métricas, conditioning, representação.
 
-| Paper | Foco | Relevância v3.2 |
+| Paper | Foco | Relevância |
 |---|---|---|
-| [Pereira et al. 2026](pereira_2026.md) — SkinToneNet + STW | Classificador MST SOTA (ViT-Small) + dataset STW (42k imgs) auditando 8 datasets faciais incluindo FairFace | **Insumo direto da Etapa 1**: SkinToneNet pré-treinado. Contaminação treino-teste: STW agrega FairFace |
-| [Aguirre & Dredze 2023](aguirre_2023.md) — Multi-task fair transfer | MTL-fair + ε-DEO; 15-44% redução de bias mantendo F1; demonstração empírica de fair transfer | Reforço empírico do LAFTR. Justifica etapas 3 e 5 |
-
-#### Fichas OVERVIEW_ONLY (pendentes leitura PDF integral)
-
-| Paper | Foco | Relevância v3.2 |
-|---|---|---|
-| [Pangelinan et al. 2023](pangelinan_2023.md) | Causas de variação demográfica em FR accuracy | **Refutação potencial de H5**: pixel info > skin tone. Motivou H6 nova |
-| [Dooley et al. 2022](dooley_2022.md) — Fairer architectures | NAS bi-objective fairness+accuracy | Reforça H2: arquitetura importa; valida ConvNeXt-T |
-| [Kolla & Savadamuthu 2022](kolla_2022.md) | Impacto da distribuição racial no treino de FR | Balanceamento NÃO basta; "racial gradation" novo |
-| [Liu et al. 2025 FAccT](liu_2025.md) — BNMR | Bayesian Network meta-learning + face component fairness | Baseline competitivo recente; surrogate fairness alinhada |
-| [Ramachandran & Rattani 2024 IJCB](ramachandran_2024.md) | SSL pipeline para fair facial attribute | Baseline SSL em FairFace + CelebA |
-| [Raumanns et al. 2024 FAIMI](raumanns_2024.md) | Single vs multi-task fairness em skin lesion | Cautela contra multi-task naive; adversarial > reinforce |
-
-Detalhes em [_validacao_cientifica_pipeline.md](../_validacao_cientifica_pipeline.md).
-Auditoria de leitura em [_auditoria_fichas.md](_auditoria_fichas.md).
-
-### Track I — Vision-Language Model fairness (NOVO Rodada 7, 11 fichas)
-
-VLMs e debiasing — endereça recomendação do orientador de comparar
-FiLM com mecanismos modernos baseados em CLIP/BLIP.
-
-| Paper | Foco | Aplicação v3.2 |
-|---|---|---|
-| [Luo et al. 2024 CVPR — FairCLIP](luo_2024_fairclip.md) | Sinkhorn distance + Harvard-FairVLMed | Cap 2 ablation FiLM vs CLIP |
-| [Dehdashtian et al. 2024 ICLR — FairerCLIP](dehdashtian_2024_fairerclip.md) | RKHS-based debiasing | Baseline VLM lightweight |
-| [Joint VL Bias Removal 2024](joint_vl_2024.md) | Alignment + counterfactual | Baseline |
-| [Lin et al. 2025 CVPR — AI-Face](lin_2025_aiface.md) | Million-scale dataset | Dataset complementar |
-| [GRAS Benchmark 2025](gras_2025.md) | 2.5M queries multi-eixo | Evidência problema |
-| [Unified Debiasing VLMs 2024](unified_debiasing_vlm_2024.md) | Framework cross-modal | Referência conceitual |
-| [Evaluating LVLM Fairness 2024 EMNLP](evaluating_lvlm_2024.md) | FACET+UTKFace audit | Evidência |
-| [BendVLM 2024](bendvlm_2024.md) | Test-time debiasing | Baseline lightweight |
-| [Debiasing CLIP Neural Interventions 2025](debiasing_neural_interventions_2025.md) | Attention heads | Paralelo FiLM |
-
-### Track J — Conditioning moderno (NOVO Rodada 7, 6 fichas)
-
-LoRA, adapters, ViT-specific — endereça recomendação do orientador.
-
-| Paper | Foco | Aplicação v3.2 |
-|---|---|---|
-| [Zhao et al. 2025 CVPR — AIM-Fair](zhao_2025_aimfair.md) | Selective fine-tuning | Baseline Cap 2 |
-| [Bian et al. 2025 ICCV — LoRA-FAIR](bian_2025_lorafair.md) | Federated LoRA fairness | Ablation arquitetural |
-| [FairLoRA 2024](fairlora_2024.md) | Fairness-driven LoRA vision | Direct competitor FiLM |
-| [On Fairness of LoRA 2024](fairness_lora_2024.md) | LoRA não enviesa per se | Validação metodológica |
-| [Tian et al. 2024 ECCV — FairViT](tian_2024_fairvit.md) | Adaptive masking ViT | Backbone alternativo |
-
-### Track auxiliar — Skin tone + race + SSL (Rodada 7, 4 fichas)
-
-| Paper | Foco | Aplicação v3.2 |
-|---|---|---|
-| [Porgali et al. 2023 CVPRW — Casual Conversations v2](porgali_2023_ccv2.md) | 7 países + Fitzpatrick+MST | Validação cross-domain MST |
-| [Reliable Demographic Inference 2025](reliable_demo_inference_2025.md) | DAI pipeline modular | Etapa 2 protocolo |
+| [Hardt, Price & Srebro 2016](hardt_2016.md) | Equal Opportunity / Equalized Odds | Métricas canônicas |
+| [Kleinberg et al. 2017](kleinberg_2017.md) | Impossibility theorem | Justifica triangulação |
+| [Zemel et al. 2013](zemel_2013.md) | LFR — Learning Fair Representations | Paradigma fundador |
+| [Madras et al. 2018](madras_2018.md) | LAFTR — Adversarial Fair Transferable | Fundamenta fair transfer |
+| [Zhang et al. 2018](zhang_2018.md) | Adversarial debiasing | Baseline alternativo |
+| [Perez et al. 2018](perez_2018.md) | FiLM — mecanismo de conditioning | **Mecanismo central da tese** |
+| [Aguirre & Dredze 2023](aguirre_2023.md) | Multi-task fair transfer | Reforço empírico do LAFTR |
+| [Counterfactual Fairness ICLR 2025](counterfactual_fairness_iclr2025.md) | Causal fairness | Direção alternativa |
 | [Demographic-Agnostic Fairness 2025](demographic_agnostic_2025.md) | Fairness sem labels | Direção futura |
-| [Provable Adversarial SSL 2024](provable_adversarial_ssl_2024.md) | SSL fair com garantias | Baseline SSL |
 
-### Track G — Mecanismos ML / Redes Neurais (NOVO Rodada 5)
+### Track I — VLM / CLIP em fairness (14 fichas) — ampliação recente
 
-| Paper | Foco | Relevância v3.2 |
-|---|---|---|
-| [Hardt, Price & Srebro 2016](hardt_2016.md) | NeurIPS 2016 — Equal Opportunity / Equalized Odds | Fonte das métricas EO_h/EOD usadas pela literatura |
-| [Perez et al. 2018 (FiLM)](perez_2018.md) | AAAI 2018 — conditional layer | Mecanismo para condicionar race classifier com saída MST |
-| [Zemel et al. 2013 (LFR)](zemel_2013.md) | ICML 2013 (Test-of-Time 2023) — Fair Representations | Paradigma fundador do campo |
-| [Madras et al. 2018 (LAFTR)](madras_2018.md) | ICML 2018 — Adversarial Fair Transferable | Fundamenta extensão race → face recognition |
-| [Zhang et al. 2018](zhang_2018.md) | AAAI/ACM AIES 2018 — Adversarial debiasing | Baseline mitigação alternativo a FSCL+ |
-| [Kleinberg et al. 2017](kleinberg_2017.md) | ITCS 2017 — Impossibility theorem | Justifica triangulação DR + worst-class + CV |
+Resposta direta à recomendação do orientador sobre CLIP.
 
-## Localização de PDFs (gitignored — local apenas)
+| Paper | Foco |
+|---|---|
+| [Luo et al. 2024 CVPR — FairCLIP](luo_2024_fairclip.md) | Sinkhorn distance + Harvard-FairVLMed |
+| [Dehdashtian et al. 2024 ICLR — FairerCLIP](dehdashtian_2024_fairerclip.md) | RKHS-based debiasing zero-shot |
+| [Joint VL Bias Removal 2024](joint_vl_2024.md) | Alignment + counterfactual |
+| [Unified Debiasing VLMs 2024](unified_debiasing_vlm_2024.md) | Framework cross-modal |
+| [BendVLM 2024](bendvlm_2024.md) | Test-time debiasing |
+| [Debiasing CLIP Neural Interventions 2025](debiasing_neural_interventions_2025.md) | Attention heads |
+| [Closed-form Debias 2026](closed_form_debias_2026.md) | Solução analítica |
+| [Bias Subspace 2025](bias_subspace_2025.md) | Projeção em subespaço |
+| [Fair Residuals VLM 2025](fair_residuals_vlm_2025.md) | Residual fairness |
+| [BioPro 2025](biopro_2025.md) | Biometric prototypes |
+| [Lin et al. 2025 CVPR — AI-Face](lin_2025_aiface.md) | Million-scale dataset |
+| [GRAS Benchmark 2025](gras_2025.md) | 2.5M queries multi-eixo |
+| [IndicFairFace 2026](indicfairface_2026.md) | Foco em Indian faces |
+| [Survey Fairness Vision-Language 2024](survey_fairness_vision_lang_2024.md) | Survey transversal |
 
-Todos os PDFs em `pdfs/`:
+### Track J — Conditioning moderno (5 fichas) — ampliação recente
 
-```
-pdfs/
-├── aldahoul_2024_vlm.pdf
-├── aldahoul_2026_naturesr.pdf       # follow-up Nature SR
-├── bhaskaruni_2019_ensemble.pdf
-├── buolamwini_2018_gendershades.pdf
-├── dehdashtian_2024_ufate.pdf
-├── dominguez_2024_dsap.pdf
-├── grother_2019_nistir8280.pdf
-├── hazirbas_2021_casual.pdf
-├── karkkainen_2021_fairface.pdf
-├── kotwal_2025_survey.pdf
-├── lafargue_2025_fairdetails.pdf
-├── lin_2022_fairgrape.pdf
-├── manzoor_2024_fineface.pdf
-├── mehrabi_2021_survey.pdf
-├── neto_2025_continuous.pdf
-├── park_2022_fscl.pdf
-├── robinson_2020_bfw.pdf
-├── sagawa_2020_groupdro.pdf
-├── schumann_2023_mst.pdf
-└── wang_2019_rfw.pdf
-```
+Adaptadores leves alternativos ao FiLM.
 
-Tamanho total: ~83 MB. Não-versionados (gitignored por política de
-copyright editorial).
+| Paper | Foco |
+|---|---|
+| [Zhao et al. 2025 CVPR — AIM-Fair](zhao_2025_aimfair.md) | Selective fine-tuning |
+| [Bian et al. 2025 ICCV — LoRA-FAIR](bian_2025_lorafair.md) | Federated LoRA fairness |
+| [FairLoRA 2024](fairlora_2024.md) | Fairness-driven LoRA vision |
+| [On Fairness of LoRA 2024](fairness_lora_2024.md) | LoRA não enviesa per se |
+| [Tian et al. 2024 ECCV — FairViT](tian_2024_fairvit.md) | Adaptive masking ViT |
+
+### Track K — Fundadores de FR (6 fichas) — ampliação recente
+
+Losses fundadoras de reconhecimento facial — preenche gap óbvio.
+
+| Paper | Foco |
+|---|---|
+| [Schroff et al. 2015](schroff_2015_facenet.md) | FaceNet — Triplet loss |
+| [Wang et al. 2018](wang_2018_cosface.md) | CosFace — LMCL |
+| [Deng et al. 2019](deng_2019_arcface.md) | ArcFace — Additive Angular Margin |
+| [Meng et al. 2021](meng_2021_magface.md) | MagFace — Quality + Magnitude |
+| [Kim et al. 2022](kim_2022_adaface.md) | AdaFace — Quality-adaptive margin |
+| [Range Loss 2016](range_loss_2016.md) | Range Loss — long-tail FR |
+
+### Track L — Auxiliar / complementar (13 fichas)
+
+Direções adjacentes — post-hoc, synthetic, federated, cross-domain, explainability.
+
+#### Post-hoc / Calibration (4)
+
+| Paper | Foco |
+|---|---|
+| [Post-hoc Comparison 2020](post_comparison_2020.md) | Comparação de métodos post-hoc |
+| [FairCal 2021](faircal_2021.md) | Fair calibration |
+| [Score Normalization 2024](score_normalization_2024.md) | Normalização de scores |
+| [FairSight 2025](fair_sight_2025.md) | Auditoria visual |
+
+#### Synthetic data (5)
+
+| Paper | Foco |
+|---|---|
+| [Synthetic Face 2024](synthetic_face_2024.md) | Synthetic faces para fairness |
+| [VariFace 2024](variface_2024.md) | Variational synthetic |
+| [FRCSyn 2024](frcsyn_2024.md) | Challenge synthetic FR |
+| [Massively Annotated 2024](massively_annotated_2024.md) | Large-scale synthetic |
+| [FairImagen NeurIPS 2025](fairimagen_neurips2025.md) | Fair image generation |
+
+#### Federated / Privacy (2)
+
+| Paper | Foco |
+|---|---|
+| [DP-FedFace 2024](dp_fedface_2024.md) | Differential privacy + federated |
+| [VoIDFace 2025](voidface_2025.md) | Privacy-preserving FR |
+
+#### Cross-domain (2)
+
+| Paper | Foco |
+|---|---|
+| [FairDomain 2024](fairdomain_2024.md) | Cross-domain fairness |
+| [Face4FairShifts 2025](face4fairshifts_2025.md) | Distribution shifts |
+
+#### Explainability (1)
+
+| Paper | Foco |
+|---|---|
+| [Explainable FR 2024](explainable_fr_2024.md) | Explicabilidade em FR |
+
+## Localização de PDFs
+
+PDFs em `pdfs/`, versionados no repositório (~400 MB).
+
+**Cobertura atual: 92 de 101 fichas (91 %) com PDF presente.**
+
+| Categoria | Total |
+|---|---|
+| Fichas com PDF no repositório | 92 |
+| Fichas sem PDF (paywall institucional ou sem URL pública) | 9 |
+
+Os 9 PDFs ausentes estão em fontes históricas (Fitzpatrick 1988,
+Lewontin 1972, Massey-Martin 2003) ou em paywalls de Springer / ACM /
+Wiley (a serem obtidos via VPN institucional).
+
+Inventário detalhado em [_pdfs_inventario.md](../_pdfs_inventario.md).
 
 ## Artefatos administrativos
 
