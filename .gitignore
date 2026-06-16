@@ -92,3 +92,6 @@ docs/ativo/04_pesquisa_bibliografica/pdfs/*.txt
 # Arquivos temporários criados pelo Office (Word, PowerPoint, Excel)
 # enquanto o arquivo está aberto. Não devem ser versionados.
 ~$*
+
+# PDFs organizados por tier (duplicatas locais para NotebookLM)
+docs/ativo/04_pesquisa_bibliografica/pdfs_por_tier/
