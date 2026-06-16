@@ -1,8 +1,9 @@
 ---
-data: 2026-06-15
+data: 2026-06-16
 tipo: mapa-citacoes
-escopo: distribuicao das 101 fichas pelos 5 capitulos da qualificacao
+escopo: distribuicao das 101 fichas pelos 5 capitulos + adicoes v3.5/v1.2
 status: ferramenta-de-escrita
+versao: 1.1 (post-analise-NotebookLM)
 ---
 
 # Mapa de citações por capítulo
@@ -14,6 +15,13 @@ status: ferramenta-de-escrita
 >
 > **Propósito**: acelerar a escrita evitando releitura do corpus para
 > identificar quais papers entram em cada parte.
+>
+> **Atualizado em v1.1** (2026-06-16): incorporadas novas seções do
+> objetivo v3.5 e narrativa v1.2:
+> - Sensitivity analysis MST (OE-2 expandido)
+> - Diversidade fenotípica intra-Latinx (OE-1 + H3)
+> - Limites de escala (Cap 4 Discussão)
+> - Ponte genética/CV (Cap 4 — Lewontin/Fuentes ↔ C6/OE-5/OE-6)
 
 ## Convenções
 
@@ -269,6 +277,43 @@ científicas). Pode citar:
 - 🟡 `\cite{kotwal2025fairness}` (state of art mais recente)
 
 ---
+
+## Capítulo 4 — adições da v3.5/v1.2
+
+### 4.6 Sub-análise intra-Latinx (NOVO v3.5)
+
+| Citação | Por que |
+|---|---|
+| 🔴 `\cite{fuentes2019aapa}` | Posição AAPA — heterogeneidade fenotípica |
+| 🔴 `\cite{lewontin1972apportionment}` | 85% variação intra-populacional |
+| 🟢 `\cite{aldahoul2024exploring}` | F1 Latinx 60% — dado a explicar |
+| 🟢 (R8 — candidatos a verificar) | Telles, Bonilla-Silva, Mora — diversidade Latinx (sociologia) — ver `_rodada_08_latinx_candidatos.md` |
+
+### 4.7 Limites de escala (NOVO v3.5)
+
+| Citação | Por que |
+|---|---|
+| 🔴 `\cite{grother2019face}` (NIST FRVT) | Escala industrial (18M imagens, 8.5M pessoas) — contraste com FairFace |
+| 🟢 `\cite{karkkainen2021fairface}` | FairFace 108k — escala mestrado |
+| 🟢 `\cite{pereiramatias2026large}` | Limitação reconhecida em audit datasets |
+| 🟢 `\cite{yucer2024racial}` (Durham) | Survey limitações datasets |
+
+### 4.8 Ponte genética ↔ visão computacional (NOVO v3.5)
+
+| Citação | Por que |
+|---|---|
+| 🔴 **`\cite{lewontin1972apportionment}`** | Patamar 1 — genético-populacional |
+| 🔴 **`\cite{fuentes2019aapa}`** | Patamar 2 — antropológico-institucional |
+| 🟢 `\cite{wangzhang2022bupt}` (BUPT/MBN) | Skin tone > race labels (precedente) |
+| 🟢 `\cite{neto2025continuous}` | Continuous labels (direção futura) |
+
+### 4.9 Sensitivity analysis MST (NOVO v3.5 — OE-2 expandido)
+
+| Citação | Por que |
+|---|---|
+| 🔴 **`\cite{pereiramatias2026large}`** (SkinToneNet) | Classificador #1 (principal) |
+| 🟢 `\cite{schumann2023monk}` (MST baseline) | Classificador #2 (validação) |
+| 🟢 `\cite{wangzhang2022bupt}` (BUPT IDS + FST+ITA) | Classificador #3 (cross-paradigm) |
 
 ## Apêndices / Discussão ética
 

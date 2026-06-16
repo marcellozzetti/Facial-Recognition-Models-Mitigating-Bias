@@ -1,7 +1,7 @@
 # Pré-qualificação narrativa — estrutura de texto
 
-> **Versão**: 1.1 — pós-revisão bibliográfica completa.
-> **Data inicial**: 2026-06-10. **Atualizada**: 2026-06-15.
+> **Versão**: 1.2 — incorpora sugestões da análise paralela NotebookLM (2026-06-16).
+> **Data inicial**: 2026-06-10. **Atualizada**: 2026-06-16.
 > **Propósito**: estrutura narrativa fechada com objetivo claro,
 > servir de base para conversão em LaTeX (Overleaf) na próxima
 > etapa.
@@ -9,8 +9,14 @@
 > Contexto → Problemas → Estado-da-arte → Gap → Objetivo → Como
 > será feito.
 >
-> **Mudanças vs v1.0**:
-> 1. Wang, Zhang & Deng (BUPT, 2022) incluído como precedente metodológico — já argumentavam "skin tone > race labels".
+> **Mudanças vs v1.1**:
+> 1. **Nova seção 3.9** — Diversidade fenotípica intra-Latinx/Hispanic como contribuição estrutural ao gap reportado.
+> 2. **Nova seção 6.5** — Limites de escala da pesquisa (FairFace vs NIST FRVT) e posicionamento como demonstração metodológica.
+> 3. **Nova seção 7** — Ponte explícita entre genética populacional (Lewontin 1972, Fuentes 2019) e visão computacional via decomposição C6/OE-5/OE-6.
+> 4. Sensitivity analysis MST adicionada à H1 como sub-experimento (robustez a 2-3 classificadores MST alternativos).
+>
+> **Mantido de v1.1**:
+> 1. Wang, Zhang & Deng (BUPT, 2022) como precedente metodológico — já argumentavam "skin tone > race labels".
 > 2. Produção científica brasileira (Parraga et al. PUCRS) e portuguesa (Univ. Porto + INESC TEC, Univ. Coimbra) reconhecidas.
 > 3. C7 ampliado para 4 configurações (A baseline / B FiLM-MST / C Gated FiLM / D FiLM-CLIP) conforme decisão arquitetural pós-avaliação de 8 candidatos.
 > 4. Coeficiente de Gini (Yang IJCV 2022) considerado como métrica auxiliar de long-tailedness.
@@ -299,6 +305,33 @@ Adicionalmente, o **Institute of Systems and Robotics da
 Universidade de Coimbra** [Muhammed, Medvedev & Gonçalves, 2025]
 contribui com VOIDFace para privacy-preserving face recognition.
 
+### 3.9 Diversidade fenotípica intra-Latinx e o gap persistente
+
+Uma observação crítica sobre o gap Latinx/Hispanic ≈ 60% F1
+persistente em modelos do estado da arte merece elaboração
+específica. A categoria "Latinx/Hispanic" do FairFace e de datasets
+correlatos constitui **rótulo sociopolítico de heterogeneidade
+fenotípica conhecida**, agregando descendentes de múltiplas
+ancestralidades — europeia, indígena americana, africana e
+mestiça em proporções variáveis cross sub-populações
+(mexicana-americana, cubana, sul-americana, caribenha,
+centro-americana). Esta heterogeneidade interna é amplamente
+documentada na literatura antropológica e de identidade racial,
+e é coerente com a posição da American Association of Biological
+Anthropologists [Fuentes et al., 2019] segundo a qual "no group
+of people is, or ever has been, biologically homogeneous or
+'pure'".
+
+Esta dissertação hipotetiza que a heterogeneidade fenotípica
+intra-categorial é **contribuição estrutural ao gap Latinx**, não
+apenas artefato algorítmico. A Hipótese H3 — Latinx exibe spread
+MST em ≥ 5 das 10 classes — operacionaliza empíricamente esta
+hipótese sobre o FairFace, e a Contribuição C6 quantifica
+explicitamente o componente fenotípico irredutível via
+decomposição de variância. **Não há precedente computacional
+desta decomposição específica** para o caso Latinx, configurando
+contribuição original mensurável.
+
 ---
 
 ## 4. O que falta ser explorado (gap)
@@ -494,7 +527,37 @@ seis etapas sequenciais:
 - Comparação pareada contra baselines.
 - Intervalos de confiança via bootstrap.
 
-### 6.4 Cronograma de execução
+### 6.4 Limites de escala e escopo (NOVO v1.2)
+
+O FairFace, com aproximadamente cento e oito mil quinhentas e uma
+imagens em sete categorias raciais, constitui escala adequada para
+uma dissertação de mestrado mas é **significativamente menor que
+auditorias industriais** como o NIST FRVT Part 3, que avaliou cento
+e oitenta e nove algoritmos sobre **dezoito milhões de imagens de
+oito milhões e meio de pessoas** [Grother, Ngan & Hanaoka, 2019].
+Esta diferença de duas a três ordens de magnitude impõe três
+ressalvas reconhecidas:
+
+Primeiro, a **generalização a deploy industrial** não é demonstrada
+nesta dissertação. O mecanismo FiLM-conditioning, mesmo com
+aproximadamente um por cento de overhead paramétrico, requer
+validação adicional em escala antes de recomendação de adoção
+comercial. Segundo, o **custo computacional** do conditioning em
+treinamento sobre milhões de identidades permanece um ponto aberto.
+Terceiro, a **validade externa** do achado da matriz Monk Skin
+Tone × race depende da representatividade do FairFace — limitação
+parcial reconhecida por Pereira et al. (2026) e Yucer et al. (Durham,
+ACM Computing Surveys 2024).
+
+Em consequência, esta dissertação posiciona-se como **demonstração
+metodológica de viabilidade** do paradigma de skin tone como sinal
+arquitetural condicionante em race classification multi-classe —
+paradigma inédito por si só — e **não como recomendação direta de
+deploy industrial**. A replicação em escala industrial é declarada
+explicitamente como **trabalho futuro**, possível direção para um
+doutorado subsequente ou parceria industrial.
+
+### 6.5 Cronograma de execução
 
 O cronograma de execução da pesquisa abrange aproximadamente vinte
 e oito semanas após a aprovação da qualificação:
@@ -511,7 +574,81 @@ e oito semanas após a aprovação da qualificação:
 
 ---
 
-## 7. Resumo
+## 7. Ponte epistemológica — genética populacional, antropologia e visão computacional (NOVO v1.2)
+
+A presente dissertação opera em uma cadeia argumentativa de três
+patamares que conectam genética populacional clássica à decisão
+metodológica em computer vision facial. Esta ponte é necessária
+para responder antecipadamente à crítica metodológica natural:
+**por que uma pesquisa em ciência da computação cita um paper de
+genética populacional de 1972 (Lewontin) e um statement
+institucional de antropologia biológica de 2019 (Fuentes et al.,
+AAPA)?**
+
+### 7.1 Patamar genético-populacional
+
+Lewontin [1972, Evolutionary Biology], em estudo clássico de
+distribuição da diversidade genética humana, demonstrou que
+**aproximadamente oitenta e cinco por cento da variação genética
+humana ocorre dentro de populações tradicionalmente classificadas
+como racialmente homogêneas** — apenas seis a quinze por cento
+distinguem essas populações entre si. Categorias raciais são, neste
+sentido genético-populacional, tipologias imprecisas para a
+diversidade humana real.
+
+### 7.2 Patamar antropológico-institucional
+
+A American Association of Biological Anthropologists, em statement
+oficial liderado por Fuentes et al. [2019, American Journal of
+Physical Anthropology], consolidou cinquenta anos de findings
+genéticos subsequentes a Lewontin afirmando que **"race does not
+provide an accurate representation of human biological variation"**
+e que **"humans are not divided biologically into distinct
+continental types or racial genetic clusters"**. Raça é, portanto,
+construto sociopolítico operativo — não taxonomia biológica.
+
+### 7.3 Patamar computacional-empírico (esta dissertação)
+
+A Contribuição C6 (decomposição quantitativa do erro Latinx em
+componente fenotípico irredutível versus algorítmico mitigável)
+**operacionaliza empíricamente em computer vision uma hipótese
+fundamentada por cinquenta e três anos de pesquisa em outras
+disciplinas mas nunca testada em visão computacional facial**.
+
+A decomposição proposta nos Objetivos Específicos cinco e seis
+quantifica, sobre o FairFace, qual proporção do erro de
+classificação racial é atribuível a sobreposição fenotípica entre
+categorias raciais — exatamente o que Lewontin (1972) e Fuentes
+et al. (2019) preveem em outros níveis de análise. Se a
+decomposição confirmar componente fenotípico irredutível
+significativo, **isto não invalida a pesquisa em race
+classification, mas reposiciona-a como auditoria honesta dos
+limites estruturais inerentes a esta tarefa quando aplicada a
+categorias sociopolíticas heterogêneas**.
+
+### 7.4 Implicação para o veredito ético
+
+A dissertação **mensura, não essencializa**. A combinação dos três
+patamares oferece base científica suficiente para sustentar três
+afirmações simultâneas, aparentemente em tensão mas
+metodologicamente coerentes:
+
+Primeira, **race classification computacional pode ter limites
+estruturais** quando aplicada a categorias sociopolíticas
+heterogêneas — coerente com Lewontin (1972), Fuentes et al.
+(2019), Wang & Deng (BUPT, 2022) e Neto et al. (2025). Segunda,
+**o esforço de mitigação algorítmica continua eticamente
+justificado** quando reconhece estes limites — coerente com EU
+AI Act, LGPD e diretrizes de auditoria de sistemas de alto risco.
+Terceira, **a quantificação desses limites estruturais é
+contribuição científica útil em si** — paradigma diferente
+de "melhorar mais um por cento" e mais relevante do que esta
+otimização incremental para a discussão pública informada sobre
+deploy de IA biométrica.
+
+---
+
+## 8. Resumo
 
 Esta dissertação propõe operacionalizar uma intuição que a literatura
 de fairness facial reconhece mas raramente formaliza: **tom de pele

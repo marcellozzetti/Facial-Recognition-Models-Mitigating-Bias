@@ -1,20 +1,25 @@
-# Objetivo da tese — v3.4 (pós-revisão bibliográfica completa)
+# Objetivo da tese — v3.5 (pós-análise paralela NotebookLM)
 
-> **Versão**: 3.4 — incorpora recomendações do cross-reference
-> sistemático tese × 101 fichas
-> (`_validacao_cross_reference_v3.md`).
-> **Versão anterior**: v3.3 (2026-06-10, pós-aprovação do pipeline
-> pelo orientador na reunião de 08/jun).
-> **Atualizada**: 2026-06-15.
+> **Versão**: 3.5 — incorpora sugestões da análise paralela do
+> NotebookLM sobre a pré-qualificação (2026-06-16).
+> **Versões anteriores**: v3.4 (cross-reference 101 fichas, 2026-06-15);
+> v3.3 (pós-reunião orientador 08/jun, 2026-06-10).
+> **Atualizada**: 2026-06-16.
 > **Propósito**: âncora narrativa para escrita da qualificação
 > (deadline 15-jul-2026 — entrega da primeira revisão ao orientador).
 >
-> **Mudanças vs v3.3**:
-> 1. OE-6 promovido (era H6) — decomposição de variância pixel info × skin tone como objetivo específico formal.
-> 2. Citação central de Wang+Deng BUPT 2022 como precedente metodológico (já argumentava skin tone > race labels).
-> 3. Adicionadas referências brasileiras/portuguesas como diferencial.
-> 4. Coeficiente de Gini (Yang IJCV 2022) considerado como métrica auxiliar.
-> 5. Estudo comparativo Cap 2 formalizado em 4 configurações (A baseline / B FiLM-MST / C Gated FiLM / D FiLM-CLIP).
+> **Mudanças vs v3.4**:
+> 1. **Sensitivity analysis MST** incluída no OE-2: validar robustez do conditioning a 2-3 classificadores MST alternativos (mitiga risco de propagação de viés do SkinToneNet).
+> 2. **Diversidade fenotípica intra-Latinx** integrada ao OE-1 e à H3: análise explícita do spread MST dentro da categoria Latinx como evidência de heterogeneidade estrutural (Rodada 8 enxuta de pesquisa em paralelo).
+> 3. **Limites de escala** reconhecidos formalmente em nova Seção 9: FairFace (108k) é orçamento de mestrado; replicação em escala industrial declarada como trabalho futuro.
+> 4. **Ponte genética ↔ visão computacional** explicitada: Lewontin (1972) + Fuentes et al. (2019, AAPA) conectados via decomposição OE-5/OE-6.
+>
+> **Mantido de v3.4**:
+> - OE-6 promovido (era H6) — decomposição de variância pixel info × skin tone como objetivo específico formal.
+> - Wang+Deng BUPT (2022) como precedente metodológico (skin tone > race labels).
+> - Referências brasileiras/portuguesas como diferencial.
+> - Coeficiente de Gini (Yang IJCV 2022) considerado como métrica auxiliar.
+> - 4 configurações no Cap 2 (A baseline / B FiLM-MST / C Gated FiLM / D FiLM-CLIP).
 
 ## 1. Storytelling aprovado pelo orientador
 
@@ -53,14 +58,26 @@ Quantificar a distribuição cruzada **MST × race classes** sobre o
 FairFace via SkinToneNet (Pereira 2026) com validação humana em
 subset. **Entregar a primeira matriz pública dessa distribuição**.
 
+**Sub-análise específica intra-Latinx (v3.5)**: análise dedicada
+do spread MST dentro da categoria Latinx/Hispanic como evidência
+empírica de **heterogeneidade fenotípica intra-categorial** —
+diretamente relevante para o F1 baixo persistente (~60%) reportado
+em modelos do estado da arte.
+
 - **Hipótese testada**: H3 — Latinx tem spread MST amplo (≥ 5 das
   10 classes MST).
 - **Métricas**: histograma MST por raça, % overlap entre raças,
   validação manual via Prolific (~700 imgs × 3 anotadores).
+- **Sub-métrica intra-Latinx**: variância intra-classe MST do
+  cohort Latinx vs variância das outras 6 raças. Se Latinx tem
+  variância significativamente maior, valida heterogeneidade.
 
-### Objetivo específico 2 — Avaliar modelos pré-treinados de skin tone (Cap 1)
+### Objetivo específico 2 — Avaliar modelos pré-treinados de skin tone + sensitivity analysis (Cap 1)
 
-> **Recomendação do orientador (2026-06-08)**.
+> **Recomendação do orientador (2026-06-08)** + **sensitivity
+> analysis adicionada na v3.5** após análise paralela NotebookLM
+> identificar o SkinToneNet como possível ponto único de falha do
+> pipeline.
 
 Conduzir avaliação metodológica de modelos pré-treinados disponíveis
 para classificação MST (SkinToneNet, Casual Conversations baseline,
@@ -68,8 +85,22 @@ Google API, alternativas HuggingFace) e **justificar a escolha do
 modelo adotado** com critérios de desempenho, generalização e
 disponibilidade.
 
-- **Saída**: tabela comparativa + decisão fundamentada + protocolo
-  de validação.
+**Sensitivity analysis (NOVO v3.5)**: replicar a Etapa 3 do pipeline
+principal usando **2-3 classificadores MST alternativos** como
+fonte do vetor MST → FiLM. Se as conclusões metodológicas (H1, H4)
+permanecem qualitativamente estáveis cross classifier, valida que o
+mecanismo arquitetural não está super-ajustado à escolha
+particular do SkinToneNet — blindagem contra a crítica "tese
+depende criticamente de um único classificador externo".
+
+- **Saída principal**: tabela comparativa + decisão fundamentada +
+  protocolo de validação.
+- **Saída sensitivity (v3.5)**: tabela com resultados da H1
+  reportados por classificador MST usado (3 colunas). Sustenta a
+  defesa contra crítica de "single point of failure".
+- **Risco mitigado**: propagação de viés do classificador MST para
+  o classificador racial via FiLM. Endereçado adicionalmente pela
+  validação humana em subset (~700 imgs).
 
 ### Objetivo específico 3 — Pipeline condicionado para race classification (Cap 2)
 
@@ -265,6 +296,104 @@ Comparação contra 6 baselines + ablation FiLM vs CLIP-conditioning.
 2. ✅ Criar 7 fichas R6 (Aguirre VERIFIED + 6 OVERVIEW_ONLY).
 3. ✅ Planejar Rodada 7 (este documento + _rodada_07_planejamento).
 4. ✅ Atualizar objetivo e hipóteses para v3.3.
-5. **PENDENTE**: executar buscas Rodada 7 e triar candidatos.
-6. **PENDENTE**: setup Overleaf com template Unifesp/ICT.
-7. **PENDENTE**: começar escrita da Introdução (Cap 1).
+5. ✅ Rodada 7 executada e triada (corpus consolidado em 101 fichas).
+6. ✅ Cross-reference sistemático tese × 101 fichas (v3.4).
+7. ✅ Análise paralela NotebookLM avaliada e incorporada (v3.5).
+8. **PENDENTE**: Rodada 8 enxuta — diversidade intra-Latinx
+   (`_rodada_08_latinx_candidatos.md`).
+9. **PENDENTE**: setup Overleaf com template Unifesp/ICT.
+10. **PENDENTE**: começar escrita da Introdução (Cap 1).
+
+## 9. Limites de escala e escopo da dissertação (NOVO v3.5)
+
+> **Reconhecimento explícito de limitações** após análise paralela
+> do NotebookLM identificar a escala como ponto a discutir.
+
+### 9.1 Escala vs auditorias industriais
+
+O **FairFace** (≈ 108.501 imagens, 7 categorias raciais), adotado
+como dataset central desta dissertação, constitui escala adequada
+para uma pesquisa de mestrado mas é **significativamente menor que
+auditorias industriais** como o NIST FRVT Part 3 (Grother, Ngan &
+Hanaoka, 2019), que avaliou 189 algoritmos sobre **18 milhões de
+imagens de 8,5 milhões de pessoas**.
+
+### 9.2 Implicações reconhecidas
+
+Esta diferença de duas a três ordens de magnitude em escala impõe
+limites ao escopo das conclusões desta dissertação:
+
+1. **Generalização a deploy industrial** não está demonstrada
+   nesta dissertação. O mecanismo FiLM-conditioning, mesmo com
+   ~1% de overhead paramétrico, requer validação adicional em
+   escala antes de recomendação de adoção comercial.
+2. **Custo computacional** do conditioning em treinamento
+   over millions of identities permanece um ponto aberto.
+3. **Validade externa** do achado de matriz MST × race depende
+   da representatividade do FairFace — limitação reconhecida
+   por Pereira et al. (2026) e Yucer et al. (Durham, ACM CSur
+   2024).
+
+### 9.3 Posicionamento
+
+Esta dissertação posiciona-se como **demonstração metodológica de
+viabilidade** do paradigma de skin tone como sinal arquitetural
+condicionante em race classification multi-classe — paradigma
+inédito por si só — e **não como recomendação de deploy industrial**.
+
+A replicação em escala industrial é declarada explicitamente como
+**trabalho futuro**, possível direção para um doutorado ou
+parceria industrial subsequente.
+
+## 10. Ponte genética ↔ visão computacional (NOVO v3.5)
+
+> **Conexão epistemológica entre antropologia biológica e
+> computer vision** — adicionada após análise paralela
+> NotebookLM identificar necessidade de consolidar o link.
+
+### 10.1 Trilogia argumentativa
+
+A dissertação opera em uma cadeia argumentativa de três
+patamares que conectam genética populacional clássica à decisão
+metodológica em computer vision:
+
+| Patamar | Referência canônica | Contribuição à tese |
+|---|---|---|
+| **Genético-populacional** | Lewontin (1972) — 85% da variação humana é intra-populacional | Estabelece que raça não captura a maior parte da diversidade biológica |
+| **Antropológico-institucional** | Fuentes et al. (AAPA Statement, 2019) | Consolida posição oficial científica sobre raça como construto social, não biológico |
+| **Computacional-empírico** | Esta dissertação (OE-5/OE-6) — decomposição quantitativa do erro Latinx | Operacionaliza as duas premissas anteriores via quantificação MST × race no FairFace |
+
+### 10.2 Operacionalização da ponte
+
+A **decomposição de variância** proposta em OE-5 e OE-6 oferece
+um **link operacional inédito** entre:
+
+- O insight genético de Lewontin (categorias raciais são tipologias
+  imprecisas)
+- A posição institucional da AAPA (raça é construto)
+- O achado empírico da nossa C6 (% da disparidade Latinx é
+  irredutível por sobreposição MST entre raças)
+
+Esta ponte responde diretamente à crítica antecipável da banca:
+*"Por que esta pesquisa em ciência da computação cita Lewontin
+1972 e AAPA 2019?"*. A resposta é: **porque a decomposição
+quantitativa proposta opera empíricamente sobre uma hipótese
+que tem 53 anos de fundamentação científica em outras
+disciplinas, mas nunca foi testada em computer vision facial**.
+
+### 10.3 Implicação para o veredito ético
+
+Se a decomposição confirmar componente fenotípico irredutível
+significativo na disparidade Latinx, isto **não invalida** a
+pesquisa em classificação racial — mas reposiciona-a como
+**auditoria honesta dos limites estruturais de race
+classification multi-classe**, alinhada com:
+
+- Fuentes et al. (2019): "race, while not a scientifically accurate
+  biological concept, can have important biological consequences
+  because of the effects of racism"
+- Wang+Deng BUPT (2022): skin tone como label mais preciso/científico
+- Neto et al. (2025): continuous labels como direção futura
+
+A dissertação **mensura, não essencializa** — declaração ética
+que deve fechar o Cap 4 (Discussão).
