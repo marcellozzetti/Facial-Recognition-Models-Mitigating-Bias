@@ -8,8 +8,8 @@ Gerado em: 2026-06-15
 
 ## Distribuição por status_verificacao
 
-- `OVERVIEW_ONLY`: 69
-- `VERIFIED`: 32
+- `OVERVIEW_ONLY`: 52
+- `VERIFIED`: 49
 
 ## Gap A — fichas SEM PDF mas COM arxiv_id (downloadáveis automaticamente)
 
@@ -58,11 +58,11 @@ Total: **9**
 | `dehdashtian_2024` | VERIFIED | dehdashtian_2024_ufate | 2404.09454 |
 | `dehdashtian_2024_fairerclip` | OVERVIEW_ONLY | dehdashtian_2024_ufate | 2403.15593 |
 | `demographic_agnostic_2025` | OVERVIEW_ONLY | demographic_agnostic_2025 | 2509.24077 |
-| `deng_2019_arcface` | OVERVIEW_ONLY | deng_2019_arcface | 1801.07698 |
+| `deng_2019_arcface` | VERIFIED | deng_2019_arcface | 1801.07698 |
 | `dominguez_2024` | VERIFIED | dominguez_2024_dsap | 2312.14626 |
 | `dooley_2022` | OVERVIEW_ONLY | dooley_2022 | 2210.09943 |
 | `dp_fedface_2024` | OVERVIEW_ONLY | — | — |
-| `enhancing_visual_attributes_2022` | OVERVIEW_ONLY | enhancing_visual_attributes_2022 | 2207.05727 |
+| `enhancing_visual_attributes_2022` | VERIFIED | enhancing_visual_attributes_2022 | 2207.05727 |
 | `evaluating_lvlm_2024` | OVERVIEW_ONLY | evaluating_lvlm_2024 | 2406.17974 |
 | `explainable_fr_2024` | OVERVIEW_ONLY | explainable_fr_2024 | 2407.05983 |
 | `face4fairshifts_2025` | OVERVIEW_ONLY | face4fairshifts_2025 | 2509.00658 |
@@ -70,8 +70,8 @@ Total: **9**
 | `fair_sight_2025` | OVERVIEW_ONLY | fair_sight_2025 | 2504.07395 |
 | `faircal_2021` | OVERVIEW_ONLY | faircal_2021 | 2106.03761 |
 | `fairdomain_2024` | OVERVIEW_ONLY | fairdomain_2024 | 2407.08813 |
-| `fairer_datasets_2024` | OVERVIEW_ONLY | fairer_datasets_2024 | 2406.16592 |
-| `fairface_challenge_eccv2020` | OVERVIEW_ONLY | fairface_challenge_eccv2020 | 2009.07838 |
+| `fairer_datasets_2024` | VERIFIED | fairer_datasets_2024 | 2406.16592 |
+| `fairface_challenge_eccv2020` | VERIFIED | fairface_challenge_eccv2020 | 2009.07838 |
 | `fairimagen_neurips2025` | OVERVIEW_ONLY | — | — |
 | `fairlora_2024` | OVERVIEW_ONLY | fairlora_2024 | 2410.17358 |
 | `fairness_lora_2024` | OVERVIEW_ONLY | fairness_lora_2024 | 2405.17512 |
@@ -85,50 +85,50 @@ Total: **9**
 | `image_distortions_2021` | OVERVIEW_ONLY | image_distortions_2021 | 2108.06581 |
 | `indicfairface_2026` | OVERVIEW_ONLY | indicfairface_2026 | 2602.12659 |
 | `joint_vl_2024` | OVERVIEW_ONLY | joint_vl_2024 | 2411.12785 |
-| `kim_2022_adaface` | OVERVIEW_ONLY | kim_2022_adaface | 2204.00964 |
+| `kim_2022_adaface` | VERIFIED | kim_2022_adaface | 2204.00964 |
 | `kleinberg_2017` | VERIFIED | kleinberg_2017_impossibility | 1609.05807 |
 | `kolla_2022` | OVERVIEW_ONLY | kolla_2022 | 2211.14498 |
 | `lafargue_2025` | VERIFIED | lafargue_2025_fairdetails | 2504.08396 |
 | `lewontin_1972` | VERIFIED | — | — |
 | `lin_2022` | VERIFIED | lin_2022_fairgrape | 2207.10888 |
 | `lin_2025_aiface` | OVERVIEW_ONLY | lin_2022_fairgrape | 2406.00783 |
-| `liu_2025` | OVERVIEW_ONLY | liu_2025 | 2505.01699 |
+| `liu_2025` | VERIFIED | liu_2025 | 2505.01699 |
 | `luo_2024_fairclip` | VERIFIED | luo_2024_fairclip | 2403.19949 |
 | `madras_2018` | VERIFIED | madras_2018_laftr | 1802.06309 |
 | `manzoor_2024` | VERIFIED | manzoor_2024_fineface | 2408.16881 |
 | `massey_martin_2003` | VERIFIED | — | — |
 | `massively_annotated_2024` | OVERVIEW_ONLY | massively_annotated_2024 | 2404.15234 |
-| `meng_2021_magface` | OVERVIEW_ONLY | meng_2021_magface | 2103.06627 |
+| `meng_2021_magface` | VERIFIED | meng_2021_magface | 2103.06627 |
 | `mllm_face_verification_2026` | OVERVIEW_ONLY | mllm_face_verification_2026 | 2603.25613 |
 | `mst_kd_2024` | OVERVIEW_ONLY | mst_kd_2024 | 2408.16563 |
 | `neto_2025` | VERIFIED | neto_2025_continuous | 2506.01532 |
 | `occlusion_bias_2024` | OVERVIEW_ONLY | occlusion_bias_2024 | 2408.10175 |
-| `pangelinan_2023` | OVERVIEW_ONLY | pangelinan_2023 | 2304.07175 |
+| `pangelinan_2023` | VERIFIED | pangelinan_2023 | 2304.07175 |
 | `park_2022` | VERIFIED | park_2022_fscl | 2203.16209 |
 | `pereira_2026` | VERIFIED | pereira_2026 | 2603.02475 |
 | `perez_2018` | VERIFIED | perez_2018_film | 1709.07871 |
-| `porgali_2023_ccv2` | OVERVIEW_ONLY | porgali_2023_ccv2 | 2303.04838 |
+| `porgali_2023_ccv2` | VERIFIED | porgali_2023_ccv2 | 2303.04838 |
 | `post_comparison_2020` | OVERVIEW_ONLY | post_comparison_2020 | 2002.03592 |
-| `provable_adversarial_ssl_2024` | OVERVIEW_ONLY | provable_adversarial_ssl_2024 | 2406.05686 |
+| `provable_adversarial_ssl_2024` | VERIFIED | provable_adversarial_ssl_2024 | 2406.05686 |
 | `racial_bias_dataset_2017` | OVERVIEW_ONLY | — | — |
-| `ramachandran_2024` | OVERVIEW_ONLY | ramachandran_2024 | 2407.10104 |
+| `ramachandran_2024` | VERIFIED | ramachandran_2024 | 2407.10104 |
 | `range_loss_2016` | OVERVIEW_ONLY | range_loss_2016 | 1611.08976 |
-| `raumanns_2024` | OVERVIEW_ONLY | raumanns_2024 | 2407.17543 |
+| `raumanns_2024` | VERIFIED | raumanns_2024 | 2407.17543 |
 | `reliable_demo_inference_2025` | OVERVIEW_ONLY | reliable_demo_inference_2025 | 2510.20482 |
-| `rethinking_assumptions_2021` | OVERVIEW_ONLY | rethinking_assumptions_2021 | 2109.03229 |
+| `rethinking_assumptions_2021` | VERIFIED | rethinking_assumptions_2021 | 2109.03229 |
 | `robustness_face_detection_2022` | OVERVIEW_ONLY | robustness_face_detection_2022 | 2211.15937 |
 | `sagawa_2020` | VERIFIED | sagawa_2020_groupdro | 1911.08731 |
-| `schroff_2015_facenet` | OVERVIEW_ONLY | schroff_2015_facenet | 1503.03832 |
+| `schroff_2015_facenet` | VERIFIED | schroff_2015_facenet | 1503.03832 |
 | `schumann_2023` | VERIFIED | schumann_2023_mst | 2305.09073 |
 | `score_normalization_2024` | OVERVIEW_ONLY | score_normalization_2024 | 2407.14087 |
-| `survey_cv_fairness_2024` | OVERVIEW_ONLY | survey_cv_fairness_2024 | 2408.02464 |
-| `survey_face_recognition_2022` | OVERVIEW_ONLY | survey_face_recognition_2022 | 2212.13038 |
+| `survey_cv_fairness_2024` | VERIFIED | survey_cv_fairness_2024 | 2408.02464 |
+| `survey_face_recognition_2022` | VERIFIED | survey_face_recognition_2022 | 2212.13038 |
 | `survey_fairness_vision_lang_2024` | OVERVIEW_ONLY | survey_multimodal_fairness_2024 | — |
 | `survey_kotwal_2025` | VERIFIED | survey_multimodal_fairness_2024 | — |
 | `survey_llm_bias_2024` | OVERVIEW_ONLY | survey_multimodal_fairness_2024 | — |
 | `survey_long_tail_2022` | OVERVIEW_ONLY | survey_multimodal_fairness_2024 | — |
 | `survey_mehrabi_2021` | VERIFIED | survey_mehrabi_2021 | 1908.09635 |
-| `survey_multimodal_fairness_2024` | OVERVIEW_ONLY | survey_multimodal_fairness_2024 | 2406.19097 |
+| `survey_multimodal_fairness_2024` | VERIFIED | survey_multimodal_fairness_2024 | 2406.19097 |
 | `survey_racial_bias_fr_2024` | OVERVIEW_ONLY | survey_multimodal_fairness_2024 | — |
 | `synthetic_face_2024` | OVERVIEW_ONLY | synthetic_face_2024 | 2402.01472 |
 | `tian_2024_fairvit` | OVERVIEW_ONLY | tian_2024_fairvit | 2407.14799 |
