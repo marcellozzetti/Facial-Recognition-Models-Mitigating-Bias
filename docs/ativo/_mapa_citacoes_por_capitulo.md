@@ -280,14 +280,16 @@ científicas). Pode citar:
 
 ## Capítulo 4 — adições da v3.5/v1.2
 
-### 4.6 Sub-análise intra-Latinx (NOVO v3.5)
+### 4.6 Sub-análise intra-Latinx (NOVO v3.5 — Rodada 8 INTEGRADA)
 
 | Citação | Por que |
 |---|---|
 | 🔴 `\cite{fuentes2019aapa}` | Posição AAPA — heterogeneidade fenotípica |
 | 🔴 `\cite{lewontin1972apportionment}` | 85% variação intra-populacional |
+| 🔴 **`\cite{telles2014pigmentocracies}`** | PERLA Project — tom de pele em 4 países LatAm |
+| 🔴 **`\cite{bryc2015genetic}`** | Genética 162k indivíduos — heterogeneidade quantificada |
+| 🟢 **`\cite{lopez2017hispanic}`** | Pew — fluidez identitária cross gerações |
 | 🟢 `\cite{aldahoul2024exploring}` | F1 Latinx 60% — dado a explicar |
-| 🟢 (R8 — candidatos a verificar) | Telles, Bonilla-Silva, Mora — diversidade Latinx (sociologia) — ver `_rodada_08_latinx_candidatos.md` |
 
 ### 4.7 Limites de escala (NOVO v3.5)
 

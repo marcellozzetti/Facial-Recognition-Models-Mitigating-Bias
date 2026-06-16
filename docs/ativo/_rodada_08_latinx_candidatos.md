@@ -2,9 +2,25 @@
 data: 2026-06-16
 tipo: rodada-pesquisa
 escopo: literatura sobre diversidade fenotipica intra-Latinx/Hispanic
-status: candidatos-a-verificar
+status: PARCIALMENTE INTEGRADA - 3 fichas criadas (telles_2014, bryc_2015, pew_2017_hispanic_identity)
 motivacao: sugestao da analise paralela NotebookLM (2026-06-16) para fortalecer a defesa do gap Latinx F1=60%
+data_integracao: 2026-06-16 (Marcello baixou 3 PDFs via VPN/web)
 ---
+
+> ✅ **STATUS DA RODADA 8**: parcialmente concluída em 2026-06-16.
+> Marcello baixou e integrou 3 dos 10 candidatos sugeridos:
+> - ✅ `telles_2014` — Pigmentocracies (PERLA Project)
+> - ✅ `bryc_2015` — Genetic Ancestry of African Americans, Latinos
+>   and European Americans (AJHG)
+> - ✅ `pew_2017_hispanic_identity` — Hispanic Identity Fades Across
+>   Generations
+>
+> Estas 3 fichas cobrem o tripé empírico necessário para sustentar
+> H3 + C6 com argumento robusto (antropologia + genética + sociologia
+> identitária). Os 7 candidatos remanescentes (Bonilla-Silva, Roth,
+> Mora, computer vision específicos, AIMs adicionais) permanecem
+> opcionais — podem ser adicionados em rodadas futuras se houver
+> necessidade, mas argumento já está suficientemente fundamentado.
 
 # Rodada 8 — Diversidade fenotípica intra-Latinx (candidatos para busca)
 

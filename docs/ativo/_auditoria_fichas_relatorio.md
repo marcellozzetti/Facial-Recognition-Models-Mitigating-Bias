@@ -5,13 +5,13 @@ Gerada por `_auditar_fichas.py` em 2026-06-15.
 ## Distribuição por qualidade
 
 - **A**: 29 fichas
-- **B**: 14 fichas
+- **B**: 17 fichas
 - **C**: 57 fichas
 - **D**: 1 fichas
 
 ## Por status_verificacao
 
-- `VERIFIED`: 100
+- `VERIFIED`: 103
 - `OVERVIEW_ONLY`: 1
 
 ## Nível D (1) — Raso — promovida em batch mas sem leitura aprofundada (ou OVERVIEW_ONLY)
@@ -82,10 +82,11 @@ Gerada por `_auditar_fichas.py` em 2026-06-15.
 | `voidface_2025` | VERIFIED | 66 | 8 | OK | — |
 | `wang_2018_cosface` | VERIFIED | 52 | 8 | OK | — |
 
-## Nível B (14) — Boa — autoria OK, seções essenciais
+## Nível B (17) — Boa — autoria OK, seções essenciais
 
 | Ficha | Status | Linhas | Seções | PDF | Flags |
 |---|---|---|---|---|---|
+| `bryc_2015` | VERIFIED | 128 | 11 | OK | — |
 | `dataset_bupt_2019` | VERIFIED | 99 | 11 | OK | — |
 | `dataset_robinson_2020` | VERIFIED | 185 | 12 | OK | — |
 | `dooley_2022` | VERIFIED | 128 | 12 | OK | — |
@@ -95,10 +96,12 @@ Gerada por `_auditar_fichas.py` em 2026-06-15.
 | `lin_2025_aiface` | VERIFIED | 85 | 12 | OK | — |
 | `liu_2025` | VERIFIED | 132 | 12 | OK | — |
 | `massey_martin_2003` | VERIFIED | 230 | 12 | — | sem-pdf |
+| `pew_2017_hispanic_identity` | VERIFIED | 109 | 11 | OK | — |
 | `porgali_2023_ccv2` | VERIFIED | 118 | 12 | OK | — |
 | `racial_bias_dataset_2017` | VERIFIED | 86 | 11 | OK | — |
 | `ramachandran_2024` | VERIFIED | 120 | 12 | OK | — |
 | `raumanns_2024` | VERIFIED | 127 | 12 | OK | — |
+| `telles_2014` | VERIFIED | 120 | 11 | OK | — |
 | `zhao_2025_aimfair` | VERIFIED | 86 | 12 | OK | — |
 
 ## Nível A (29) — Excelente — leitura aprofundada, autoria completa, 12 seções, PDF
