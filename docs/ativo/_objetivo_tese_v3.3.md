@@ -1,9 +1,20 @@
-# Objetivo da tese — v3.3 (pós-reunião 2026-06-08)
+# Objetivo da tese — v3.4 (pós-revisão bibliográfica completa)
 
-> **Versão**: 3.3 — pós-aprovação do pipeline pelo orientador.
-> **Atualizada**: 2026-06-10.
+> **Versão**: 3.4 — incorpora recomendações do cross-reference
+> sistemático tese × 101 fichas
+> (`_validacao_cross_reference_v3.md`).
+> **Versão anterior**: v3.3 (2026-06-10, pós-aprovação do pipeline
+> pelo orientador na reunião de 08/jun).
+> **Atualizada**: 2026-06-15.
 > **Propósito**: âncora narrativa para escrita da qualificação
-> (deadline 15-jul-2026).
+> (deadline 15-jul-2026 — entrega da primeira revisão ao orientador).
+>
+> **Mudanças vs v3.3**:
+> 1. OE-6 promovido (era H6) — decomposição de variância pixel info × skin tone como objetivo específico formal.
+> 2. Citação central de Wang+Deng BUPT 2022 como precedente metodológico (já argumentava skin tone > race labels).
+> 3. Adicionadas referências brasileiras/portuguesas como diferencial.
+> 4. Coeficiente de Gini (Yang IJCV 2022) considerado como métrica auxiliar.
+> 5. Estudo comparativo Cap 2 formalizado em 4 configurações (A baseline / B FiLM-MST / C Gated FiLM / D FiLM-CLIP).
 
 ## 1. Storytelling aprovado pelo orientador
 
@@ -106,17 +117,48 @@ mitigável** (resíduo pós-conditioning).
   ética/social sobre limites estruturais de race classification
   multi-classe.
 
-## 4. Contribuições científicas (revisadas v3.3)
+### Objetivo específico 6 — Decomposição quantitativa pixel info × skin tone (Cap 4) — **NOVO v3.4**
+
+> **Promoção da hipótese H6 a objetivo específico formal** após
+> leitura integral de Pangelinan et al. (2023, Camada 1 VERIFIED).
+
+**Quantificar empíricamente a contribuição relativa de duas
+variáveis** ao gap de disparidade entre raças:
+
+1. **Pixel information** (face-pixel fraction via segmentation,
+   replicando metodologia BiSeNet de Pangelinan 2023).
+2. **Skin tone** (vetor MST 10-dim via SkinToneNet).
+
+**Hipótese H6 formalizada**: disparity residual no Black/African após
+o conditioning é predominantemente explicada por pixel info,
+**não** por skin tone — esperando ≥ 70 % da variância
+do gap atribuível a face-pixel fraction.
+
+- **Métrica**: R² na decomposição de variância (linear regression
+  do gap residual sobre pixel info + MST).
+- **Auxiliar**: coeficiente de Gini (Yang et al. IJCV 2022, BUPT)
+  para reportar long-tailedness do FairFace 7-class.
+- **Resultado esperado**: confirmação ou refutação quantitativa da
+  refutação central de Pangelinan, transformando o ponto de tensão
+  metodológica em **contribuição original quantitativa** (C6
+  reformulada).
+
+### Status do OE-6
+
+- **Decisão pendente do orientador** (item agendado para próxima reunião).
+- **Provisoriamente incluído** porque (a) já está endossado pela leitura integral de Pangelinan, (b) reforça defensividade da banca, (c) pode ser rebaixado para H6 (sem OE) se orientador preferir.
+
+## 4. Contribuições científicas (revisadas v3.4)
 
 | ID | Contribuição | Originalidade |
 |---|---|---|
 | **C1** | Avaliação metodológica de modelos pré-treinados MST + protocolo de escolha | Recomendação orientador 2026-06-08 |
 | **C2** | Matriz pública MST × race do FairFace | Não publicado: Pereira 2026 só agrega |
-| **C3** | Primeira aplicação de FiLM-conditioning a fairness facial | Sem precedente direto |
-| **C4** | Triangulação de métricas multi-classe (DR + worst-class F1 + EO_h/EOD por classe) | Baseado em Hardt 2016, original em race 7-class |
+| **C3** | Primeira aplicação de FiLM-conditioning a fairness facial | Sem precedente direto (Perez 2018 §11 declara fairness como Future Work) |
+| **C4** | Triangulação de métricas multi-classe (DR + worst-class F1 + EO_h/EOD por classe) | Baseado em Hardt 2016, original em race 7-class. Coeficiente de Gini (Yang IJCV 2022) como métrica auxiliar de long-tailedness. |
 | **C5** | Demonstração empírica de fair transferência classification → FR | LAFTR é teórico; Aguirre 2023 é NLP; CV é nova |
-| **C6** | Decomposição variância (fenotípico × algorítmico) | Diagnóstico inédito |
-| **C7** | Comparativo FiLM vs CLIP-conditioning para race fairness | Recomendação orientador 2026-06-08 |
+| **C6** | Decomposição de variância **fenotípico × algorítmico** com quantificação explícita pixel info × skin tone | Diagnóstico inédito. **Endossada por Pangelinan 2023** (refutação central — Camada 1 VERIFIED). Reforçada via OE-6. |
+| **C7** | Estudo comparativo de mecanismos de conditioning em race fairness — **4 configurações**: A baseline / B FiLM-MST (proposta) / C Gated FiLM (ablação) / D FiLM-CLIP (avaliação alternativa) | Recomendação orientador 2026-06-15 + decisão arquitetural pós-avaliação de 8 candidatos (`_decisao_arquitetural_film.md`) |
 
 ## 5. Hipóteses revisadas v3.3 (6 hipóteses, era 5)
 
@@ -161,24 +203,47 @@ quase uma década (Buolamwini & Gebru 2018) que esses sistemas
 
 ### O que tem sido feito (estudos recentes)
 
-- **Datasets balanceados**: FairFace (2021), RFW (2019), BFW (2020).
-- **Skin tone como dimensão alternativa**: Schumann 2023 (MST),
-  Pereira 2026 (SkinToneNet).
-- **Mitigação algorítmica**: Park 2022 (FSCL+), Sagawa 2020 (Group
-  DRO), Manzoor 2024 (FineFACE), Liu 2025 (BNMR).
-- **Vision-language models**: AlDahoul 2024/26 (FaceScanPaliGemma),
-  FairCLIP (Luo 2024).
+- **Datasets balanceados**: FairFace (Kärkkäinen & Joo 2021),
+  RFW (Wang et al. 2019), BFW (Robinson et al. 2020),
+  BUPT-Balancedface (Wang, Zhang & Deng — BUPT 2022).
+- **Skin tone como dimensão alternativa**: Schumann et al. 2023
+  (Monk Skin Tone), Pereira Matias et al. 2026 (SkinToneNet),
+  Porgali et al. 2023 (CCv2 — Meta), Wang & Deng 2022
+  (**BUPT — já argumentavam em 2022 que skin tone é label mais
+  preciso/científico que race**, antecipando a decisão metodológica
+  desta dissertação).
+- **Mitigação algorítmica**: Park et al. 2022 (FSCL+), Sagawa et al.
+  2020 (Group DRO), Manzoor & Rattani 2024 (FineFACE), Liu et al.
+  2025 (BNMR — FAccT).
+- **Vision-language models**: AlDahoul et al. 2024 (FaceScanPaliGemma
+  — Nature SR 2026), Luo et al. 2024 (FairCLIP — CVPR 2024),
+  Dehdashtian et al. 2024 (FairerCLIP — ICLR 2024).
+- **Produção científica brasileira**: Parraga et al. (PUCRS MALTA Lab,
+  ACM CSur 2025) — survey de fairness em deep learning para
+  vision e language, financiado por Motorola Mobility Brasil + CAPES.
+- **Produção científica portuguesa**: grupo Univ. Porto + INESC TEC
+  (Pedro C. Neto, Ana F. Sequeira, Rafael Mamede et al.) com 4
+  trabalhos no corpus (MST-KD 2024, Massively Annotated 2024,
+  Occlusion Bias 2024) e Univ. Coimbra ISR (VOIDFace 2025).
 
 ### O que falta ser explorado (gap)
 
 - **Skin tone como sinal arquitetural condicionante** em race
-  classification multi-classe — sem precedente direto.
+  classification multi-classe — sem precedente direto. **Perez et
+  al. (2018, FiLM) declara explicitamente em §11 (Future Work) que
+  aplicação a fairness não foi testada**, configurando lacuna
+  formal.
 - **Matriz pública MST × race** para FairFace — Pereira 2026 audita
-  mas não cruza.
-- **Decomposição irredutível (fenotípico) vs redutível
-  (algorítmico)** do erro Latinx — inédito.
-- **Fair transferência empírica em face recognition CV** — LAFTR é
-  teórico, Aguirre é NLP.
+  oito datasets via SkinToneNet mas **não publica a cross-tabulation
+  MST × race**.
+- **Decomposição quantitativa pixel info × skin tone** como
+  contribuições explicativas independentes do gap residual após
+  conditioning — endereçando refutação central de Pangelinan et al.
+  (2023, Camada 1 VERIFIED) que documenta pixel info como
+  confounder primário.
+- **Fair transferência empírica em face recognition CV** — Madras
+  et al. (2018, LAFTR) é puramente teórico e Aguirre & Dredze (2023)
+  demonstra empiricamente apenas em NLP.
 
 ### Objetivo
 

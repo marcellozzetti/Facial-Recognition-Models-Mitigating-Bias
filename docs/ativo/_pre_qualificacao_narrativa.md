@@ -1,13 +1,20 @@
 # Pré-qualificação narrativa — estrutura de texto
 
-> **Versão**: 1.0 — primeira escrita pré-qualificação.
-> **Data**: 2026-06-10.
+> **Versão**: 1.1 — pós-revisão bibliográfica completa.
+> **Data inicial**: 2026-06-10. **Atualizada**: 2026-06-15.
 > **Propósito**: estrutura narrativa fechada com objetivo claro,
 > servir de base para conversão em LaTeX (Overleaf) na próxima
 > etapa.
 > **Storytelling aprovado** pelo orientador (Prof. Marcos Quiles):
 > Contexto → Problemas → Estado-da-arte → Gap → Objetivo → Como
 > será feito.
+>
+> **Mudanças vs v1.0**:
+> 1. Wang, Zhang & Deng (BUPT, 2022) incluído como precedente metodológico — já argumentavam "skin tone > race labels".
+> 2. Produção científica brasileira (Parraga et al. PUCRS) e portuguesa (Univ. Porto + INESC TEC, Univ. Coimbra) reconhecidas.
+> 3. C7 ampliado para 4 configurações (A baseline / B FiLM-MST / C Gated FiLM / D FiLM-CLIP) conforme decisão arquitetural pós-avaliação de 8 candidatos.
+> 4. Coeficiente de Gini (Yang IJCV 2022) considerado como métrica auxiliar de long-tailedness.
+> 5. Pangelinan promovido a referência canônica do gap C6 (lido integralmente — Camada 1 VERIFIED).
 
 ---
 
@@ -199,6 +206,17 @@ Wild, quarenta e dois mil trezentos e treze imagens de três mil
 quinhentos e sessenta e quatro indivíduos), atingindo SOTA em
 classificação MST cross-domain.
 
+Anteriormente, em 2022, Wang, Zhang & Deng [arXiv:2205.06548] já
+haviam apresentado argumento metodológico relevante: ao introduzir
+o conjunto Identity Shades como dataset de teste balanceado por
+skin tone via Fitzpatrick + Individual Typology Angle, junto com
+BUPT-Globalface, BUPT-Balancedface e o algoritmo Meta Balanced
+Network, **declararam explicitamente que "race labels são instáveis"
+e optaram por skin tone como label mais preciso e científico**.
+Esta dissertação opera sob a mesma premissa metodológica, agora
+fundamentada também pela escala MST mais granular (10 classes vs
+6 do Fitzpatrick) e pelo classificador SkinToneNet recente.
+
 ### 3.5 Fair representation learning e teoria da transferência
 
 Uma linhagem teórica importante foi inaugurada por Zemel et al.
@@ -226,17 +244,60 @@ Em paralelo, Dominguez-Catena, Paternain & Galar [2024, Information
 Fusion] propuseram DSAP — framework unificado de auditoria de
 datasets via Renkonen similarity, importado da ecologia. Lafargue,
 Claeys & Loubes [2025, ECML PKDD] propuseram pipeline de auditoria
-com testes estatísticos uncertainty-aware. Dooley et al. [2022]
-demonstraram via Neural Architecture Search que **biases são
-inerentes a arquiteturas neurais**, encontrando suíte de modelos
-Pareto-superior em accuracy e fairness simultaneamente.
+com testes estatísticos uncertainty-aware. Dooley et al. [2022,
+NeurIPS 2023] demonstraram via Neural Architecture Search que
+**biases são inerentes a arquiteturas neurais**, encontrando suíte
+de modelos Pareto-superior em accuracy e fairness simultaneamente.
 
 Quanto a mecanismos arquiteturais de conditioning, Perez et al.
 [2018, AAAI] propuseram FiLM — Feature-wise Linear Modulation —
 camada de modulação afim por canal aprendida a partir de contexto
 auxiliar. FiLM é parameter-efficient (cerca de um por cento
 overhead) e amplamente adotado em VQA e geração condicional, mas
-**nunca foi testado em fairness facial até a presente dissertação**.
+**nunca foi testado em fairness facial até a presente dissertação**
+— os próprios autores [Perez et al., 2018, §11] declaram aplicação
+a fairness como direção não testada em Future Work.
+
+### 3.7 Refutação central de Pangelinan et al. (2023) — confounders de pixel information
+
+Em revisão crítica de quatro experimentos isolando causas comumente
+especuladas para a disparidade demográfica em face recognition,
+Pangelinan, Krishnapriya, Albiero, Bezold, Zhang, Vangara, King &
+Bowyer [2023, arXiv:2304.07175] documentam que **skin tone isolado,
+face geometry e balanceamento de dados de treino não explicam a
+disparidade demográfica**, identificando **pixel information como
+única variável que melhora parcialmente o gender gap em FNMR**.
+O gap em FMR persiste mesmo após equalização de pixels. Esta
+refutação é endereçada na presente dissertação via Hipótese H6 e
+Objetivo Específico OE-6 (decomposição quantitativa de variância
+pixel info × skin tone) — transformando o ponto de tensão
+metodológica em contribuição original quantitativa.
+
+### 3.8 Produção científica brasileira e portuguesa em fairness
+
+Pesquisa nacional e lusófona tem contribuído ativamente para o
+campo. Parraga, More, Oliveira, Gavenski, Kupssinskü, Medronha,
+Moura, Simões & Barros [2025, ACM Computing Surveys, 40 páginas],
+do **Machine Learning Theory and Applications (MALTA) Lab da
+Pontifícia Universidade Católica do Rio Grande do Sul, Brasil**,
+publicam survey extensa de fairness em deep learning para vision e
+language, propondo taxonomia tailored para pesquisa em deep
+learning. O trabalho foi financiado por Motorola Mobility Brasil e
+pela CAPES (Finance Code 001).
+
+No espaço lusófono, o grupo da **Faculdade de Engenharia da
+Universidade do Porto e do Institute for Systems and Computer
+Engineering, Technology and Science (INESC TEC)** — composto por
+Pedro C. Neto, Rafael M. Mamede, Ana F. Sequeira, Jaime S. Cardoso,
+Eduarda Caldeira e Tiago Gonçalves — contribui com quatro
+trabalhos catalogados no corpus desta dissertação: MST Knowledge
+Distillation [Caldeira et al., 2024], Massively Annotated Datasets
+[Neto, Mamede, Albuquerque, Gonçalves & Sequeira, 2024], Fairness
+Under Cover (occlusion bias) [Mamede, Neto & Sequeira, 2024] e
+participação em iniciativas paralelas de auditoria sintética.
+Adicionalmente, o **Institute of Systems and Robotics da
+Universidade de Coimbra** [Muhammed, Medvedev & Gonçalves, 2025]
+contribui com VOIDFace para privacy-preserving face recognition.
 
 ---
 
