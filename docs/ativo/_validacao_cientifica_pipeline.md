@@ -45,7 +45,7 @@ Foram identificados **9 papers novos** que devem entrar no corpus
 | Usar escala MST e não Fitzpatrick | Schumann 2023, Hazirbas 2021, Buolamwini 2018 | ✓ sólido | Nenhuma refutação encontrada |
 | Treinar em MST-E + Casual Conversations | Schumann 2023 (MST-E); Hazirbas 2021 (CC) | ⚠️ parcial | **Pereira 2026 usa STW (42k imagens) — alternativa nova** |
 | Backbone ConvNeXt-T | — | ❌ ausente | **SkinToneNet usa ViT-Small fine-tuned** |
-| Validação por anotadores em Prolific | Schumann 2023 (protocolo de consenso) | ✓ sólido | — |
+| Validação interna por equipe acadêmica (Mestrando + Orientador) | Schumann 2023 (protocolo de consenso adaptado a escala menor) | ✓ ajustada v3.6 | Adequação ética CEP Art. 8º Res. 200/2021 — substitui Prolific |
 
 ### Papers novos identificados
 
@@ -326,9 +326,13 @@ Em ordem de prioridade:
   como Pereira). C1 (classificador MST) deixa de ser contribuição se
   usarmos SkinToneNet pré-treinado.
 - **Mitigação revisada:**
-  - **Etapa A** (obrigatória): validar SkinToneNet em subset FairFace
-    anotado manualmente por anotadores diversos via Prolific (~700 imgs ×
-    3 anotadores). Detectar overfit do treino que viu FairFace.
+  - **Etapa A** (obrigatória, v3.6 ajustada): validar SkinToneNet em
+    subset FairFace anotado manualmente pela equipe acadêmica interna
+    (Mestrando + Orientador, ~200-300 imgs estratificadas por raça e
+    tom MST). Detectar overfit do treino que viu FairFace.
+    **Ajuste ético v3.6**: substitui Prolific (crowdsourcing externo)
+    para enquadrar projeto no Art. 8º da Resolução 200/2021/CONSU
+    (pesquisa sem envolvimento direto ou indireto de seres humanos).
   - **Etapa B**: aguardar liberação de código/pesos (paper declara
     "available soon" — não disponível em 2026-06-09).
   - **Etapa C**: se código for liberado, considerar re-treinar

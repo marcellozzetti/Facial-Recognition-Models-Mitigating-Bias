@@ -1,10 +1,14 @@
-# Objetivo da tese — v3.5 (pós-análise paralela NotebookLM)
+# Objetivo da tese — v3.6 (adequação ética CEP/Unifesp)
 
-> **Versão**: 3.5 — incorpora sugestões da análise paralela do
-> NotebookLM sobre a pré-qualificação (2026-06-16).
-> **Versões anteriores**: v3.4 (cross-reference 101 fichas, 2026-06-15);
+> **Versão**: 3.6 — remoção da validação via Prolific do OE-1 para
+> enquadrar projeto no Art. 8º da Resolução 200/2021/CONSU
+> (pesquisa que não envolve seres humanos direta ou indiretamente),
+> dispensando submissão ao CEP. **Substituída por validação interna
+> com equipe acadêmica.**
+> **Versões anteriores**: v3.5 (análise paralela NotebookLM, 2026-06-16);
+> v3.4 (cross-reference 101 fichas, 2026-06-15);
 > v3.3 (pós-reunião orientador 08/jun, 2026-06-10).
-> **Atualizada**: 2026-06-16.
+> **Atualizada**: 2026-06-30.
 > **Propósito**: âncora narrativa para escrita da qualificação
 > (deadline 15-jul-2026 — entrega da primeira revisão ao orientador).
 >
@@ -66,8 +70,18 @@ em modelos do estado da arte.
 
 - **Hipótese testada**: H3 — Latinx tem spread MST amplo (≥ 5 das
   10 classes MST).
-- **Métricas**: histograma MST por raça, % overlap entre raças,
-  validação manual via Prolific (~700 imgs × 3 anotadores).
+- **Métricas**: histograma MST por raça, % overlap entre raças.
+- **Validação humana (v3.6 — adequação ética CEP/Unifesp)**: a
+  validação manual originalmente prevista via plataforma de
+  crowdsourcing externa (Prolific) foi **substituída por validação
+  interna com a equipe acadêmica** — Mestrando + Orientador
+  (+ Co-orientador, se designado) anotam manualmente um subset
+  estratificado de aproximadamente 200-300 imagens do FairFace
+  para validar a concordância com o SkinToneNet.
+  Esta substituição enquadra o projeto no **Art. 8º da Resolução
+  200/2021/CONSU** (pesquisa sem envolvimento direto ou indireto
+  de seres humanos), dispensando submissão ao CEP e exigindo
+  apenas Declaração de Responsabilidade conforme `_checklist_etica_cep.md`.
 - **Sub-métrica intra-Latinx**: variância intra-classe MST do
   cohort Latinx vs variância das outras 6 raças. Se Latinx tem
   variância significativamente maior, valida heterogeneidade.

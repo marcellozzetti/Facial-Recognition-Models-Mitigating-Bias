@@ -223,8 +223,9 @@ def build_presentation() -> Presentation:
             ("3.", "Cross-reference sistemático tese × 104 fichas"),
             ("4.", "Validação externa via NotebookLM (Google AI Plus) — segunda opinião"),
             ("5.", "Rodada 8 — fundamentação Latinx (Telles, Bryc, Pew)"),
-            ("6.", "Estudo comparativo Cap 2 — 4 configurações de conditioning"),
-            ("7.", "Decisões a alinhar + próximos passos da escrita"),
+            ("6.", "Adequação ética — Resolução 200/2021/CONSU Unifesp"),
+            ("7.", "Estudo comparativo Cap 2 — 4 configurações de conditioning"),
+            ("8.", "Decisões a alinhar + solicitação pessoal + próximos passos"),
         ],
         footer="",
     )
@@ -388,8 +389,59 @@ def build_presentation() -> Presentation:
         footer="Tripé empírico que sustenta H3 + C6 com 3 disciplinas independentes convergentes.",
     )
 
-    # SEÇÃO 6 — 4 configurações Cap 2
-    add_section_divider(prs, "6", "Estudo comparativo do Capítulo 2",
+    # SEÇÃO 6 — Adequação ética CEP/Unifesp
+    add_section_divider(prs, "6", "Adequação ética — Resolução 200/2021 Unifesp",
+                        "Enquadramento no Art. 8º — dispensa de submissão ao CEP")
+
+    add_bullets(
+        prs,
+        "Avaliação normativa do projeto",
+        [
+            ("Base legal:", "Resolução nº 200/2021/CONSELHO UNIVERSITÁRIO Unifesp (SEI 0719529)"),
+            ("Pergunta central:", "o projeto envolve, direta ou indiretamente, seres humanos?"),
+            ("", ""),
+            ("Análise:", "uso exclusivo de datasets secundários públicos (FairFace, RFW, BFW, BUPT) — sem coleta primária"),
+            ("Análise:", "pesquisa puramente computacional — sem intervenção sobre seres humanos"),
+            ("Ajuste aplicado (v3.6):", "validação manual do OE-1 substituída por validação interna pela equipe acadêmica"),
+            ("", ""),
+            ("Enquadramento:", "Art. 8º — dispensa de cadastro no CEP, exige apenas Declaração de Responsabilidade"),
+        ],
+        footer="Detalhamento em _checklist_etica_cep.md",
+    )
+
+    add_table_slide(
+        prs,
+        "Ajuste técnico no OE-1 — validação manual",
+        ["Aspecto", "Versão anterior (v3.5)", "Versão ajustada (v3.6)"],
+        [
+            ["Método", "Crowdsourcing externo via Prolific", "Validação interna pela equipe acadêmica"],
+            ["Anotadores", "~3 anotadores externos pagos", "Mestrando + Orientador (+ Co-orientador, se designado)"],
+            ["Escala", "~700 imagens estratificadas", "~200-300 imagens estratificadas"],
+            ["Estratificação", "Por raça e tom MST", "Por raça e tom MST (preservada)"],
+            ["Implicação ética", "Pesquisa indireta com seres humanos — requer CEP", "Dispensa CEP — apenas Declaração de Responsabilidade"],
+        ],
+        col_widths=[2.5, 4.5, 5.5],
+        highlight_rows=[4],
+        footer="Rigor metodológico preservado via estratificação; escala adaptada à equipe interna.",
+    )
+
+    add_bullets(
+        prs,
+        "Próximos passos administrativos",
+        [
+            ("1.", "Confirmar hoje quem é o(a) Chefe do Departamento (3ª assinatura necessária)"),
+            ("2.", "Baixar modelo de Declaração de Responsabilidade em http://www.cep.unifesp.br/cep"),
+            ("3.", "Coletar 3 assinaturas: Mestrando + Orientador + Chefe de Departamento"),
+            ("4.", "Anexar Declaração assinada à entrega da qualificação"),
+            ("5.", "Incluir parágrafo metodológico no Cap 4 sobre dispensa CEP (Art. 8º)"),
+            ("", ""),
+            ("Trâmite sugerido:", "SEI Unifesp para tramitação eletrônica das assinaturas"),
+        ],
+        footer="",
+    )
+
+    # SEÇÃO 7 — 4 configurações Cap 2
+    add_section_divider(prs, "7", "Estudo comparativo do Capítulo 2",
                         "4 configurações de conditioning — proposta + alternativa moderna")
 
     add_table_slide(
@@ -407,9 +459,9 @@ def build_presentation() -> Presentation:
         footer="Atende recomendação da reunião 15/jun: linha tradicional + avaliação CLIP.",
     )
 
-    # SEÇÃO 7 — Decisões + próximos passos
-    add_section_divider(prs, "7", "Decisões a alinhar e próximos passos",
-                        "Reta final para a primeira revisão em 15/jul/2026")
+    # SEÇÃO 8 — Decisões + solicitação pessoal + próximos passos
+    add_section_divider(prs, "8", "Decisões, solicitação pessoal e próximos passos",
+                        "Alinhamento final e planejamento da reta de escrita")
 
     add_bullets(
         prs,
@@ -419,24 +471,40 @@ def build_presentation() -> Presentation:
             ("2.", "Estudo comparativo com 4 configurações atende à recomendação anterior?"),
             ("3.", "Há template Overleaf institucional Unifesp / ICT ou seguimos com o padrão?"),
             ("4.", "Co-orientador — alguma definição?"),
-            ("5.", "Sugestões para a banca preliminar?"),
+            ("5.", "Chefe do Departamento — quem assina a Declaração de Responsabilidade do CEP?"),
+            ("6.", "Trâmite formal para solicitar extensão de prazo (próximo slide)?"),
+        ],
+        footer="",
+    )
+
+    add_bullets(
+        prs,
+        "Solicitação pessoal — extensão de prazo",
+        [
+            ("Motivo:", "nascimento de minha filha em 28/março/2026"),
+            ("", "Período de afastamento das atividades acadêmicas nas semanas subsequentes para cuidado parental"),
+            ("", ""),
+            ("Solicitação:", "extensão de 2 meses no prazo da primeira revisão"),
+            ("Prazo original:", "15/jul/2026"),
+            ("Prazo solicitado:", "15/set/2026"),
+            ("", ""),
+            ("Documento:", "carta formal redigida em 2 parágrafos, pronta para envio via SEI ou conforme trâmite indicado pelo Programa"),
+            ("Pergunta:", "qual é o trâmite formal correto para protocolar a solicitação?"),
         ],
         footer="",
     )
 
     add_table_slide(
         prs,
-        "Próximas 3 semanas — plano de escrita",
-        ["Semana", "Período", "Entregável"],
+        "Plano de escrita — dois cenários (com e sem extensão)",
+        ["Cenário", "Janela", "Ritmo de escrita", "Entrega"],
         [
-            ["1 (esta)", "29/jun - 05/jul", "Setup Overleaf + Capítulo 1 (Introdução)"],
-            ["2", "06 - 12/jul", "Capítulo 2 (Revisão) + Capítulo 3 (Objetivos)"],
-            ["3", "13 - 14/jul", "Capítulo 4 (Metodologia) + Capítulo 5 (Cronograma) + revisão"],
-            ["Target", "15/jul", "Entrega da primeira revisão ao orientador"],
+            ["Original", "29/jun - 15/jul", "Acelerado — 5 capítulos em 17 dias", "15/jul/2026"],
+            ["Com extensão", "29/jun - 15/set", "Sustentável — 5 capítulos em 78 dias com revisão", "15/set/2026"],
         ],
-        col_widths=[1.5, 2.5, 8.5],
-        highlight_rows=[0, 3],
-        footer="Plano enxuto — 17 dias para entregar 5 capítulos + revisão final.",
+        col_widths=[2.0, 3.0, 5.5, 2.5],
+        highlight_rows=[1],
+        footer="Cenário com extensão preserva qualidade e permite revisão iterativa pelo orientador.",
     )
 
     add_bullets(

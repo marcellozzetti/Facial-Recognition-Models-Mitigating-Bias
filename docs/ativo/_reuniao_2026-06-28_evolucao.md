@@ -62,6 +62,14 @@ Resposta direta a uma das sugestões da análise NotebookLM. **3 novas
 fichas** integradas para sustentar empíricamente a hipótese H3 +
 contribuição C6 com **tripé antropologia + genética + sociologia**.
 
+### 2.5 Adequação ética CEP/Unifesp (Resolução 200/2021)
+
+Avaliação da **Resolução nº 200/2021/CONSU** (SEI 0719529): projeto
+ajustado para se enquadrar no **Art. 8º** (dispensa de submissão ao
+CEP). Validação Prolific do OE-1 removida na v3.6 e substituída por
+validação interna pela equipe acadêmica. Exige apenas **Declaração
+de Responsabilidade** com 3 assinaturas.
+
 ---
 
 ## 3. Validação externa via NotebookLM (Google AI Plus)
@@ -154,7 +162,55 @@ fecha esse argumento.
 
 ---
 
-## 5. Estado consolidado do corpus
+## 5. Adequação ética — Resolução 200/2021/CONSU Unifesp
+
+### 5.1 Análise normativa
+
+Avaliada a **Resolução nº 200/2021/CONSELHO UNIVERSITÁRIO** da
+Unifesp (SEI 0719529), que dispõe sobre diretrizes para projetos
+de pesquisa no CEP e CEUA. Mapeamento de cada característica do
+projeto contra os artigos da resolução documentado em
+`_checklist_etica_cep.md`.
+
+### 5.2 Decisão: enquadramento no Art. 8º
+
+| Critério | Avaliação |
+|---|---|
+| Coleta primária de dados de seres humanos | Não |
+| Intervenção direta em seres humanos | Não |
+| Uso de animais vertebrados vivos | Não |
+| **Crowdsourcing externo (Prolific)** | **Removido na v3.6** |
+| Datasets contêm faces humanas | Sim, mas secundários, públicos, sem identificação primária coletada |
+
+**Conclusão**: projeto enquadra-se no **Art. 8º** — dispensa de
+cadastro no CEP, exige apenas **Declaração de Responsabilidade**.
+
+### 5.3 Ajuste técnico no OE-1 (v3.6)
+
+A validação manual originalmente prevista via Prolific
+(~700 imgs × 3 anotadores externos) foi **substituída por
+validação interna** com a equipe acadêmica do projeto:
+Mestrando + Orientador (+ Co-orientador, se designado) anotam
+manualmente um subset estratificado de **~200-300 imagens** do
+FairFace para validar a concordância com o SkinToneNet.
+
+**Impacto científico**: protocolo de validação preservado;
+escala ajustada; rigor metodológico mantido via estratificação
+por raça e tom MST.
+
+### 5.4 Próximos passos administrativos
+
+1. Confirmar nesta reunião quem é o(a) **Chefe do Departamento**
+   ao qual o orientador está vinculado (3ª assinatura necessária)
+2. Baixar modelo da **Declaração de Responsabilidade** em
+   http://www.cep.unifesp.br/cep
+3. Coletar 3 assinaturas (Mestrando + Orientador + Chefe)
+4. Anexar Declaração assinada à entrega da qualificação
+5. Incluir parágrafo metodológico no Cap 4 sobre dispensa CEP
+
+---
+
+## 6. Estado consolidado do corpus
 
 | Métrica | Valor |
 |---|---|
@@ -169,9 +225,9 @@ fecha esse argumento.
 
 ---
 
-## 6. Decisões a alinhar hoje
+## 7. Decisões a alinhar hoje
 
-### 6.1 Promover OE-6 (formalizar H6)
+### 7.1 Promover OE-6 (formalizar H6)
 
 Após Pangelinan 2023 ser lido integralmente e Bryc 2015 ter sido
 incorporado (Rodada 8), recomenda-se **formalizar a decomposição
@@ -181,7 +237,7 @@ quantitativa de variância pixel info × skin tone** como
 **Pergunta**: o orientador concorda em promover H6 para OE-6
 formal?
 
-### 6.2 Estrutura final do estudo comparativo (4 configurações)
+### 7.2 Estrutura final do estudo comparativo (4 configurações)
 
 Cap 2 conduzirá ablation com 4 configurações:
 
@@ -195,7 +251,7 @@ Cap 2 conduzirá ablation com 4 configurações:
 **Pergunta**: este desenho atende à recomendação de "avaliar CLIP
 como alternativa moderna" feita na reunião de 15/jun?
 
-### 6.3 Próximos passos da escrita
+### 7.3 Próximos passos da escrita
 
 - **Esta semana**: começar **Capítulo 1 — Introdução**
   (estrutura no repositório base do GitHub).
@@ -208,7 +264,24 @@ template Overleaf ou padrão ABNT específico da Unifesp/ICT?
 
 ---
 
-## 7. Próximas ações imediatas (semana 29/jun-5/jul)
+### 7.4 Solicitação pessoal — extensão de prazo
+
+Em razão do **nascimento de minha filha em 28/março/2026** e do
+período de afastamento subsequente para cuidado parental, solicito
+**extensão de 2 meses** no prazo da primeira revisão:
+
+- **Prazo original**: 15/jul/2026
+- **Prazo solicitado**: **15/set/2026**
+- Carta formal redigida (2 parágrafos) — pronta para envio via SEI
+  ou conforme trâmite indicado pelo Programa.
+
+**Pergunta**: qual é o trâmite formal correto para protocolar a
+solicitação (carta direta ao orientador, requerimento via SEI ao
+Programa, processo formal com anexos)?
+
+---
+
+## 8. Próximas ações imediatas (semana 29/jun-5/jul)
 
 1. **Setup Overleaf** com template institucional (esta semana).
 2. **Importar bibliografia consolidada** (`referencias.bib`).
@@ -223,7 +296,8 @@ template Overleaf ou padrão ABNT específico da Unifesp/ICT?
 ## Anexos
 
 - [_validacao_cross_reference_v3.md](_validacao_cross_reference_v3.md) — auditoria sistemática 104 fichas × tese
-- [_objetivo_tese_v3.3.md](_objetivo_tese_v3.3.md) — v3.5 atualizada com OE-6 e sensitivity analysis
+- [_objetivo_tese_v3.3.md](_objetivo_tese_v3.3.md) — v3.6 atualizada (adequação ética CEP — Prolific removido)
+- [_checklist_etica_cep.md](_checklist_etica_cep.md) — enquadramento Art. 8º Resolução 200/2021/CONSU
 - [_pre_qualificacao_narrativa.md](_pre_qualificacao_narrativa.md) — v1.2 com 3 novas seções (Latinx, escala, ponte genética/CV)
 - [_mapa_citacoes_por_capitulo.md](_mapa_citacoes_por_capitulo.md) — 104 fichas alocadas por capítulo
 - [_tiers_relevancia_pdfs.md](_tiers_relevancia_pdfs.md) — organização para NotebookLM
