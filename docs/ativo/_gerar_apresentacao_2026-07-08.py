@@ -264,24 +264,25 @@ def build_presentation() -> Presentation:
         footer="Solicitação pessoal e debate técnico fecham a reunião como pontos complementares.",
     )
 
-    # 3. Recap do objetivo da tese
+    # 3. Recap do objetivo + pergunta central
     add_bullets(
         prs,
-        "Recapitulando o objetivo da tese",
+        "A tese em uma tela",
         [
+            ("Problema empírico:",
+             "F1 macro alto mascara disparidade Black ≈ 90 % vs Latinx ≈ 60 % em SOTA sobre FairFace (AlDahoul 2024)"),
+            ("Pergunta de pesquisa:",
+             "condicionar arquiteturalmente um classificador racial pelo tom de pele (MST) reduz essa disparidade sem sacrificar acurácia agregada?"),
+            ("", ""),
             ("Objetivo geral:",
-             "desenvolver e avaliar um pipeline de classificação racial em imagens faciais que incorpora tom de pele (escala Monk Skin Tone) como sinal auxiliar condicionante via mecanismo arquitetural"),
+             "desenvolver e avaliar pipeline de classificação racial que incorpora tom de pele (escala Monk 10 classes) como sinal auxiliar condicionante via mecanismo arquitetural (FiLM)"),
             ("", ""),
-            ("Problema empírico atacado:",
-             "disparidade severa entre Black F1 ≈ 90 % e Latinx F1 ≈ 60 % em SOTA sobre FairFace (FaceScanPaliGemma, AlDahoul 2024)"),
-            ("", ""),
-            ("Contribuição principal esperada:",
-             "primeira instância empírica documentada do uso de tom de pele explícito como contexto arquitetural para race classification multi-classe"),
-            ("", ""),
-            ("Diagnóstico central da tese:",
-             "o erro Latinx tem componente fenotípico irredutível (heterogeneidade MST intra-categoria) + componente algorítmico — a decomposição desses dois é o principal diferencial"),
+            ("Contribuição principal:",
+             "primeira instância empírica de tom de pele como contexto arquitetural para race classification multi-classe"),
+            ("Diagnóstico central:",
+             "erro Latinx = componente fenotípico irredutível (overlap MST) + componente algorítmico — a decomposição é o diferencial da tese"),
         ],
-        footer="Base para tudo que vem a seguir — pipeline, quatro configurações, sete contribuições, seis hipóteses.",
+        footer="MST vs Fitzpatrick: 10 vs 6 classes, projetado para CV vs dermatologia. FiLM vs concatenação: modula vs re-aprende.",
     )
 
     # 4. Consolidado do corpus
@@ -304,24 +305,7 @@ def build_presentation() -> Presentation:
             ["R8 — Diversidade Latinx (antropo + genética + socio)", "3", "2,9 %", "Telles 2014, Bryc 2015, Pew 2017"],
         ],
         col_widths=[4.8, 0.7, 1.2, 5.8],
-        footer="Corpus preparado ao longo de 8 rodadas de expansão. 99 % das fichas verified via leitura direta do PDF.",
-    )
-
-    add_table_slide(
-        prs,
-        "Densidade do corpus — distribuição temporal",
-        ["Período", "N fichas", "% corpus", "Papel na tese"],
-        [
-            ["Pré-2015 (fundações históricas)", "5", "4,8 %", "Lewontin 1972, Taigman DeepFace 2014, Telles 2014 — fundamentam OG"],
-            ["2015-2017 (fairness formal)", "6", "5,8 %", "Hardt 2016 (Equal Opportunity), Kleinberg 2017 (impossibility)"],
-            ["2018-2020 (marcos canônicos)", "14", "13,5 %", "Perez FiLM 2018, Buolamwini 2018, Madras LAFTR 2018"],
-            ["2021-2022 (state of the art anterior)", "17", "16,3 %", "Radford CLIP 2021, Kärkkäinen FairFace 2021, Liu ConvNeXt 2022"],
-            ["2023 (contexto imediato)", "5", "4,8 %", "Schumann MST-E, Pangelinan (refutação central)"],
-            ["2024-2026 (fronteira)", "55", "52,9 %", "AlDahoul 2024, Luo FairCLIP 2024, Pereira SkinToneNet 2026"],
-        ],
-        col_widths=[4.0, 1.2, 1.3, 6.0],
-        highlight_rows=[5],
-        footer="Mais de metade do corpus é 2024+. Cinco papers 2026 sustentam o argumento de trabalho na fronteira.",
+        footer="Fronteira temporal: 55 fichas (53 %) são 2024+, incluindo 5 papers de 2026 — corpus na fronteira absoluta.",
     )
 
     # SEÇÃO 1 — Plano até a defesa
@@ -352,40 +336,17 @@ def build_presentation() -> Presentation:
 
     add_bullets(
         prs,
-        "O que cada capítulo já tem",
+        "Estado real da escrita — 5 capítulos",
         [
-            ("Capítulo 1 — Introdução",
-             "argumento central: F1 macro alto mascara disparidade Black 90 % × Latinx 60 % em SOTA sobre FairFace"),
-            ("Capítulo 2 — Revisão",
-             "fairness (Buolamwini, Hardt, Kleinberg), MST (Schumann, Pereira), FiLM (Perez), 104 papers verificados"),
-            ("Capítulo 3 — Objetivos",
-             "objetivo geral, seis específicos, seis hipóteses testáveis, sete contribuições esperadas"),
-            ("Capítulo 4 — Metodologia",
-             "pipeline em seis etapas, quatro configurações comparativas, adequação ética já resolvida"),
-            ("Capítulo 5 — Cronograma",
-             "único capítulo que só fecha depois desta reunião (marcos ajustados hoje)"),
+            ("Cap 1 — Introdução:", "corpo pronto; ancora a disparidade Black 90 % × Latinx 60 % e a pergunta de pesquisa"),
+            ("Cap 2 — Revisão:", "corpo pronto; fairness (Buolamwini, Hardt, Kleinberg) + MST (Schumann, Pereira) + FiLM (Perez)"),
+            ("Cap 3 — Objetivos:", "corpo pronto; OG + 6 OE + 6 hipóteses + 7 contribuições"),
+            ("Cap 4 — Metodologia:", "corpo pronto; pipeline 6 etapas + 4 configurações + adequação ética CEP resolvida"),
+            ("Cap 5 — Cronograma:", "único que fecha depois desta reunião (marcos ajustados hoje)"),
             ("", ""),
-            ("Formato:",
-             "corpo escrito em Markdown estruturado; próximos sete dias faço a transposição para LaTeX/Overleaf"),
+            ("Formato:", "Markdown estruturado no repositório; transposição manual para LaTeX/Overleaf nos próximos 7 dias"),
         ],
-        footer="Se quiser ver, abro qualquer capítulo agora — está tudo no GitHub.",
-    )
-
-    add_bullets(
-        prs,
-        "A pergunta central da tese, em uma frase",
-        [
-            ("", ""),
-            ("Pergunta de pesquisa:",
-             "condicionar arquiteturalmente um classificador racial pelo tom de pele (MST) reduz a disparidade Black × Latinx sem sacrificar acurácia agregada?"),
-            ("", ""),
-            ("Por que MST em vez de Fitzpatrick:",
-             "Fitzpatrick foi projetada para dermatologia (queimadura solar), tem apenas 6 classes e viés fototípico documentado. MST tem 10 classes e foi desenhada para representatividade em CV — Google 2022, Schumann 2023."),
-            ("", ""),
-            ("Por que FiLM em vez de concatenação simples:",
-             "FiLM (Perez, AAAI 2018) modula features por escala e deslocamento condicionados — permite que o mesmo backbone reaja diferente ao mesmo pixel dependendo do contexto MST. Concatenação exige que o modelo re-aprenda a semântica do sinal."),
-        ],
-        footer="Slide-âncora do Cap 1. Toda a argumentação da tese sai daqui.",
+        footer="Repositório aberto se quiser conferir capítulo a capítulo agora.",
     )
 
     add_table_slide(
@@ -441,6 +402,39 @@ def build_presentation() -> Presentation:
         footer="Esse é o argumento pelo qual C6 (decomposição fenotípico × algorítmico) vira contribuição central.",
     )
 
+    add_table_slide(
+        prs,
+        "Validação externa via NotebookLM — 7 perguntas de defesa antecipadas",
+        ["Pergunta submetida", "Veredito", "Ponto-chave"],
+        [
+            ["Tese é nova?", "Sim", "FiLM em fairness facial é inédito; matriz MST × FairFace preenche gap de Pereira 2026"],
+            ["Valor científico?", "Elevado", "Diagnóstico estrutural fenotípico × algorítmico + European AI Act 2024"],
+            ["Divergências / SOTA?", "Sim", "FaceScanPaliGemma 75,7 % acc; Pangelinan 2023 refuta via 'pixel info' (endereçado por H6)"],
+            ["Faltam artigos?", "Latinx", "Diversidade intra-Latinx monolítica — respondido pela Rodada 8 (Telles/Bryc/Pew)"],
+            ["Furos e gaps?", "2 pontos", "Dependência SkinToneNet (mitigado por sensitivity analysis); escalabilidade além FairFace"],
+            ["Corpus atualizado?", "Fronteira", "Papers 2026 já cobertos (Pereira, AlDahoul, Lian)"],
+            ["Pipeline defensável?", "Sim", "Sequenciamento + controle de confounders + ablação + rigor estatístico"],
+        ],
+        col_widths=[3.5, 1.8, 7.2],
+        footer='Veredito NotebookLM: "trabalho bem estruturado, contribuições claras, fundamentado em literatura de ponta. Ponto crítico da defesa: decomposição do erro Latinx".',
+    )
+
+    add_table_slide(
+        prs,
+        "Cinco caminhos possíveis para mitigar viés — por que escolhi FiLM + MST + Decomposição",
+        ["Caminho", "Ideia central", "Posição relativa à minha proposta"],
+        [
+            ["1. Condicionamento arquitetural (FiLM)", "Modular features do backbone com tom de pele como sinal auxiliar", "Caminho que adotei — inédito em fairness facial"],
+            ["2. Decomposição fenotípico × algorítmico", "Separar erro irredutível de erro mitigável", "Adotei — OE-6 na v3.6 formaliza isso"],
+            ["3. Destilação de conhecimento (MST-KD)", "Múltiplos professores enviesados por etnia → estudante", "Alternativa avaliada — abandonada por custo computacional"],
+            ["4. Intervenção geométrica em embeddings (SPD/SFID)", "Projeção ortogonal ao subespaço do viés em VLMs — training-free", "Complementar — cobrimos parcialmente via configuração D (FiLM-CLIP)"],
+            ["5. Rótulos demográficos contínuos (Ethnicity Shift)", "Etnia como espectro contínuo, não categoria discreta", "Interseciona com MST — MST é já uma discretização de espectro"],
+        ],
+        col_widths=[3.5, 4.5, 5.0],
+        highlight_rows=[0, 1],
+        footer="Adotei os caminhos 1 + 2 combinados. Deixo 3-5 declarados em Cap 4 como alternativas ponderadas e não adotadas.",
+    )
+
     add_quote_slide(
         prs,
         "Postura sobre uso de LLM — como quero deixar explícito na defesa",
@@ -460,40 +454,24 @@ def build_presentation() -> Presentation:
 
     add_bullets(
         prs,
-        "O contexto",
+        "Contexto e trade-off que enfrentei",
         [
-            ("O que investiguei:",
-             "Resolução 200/2021 do Conselho Universitário — dispõe sobre projetos que devem passar pelo CEP"),
+            ("O gatilho:",
+             "no OE-1 original eu previa validar MST em ~700 imgs × 3 anotadores via Prolific — crowdsourcing pago, margem cinzenta perante Res. 200/2021 do CONSU"),
             ("", ""),
-            ("Por que fui atrás disso:",
-             "no OE-1 original eu previa validar a classificação MST em ~700 imagens usando três anotadores externos via Prolific. Isso é crowdsourcing pago — margem cinzenta."),
-            ("", ""),
-            ("O que a resolução diz:",
-             "Art. 1º — todo projeto que envolve seres humanos direta ou indiretamente precisa passar pelo CEP antes de começar. Não pode retroagir."),
-            ("Art. 8º:",
-             "pesquisas que não envolvem seres humanos ficam dispensadas do cadastro, mas exigem Declaração de Responsabilidade assinada por estudante, orientador e chefe de departamento."),
-        ],
-        footer="",
-    )
-
-    add_bullets(
-        prs,
-        "O trade-off que enfrentei",
-        [
             ("Opção A — manter Prolific:",
-             "amostra maior (700 × 3 = 2.100 anotações), diversidade de anotadores, mas exige submissão ao CEP com prazo estimado de 2-3 meses"),
+             "amostra maior (2.100 anotações), mas exige CEP com prazo estimado de 2-3 meses — bloqueia defesa em outubro"),
             ("Opção B — abandonar validação humana:",
-             "confiaria só no SkinToneNet (Pereira 2026), mas isso vira ponto único de falha — foi exatamente a crítica do NotebookLM"),
+             "SkinToneNet como oráculo — vira ponto único de falha (crítica do NotebookLM)"),
             ("Opção C — validação interna reduzida:",
-             "eu + o senhor anotamos ~200-300 imagens estratificadas por raça e MST. Menor escala, mas suficiente estatisticamente para inter-annotator agreement + concordância com SkinToneNet"),
+             "eu + o senhor anotamos ~200-300 imgs estratificadas por raça e MST. Menor escala, mas suficiente para IAA + concordância com SkinToneNet"),
             ("", ""),
-            ("Decisão que tomei:",
-             "Opção C — preserva rigor metodológico via estratificação, elimina risco regulatório, não bloqueia o cronograma"),
-            ("", ""),
-            ("O que preciso do senhor hoje:",
-             "1) validar a decisão; 2) me dizer quem é o chefe do departamento que assina a Declaração"),
+            ("Decisão que tomei (Opção C):",
+             "enquadra o projeto no Art. 8º da Res. 200/2021 → dispensa CEP, exige apenas Declaração de Responsabilidade (3 assinaturas: eu + orientador + chefe de departamento)"),
+            ("O que preciso hoje:",
+             "1) validar a decisão; 2) confirmar quem é o chefe do departamento que assina"),
         ],
-        footer="Se preferir voltar para Prolific, eu topo — mas aí a defesa em outubro fica em risco por causa do prazo CEP.",
+        footer="Se preferir voltar para Prolific, eu topo — mas o prazo CEP compromete outubro.",
     )
 
     add_table_slide(
@@ -513,85 +491,46 @@ def build_presentation() -> Presentation:
         footer="A perda de escala é real. Vou declarar explicitamente como limitação metodológica no Cap 4.",
     )
 
-    # SEÇÃO 4 — Solicitação pessoal
-    add_section_divider(prs, "4", "Solicitação pessoal — extensão de dois meses",
-                        "Nascimento da minha filha em 28/março e afastamento subsequente")
-
+    # Complemento — solicitação pessoal
     add_bullets(
         prs,
-        "O contexto e o que estou pedindo",
+        "Complemento — solicitação pessoal de extensão de 2 meses",
         [
             ("O que aconteceu:",
-             "minha filha nasceu em 28 de março. Fiquei afastado das atividades acadêmicas nas semanas seguintes para dar o cuidado que ela e a mãe precisaram."),
+             "minha filha nasceu em 28/março. Fiquei afastado nas semanas seguintes para o cuidado que ela e a mãe precisaram"),
             ("", ""),
             ("O que preservei:",
-             "os marcos de 15/jul e 30/jul continuam de pé. Não estou pedindo prazo para a primeira revisão nem para o pedido formal."),
-            ("", ""),
+             "marcos de 15/jul (1ª revisão) e 30/jul (pedido formal) continuam de pé"),
             ("O que estou pedindo:",
-             "extensão de dois meses no prazo da defesa da qualificação — de agosto para outubro. Isso me dá margem para escrever a versão final com o rigor que o trabalho merece."),
+             "extensão de 2 meses no prazo da defesa — de agosto para outubro"),
             ("", ""),
             ("Documento:",
-             "carta em dois parágrafos redigida, pronta para envio. Preciso só do senhor me confirmar o trâmite — se é carta direta, requerimento via SEI ou processo formal com anexos."),
+             "carta em 2 parágrafos redigida, pronta para envio via SEI ou trâmite indicado pelo Programa"),
         ],
-        footer="",
+        footer="Fora do escopo dos 3 bullets da agenda, mas precisa de encaminhamento hoje.",
     )
 
-    # SEÇÃO 5 — Debate
-    add_section_divider(prs, "5", "Debate aberto",
-                        "Seis perguntas onde preciso da opinião do orientador")
-
+    # Complemento — perguntas
     add_bullets(
         prs,
-        "Perguntas técnicas",
+        "Perguntas em aberto — técnicas + administrativas",
         [
-            ("1.",
-             "A quantidade de configurações comparativas (A, B, C, D) é suficiente ou o senhor recomenda incluir uma quinta variante — por exemplo, FiLM com skin tone contínuo (ITA/L*) em vez de MST discreto?"),
-            ("2.",
-             "No Cap 2, faz sentido eu incluir uma subseção de meia página comparando FiLM com CBN, cross-attention e AdaIN — ou deixo isso para a defesa oral?"),
-            ("3.",
-             "Sobre a extensão para face recognition (OE-4) — o senhor concorda que a métrica principal deva ser TPR@FAR=1e-4 estratificada por raça, ou prefere DR agregado?"),
+            ("1. Configurações comparativas:",
+             "as 4 configs (A/B/C/D) bastam ou incluo uma 5ª variante (skin tone contínuo ITA/L* em vez de MST discreto)?"),
+            ("2. Cap 2 — ablation arquitetural:",
+             "faz sentido meia-página comparando FiLM × CBN × cross-attention × AdaIN, ou deixo para a defesa oral?"),
+            ("3. OE-4 (fair transfer):",
+             "métrica principal TPR@FAR=1e-4 estratificada por raça, ou DR agregado?"),
+            ("4. Declaração CEP:",
+             "quem é o chefe do departamento que assina?"),
+            ("5. Extensão de 2 meses:",
+             "trâmite correto — carta direta, requerimento SEI ao PPG, ou processo formal?"),
+            ("6. Template Overleaf:",
+             "padrão institucional Unifesp/ICT ou abnTeX2 genérico?"),
+            ("Bônus:",
+             "sugestões para banca preliminar (fairness externo + CV aplicada)?"),
         ],
-        footer="",
-    )
-
-    add_bullets(
-        prs,
-        "Perguntas administrativas",
-        [
-            ("4.",
-             "Quem é o chefe do departamento que deve assinar a Declaração de Responsabilidade do CEP?"),
-            ("5.",
-             "Qual o trâmite correto para a solicitação de extensão de dois meses — carta direta, requerimento SEI ao PPG ou processo formal com anexos?"),
-            ("6.",
-             "O senhor tem preferência sobre template Overleaf (padrão institucional Unifesp / ICT vs template ABNT genérico do abnTeX2)?"),
-            ("", ""),
-            ("Bônus (se der tempo):",
-             "alguma sugestão sobre composição da banca preliminar? Estou pensando em alguém de fairness (pode ser externo) + alguém de visão computacional aplicada."),
-        ],
-        footer="",
-    )
-
-    add_bullets(
-        prs,
-        "Próximos sete dias — como vou organizar a semana",
-        [
-            ("Hoje (08/jul):",
-             "aplicar o que sair desta reunião; setar Overleaf; iniciar transposição do Cap 1"),
-            ("09-10/jul:",
-             "finalizar Cap 1 no Overleaf; transpor Cap 2 (Revisão bibliográfica — o mais denso)"),
-            ("11-12/jul:",
-             "transpor Cap 3 (Objetivos) e Cap 4 (Metodologia)"),
-            ("13/jul:",
-             "fechar Cap 5 (Cronograma) com marcos ajustados hoje; revisão final integrada"),
-            ("14/jul:",
-             "leitura completa de ponta a ponta; ajustes de coerência e ABNT"),
-            ("15/jul:",
-             "entrega da primeira revisão ao senhor via Overleaf compartilhado"),
-            ("", ""),
-            ("Em paralelo:",
-             "iniciar tramitação da Declaração de Responsabilidade + protocolar carta de extensão"),
-        ],
-        footer="",
+        footer="Plano dos próximos 7 dias documentado na cola — transposição Cap 1 hoje, entrega 15/jul.",
     )
 
     add_section_divider(prs, "", "Obrigado",
