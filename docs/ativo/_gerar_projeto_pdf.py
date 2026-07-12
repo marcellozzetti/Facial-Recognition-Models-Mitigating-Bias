@@ -207,7 +207,7 @@ def build_pdf(path: Path) -> None:
     # 1. Identificação
     story.append(_p("1. Identificação", s["h1"]))
     identificacao = [
-        ["Título do projeto", "Equidade Racial em Classificação Facial: Pipeline Condicionado por Tom de Pele (Escala Monk Skin Tone) via FiLM sobre o Dataset FairFace"],
+        ["Título do projeto", "Mitigação de Viés Racial em Classificação Facial via Condicionamento por Tom de Pele em Arquiteturas Profundas"],
         ["Mestrando", "Marcello Ozzetti"],
         ["Orientador / Pesquisador Responsável", "Prof. Dr. Marcos Quiles"],
         ["Programa", "Mestrado em Ciência da Computação"],
