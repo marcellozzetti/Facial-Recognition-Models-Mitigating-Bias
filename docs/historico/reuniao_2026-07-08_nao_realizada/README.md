@@ -2,7 +2,7 @@
 
 Material preparado para reunião com o orientador Prof. Marcos Quiles
 agendada originalmente para **08 de julho de 2026**, que **não
-aconteceu** (reagendada para 09/jul/2026).
+aconteceu** (reagendada para 13/jul/2026).
 
 ## Arquivos
 
@@ -13,6 +13,6 @@ aconteceu** (reagendada para 09/jul/2026).
 
 ## Contexto
 
-O material foi remontado no dia 09/jul refletindo a conclusão da
-migração para Overleaf. Ver `docs/ativo/_reuniao_2026-07-09_*` para
+O material foi remontado no dia 13/jul refletindo a conclusão da
+migração para Overleaf. Ver `docs/ativo/_reuniao_2026-07-13_*` para
 o material efetivamente apresentado.

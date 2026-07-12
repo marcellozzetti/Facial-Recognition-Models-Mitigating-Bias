@@ -1,4 +1,4 @@
-"""Gera apresentacao PowerPoint da reuniao 2026-07-09.
+"""Gera apresentacao PowerPoint da reuniao 2026-07-13.
 
 Reuniao apos migracao da qualificacao para Overleaf. Marco 15/jul
 antecipado — primeira revisao pronta para entrega.
@@ -11,8 +11,8 @@ antecipado — primeira revisao pronta para entrega.
 - Perguntas de debate
 
 Uso:
-    python _gerar_apresentacao_2026-07-09.py
-    -> produz: docs/ativo/material_reuniao_orientador_2026-07-09.pptx
+    python _gerar_apresentacao_2026-07-13.py
+    -> produz: docs/ativo/material_reuniao_orientador_2026-07-13.pptx
 """
 
 from __future__ import annotations
@@ -69,7 +69,7 @@ def add_title_slide(prs: Presentation) -> None:
         ("Mestrando:", "Marcello Ozzetti"),
         ("Orientador:", "Prof. Marcos Quiles"),
         ("Programa:", "Mestrado em Ciência da Computação — Unifesp / ICT"),
-        ("Reunião:", "9 de julho de 2026"),
+        ("Reunião:", "13 de julho de 2026"),
     ]
     for i, (k, v) in enumerate(rows):
         p = mf.paragraphs[0] if i == 0 else mf.add_paragraph()
@@ -323,13 +323,13 @@ def build_presentation() -> Presentation:
         "Cronograma consolidado",
         ["#", "Marco", "Data", "Comentário"],
         [
-            ["1", "Primeira revisão da qualificação ao orientador", "15/jul/2026", "PRONTA — Overleaf compartilhado a partir de hoje"],
+            ["1", "Primeira revisão da qualificação ao orientador", "15/jul/2026", "PRONTA — Overleaf compartilhado hoje (48h antes do marco)"],
             ["2", "Pedido formal de qualificação ao PPG-CC / ICT", "30/jul/2026", "Prazo regimental do Programa — mantido"],
             ["3", "Defesa da qualificação", "outubro/2026", "Ajuste de agosto → outubro (extensão de 2 meses solicitada)"],
         ],
         col_widths=[0.5, 5.5, 2.0, 5.0],
         highlight_rows=[0, 2],
-        footer="Marco 1 antecipado em seis dias. Marcos 2 e 3 conforme planejado.",
+        footer="Marco 1 antecipado em dois dias. Marcos 2 e 3 conforme planejado.",
     )
 
     # SEÇÃO 2 — Estado da escrita
@@ -545,7 +545,7 @@ def build_presentation() -> Presentation:
 
 def main() -> None:
     here = Path(__file__).parent
-    out = here / "material_reuniao_orientador_2026-07-09.pptx"
+    out = here / "material_reuniao_orientador_2026-07-13.pptx"
     prs = build_presentation()
     prs.save(out)
     print(f"Apresentacao gerada: {out}")

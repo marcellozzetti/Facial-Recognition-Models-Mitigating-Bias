@@ -1,14 +1,14 @@
 ---
-data: 2026-07-09
+data: 2026-07-13
 tipo: material-apresentacao
 participantes: [Marcello Ozzetti, Prof. Marcos Quiles]
 reuniao_anterior_realizada: 2026-06-15
 proxima_entrega: primeira revisao ja disponivel no Overleaf
 status: preparacao
-marco_1: PRONTO (antecipado em 6 dias)
+marco_1: PRONTO (antecipado em 2 dias)
 ---
 
-# Reunião com o orientador — 09/jul/2026
+# Reunião com o orientador — 13/jul/2026
 
 > **Marco 1 antecipado**: a primeira revisão da qualificação, prevista
 > originalmente para 15/jul, está pronta e no Overleaf a partir de hoje.
@@ -20,7 +20,7 @@ marco_1: PRONTO (antecipado em 6 dias)
 
 | # | Marco | Data | Status |
 |---|---|---|---|
-| 1 | Primeira revisão da qualificação ao orientador | 15/jul/2026 | **PRONTA hoje — antecipada em seis dias** |
+| 1 | Primeira revisão da qualificação ao orientador | 15/jul/2026 | **PRONTA hoje — 48h antes do marco** |
 | 2 | Pedido formal de qualificação ao PPG-CC / ICT | 30/jul/2026 | Prazo regimental — mantido |
 | 3 | Defesa da qualificação | outubro/2026 | Ajuste de agosto → outubro (extensão de 2 meses solicitada) |
 
@@ -157,7 +157,7 @@ Reiteração formal da solicitação já apresentada:
 
 ## Anexos
 
-- [_reuniao_2026-07-09_cola.md](_reuniao_2026-07-09_cola.md) — cola de bolso de 1 página
+- [_reuniao_2026-07-13_cola.md](_reuniao_2026-07-13_cola.md) — cola de bolso de 1 página
 - [_objetivo_tese_v3.3.md](_objetivo_tese_v3.3.md) — v3.6 com adequação ética
 - [_checklist_etica_cep.md](_checklist_etica_cep.md) — enquadramento Art. 8º
 - [projeto_declaracao_responsabilidade.docx](projeto_declaracao_responsabilidade.docx) — projeto formal em Word

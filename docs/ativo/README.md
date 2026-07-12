@@ -7,7 +7,7 @@
 ## 1. Bases narrativas dos capítulos
 
 Documentos-fonte para a escrita no Overleaf. Cada base foi transposta
-manualmente para LaTeX (`docs/tese/capitulos/`) ao longo de 08-09/jul.
+manualmente para LaTeX (`docs/tese/capitulos/`) ao longo de 08-12/jul.
 
 | Arquivo | Vira qual capítulo |
 |---|---|
@@ -53,17 +53,17 @@ ainda são consultados eventualmente durante a escrita.
 | `06_gap.md` | Identificação e ranqueamento de lacunas |
 | `07_thesis_statement.md` | Thesis statement v3.2 (prescritivo — âncora conceitual) |
 
-## 5. Material da reunião de 09/jul/2026
+## 5. Material da reunião de 13/jul/2026
 
 Reunião de status com Prof. Marcos Quiles. Após a reunião, este
-material será movido para `docs/historico/reuniao_2026-07-09/`.
+material será movido para `docs/historico/reuniao_2026-07-13/`.
 
 | Arquivo | Uso |
 |---|---|
-| `_reuniao_2026-07-09_cola.md` | Cola de bolso (1 página, 8-10 min) |
-| `_reuniao_2026-07-09_evolucao.md` | Documento técnico completo |
-| `_gerar_apresentacao_2026-07-09.py` | Script gerador do PPT |
-| `material_reuniao_orientador_2026-07-09.pptx` | Apresentação (21 slides) |
+| `_reuniao_2026-07-13_cola.md` | Cola de bolso (1 página, 8-10 min) |
+| `_reuniao_2026-07-13_evolucao.md` | Documento técnico completo |
+| `_gerar_apresentacao_2026-07-13.py` | Script gerador do PPT |
+| `material_reuniao_orientador_2026-07-13.pptx` | Apresentação (21 slides) |
 
 ## 6. Geradores de figuras para a tese
 
@@ -81,7 +81,7 @@ Scripts que produzem imagens LaTeX-ready para inclusão nos capítulos.
 ## O que foi arquivado (docs/historico/)
 
 - **`reuniao_2026-06-28_nao_realizada/`** — material da reunião de 28/jun que não aconteceu
-- **`reuniao_2026-07-08_nao_realizada/`** — material da reunião de 08/jul que foi remarcada para 09/jul
+- **`reuniao_2026-07-08_nao_realizada/`** — material da reunião de 08/jul que foi remarcada para 13/jul
 - **`scripts_operacionais/`** — 7 scripts one-shot já executados (download PDFs, correção autoria, auditoria)
 - **`analises_pontuais/`** — 6 análises intermediárias já consolidadas nos documentos ativos
 

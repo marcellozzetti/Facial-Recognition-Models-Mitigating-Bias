@@ -1,12 +1,12 @@
 ---
-data: 2026-07-09
+data: 2026-07-13
 tipo: cola-apresentacao
 reuniao_anterior_realizada: 2026-06-15
 status: ativo
-marco_1_status: PRONTA (antecipado em 6 dias)
+marco_1_status: PRONTA (antecipado em 2 dias)
 ---
 
-# Cola de bolso — reunião 09/jul/2026 (1 página)
+# Cola de bolso — reunião 13/jul/2026 (1 página)
 
 ## Abertura (30s)
 
@@ -23,7 +23,7 @@ marco_1_status: PRONTA (antecipado em 6 dias)
 
 | # | Marco | Data | Status |
 |---|---|---|---|
-| 1 | **1ª revisão da qualificação** | 15/jul/2026 | **PRONTA — Overleaf compartilhado hoje** |
+| 1 | **1ª revisão da qualificação** | 15/jul/2026 | **PRONTA — Overleaf compartilhado hoje (48h antes)** |
 | 2 | Pedido formal de qualificação | 30/jul/2026 | Mantido |
 | 3 | Defesa da qualificação | outubro/2026 | Ajuste ago→out (extensão de 2 meses solicitada) |
 
@@ -107,4 +107,4 @@ marco_1_status: PRONTA (antecipado em 6 dias)
 
 **Tempo estimado**: 8-10 min + Q&A.
 
-**Documento completo**: [_reuniao_2026-07-09_evolucao.md](_reuniao_2026-07-09_evolucao.md)
+**Documento completo**: [_reuniao_2026-07-13_evolucao.md](_reuniao_2026-07-13_evolucao.md)
