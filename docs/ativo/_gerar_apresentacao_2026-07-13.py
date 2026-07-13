@@ -46,7 +46,7 @@ def add_title_slide(prs: Presentation) -> None:
     tf = tx.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Qualificação no Overleaf — pronta para primeira revisão"
+    p.text = "Qualificação no Overleaf — Cap 2 em ajuste final"
     p.font.size = Pt(34)
     p.font.bold = True
     p.font.color.rgb = NAVY
@@ -259,7 +259,7 @@ def build_presentation() -> Presentation:
             ("", ""),
             ("1.", "Plano até a defesa"),
             ("", ""),
-            ("2.", "Estado real da escrita — qualificação migrada para o Overleaf, pronta para primeira revisão"),
+            ("2.", "Estado real da escrita — qualificação no Overleaf, Cap 2 em revisão ativa"),
             ("", ""),
             ("3.", "Decisão de pesquisa ética — Declaração de Responsabilidade em preparação"),
         ],
@@ -323,7 +323,7 @@ def build_presentation() -> Presentation:
         "Cronograma consolidado",
         ["#", "Marco", "Data", "Comentário"],
         [
-            ["1", "Primeira revisão da qualificação ao orientador", "15/jul/2026", "PRONTA — Overleaf compartilhado hoje (48h antes do marco)"],
+            ["1", "Primeira revisão da qualificação ao orientador", "15/jul/2026", "Overleaf compartilhado hoje; Cap 1, 3, 4, 5 em versão inicial; Cap 2 em revisão ativa"],
             ["2", "Pedido formal de qualificação ao PPG-CC / ICT", "30/jul/2026", "Prazo regimental do Programa — mantido"],
             ["3", "Defesa da qualificação", "outubro/2026", "Ajuste de agosto → outubro (extensão de 2 meses solicitada)"],
         ],
@@ -338,18 +338,18 @@ def build_presentation() -> Presentation:
 
     add_bullets(
         prs,
-        "Estado real da escrita — qualificação migrada para o Overleaf",
+        "Estado real da escrita — qualificação no Overleaf",
         [
-            ("Cap 1 — Introdução:", "no Overleaf; ancora a disparidade Black 90 % × Latinx 60 % e a pergunta de pesquisa"),
-            ("Cap 2 — Revisão:", "no Overleaf; fairness (Buolamwini, Hardt, Kleinberg) + MST (Schumann, Pereira) + FiLM (Perez)"),
+            ("Cap 1 — Introdução:", "no Overleaf, versão inicial completa; ancora a disparidade Black 90 % × Latinx 60 %"),
+            ("Cap 2 — Revisão:", "em escrita e revisão ativa; corpo bibliográfico está sendo densificado com 104 referências mapeadas"),
             ("Cap 3 — Objetivos:", "no Overleaf; OG + 6 OE + 6 hipóteses + 7 contribuições"),
             ("Cap 4 — Metodologia:", "no Overleaf; pipeline 6 etapas + 4 configurações + adequação ética CEP formalizada"),
             ("Cap 5 — Cronograma:", "no Overleaf; marcos ajustados conforme plano consolidado"),
             ("", ""),
-            ("Transposição:", "concluída — LaTeX no Overleaf, bibliografia .bib com 104 entradas importada, referências cruzadas testadas"),
-            ("Compartilhamento:", "convite do Overleaf enviado ao senhor a partir desta reunião — pronto para primeira revisão"),
+            ("Transposição:", "esqueleto no Overleaf; bibliografia .bib com 104 entradas importada; referências cruzadas testadas"),
+            ("Compartilhamento:", "convite do Overleaf enviado ao senhor a partir desta reunião — foco maior de revisão pedido no Cap 2"),
         ],
-        footer="Marco 15/jul antecipado. Nesta semana entro em modo escuta e revisão conforme feedback.",
+        footer="Cap 2 é o capítulo mais denso e onde ainda concentro esforço técnico esta semana.",
     )
 
     add_table_slide(

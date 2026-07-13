@@ -11,9 +11,10 @@ marco_1_status: PRONTA (antecipado em 2 dias)
 ## Abertura (30s)
 
 > "Professor, dois avanços grandes desde nossa última conversa: **a qualificação
-> está migrada para o Overleaf e o convite de compartilhamento foi enviado**.
-> Portanto o marco de 15/jul chega antecipado — já estou pronto para a
-> primeira revisão. Também trago a decisão de pesquisa ética finalizada."
+> está no Overleaf e o convite de compartilhamento foi enviado**. Capítulos 1,
+> 3, 4 e 5 já em versão inicial completa; **Cap 2 (Revisão) ainda em escrita
+> e revisão ativa** — é o capítulo mais denso e onde concentro esforço técnico
+> esta semana. Também trago a decisão de pesquisa ética finalizada."
 
 ---
 
@@ -23,7 +24,7 @@ marco_1_status: PRONTA (antecipado em 2 dias)
 
 | # | Marco | Data | Status |
 |---|---|---|---|
-| 1 | **1ª revisão da qualificação** | 15/jul/2026 | **PRONTA — Overleaf compartilhado hoje (48h antes)** |
+| 1 | **1ª revisão da qualificação** | 15/jul/2026 | Overleaf compartilhado hoje; Caps 1, 3, 4, 5 em versão inicial; **Cap 2 em revisão ativa** |
 | 2 | Pedido formal de qualificação | 30/jul/2026 | Mantido |
 | 3 | Defesa da qualificação | outubro/2026 | Ajuste ago→out (extensão de 2 meses solicitada) |
 
@@ -32,16 +33,17 @@ marco_1_status: PRONTA (antecipado em 2 dias)
 ## Ponto 2 — Estado real da escrita (3-4 min)
 
 > "A migração de Markdown para LaTeX no Overleaf foi feita esta semana, capítulo
-> por capítulo, manualmente. Bibliografia .bib com 104 entradas importada.
-> Referências cruzadas testadas. Está pronto para o senhor abrir."
+> por capítulo. Bibliografia .bib com 104 entradas importada. Ainda estou em
+> escrita e revisão ativa do Cap 2 — é o capítulo mais denso — e peço ao senhor
+> foco maior de revisão nele."
 
-### Estrutura no Overleaf
+### Estado por capítulo
 
-- **Cap 1 — Introdução**: disparidade Black 90 % × Latinx 60 %, pergunta de pesquisa
-- **Cap 2 — Revisão**: fairness + MST + FiLM organizados por frente
-- **Cap 3 — Objetivos**: OG + 6 OE + 6 hipóteses + 7 contribuições
-- **Cap 4 — Metodologia**: pipeline 6 etapas + 4 configurações + adequação ética CEP formalizada
-- **Cap 5 — Cronograma**: marcos consolidados
+- **Cap 1 — Introdução**: versão inicial completa; disparidade Black 90 % × Latinx 60 %, pergunta de pesquisa
+- **Cap 2 — Revisão**: **em escrita e revisão ativa**; densificação com 104 refs mapeadas por frente
+- **Cap 3 — Objetivos**: versão inicial completa; OG + 6 OE + 6 hipóteses + 7 contribuições
+- **Cap 4 — Metodologia**: versão inicial completa; pipeline 6 etapas + 4 configurações + adequação ética
+- **Cap 5 — Cronograma**: versão inicial completa; marcos consolidados
 
 ### ⭐ Postura sobre uso de LLM (mencionar)
 

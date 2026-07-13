@@ -20,7 +20,7 @@ marco_1: PRONTO (antecipado em 2 dias)
 
 | # | Marco | Data | Status |
 |---|---|---|---|
-| 1 | Primeira revisão da qualificação ao orientador | 15/jul/2026 | **PRONTA hoje — 48h antes do marco** |
+| 1 | Primeira revisão da qualificação ao orientador | 15/jul/2026 | Overleaf compartilhado hoje; Caps 1, 3, 4, 5 em versão inicial completa; **Cap 2 em revisão ativa** |
 | 2 | Pedido formal de qualificação ao PPG-CC / ICT | 30/jul/2026 | Prazo regimental — mantido |
 | 3 | Defesa da qualificação | outubro/2026 | Ajuste de agosto → outubro (extensão de 2 meses solicitada) |
 
@@ -41,11 +41,11 @@ testadas.
 
 | Capítulo | Conteúdo consolidado |
 |---|---|
-| Cap 1 — Introdução | Contexto do reconhecimento facial, disparidade documentada (Black 90 % × Latinx 60 % em SOTA), pergunta de pesquisa, gap na literatura, objetivo geral |
-| Cap 2 — Revisão bibliográfica | Fairness formal (Buolamwini, Hardt, Kleinberg), MST (Schumann, Pereira), FiLM (Perez), refutação central (Pangelinan), tripé Latinx (Telles, Bryc, Pew) |
-| Cap 3 — Objetivos | Objetivo geral + 6 objetivos específicos + 6 hipóteses testáveis + 7 contribuições esperadas |
-| Cap 4 — Metodologia | Pipeline em 6 etapas, 4 configurações comparativas (A/B/C/D), rigor experimental, adequação ética CEP formalizada |
-| Cap 5 — Cronograma | Marcos consolidados conforme plano de trabalho |
+| Cap 1 — Introdução | **Versão inicial completa.** Contexto do reconhecimento facial, disparidade documentada (Black 90 % × Latinx 60 % em SOTA), pergunta de pesquisa, gap na literatura, objetivo geral. |
+| Cap 2 — Revisão bibliográfica | **Em escrita e revisão ativa** — é o capítulo mais denso. Estrutura pronta: fairness formal (Buolamwini 2018, Hardt 2016, Kleinberg 2017), MST (Schumann 2023, Pereira 2026), FiLM (Perez 2018), refutação central (Pangelinan 2023), tripé Latinx (Telles 2014, Bryc 2015, Pew 2017). Densificação com as 104 referências mapeadas está em curso. |
+| Cap 3 — Objetivos | **Versão inicial completa.** Objetivo geral + 6 objetivos específicos + 6 hipóteses testáveis + 7 contribuições esperadas. |
+| Cap 4 — Metodologia | **Versão inicial completa.** Pipeline em 6 etapas, 4 configurações comparativas (A/B/C/D), rigor experimental, adequação ética CEP formalizada. |
+| Cap 5 — Cronograma | **Versão inicial completa.** Marcos consolidados conforme plano de trabalho. |
 
 ### 2.3 Postura sobre uso de LLM
 
