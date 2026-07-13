@@ -46,13 +46,13 @@ def add_title_slide(prs: Presentation) -> None:
     tf = tx.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "Qualificação no Overleaf — Cap 2 em ajuste final"
-    p.font.size = Pt(34)
+    p.text = "Acompanhamento Semana"
+    p.font.size = Pt(38)
     p.font.bold = True
     p.font.color.rgb = NAVY
 
     p2 = tf.add_paragraph()
-    p2.text = "Migração LaTeX concluída, decisões éticas e ajuste de cronograma"
+    p2.text = "Escrita LaTeX em andamento, decisões éticas e ajuste de cronograma"
     p2.font.size = Pt(20)
     p2.font.color.rgb = GRAY_DK
 
@@ -261,9 +261,9 @@ def build_presentation() -> Presentation:
             ("", ""),
             ("2.", "Estado real da escrita — qualificação no Overleaf, Cap 2 em revisão ativa"),
             ("", ""),
-            ("3.", "Decisão de pesquisa ética — Declaração de Responsabilidade em preparação"),
+            ("Já resolvido:", "Declaração de Responsabilidade CEP submetida ontem (12/jul) — Art. 8º da Res. 200/2021"),
         ],
-        footer="Solicitação pessoal e debate técnico fecham a reunião como pontos complementares.",
+        footer="Solicitação pessoal (extensão) e debate técnico fecham a reunião como pontos complementares.",
     )
 
     # 3. Recap do objetivo + pergunta central
@@ -309,10 +309,6 @@ def build_presentation() -> Presentation:
         col_widths=[4.8, 0.7, 1.2, 5.8],
         footer="Fronteira temporal: 55 fichas (53 %) são 2024+, incluindo 5 papers de 2026 — corpus na fronteira absoluta.",
     )
-
-    # SEÇÃO 1 — Plano até a defesa
-    add_section_divider(prs, "1", "Plano até a defesa",
-                        "Três marcos formais, novo horizonte de outubro")
 
     # SEÇÃO 1 — Plano até a defesa
     add_section_divider(prs, "1", "Plano até a defesa",
@@ -438,63 +434,6 @@ def build_presentation() -> Presentation:
         footer="Adotei os caminhos 1 + 2 combinados. Deixo 3-5 declarados em Cap 4 como alternativas ponderadas e não adotadas.",
     )
 
-    add_quote_slide(
-        prs,
-        "Postura sobre uso de LLM — como quero deixar explícito na defesa",
-        "A LLM me poupou tempo em bibliotecas de referência, formatação de fichas e "
-        "revisão de coerência entre capítulos. Mas cada afirmação central da tese — "
-        "a pergunta de pesquisa, a escolha do backbone, o mecanismo FiLM, o ajuste "
-        "ético do OE-1, o argumento de heterogeneidade intra-Latinx — nasceu de "
-        "leitura minha e de conversas nesta sala. A transposição para o Overleaf foi "
-        "manual, linha a linha, exatamente para forçar essa apropriação — e o senhor "
-        "poderá conferir isso lendo o texto entregue hoje.",
-        attribution="posição que vou defender se questionado na banca",
-        footer="Preferi trazer isso já, para o senhor calibrar comigo o quanto explicitar em texto vs quanto só demonstrar em resposta.",
-    )
-
-    # SEÇÃO 3 — Decisão ética
-    add_section_divider(prs, "3", "Decisão ética que tomei sozinho",
-                        "Preciso validar o enquadramento no Art. 8º")
-
-    add_bullets(
-        prs,
-        "Contexto e trade-off que enfrentei",
-        [
-            ("O gatilho:",
-             "no OE-1 original eu previa validar MST em ~700 imgs × 3 anotadores via Prolific — crowdsourcing pago, margem cinzenta perante Res. 200/2021 do CONSU"),
-            ("", ""),
-            ("Opção A — manter Prolific:",
-             "amostra maior (2.100 anotações), mas exige CEP com prazo estimado de 2-3 meses — bloqueia defesa em outubro"),
-            ("Opção B — abandonar validação humana:",
-             "SkinToneNet como oráculo — vira ponto único de falha (crítica do NotebookLM)"),
-            ("Opção C — validação interna reduzida:",
-             "eu + o senhor anotamos ~200-300 imgs estratificadas por raça e MST. Menor escala, mas suficiente para IAA + concordância com SkinToneNet"),
-            ("", ""),
-            ("Decisão que tomei (Opção C):",
-             "enquadra o projeto no Art. 8º da Res. 200/2021 → dispensa CEP, exige apenas Declaração de Responsabilidade (3 assinaturas: eu + orientador + chefe de departamento)"),
-            ("O que preciso hoje:",
-             "1) validar a decisão; 2) confirmar quem é o chefe do departamento que assina"),
-        ],
-        footer="Se preferir voltar para Prolific, eu topo — mas o prazo CEP compromete outubro.",
-    )
-
-    add_table_slide(
-        prs,
-        "O que muda tecnicamente entre v3.5 e v3.6 do OE-1",
-        ["Aspecto", "v3.5 (com Prolific)", "v3.6 (interno)"],
-        [
-            ["Escala da validação", "~700 imagens × 3 anotadores externos", "~200-300 imagens × 2-3 anotadores internos"],
-            ["Diversidade dos anotadores", "Crowdworkers com perfil variado", "Mestrando + orientador (potencial viés declarado)"],
-            ["Métrica de concordância", "Fleiss' kappa (múltiplos anotadores)", "Cohen's kappa (par a par)"],
-            ["Poder estatístico", "IC 95 % com margem menor", "IC 95 % com margem maior — declarado como limitação"],
-            ["Risco regulatório", "Requer CEP (2-3 meses)", "Art. 8º — apenas Declaração"],
-            ["Cronograma", "Bloqueia defesa em outubro", "Compatível com outubro"],
-        ],
-        col_widths=[3.0, 4.5, 5.0],
-        highlight_rows=[4, 5],
-        footer="A perda de escala é real. Vou declarar explicitamente como limitação metodológica no Cap 4.",
-    )
-
     # Complemento — solicitação pessoal
     add_bullets(
         prs,
@@ -511,7 +450,7 @@ def build_presentation() -> Presentation:
             ("Documento:",
              "carta em 2 parágrafos redigida, pronta para envio via SEI ou trâmite indicado pelo Programa"),
         ],
-        footer="Fora do escopo dos 3 bullets da agenda, mas precisa de encaminhamento hoje.",
+        footer="Complemento à agenda, mas precisa de encaminhamento hoje.",
     )
 
     # Complemento — perguntas
@@ -527,9 +466,7 @@ def build_presentation() -> Presentation:
              "faz sentido meia-página comparando FiLM × CBN × cross-attention × AdaIN, ou deixo para a defesa oral?"),
             ("4. OE-4 (fair transfer):",
              "métrica principal TPR@FAR=1e-4 estratificada por raça, ou DR agregado?"),
-            ("5. Declaração CEP:",
-             "quem é o chefe do departamento que assina? Posso encaminhar o projeto formatado hoje mesmo."),
-            ("6. Extensão de 2 meses:",
+            ("5. Extensão de 2 meses:",
              "trâmite correto — carta direta, requerimento SEI ao PPG, ou processo formal?"),
             ("Bônus:",
              "sugestões para banca preliminar (fairness externo + CV aplicada)?"),

@@ -10,11 +10,12 @@ marco_1_status: PRONTA (antecipado em 2 dias)
 
 ## Abertura (30s)
 
-> "Professor, dois avanços grandes desde nossa última conversa: **a qualificação
-> está no Overleaf e o convite de compartilhamento foi enviado**. Capítulos 1,
-> 3, 4 e 5 já em versão inicial completa; **Cap 2 (Revisão) ainda em escrita
-> e revisão ativa** — é o capítulo mais denso e onde concentro esforço técnico
-> esta semana. Também trago a decisão de pesquisa ética finalizada."
+> "Professor, esta semana avancei em dois pontos: **a qualificação está no
+> Overleaf e o convite de compartilhamento foi enviado** — Caps 1, 3, 4 e 5
+> em versão inicial completa; Cap 2 ainda em escrita e revisão ativa, é o
+> capítulo mais denso. E **submeti ontem (12/jul) a Declaração de
+> Responsabilidade CEP** já resolvida, enquadrando o projeto no Art. 8º da
+> Resolução 200/2021 — está tudo protocolado."
 
 ---
 
@@ -59,25 +60,14 @@ marco_1_status: PRONTA (antecipado em 2 dias)
 
 ---
 
-## Ponto 3 — Decisão de pesquisa ética (2 min)
+## Já resolvido — Declaração CEP submetida ontem (30s)
 
-> "Enquadrei o projeto no Art. 8º da Resolução 200/2021 — dispensa de submissão
-> ao CEP. O documento formal do projeto já está pronto em Word e PDF, com o
-> título oficial. Falta só o senhor me dizer quem é o chefe do departamento
-> que assina a Declaração de Responsabilidade junto conosco."
-
-### Documentos preparados
-
-- ✅ Projeto formal em Word (.docx) — 42 KB, formatação Calibri Word-nativa
-- ✅ Projeto formal em PDF — 18 KB, formatação profissional
-- ✅ Texto pronto para os 6 campos da Carta de Encaminhamento
-- ⏳ Aguardando modelo oficial da Declaração de Responsabilidade
-
-### Ajuste técnico do OE-1 (relembrar)
-
-- v3.5 previa validação MST via Prolific (crowdsourcing pago)
-- v3.6 mudou para validação interna (Mestrando + Orientador, ~200-300 imgs)
-- Isso é o que permitiu enquadrar no Art. 8º
+> "Só para o senhor saber: **ontem, 12/jul, submeti a Declaração de
+> Responsabilidade CEP**. Enquadramos o projeto no Art. 8º da Res. 200/2021
+> — dispensa de submissão ao CEP porque a pesquisa é puramente computacional
+> sobre datasets públicos, sem coleta primária nem crowdsourcing. Isso é
+> resultado do ajuste técnico do OE-1 (validação MST antes via Prolific, agora
+> interna Mestrando + Orientador). Nenhum bloqueio administrativo em aberto."
 
 ---
 
@@ -92,11 +82,10 @@ marco_1_status: PRONTA (antecipado em 2 dias)
 ## Perguntas que vou fazer
 
 1. **Sobre o Overleaf**: há capítulo que o senhor gostaria de ver com tratamento diferente antes da minha próxima rodada?
-2. **Chefe do Departamento**: quem assina a Declaração de Responsabilidade?
-3. **Trâmite da extensão**: carta direta ao senhor, requerimento via SEI ao PPG, ou processo formal?
-4. **Template Overleaf**: o padrão que estou usando serve, ou o Programa exige template institucional específico?
-5. **Co-orientador** — alguma definição?
-6. **Banca preliminar** — sugestões?
+2. **Trâmite da extensão**: carta direta ao senhor, requerimento via SEI ao PPG, ou processo formal?
+3. **Template Overleaf**: o padrão que estou usando serve, ou o Programa exige template institucional específico?
+4. **Co-orientador** — alguma definição?
+5. **Banca preliminar** — sugestões?
 
 ---
 
@@ -107,6 +96,6 @@ marco_1_status: PRONTA (antecipado em 2 dias)
 
 ---
 
-**Tempo estimado**: 8-10 min + Q&A.
+**Tempo estimado**: 6-8 min + Q&A.
 
 **Documento completo**: [_reuniao_2026-07-13_evolucao.md](_reuniao_2026-07-13_evolucao.md)

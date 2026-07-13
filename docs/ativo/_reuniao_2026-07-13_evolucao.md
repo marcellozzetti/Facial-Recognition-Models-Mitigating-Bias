@@ -70,46 +70,30 @@ Ponto crítico para ser explicitado ao orientador antes da defesa:
 
 ---
 
-## 3. Decisão de pesquisa ética — Art. 8º da Res. 200/2021
+## 3. Já resolvido — Declaração de Responsabilidade CEP submetida em 12/jul
 
-### 3.1 Análise normativa concluída
+A Declaração de Responsabilidade prevista no parágrafo único do
+Art. 8º da Resolução 200/2021/CONSU Unifesp foi **submetida ontem
+(12 de julho de 2026)**. Contexto rápido:
 
-Resolução avaliada: **nº 200/2021/CONSELHO UNIVERSITÁRIO Unifesp** (SEI 0719529).
+- **Enquadramento**: Art. 8º — pesquisa puramente computacional
+  sobre datasets públicos secundários (FairFace, RFW, BFW), sem
+  coleta primária nem crowdsourcing. **Dispensa de submissão ao
+  CEP**.
+- **Ajuste técnico que viabilizou o enquadramento**: OE-1 mudou de
+  validação MST via Prolific (crowdsourcing pago externo) para
+  validação interna pela equipe acadêmica — Mestrando + Orientador,
+  em subset estratificado de aproximadamente 200 a 300 imagens.
+  Documentado como versão 3.6 do objetivo.
+- **Assinaturas coletadas**: Mestrando + Orientador + Chefe do
+  Departamento.
+- **Status administrativo**: nenhum bloqueio em aberto para a
+  qualificação. A Declaração assinada será anexada à entrega
+  formal em 30/jul.
 
-O projeto se enquadra no **Art. 8º** — dispensa de submissão ao CEP,
-exige apenas **Declaração de Responsabilidade** com três assinaturas
-(Mestrando + Orientador + Chefe do Departamento).
-
-### 3.2 Ajuste técnico aplicado (v3.5 → v3.6)
-
-| Aspecto | v3.5 (com Prolific) | v3.6 (interno) |
-|---|---|---|
-| Método de validação MST | Crowdsourcing externo Prolific | Validação interna equipe acadêmica |
-| Anotadores | ~3 externos pagos | Mestrando + Orientador |
-| Escala | ~700 imgs × 3 = 2.100 anotações | ~200-300 imgs estratificadas |
-| Estratificação | Por raça e tom MST | Por raça e tom MST (preservada) |
-| Implicação ética | Requer CEP (2-3 meses) | Dispensa CEP (Declaração) |
-
-### 3.3 Documentos administrativos preparados
-
-Prontos no repositório e no Word:
-
-- **Projeto formal em Word (.docx)** — 42 KB, formatação Calibri, cabeçalho
-  institucional Unifesp/ICT, tabelas com estilo profissional, área de
-  assinaturas. Pronto para editar e submeter.
-- **Projeto formal em PDF** — 18 KB, mesma formatação, opção alternativa
-  para submissão.
-- **Texto pronto para os 6 campos** da Carta de Encaminhamento (caso a
-  secretaria peça esse modelo).
-
-### 3.4 Trâmite pendente
-
-1. **Confirmar hoje** com o orientador quem é o(a) Chefe do
-   Departamento ao qual está vinculado (3ª assinatura obrigatória).
-2. **Baixar modelo** oficial da Declaração de Responsabilidade em
-   http://www.cep.unifesp.br/cep.
-3. **Coletar 3 assinaturas** via SEI Unifesp.
-4. **Anexar Declaração assinada** à entrega da qualificação em 30/jul.
+Documentos-fonte: `_checklist_etica_cep.md`,
+`_projeto_declaracao_responsabilidade.md`,
+`projeto_declaracao_responsabilidade.docx` / `.pdf`.
 
 ---
 
@@ -132,23 +116,21 @@ Reiteração formal da solicitação já apresentada:
 
 1. **Sobre o Overleaf**: há capítulo que o senhor gostaria de ver com
    tratamento diferente antes da minha próxima rodada de revisão?
-2. **Chefe do Departamento**: quem deve assinar a Declaração de
-   Responsabilidade do CEP?
-3. **Trâmite da extensão de 2 meses**: carta direta ao orientador,
+2. **Trâmite da extensão de 2 meses**: carta direta ao orientador,
    requerimento via SEI ao PPG, ou processo formal com anexos?
-4. **Template Overleaf**: o padrão que está sendo usado atende ao PPG,
+3. **Template Overleaf**: o padrão que está sendo usado atende ao PPG,
    ou é necessário migrar para template institucional específico do
    Unifesp / ICT?
-5. **Co-orientador**: alguma definição?
-6. **Composição da banca preliminar**: alguma sugestão?
+4. **Co-orientador**: alguma definição?
+5. **Composição da banca preliminar**: alguma sugestão?
 
 ---
 
-## 6. Próximos passos — semana 09-15/jul
+## 6. Próximos passos — semana 13-15/jul
 
-1. **Aguardar comentários no Overleaf** (modo escuta e revisão).
-2. **Iniciar tramitação da Declaração de Responsabilidade** em paralelo,
-   assim que o chefe de departamento for confirmado.
+1. **Fechar a densificação do Cap 2** (Revisão bibliográfica) com as
+   104 referências mapeadas por frente teórica.
+2. **Aguardar comentários no Overleaf** (modo escuta e revisão).
 3. **Protocolar carta de extensão** conforme trâmite indicado hoje.
 4. **Preparar versão 2 do documento** até 30/jul, incorporando o
    feedback.
@@ -161,6 +143,6 @@ Reiteração formal da solicitação já apresentada:
 - [_objetivo_tese_v3.3.md](_objetivo_tese_v3.3.md) — v3.6 com adequação ética
 - [_checklist_etica_cep.md](_checklist_etica_cep.md) — enquadramento Art. 8º
 - [projeto_declaracao_responsabilidade.docx](projeto_declaracao_responsabilidade.docx) — projeto formal em Word
-- [projeto_declaracao_responsabilidade_v2.pdf](projeto_declaracao_responsabilidade_v2.pdf) — projeto formal em PDF
+- [projeto_declaracao_responsabilidade.pdf](projeto_declaracao_responsabilidade.pdf) — projeto formal em PDF
 - `docs/tese/` — Overleaf sincronizado com repositório GitHub
 - `docs/tese/referencias.bib` — bibliografia consolidada (104 entradas)
