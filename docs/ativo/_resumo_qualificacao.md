@@ -143,22 +143,22 @@ específicos ao colar no Overleaf.
 
 | Categoria | Chave | Ano | Fonte |
 |---|---|---|---|
-| Auditoria industrial | `grother2019nistir` | 2019 | NIST |
-| Fundação fairness facial | `buolamwini2018gendershades` | 2018 | FAT* |
+| Auditoria industrial | `grother2019face` | 2019 | NIST |
+| Fundação fairness facial | `buolamwini2018gender` | 2018 | FAT* |
 | Dataset principal | `karkkainen2021fairface` | 2021 | WACV |
-| SOTA competidor | `aldahoul2024` | 2024 | arXiv |
-| Balanceamento não resolve | `kolla2022racial` | 2022 | — |
-| Dataset RFW | `wang2019rfw` | 2019 | ICCV |
-| Antropologia Latinx | `telles2014` | 2014 | UNC Press |
-| Genética Latinx | `bryc2015` | 2015 | AJHG |
-| Sociologia Latinx | `pew2017hispanic` | 2017 | Pew Research |
-| Refutação central | `pangelinan2023` | 2023 | FAccT |
-| Skin tone SOTA | `pereira2026` | 2026 | arXiv |
+| SOTA competidor | `aldahoul2024exploring` | 2024 | arXiv |
+| Balanceamento não resolve | `kolla2022impact` | 2022 | — |
+| Dataset RFW | `wang2019racial` | 2019 | ICCV |
+| Antropologia Latinx | `telles2014pigmentocrac` | 2014 | UNC Press |
+| Genética Latinx | `bryc2015genetic` | 2015 | AJHG |
+| Sociologia Latinx | `lopez2017hispanic` | 2017 | Pew Research |
+| Refutação central | `pangelinan2023exploring` | 2023 | FAccT |
+| Skin tone SOTA (SkinToneNet) | `matias2026large` | 2026 | arXiv |
 | Mecanismo FiLM | `perez2018film` | 2018 | AAAI |
-| Backbone | `liu2022convnext` | 2022 | CVPR |
-| Fair recognition | `robinson2020bfw` | 2020 | CVPRW |
-| Impossibilidade | `kleinberg2017` | 2017 | ITCS |
-| Fairness formal | `hardt2016` | 2016 | NeurIPS |
+| Backbone ConvNeXt-T | *(sem cite; termo técnico)* | — | — |
+| Fair recognition | `robinson2020face` | 2020 | CVPRW |
+| Impossibilidade | `kleinberg2017inherent` | 2017 | ITCS |
+| Fairness formal | `hardt2016equality` | 2016 | NeurIPS |
 
 **Distribuição temporal:** 3 refs 2014-2018 (fundações), 4 refs
 2019-2021 (marcos consolidados), 9 refs 2022-2026 (fronteira).
