@@ -43,7 +43,7 @@ Quatro classes principais de risco foram identificadas, com respectivas estraté
 \item[Risco~2 --- Dependência do SkinToneNet como oráculo.] O pipeline depende da precisão do SkinToneNet~\autocite{matias2026large} na Etapa~1; falhas de generalização podem propagar-se para o \emph{conditioning}. \\
 \textbf{Mitigação}: validação humana interna estratificada (Seção~\ref{sec:validacao_interna}) e \emph{sensitivity analysis} com dois ou três classificadores MST alternativos, conforme OE2. A limitação de escala da validação interna --- aproximadamente duzentas a trezentas imagens --- é declarada explicitamente na Seção~\ref{sec:validacao_interna}.
 
-\item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \citeauthor{pangelinan2023exploring}~\autocite{pangelinan2023exploring} argumentam que o \emph{driver} estrutural do gap em FR é \emph{pixel information}, não tom de pele. \\
+\item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \textcite{pangelinan2023exploring} argumentam que o \emph{driver} estrutural do gap em FR é \emph{pixel information}, não tom de pele. \\
 \textbf{Mitigação}: H5 reformulada com controle explícito de \emph{pixel information} via alinhamento e \emph{crop}; H6 formalizada como teste direto da tese de Pangelinan (decomposição de variância). Refutação parcial converte-se em contribuição quantitativa (C6).
 
 \item[Risco~4 --- Limitação computacional.] Treinamento múltiplo com três sementes por configuração pode exigir tempo de GPU significativo. \\

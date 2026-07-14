@@ -1,5 +1,7 @@
-% Documento principal de qualificação — esqueleto genérico
-% Adaptar ao template Unifesp/ICT no Overleaf
+% ============================================================
+% Documento principal de qualificação — padrão ABNT
+% (ajustar conforme template Unifesp/ICT no Overleaf)
+% ============================================================
 
 \documentclass[12pt,a4paper]{article}
 
@@ -10,31 +12,55 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage{hyperref}
 \usepackage{microtype}
 \usepackage{csquotes}
 \usepackage{enumitem}
 \usepackage{geometry}
 \geometry{a4paper,margin=2.5cm}
 
-% Bibliografia
-\usepackage[backend=biber,style=numeric,maxbibnames=99]{biblatex}
+% ---------- Espaçamento entre linhas: ABNT recomenda 1,5 ---------
+\usepackage{setspace}
+\onehalfspacing
+
+% ---------- Recuo de primeira linha: ABNT recomenda 1,25 cm ----
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+
+% ---------- Bibliografia: sistema autor-data ABNT (NBR 10520) --
+% Requer biblatex-abnt (disponível em TeXLive e no Overleaf).
+% - style=abnt   : formatação de referências conforme NBR 6023
+% - repeatfields : não usa travessão "___" para autores repetidos
+% - noslsn       : sem "sine loco / sine nomine"
+% - extrayear    : desambigua obras do mesmo autor no mesmo ano
+\usepackage[
+  backend=biber,
+  style=abnt,
+  repeatfields=true,
+  noslsn=true,
+  extrayear=true,
+  giveninits=true,
+  maxbibnames=99
+]{biblatex}
 \addbibresource{referencias.bib}
 
-% Hyperref
+% ---------- Hyperref e cores discretas --------------------------
+\usepackage{hyperref}
 \hypersetup{
   colorlinks=true,
-  linkcolor=blue!50!black,
-  citecolor=green!50!black,
-  urlcolor=blue!70!black
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue!50!black
 }
+
+% ---------- Comando \newword e ambiente {glossario} -------------
+\input{newword}
 
 % ========== METADADOS ==========
 \title{Mitigação de Viés Racial em Classificação Facial via\\
        Condicionamento por Tom de Pele em Arquiteturas Profundas\\
        \large{Qualificação de Mestrado}}
 \author{Marcello Ozzetti\\
-        Orientador: Prof. Marcos Quiles\\
+        Orientador: Prof.\ Marcos Quiles\\
         Mestrado em Ciência da Computação --- Unifesp/ICT}
 \date{Julho de 2026}
 
@@ -43,17 +69,22 @@
 
 \maketitle
 
+% Elementos pré-textuais
 \input{capitulos/00_resumo}
 
 \tableofcontents
 \newpage
 
+% Corpo do texto
 \input{capitulos/01_introducao}
 \input{capitulos/02_revisao_literatura}
 \input{capitulos/03_objetivos}
 \input{capitulos/04_metodologia}
 \input{capitulos/05_cronograma}
 
-\printbibliography
+% Elementos pós-textuais
+\input{glossario}
+
+\printbibliography[title={Referências}]
 
 \end{document}

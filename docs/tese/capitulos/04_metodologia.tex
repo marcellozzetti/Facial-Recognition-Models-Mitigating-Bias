@@ -20,7 +20,7 @@ O pipeline metodológico, aprovado em reunião de orientação em 8 de junho de 
 
 \item \textbf{Etapa 4 --- Comparação contra \emph{baselines}}: avaliação sistemática do pipeline contra seis \emph{baselines} de mitigação (Seção~\ref{sec:baselines}), com triangulação completa de métricas (Seção~\ref{sec:metricas}). \textit{(OE3, OE5, Contribuição C4.)}
 
-\item \textbf{Etapa 5 --- Transferência \emph{fair}}: aplicação do \emph{backbone} \emph{fair-trained} para tarefa \emph{downstream} de \emph{face recognition} nos datasets RFW~\autocite{wang2019racial} e/ou BFW~\autocite{robinson2020face}, com controle explícito de \emph{pixel information} como \emph{confounder}, conforme metodologia proposta por \citeauthor{pangelinan2023exploring}~\autocite{pangelinan2023exploring}. \textit{(OE4, Contribuição C5.)}
+\item \textbf{Etapa 5 --- Transferência \emph{fair}}: aplicação do \emph{backbone} \emph{fair-trained} para tarefa \emph{downstream} de \emph{face recognition} nos datasets RFW~\autocite{wang2019racial} e/ou BFW~\autocite{robinson2020face}, com controle explícito de \emph{pixel information} como \emph{confounder}, conforme metodologia proposta por \textcite{pangelinan2023exploring}. \textit{(OE4, Contribuição C5.)}
 
 \item \textbf{Etapa 6 --- Síntese decompositiva}: combinação dos resultados obtidos nas Etapas~2 e~5 para quantificar a contribuição relativa do componente fenotípico (irredutível, associado ao \emph{overlap} MST intra-categoria) \emph{versus} componente algorítmico (mitigável) do erro de classificação Latinx. \textit{(OE6, Contribuição C6.)}
 \end{enumerate}
@@ -43,7 +43,7 @@ Todos os datasets adotados são secundários e publicamente disponíveis, sem co
 Seis \emph{baselines} de mitigação algorítmica compõem o quadro comparativo, escolhidos para cobrir cinco famílias metodológicas distintas --- linha canônica, controle arquitetural moderno, aprendizado contrastivo, otimização robusta a distribuição, atenção multi-camada e \emph{debiasing} adversarial:
 
 \begin{enumerate}
-\item ResNet-34, \emph{baseline} canônico originalmente treinado por \citeauthor{karkkainen2021fairface} sobre o FairFace~\autocite{karkkainen2021fairface,aldahoul2024exploring};
+\item ResNet-34, \emph{baseline} canônico originalmente treinado por \textcite{karkkainen2021fairface} sobre o FairFace~\autocite{aldahoul2024exploring};
 \item ConvNeXt-T puro, sem \emph{conditioning}, como controle arquitetural moderno;
 \item FSCL+~\autocite{park2022fair};
 \item Group DRO~\autocite{sagawa2020distribution};
