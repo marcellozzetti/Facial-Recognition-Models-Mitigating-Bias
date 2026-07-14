@@ -58,7 +58,36 @@ Em uma linhagem teórica complementar, \citeauthor{zemel2013learning}~\autocite{
 
 Ao lado das linhas anteriores, uma frente instrumental consolida-se em torno de \emph{auditoria automatizada de datasets} e \emph{mecanismos arquiteturais} para \emph{fairness}. \citeauthor{dominguezcatena2024dsap}~\autocite{dominguezcatena2024dsap} propuseram o DSAP, \emph{framework} unificado de auditoria de datasets baseado em similaridade de Renkonen. \citeauthor{lafargue2025fairness}~\autocite{lafargue2025fairness} propuseram um \emph{pipeline} de auditoria de \emph{fairness} com testes estatísticos \emph{uncertainty-aware}. \citeauthor{dooley2022rethinking}~\autocite{dooley2022rethinking} demonstraram, via \emph{Neural Architecture Search}, que vieses podem ser inerentes a arquiteturas neurais específicas.
 
-Quanto a mecanismos arquiteturais de \emph{conditioning}, \citeauthor{perez2018film}~\autocite{perez2018film} propuseram o FiLM (\emph{Feature-wise Linear Modulation}), \emph{parameter-efficient} e amplamente adotado em domínios como \emph{Visual Question Answering}, mas --- conforme argumentado na Seção~\ref{sec:rl_gaps} --- \textbf{ainda não testado em \emph{fairness} facial na literatura consultada}. Alternativas modernas incluem abordagens baseadas em LoRA~\autocite{sukumaran2024fairlora,bian2025lora}, o AIM-Fair~\autocite{zhao2025aim} e Vision Transformers \emph{fairness-aware} como o FairViT~\autocite{tian2024fairvit}. Estas alternativas são investigadas como \emph{ablation} arquitetural no Capítulo~\ref{sec:metodologia}.
+Quanto a mecanismos arquiteturais de \emph{conditioning}, \citeauthor{perez2018film}~\autocite{perez2018film} propuseram o FiLM (\emph{Feature-wise Linear Modulation}), \emph{parameter-efficient} e amplamente adotado em domínios como \emph{Visual Question Answering}, mas --- conforme argumentado na Seção~\ref{sec:rl_gaps} --- \textbf{ainda não testado em \emph{fairness} facial na literatura consultada}. Alternativas modernas incluem abordagens baseadas em LoRA~\autocite{sukumaran2024fairlora,bian2025lora}, o AIM-Fair~\autocite{zhao2025aim} e Vision Transformers \emph{fairness-aware} como o FairViT~\autocite{tian2024fairvit}. A análise comparativa detalhada de mecanismos de \emph{conditioning} candidatos é apresentada na Seção~\ref{sec:rl_conditioning_alt}, e a Configuração D descrita no Capítulo~\ref{sec:metodologia} (Seção~\ref{sec:ablation}) opera como \emph{ablation} arquitetural direta contra FiLM sobre \emph{embedding} CLIP-\emph{text}.
+
+\subsection{Alternativas de \emph{conditioning} ponderadas e justificativa da escolha}
+\label{sec:rl_conditioning_alt}
+
+A escolha do mecanismo FiLM como linha principal deste trabalho foi precedida de avaliação sistemática de oito alternativas de \emph{conditioning} disponíveis na literatura. A Tabela~\ref{tab:cond_alternativas} sintetiza a análise, considerando o cenário específico da presente pesquisa: sinal de \emph{conditioning} vetorial de baixa dimensionalidade (Monk Skin Tone, dez \emph{softmax} de saída), \emph{backbone} moderno baseado em convoluções (ConvNeXt-T, 28 milhões de parâmetros), restrição de orçamento computacional compatível com dissertação de mestrado, exigência de interpretabilidade dos parâmetros de modulação por canal, e a lacuna documentada na Seção~\ref{sec:rl_gaps} (G2) quanto a \emph{conditioning} arquitetural em \emph{fairness} facial.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{3.5cm}p{3.5cm}p{7.5cm}}
+\toprule
+\textbf{Mecanismo} & \textbf{Origem canônica} & \textbf{Justificativa da não adoção como linha principal} \\
+\midrule
+Concatenação direta MST~$\rightarrow$~\emph{features} & Prática comum & Explosão paramétrica proporcional à largura da \emph{feature map}, diluição do sinal e ausência de modulação explícita. \\
+\emph{Conditional Batch Normalization} & Literatura anterior a FiLM & Caso particular do FiLM; generalizado pela formulação de Perez et al.~\autocite{perez2018film}. \\
+\emph{Cross-attention} & \emph{Transformer decoders} & Superdimensionado para sinal de dez dimensões; aproximadamente três vezes o custo paramétrico de FiLM sem ganho de expressividade demonstrável nesse regime. \\
+AdaIN (\emph{Adaptive Instance Normalization}) & \emph{Style transfer} & Projetado para transferência de estilo em nível de instância; incompatível conceitualmente com condicionamento demográfico global. \\
+SPADE (\emph{Spatially Adaptive Normalization}) & Síntese de imagens & Requer mapa espacial denso como sinal condicionante; incompatível com vetor MST global. \\
+\emph{HyperNetworks} & Meta-aprendizagem & Instabilidade de treinamento documentada; sobredimensionado para o tamanho de sinal e de \emph{backbone} deste trabalho. \\
+LoRA e Adaptadores & \emph{Parameter-efficient fine-tuning} & Categoria metodológica distinta: modificam pesos de camadas do \emph{backbone}, não realizam \emph{conditioning} de \emph{features} por sinal externo. Cobertos parcialmente pela literatura recente de \emph{fairness}~\autocite{sukumaran2024fairlora,bian2025lora}, tratados como direção complementar de trabalho futuro. \\
+\midrule
+\textbf{FiLM} (adotado) & \citeauthor{perez2018film}~\autocite{perez2018film} & Adequação dimensional ao sinal MST 10-dim; \emph{overhead} paramétrico de aproximadamente 1\,\% sobre o \emph{backbone}; interpretabilidade direta de $\gamma$ e $\beta$ por canal; compatibilidade com a estrutura de \emph{LayerNorm} do ConvNeXt-T; e ausência de aplicação documentada em \emph{fairness} facial em \emph{race classification} multi-classe. \\
+\bottomrule
+\end{tabular}
+\caption{Alternativas de \emph{conditioning} avaliadas e critérios de não adoção como linha principal.}
+\label{tab:cond_alternativas}
+\end{table}
+
+Reconhecem-se explicitamente três limitações do FiLM padrão como escolha metodológica, discutidas em maior profundidade no Capítulo~\ref{sec:metodologia}: (i) a natureza afim das transformações não captura interações não-lineares entre tom de pele e categoria racial, limitação endereçada pela Configuração~C (\emph{Gated FiLM}) no estudo comparativo (Seção~\ref{sec:ablation}); (ii) a modulação global por canal não incorpora informação espacial, o que é coerente com a natureza global do tom de pele mas restringe análises locais; e (iii) o mecanismo opera em passo único, sem iteração de refinamento. As Configurações~C e~D do estudo comparativo (Seção~\ref{sec:ablation}) foram desenhadas para isolar empiricamente o impacto das duas primeiras limitações.
 
 \subsection{Lacunas científicas identificadas}
 \label{sec:rl_gaps}
