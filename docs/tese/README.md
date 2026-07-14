@@ -22,18 +22,19 @@ docs/tese/
 ├── images/
 │   └── Unifesp_completa_policromia_RGB.png
 └── tex/
-    ├── pre-textual/
+    ├── pre-textual/                     ← Elementos pré-textuais
     │   ├── dedicatoria.tex
     │   ├── agradecimentos.tex
     │   ├── epigrafe.tex
     │   └── ficha-catalografica.pdf
-    ├── introducao.tex            ← Capítulo 1
-    ├── revisao-literatura.tex    ← Capítulo 2
-    ├── objetivos.tex             ← Capítulo 3
-    ├── metodologia.tex           ← Capítulo 4
-    ├── plano-trabalho.tex        ← Capítulo 5 (Cronograma)
-    ├── newword.tex               ← comando \newword + ambiente {glossario}
-    └── glossario.tex             ← 73 termos técnicos (pós-textual)
+    ├── textual/                         ← Elementos textuais (5 capítulos)
+    │   ├── introducao.tex               ← Capítulo 1
+    │   ├── revisao-literatura.tex       ← Capítulo 2
+    │   ├── objetivos.tex                ← Capítulo 3
+    │   ├── metodologia.tex              ← Capítulo 4
+    │   └── plano-trabalho.tex           ← Capítulo 5 (Cronograma)
+    ├── newword.tex                      ← comando \newword + ambiente {glossario}
+    └── glossario.tex                    ← 73 termos técnicos (pós-textual)
 ```
 
 ## Padrão de citação
