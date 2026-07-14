@@ -1,33 +1,64 @@
 \section{Introdução}
+\label{sec:introducao}
 
-\subsection{Contexto}
+\subsection{Contexto: reconhecimento facial como infraestrutura social}
 \label{sec:contexto}
 
-Sistemas de reconhecimento facial deixaram de ser uma tecnologia restrita a laboratórios para se tornar parte cotidiana da infraestrutura social. Aplicações vão de \textbf{catracas biométricas em academias e empresas}, passando por \textbf{desbloqueio de aparelhos pessoais}, \textbf{autenticação bancária e identidade digital}, até \textbf{controle de fronteira em aeroportos} e \textbf{identificação policial em vias públicas}. Em escala global, o National Institute of Standards and Technology auditou em 2019 cento e oitenta e nove algoritmos de reconhecimento facial sobre dezoito milhões de imagens de oito milhões e meio de pessoas, na maior auditoria pública já realizada em biometria facial \autocite{grother2019nistir}.
+Sistemas de reconhecimento facial deixaram, na última década, de ser uma tecnologia restrita a laboratórios de pesquisa para integrar a infraestrutura cotidiana de identificação humana. Aplicam-se em desbloqueio de dispositivos pessoais, autenticação bancária e identidade digital, controle de acesso a ambientes corporativos, controle de fronteiras em aeroportos e identificação policial em vias públicas. Em escala industrial, o \emph{Face Recognition Vendor Test} do National Institute of Standards and Technology auditou, em 2019, cento e oitenta e nove algoritmos comerciais sobre dezoito milhões de imagens de oito milhões e meio de pessoas --- a maior auditoria pública já conduzida em biometria facial~\autocite{grother2019face}.
 
-A literatura científica acompanhou essa expansão. Modelos modernos combinam grandes datasets faciais (FairFace, VGGFace2, MS-Celeb-1M) com arquiteturas neurais profundas (ResNet, ConvNeXt, Vision Transformers) e técnicas avançadas de loss (ArcFace, CosFace), atingindo desempenhos próximos ao humano em condições controladas. Em paralelo, vision-language models como CLIP \autocite{radford2021clip} e PaliGemma criaram nova categoria de classificadores faciais via reformulação como Visual Question Answering --- o estado da arte atual em classificação racial multi-classe sobre FairFace é o \textbf{FaceScanPaliGemma}, com 75,7\% de acurácia e F1 macro de 75\% \autocite{aldahoul2026}.
+Do lado científico, a maturação técnica também se acelerou. Modelos modernos combinam grandes datasets faciais~\autocite{karkkainen2021fairface,wang2019racial,robinson2020face}, arquiteturas neurais profundas fundadas em ResNet, ConvNeXt e Vision Transformers, e funções de perda especializadas (ArcFace, CosFace), atingindo desempenho próximo ao humano em condições controladas. Em paralelo, \emph{vision-language models} como PaliGemma reformularam a classificação racial como \emph{Visual Question Answering}: o estado da arte atual em classificação racial multi-classe sobre o FairFace, o \textbf{FaceScanPaliGemma}~\autocite{aldahoul2024exploring}, atinge F1 macro de 75\,\% e acurácia agregada de 75,7\,\%.
 
-Esta dissertação se insere nesta interseção entre maturidade tecnológica e responsabilidade social. O reconhecimento facial funciona para a maioria das pessoas --- mas a documentação científica mostra que não funciona igualmente bem para todas.
+O presente trabalho insere-se na interseção entre essa maturidade tecnológica e a responsabilidade social que ela impõe. A infraestrutura funciona para a maior parte das pessoas; a documentação científica acumulada em quase uma década, contudo, mostra que ela não funciona igualmente bem para todas.
 
-\subsection{Problemas existentes}
+\subsection{Problema: disparidade demográfica residual}
 \label{sec:problema}
 
-O problema central que motiva esta dissertação é simples de enunciar e tecnicamente difícil de resolver: \textbf{sistemas de reconhecimento facial apresentam disparidade demográfica significativa em accuracy entre grupos raciais, mesmo quando treinados em datasets explicitamente balanceados}.
+O problema central que motiva a presente pesquisa enuncia-se de forma direta: \textbf{sistemas de reconhecimento facial apresentam disparidade demográfica significativa em acurácia entre grupos raciais, mesmo quando treinados sobre datasets explicitamente balanceados por design}.
 
-\subsubsection{Disparidade documentada no estado-da-arte}
+\subsubsection{Disparidade documentada no estado da arte}
+\label{sec:problema_disparidade}
 
-O estado-da-arte atual em classificação racial em sete classes sobre o FairFace, o FaceScanPaliGemma \autocite{aldahoul2026}, atinge F1 macro de 75\%. Mas o detalhamento por classe racial revela disparidade severa: F1 de 90\% para faces Black, 80\% para White, 60\% para Latinx/Hispanic e 67\% para Southeast Asian. \textbf{A pior classe (Latinx) tem F1 trinta pontos percentuais abaixo da melhor classe (Black)}.
+Apesar do F1 macro de 75\,\% reportado pelo FaceScanPaliGemma~\autocite{aldahoul2024exploring}, o detalhamento por classe racial revela disparidade severa: aproximadamente 90\,\% para faces classificadas como \emph{Black}, 80\,\% para \emph{White}, 67\,\% para \emph{Southeast Asian} e apenas 60\,\% para \emph{Latinx/Hispanic}. A pior classe (Latinx) exibe F1 aproximadamente trinta pontos percentuais abaixo da melhor classe (Black).
 
-Esta disparidade não é artefato de um único modelo. O baseline ResNet-34 originalmente treinado por \citeauthor{karkkainen2021fairface} \autocite{karkkainen2021fairface} sobre o FairFace mostra padrão semelhante: 72\% de accuracy geral, mas apenas 59,6\% em Hispanic versus 83,2\% em Black \autocite{lin2022fairgrape}. A hierarquia de dificuldade entre raças é \textbf{estável across métodos}, sugerindo um problema estrutural, não algorítmico contingente.
+A disparidade não é artefato de um único modelo. O baseline canônico ResNet-34 originalmente treinado por \citeauthor{karkkainen2021fairface}~\autocite{karkkainen2021fairface} sobre o FairFace apresenta padrão análogo: 72\,\% de acurácia agregada, porém apenas 59,6\,\% em Hispanic contra 83,2\,\% em Black, conforme reportado independentemente por \citeauthor{lin2022fairgrape}~\autocite{lin2022fairgrape} em experimentos de pruning \emph{fairness-aware}. A hierarquia de dificuldade entre raças mostra-se \textbf{estável através de múltiplos métodos, arquiteturas e datasets}, o que sugere um problema estrutural em vez de algorítmico contingente.
 
 \subsubsection{Balanceamento de dados não resolve}
+\label{sec:problema_balanceamento}
 
-A solução intuitiva --- balancear o dataset por raça --- é insuficiente. O próprio FairFace foi construído com este propósito \autocite{karkkainen2021fairface}, distribuindo 108.501 imagens aproximadamente igual entre sete categorias raciais. Mesmo assim, a disparidade Latinx versus White persiste.
+A solução intuitiva de balancear o conjunto de treino por raça já foi exaustivamente testada e demonstrou-se insuficiente. O próprio FairFace foi construído com esse propósito~\autocite{karkkainen2021fairface}, distribuindo suas 108.501 imagens de forma aproximadamente equilibrada entre sete categorias raciais. Mesmo assim, a disparidade Latinx \emph{versus} White persiste.
 
-\citeauthor{kolla2022racial} \autocite{kolla2022racial} conduziram dezesseis experimentos com proporções variáveis de raças no treino, concluindo explicitamente que ``distribuição uniforme de raças nos dados de treino não garante face recognition livre de viés''. \citeauthor{wang2019rfw} \autocite{wang2019rfw}, ao introduzir o dataset RFW (Racial Faces in-the-Wild), observaram que ``algumas raças permanecem intrinsecamente mais difíceis de reconhecer, mesmo com dados de treinamento balanceados''. Em escala industrial, o relatório NISTIR 8280 documentou diferenciais de falso positivo de dez a cem vezes maiores entre grupos raciais em algoritmos comerciais \autocite{grother2019nistir}.
+\citeauthor{kolla2022impact}~\autocite{kolla2022impact} conduziram dezesseis experimentos com proporções variáveis de raças no treino, concluindo explicitamente que ``distribuição uniforme de raças nos dados de treinamento não garante face recognition livre de viés''. \citeauthor{wang2019racial}~\autocite{wang2019racial}, ao introduzir o dataset \emph{Racial Faces in-the-Wild} (RFW), observaram que ``algumas raças permanecem intrinsecamente mais difíceis de reconhecer, mesmo com dados de treinamento balanceados''. Em escala industrial, o relatório NISTIR 8280~\autocite{grother2019face} documentou diferenciais de dez a cem vezes na taxa de falso positivo entre grupos raciais em algoritmos comerciais.
 
-\subsubsection{Implicações sociais}
+\subsubsection{Diagnóstico: heterogeneidade fenotípica intra-categorial}
+\label{sec:problema_heterogeneidade}
 
-A disparidade tem consequências concretas. Quando um sistema de reconhecimento facial é utilizado em catraca biométrica, autenticação financeira ou identificação policial, \textbf{a probabilidade de erro depende do rosto da pessoa}. Casos documentados de prisão errada por falso match em sistemas comerciais de FR já levaram a litígios e moratórias regulatórias. O European AI Act de 2024 incluiu auditoria de fairness como requisito formal para sistemas de IA classificados como alto risco \autocite{lafargue2025}.
+Trabalhos recentes apontam duas direções complementares para explicar essa disparidade residual. A primeira, empírica, sustenta que a categoria \emph{Latinx/Hispanic} do FairFace mascara heterogeneidade fenotípica interna substantiva. Evidência convergente vem de três disciplinas independentes: a antropologia biológica --- via o projeto PERLA (\emph{Project on Ethnicity and Race in Latin America}) coordenado por \citeauthor{telles2014pigmentocrac}~\autocite{telles2014pigmentocrac}, que documentou pigmentocracia em quatro países latino-americanos ---, a genética populacional --- com o estudo de \citeauthor{bryc2015genetic}~\autocite{bryc2015genetic} sobre 162.721 indivíduos, evidenciando composição altamente variável de ancestralidade Native American, European e African em Latinos ---, e a sociologia identitária --- com a análise longitudinal do Pew Research Center~\autocite{lopez2017hispanic}, que documenta declínio da identidade Hispanic de 97\,\% para 50\,\% ao longo de quatro gerações nos Estados Unidos. A rotulagem monolítica no FairFace, portanto, agrupa em uma única categoria fenótipos que atravessam a totalidade do espectro Monk Skin Tone.
 
-A questão científica deixou de ser ``existe viés?'' --- está documentado há quase uma década, desde o estudo seminal Gender Shades \autocite{buolamwini2018gendershades}. A questão atual é: \textbf{qual é o mecanismo gerador desse viés residual mesmo em datasets balanceados, e como mitigá-lo de forma eficaz?}
+A segunda direção, também recente, sugere que o \emph{tom de pele} --- e não a categoria racial nominal --- é o \emph{driver} estrutural do gap. \citeauthor{pangelinan2023exploring}~\autocite{pangelinan2023exploring} apresentam análise causal que atribui a disparidade em face recognition primariamente a diferenças de \emph{pixel information} (fração de face útil na imagem), colocando o balanceamento racial em segundo plano. \citeauthor{matias2026large}~\autocite{matias2026large} confirmam a maturidade do tom de pele como dimensão auditável ao publicar o \textbf{SkinToneNet}, primeiro classificador MST em larga escala.
+
+\subsubsection{Implicações sociais e regulatórias}
+\label{sec:problema_sociais}
+
+A disparidade tem consequências concretas: quando um sistema é utilizado em catraca biométrica, autenticação financeira ou identificação policial, \textbf{a probabilidade de erro depende do rosto da pessoa}. Casos documentados de prisão errada por falso \emph{match} em sistemas comerciais de \emph{face recognition} já resultaram em litígios e moratórias regulatórias em múltiplas jurisdições. O \emph{European AI Act}, publicado em 2024, incluiu auditoria de \emph{fairness} como requisito formal para sistemas classificados como de alto risco~\autocite{lafargue2025fairness}.
+
+A questão científica, portanto, deixou de ser ``existe viés?'' --- está documentada desde o estudo seminal \emph{Gender Shades}~\autocite{buolamwini2018gender}. A questão atual é: \textbf{qual é o mecanismo gerador desse viés residual mesmo em datasets balanceados, e como mitigá-lo de forma cientificamente defensável?}
+
+\subsection{Objetivo e contribuições da pesquisa}
+\label{sec:intro_objetivo}
+
+Propõe-se desenvolver e avaliar um pipeline de classificação racial em imagens faciais que incorpora o tom de pele explícito (escala Monk Skin Tone, dez classes) como sinal auxiliar condicionante, por meio do mecanismo arquitetural \emph{Feature-wise Linear Modulation} (FiLM)~\autocite{perez2018film}, aplicado sobre \emph{backbone} ConvNeXt-T. A escolha da escala MST em detrimento da escala Fitzpatrick fundamenta-se no viés fototípico documentado desta última~\autocite{fitzpatrick1988validity} e na consolidação da MST como padrão moderno para auditoria de \emph{fairness}~\autocite{schumann2023consensus,matias2026large}. A escolha do mecanismo FiLM em detrimento de concatenação simples fundamenta-se em sua capacidade de modular \emph{features} intermediárias por escala e deslocamento, discutida em detalhe na Seção~\ref{sec:film} do Capítulo de Metodologia.
+
+Três contribuições principais são pretendidas:
+
+\begin{enumerate}[label=(\roman*)]
+\item a primeira matriz pública de distribuição cruzada MST~$\times$~classes raciais sobre o FairFace \emph{validation set};
+\item a primeira instância empírica documentada do uso de tom de pele como contexto arquitetural em race classification multi-classe;
+\item uma decomposição quantitativa do erro Latinx em componente fenotípico (irredutível, derivado do \emph{overlap} MST intra-categoria) e componente algorítmico (mitigável, atacável por conditioning arquitetural), oferecendo diagnóstico estrutural no lugar de mera redução agregada de F1.
+\end{enumerate}
+
+A pesquisa é conduzida em conformidade com o \emph{European AI Act} (2024), que estabelece obrigatoriedade de auditoria de \emph{fairness} em sistemas biométricos classificados como de alto risco.
+
+\subsection{Organização da dissertação}
+\label{sec:intro_organizacao}
+
+O restante deste documento está organizado como segue. O Capítulo~\ref{sec:rl} apresenta a revisão de literatura em seis frentes e identifica cinco lacunas científicas endereçadas por esta dissertação. O Capítulo~\ref{sec:objetivos} formaliza o objetivo geral, seis objetivos específicos, seis hipóteses testáveis e sete contribuições esperadas. O Capítulo~\ref{sec:metodologia} descreve o pipeline metodológico em seis etapas, as quatro configurações comparativas de \emph{conditioning}, os seis \emph{baselines} de mitigação, a triangulação de métricas fundamentada no Teorema da Impossibilidade~\autocite{kleinberg2017inherent} e o enquadramento ético do projeto no Art.~8\textsuperscript{o} da Resolução n\textsuperscript{o} 200/2021/CONSU da Unifesp. O Capítulo~\ref{sec:cronograma} apresenta o cronograma de execução, riscos identificados e próximos passos.
