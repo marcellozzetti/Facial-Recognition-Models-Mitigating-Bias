@@ -1,52 +1,76 @@
-# Estrutura LaTeX da qualificação
+# Tese — Qualificação de Mestrado (Marcello Ozzetti / Unifesp-ICT)
 
-Arquivos LaTeX prontos para integração no Overleaf (template Unifesp/ICT).
+Estrutura oficial da dissertação em **LaTeX/abnTeX2**, seguindo o
+template ICMC adaptado ao padrão Unifesp-ICT.
 
-## Estrutura
+## Arquivo principal
+
+- **`thesis.tex`** — arquivo a compilar (comando `pdflatex + bibtex + pdflatex + pdflatex`, ou `latexmk -pdf` no Overleaf)
+
+## Estrutura de diretórios
 
 ```
 docs/tese/
-├── README.md                        (este arquivo)
-├── main.tex                         (esqueleto principal — adaptar ao template)
-├── capitulos/
-│   ├── 00_resumo.tex                (resumo + abstract)
-│   ├── 01_introducao.tex            (Contexto + Problemas)
-│   ├── 02_revisao_literatura.tex    (Estado-da-arte + Gap)
-│   ├── 03_objetivos.tex             (Objetivos + Hipóteses + Contribuições)
-│   ├── 04_metodologia.tex           (Pipeline 6 etapas + Protocolo)
-│   └── 05_cronograma.tex            (Cronograma + Próximos passos)
-└── referencias.bib                  (Bibliografia BibTeX)
+├── thesis.tex                    ← arquivo mestre
+├── references.bib                ← bibliografia (104 entradas verificadas)
+├── packages/
+│   ├── icmc.cls                  ← classe LaTeX (abnTeX2 + adaptações ICMC)
+│   ├── abntexalfenglish.bst      ← estilo bibliográfico ABNT
+│   ├── capa.pdf                  ← capa institucional
+│   ├── contra-capa.png
+│   └── fonts/
+├── images/
+│   └── Unifesp_completa_policromia_RGB.png
+└── tex/
+    ├── pre-textual/
+    │   ├── dedicatoria.tex
+    │   ├── agradecimentos.tex
+    │   ├── epigrafe.tex
+    │   └── ficha-catalografica.pdf
+    ├── introducao.tex            ← Capítulo 1
+    ├── revisao-literatura.tex    ← Capítulo 2
+    ├── objetivos.tex             ← Capítulo 3
+    ├── metodologia.tex           ← Capítulo 4
+    ├── plano-trabalho.tex        ← Capítulo 5 (Cronograma)
+    ├── newword.tex               ← comando \newword + ambiente {glossario}
+    └── glossario.tex             ← 73 termos técnicos (pós-textual)
 ```
 
-## Como usar no Overleaf
+## Padrão de citação
 
-1. Abrir seu projeto Overleaf existente (template Unifesp/ICT).
-2. Fazer upload dos arquivos `.tex` da pasta `capitulos/`.
-3. Fazer upload de `referencias.bib`.
-4. No arquivo principal do Overleaf, importar capítulos via:
-   ```latex
-   \input{capitulos/01_introducao}
-   \input{capitulos/02_revisao_literatura}
-   \input{capitulos/03_objetivos}
-   \input{capitulos/04_metodologia}
-   \input{capitulos/05_cronograma}
-   ```
-5. Adicionar `\bibliography{referencias}` antes do `\end{document}`.
+Sistema **autor-data ABNT** (NBR 10520) via BibTeX clássico + `abntexalfenglish.bst`:
 
-## Fontes de conteúdo
+| Comando | Renderização | Uso |
+|---|---|---|
+| `\cite{X}` | (KÄRKKÄINEN, 2021) | Citação implícita |
+| `\citeonline{X}` | Kärkkäinen (2021) | Citação nominal (autor no texto) |
+| `\citeauthoronline{X}` | Kärkkäinen | Só o autor, sem ano |
+| `\citeyear{X}` | 2021 | Só o ano |
 
-- **Texto narrativo**: extraído de [_pre_qualificacao_narrativa.md](../ativo/_pre_qualificacao_narrativa.md)
-- **Objetivos + hipóteses**: [_objetivo_tese_v3.3.md](../ativo/_objetivo_tese_v3.3.md)
-- **Referências**: 55 fichas do [corpus](../ativo/04_pesquisa_bibliografica/INDEX.md)
+**Não usar** `\autocite` nem `\textcite` (são do `biblatex`, incompatíveis com esta classe).
 
-## Próximos passos
+## Como compilar
 
-1. Adaptar `main.tex` ao template Unifesp (mudar documentclass, etc).
-2. Refinar cada capítulo com revisão crítica.
-3. Adicionar figuras (FiLM diagram, ConvNeXt-T, pipeline).
-4. Verificar referências BibTeX vs corpus.
-5. Polir linguagem acadêmica formal.
+### No Overleaf
+1. Fazer upload da pasta `docs/tese/` inteira
+2. Configurar `thesis.tex` como arquivo principal
+3. TeX Live 2021+ (padrão do Overleaf)
+4. Compilador: **pdfLaTeX** (não LuaLaTeX nem XeLaTeX)
 
-## Deadline
+### Localmente (MiKTeX / TeXLive)
+```bash
+cd docs/tese
+pdflatex thesis
+bibtex thesis
+pdflatex thesis
+pdflatex thesis
+```
 
-**Submissão**: 15 de julho de 2026 (~35 dias a partir de 2026-06-10).
+Ou:
+```bash
+latexmk -pdf thesis
+```
+
+## Histórico
+
+- **`docs/historico/tese_biblatex_backup/`** — versão anterior em biblatex (antes da migração para o template abnTeX2/ICMC). Preservada para consulta.

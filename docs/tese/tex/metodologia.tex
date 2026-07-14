@@ -1,0 +1,114 @@
+\subsection{Natureza da pesquisa}
+\label{sec:natureza}
+
+A pesquisa caracteriza-se como \textbf{puramente computacional}, conduzida integralmente sobre datasets de imagens faciais publicamente disponíveis. Envolve treinamento e avaliação de modelos de aprendizado profundo, análise estatística de métricas de desempenho estratificadas por grupo demográfico, comparação sistemática entre configurações arquiteturais e síntese analítica dos resultados. Não há, em nenhuma etapa, coleta primária de dados de seres humanos, intervenção sobre sujeitos ou uso de plataformas externas de \emph{crowdsourcing}. O enquadramento ético formal é discutido na Seção~\ref{sec:etica}.
+
+\subsection{Pipeline experimental em seis etapas}
+\label{sec:pipeline}
+
+O pipeline metodológico, aprovado em reunião de orientação em 8 de junho de 2026, estrutura-se em seis etapas sequenciais, cada uma vinculada a um ou mais objetivos específicos (Seção~\ref{sec:obj_especificos}) e a contribuições esperadas (Seção~\ref{sec:contribuicoes}):
+
+\begin{enumerate}
+\item \textbf{Etapa 1 --- Classificador MST}: adoção do SkinToneNet~\cite{matias2026large} como insumo pré-treinado, mediante validação interna de concordância em subset estratificado do FairFace anotado manualmente pela equipe acadêmica. A modalidade de validação é detalhada na Seção~\ref{sec:validacao_interna}. \textit{(OE1, OE2.)}
+
+\item \textbf{Etapa 2 --- Auditoria fenotípica do FairFace}: aplicação do SkinToneNet sobre o FairFace \emph{validation set} e construção da matriz pública Monk Skin Tone~$\times$~classes raciais. \textit{(OE1, Contribuição C2.)}
+
+\item \textbf{Etapa 3 --- Classificador racial com \emph{conditioning}}: treinamento de ConvNeXt-T \emph{fine-tuned} em FairFace \emph{train}, com camadas FiLM~\cite{perez2018film} por estágio recebendo como contexto o vetor MST produzido na Etapa~1. \textit{(OE3, Contribuições C3, C7.)}
+
+\item \textbf{Etapa 4 --- Comparação contra \emph{baselines}}: avaliação sistemática do pipeline contra seis \emph{baselines} de mitigação (Seção~\ref{sec:baselines}), com triangulação completa de métricas (Seção~\ref{sec:metricas}). \textit{(OE3, OE5, Contribuição C4.)}
+
+\item \textbf{Etapa 5 --- Transferência \emph{fair}}: aplicação do \emph{backbone} \emph{fair-trained} para tarefa \emph{downstream} de \emph{face recognition} nos datasets RFW~\cite{wang2019racial} e/ou BFW~\cite{robinson2020face}, com controle explícito de \emph{pixel information} como \emph{confounder}, conforme metodologia proposta por \citeonline{pangelinan2023exploring}. \textit{(OE4, Contribuição C5.)}
+
+\item \textbf{Etapa 6 --- Síntese decompositiva}: combinação dos resultados obtidos nas Etapas~2 e~5 para quantificar a contribuição relativa do componente fenotípico (irredutível, associado ao \emph{overlap} MST intra-categoria) \emph{versus} componente algorítmico (mitigável) do erro de classificação Latinx. \textit{(OE6, Contribuição C6.)}
+\end{enumerate}
+
+\subsection{Datasets utilizados}
+\label{sec:datasets}
+
+Todos os datasets adotados são secundários e publicamente disponíveis, sem coleta primária associada:
+
+\begin{description}[font=\bfseries\sffamily]
+\item[Treino de classificação racial]: FairFace \emph{train split}, 86.744 imagens com sete classes raciais~\cite{karkkainen2021fairface}.
+\item[Validação de MST]: STW~\cite{matias2026large} e Casual Conversations v2~\cite{porgali2023casual}.
+\item[Teste de classificação racial]: FairFace \emph{test split}, 10.954 imagens~\cite{karkkainen2021fairface}.
+\item[Teste de transferência \emph{fair}]: RFW~\cite{wang2019racial} e/ou BFW~\cite{robinson2020face}.
+\end{description}
+
+\subsection{Baselines de comparação}
+\label{sec:baselines}
+
+Seis \emph{baselines} de mitigação algorítmica compõem o quadro comparativo, escolhidos para cobrir cinco famílias metodológicas distintas --- linha canônica, controle arquitetural moderno, aprendizado contrastivo, otimização robusta a distribuição, atenção multi-camada e \emph{debiasing} adversarial:
+
+\begin{enumerate}
+\item ResNet-34, \emph{baseline} canônico originalmente treinado por \citeonline{karkkainen2021fairface} sobre o FairFace~\cite{aldahoul2024exploring};
+\item ConvNeXt-T puro, sem \emph{conditioning}, como controle arquitetural moderno;
+\item FSCL+~\cite{park2022fair};
+\item Group DRO~\cite{sagawa2020distribution};
+\item FineFACE~\cite{manzoor2024fineface};
+\item \emph{Adversarial debiasing}~\cite{zhang2018mitigating}.
+\end{enumerate}
+
+\subsection{Mecanismo de \emph{conditioning} FiLM}
+\label{sec:film}
+
+Para cada estágio do \emph{backbone} ConvNeXt-T, insere-se uma camada FiLM~\cite{perez2018film} que recebe o vetor $z \in \mathbb{R}^{10}$ (saída \emph{softmax} do SkinToneNet pré-treinado) e produz parâmetros de modulação $(\gamma_i, \beta_i)$ por canal, aplicados como transformação afim sobre as \emph{feature maps} intermediárias:
+
+\begin{equation}
+\mathrm{FiLM}(F_i \mid \gamma_i, \beta_i) = \gamma_i \odot F_i + \beta_i
+\end{equation}
+
+onde $F_i$ é a \emph{feature map} intermediária do estágio $i$ e $\odot$ denota multiplicação elemento a elemento. As funções $f_\gamma$ e $f_\beta$ são implementadas por duas \emph{Multi-Layer Perceptrons} treináveis com aproximadamente 380.000 parâmetros adicionais totais, o que corresponde a cerca de 1\,\% de \emph{overhead} sobre o \emph{backbone} de 28 milhões de parâmetros. A escolha de FiLM sobre alternativas de \emph{conditioning} (concatenação simples, \emph{Conditional Batch Normalization}, \emph{cross-attention}) é justificada pela combinação de eficiência paramétrica, capacidade de modulação por escala e deslocamento em nível de canal e sucesso documentado em \emph{Visual Question Answering}~\cite{perez2018film}.
+
+\subsection{Ablation arquitetural --- quatro configurações comparativas}
+\label{sec:ablation}
+
+Atendendo à recomendação registrada na reunião de orientação de 15 de junho de 2026, o Cap.~2 conduzirá \emph{ablation} arquitetural comparando quatro configurações do estágio de \emph{conditioning}, mantidos idênticos o \emph{backbone} (ConvNeXt-T), o dataset (FairFace) e o protocolo de avaliação:
+
+\begin{description}[font=\bfseries\sffamily]
+\item[Configuração A --- Baseline sem \emph{conditioning}]: ConvNeXt-T \emph{fine-tuned} sem qualquer sinal auxiliar, como controle.
+\item[Configuração B --- FiLM linear com MST 10-dim]: proposta principal, com $f_\gamma$ e $f_\beta$ implementadas por MLPs lineares. \textit{(Hipótese H1 central.)}
+\item[Configuração C --- FiLM \emph{gated} com MST 10-dim]: variante não-linear, com \emph{gating} sigmoide, para isolar o efeito da linearidade das funções de modulação como ablação metodológica.
+\item[Configuração D --- FiLM sobre \emph{embedding} CLIP-\emph{text} 512-dim]: alternativa moderna, com sinal condicionante em \emph{embedding} semântico produzido por CLIP-\emph{text}~\cite{luo2024fairclip} em vez do vetor MST discreto. Endereça a recomendação de avaliar CLIP como \emph{conditioning} alternativo.
+\end{description}
+
+\subsection{Triangulação de métricas}
+\label{sec:metricas}
+
+Fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent}, que estabelece a impossibilidade de satisfazer simultaneamente múltiplas definições formais de \emph{fairness}, a avaliação é conduzida em dois cenários:
+
+\paragraph{Cenário A --- Protocolo principal (\emph{race} apenas).}
+\begin{itemize}
+\item F1 macro, agregada e por classe;
+\item \emph{Disparity Ratio}: $\mathrm{DR} = \min_c \mathrm{F1}_c / \max_c \mathrm{F1}_c$;
+\item \emph{Worst-class} F1, seguindo o princípio de \emph{Distributionally Robust Optimization}~\cite{sagawa2020distribution}.
+\end{itemize}
+
+\paragraph{Cenário B --- Ablação intersectional (\emph{race} $\times$ \emph{gender}).}
+\begin{itemize}
+\item \emph{Equal Opportunity} por classe: para cada raça $c$, gap entre $\mathrm{TPR}_c^{M}$ e $\mathrm{TPR}_c^{F}$~\cite{hardt2016equality};
+\item \emph{Equalized Odds} por classe: gap simultâneo em TPR e FPR~\cite{hardt2016equality}.
+\end{itemize}
+
+\subsection{Validação humana interna do OE1}
+\label{sec:validacao_interna}
+
+A validação de concordância entre o SkinToneNet e a rotulagem humana, prevista no OE1, é realizada \textbf{exclusivamente pela equipe acadêmica do projeto} --- Mestrando e Orientador ---, sobre um subset estratificado de aproximadamente duzentas a trezentas imagens do FairFace, com estratificação por raça e por tom MST. Não haverá contratação de anotadores externos nem uso de plataformas de \emph{crowdsourcing}. As métricas de concordância adotadas são o coeficiente $\kappa$ de Cohen \emph{par a par} e a exatidão categórica com intervalo de confiança de 95\,\% obtido por \emph{bootstrap}. A escala reduzida é declarada explicitamente como limitação metodológica, sendo compensada por estratificação rigorosa e por replicação da avaliação com dois ou três classificadores MST alternativos, conforme \emph{sensitivity analysis} prevista no OE2.
+
+\subsection{Rigor experimental}
+\label{sec:rigor}
+
+Todos os experimentos são conduzidos sob os seguintes protocolos de rigor:
+
+\begin{itemize}
+\item Três sementes aleatórias independentes (42, 1, 2), com reporte de média e desvio padrão para cada métrica;
+\item Comparação pareada casada entre configurações, com o mesmo \emph{split} de dados e a mesma inicialização por semente;
+\item Intervalos de confiança de 95\,\% obtidos por \emph{bootstrap} não paramétrico;
+\item Reporte estratificado por raça e por interseção raça~$\times$~gênero.
+\end{itemize}
+
+\subsection{Aspectos éticos --- enquadramento no Art.~8\textsuperscript{o} da Resolução n\textsuperscript{o} 200/2021/CONSU}
+\label{sec:etica}
+
+A pesquisa enquadra-se no \textbf{Art.~8\textsuperscript{o} da Resolução n\textsuperscript{o} 200/2021} do Conselho Universitário da Universidade Federal de São Paulo, que dispensa de cadastro no Comitê de Ética em Pesquisa (CEP) os projetos que não envolvem, direta ou indiretamente, seres humanos, nem animais vertebrados vivos. A dispensa fundamenta-se em cinco condições verificadas: (i) uso exclusivo de datasets secundários publicamente disponíveis; (ii) ausência de coleta primária de imagens ou de dados demográficos; (iii) ausência de intervenção sobre pessoas físicas; (iv) ausência de envolvimento indireto de participantes via \emph{crowdsourcing} externo, conforme detalhado na Seção~\ref{sec:validacao_interna}; (v) análise agregada por grupo demográfico, sem identificação de sujeitos.
+
+Em conformidade com o parágrafo único do referido Art.~8\textsuperscript{o}, foi submetida \textbf{Declaração de Responsabilidade} assinada pelo estudante, pelo orientador e pelo chefe do Departamento ao qual o orientador está vinculado, protocolada institucionalmente e anexada a este documento. Compromete-se a submeter novo protocolo ao CEP da Unifesp caso, no curso da pesquisa, sobrevenha qualquer alteração de escopo que envolva seres humanos ou animais.

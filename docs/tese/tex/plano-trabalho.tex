@@ -1,0 +1,66 @@
+\subsection{Marcos formais até a defesa}
+\label{sec:cron_marcos}
+
+O cronograma consolidado da pesquisa organiza-se em três marcos formais imediatos, complementados por marcos de execução experimental subsequentes:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{6.5cm}p{2.8cm}p{5.5cm}}
+\toprule
+\textbf{Marco} & \textbf{Data} & \textbf{Descrição} \\
+\midrule
+Primeira revisão da qualificação ao orientador & Julho de 2026 & Entrega em plataforma Overleaf \\
+Pedido formal de qualificação ao PPG-CC/ICT & Julho de 2026 & Prazo regimental do Programa \\
+\textbf{Defesa da qualificação} & \textbf{Outubro de 2026} & Ajustada em relação ao prazo original de agosto/2026 em virtude de solicitação de prorrogação de dois meses \\
+Setup metodológico completo & Novembro de 2026 & Especificações técnicas detalhadas \\
+Cap.~1 --- Auditoria MST~$\times$~raça & Dezembro de 2026 & Resultados de H3 + protocolo OE2 \\
+Cap.~2 --- Pipeline condicionado + \emph{ablation} & Março de 2027 & Resultados H1, H2, H4 + C3, C7 \\
+Cap.~3 --- Transferência \emph{fair} para FR & Maio de 2027 & Resultados H5, H6 + C5 \\
+Cap.~4 --- Síntese decompositiva & Junho de 2027 & Decomposição C6 \\
+Escrita final da dissertação & Em paralelo (Nov/2026 -- Jul/2027) & Texto final \\
+Defesa da dissertação & Segundo semestre de 2027 & --- \\
+\bottomrule
+\end{tabular}
+\caption{Cronograma consolidado de execução da pesquisa.}
+\label{tab:cronograma}
+\end{table}
+
+O ajuste do marco da defesa da qualificação de agosto para outubro de 2026 decorre de solicitação formal de prorrogação de dois meses, motivada por afastamento parental ocorrido a partir de março de 2026. Os marcos anteriores (primeira revisão e pedido formal) foram integralmente preservados.
+
+\subsection{Riscos identificados e estratégias de mitigação}
+\label{sec:riscos}
+
+Quatro classes principais de risco foram identificadas, com respectivas estratégias de mitigação documentadas:
+
+\begin{description}[font=\bfseries\sffamily]
+\item[Risco~1 --- Refutação de hipóteses.] Qualquer uma das seis hipóteses testáveis (Seção~\ref{sec:hipoteses}) pode ser refutada pelos dados empíricos. \\
+\textbf{Mitigação}: cada hipótese possui plano B documentado; a observação negativa é resultado científico válido, e a refutação de H5 ou H6, em particular, torna-se contribuição empírica ao debate central da literatura (Seção~\ref{sec:rl_fairrep}).
+
+\item[Risco~2 --- Dependência do SkinToneNet como oráculo.] O pipeline depende da precisão do SkinToneNet~\cite{matias2026large} na Etapa~1; falhas de generalização podem propagar-se para o \emph{conditioning}. \\
+\textbf{Mitigação}: validação humana interna estratificada (Seção~\ref{sec:validacao_interna}) e \emph{sensitivity analysis} com dois ou três classificadores MST alternativos, conforme OE2. A limitação de escala da validação interna --- aproximadamente duzentas a trezentas imagens --- é declarada explicitamente na Seção~\ref{sec:validacao_interna}.
+
+\item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \citeonline{pangelinan2023exploring} argumentam que o \emph{driver} estrutural do gap em FR é \emph{pixel information}, não tom de pele. \\
+\textbf{Mitigação}: H5 reformulada com controle explícito de \emph{pixel information} via alinhamento e \emph{crop}; H6 formalizada como teste direto da tese de Pangelinan (decomposição de variância). Refutação parcial converte-se em contribuição quantitativa (C6).
+
+\item[Risco~4 --- Limitação computacional.] Treinamento múltiplo com três sementes por configuração pode exigir tempo de GPU significativo. \\
+\textbf{Mitigação}: ConvNeXt-T é arquitetura relativamente leve, com 28 milhões de parâmetros; estima-se necessidade de aproximadamente 200 a 400 horas de GPU para a totalidade dos experimentos do Cap.~2, viáveis em infraestrutura de nuvem contratada individualmente.
+\end{description}
+
+\subsection{Próximos passos imediatos após a qualificação}
+\label{sec:proximos}
+
+Após a aprovação desta qualificação, os passos imediatos previstos são:
+
+\begin{enumerate}
+\item Confirmação da disponibilidade pública dos pesos do SkinToneNet~\cite{matias2026large}; caso não estejam disponíveis à época, executa-se plano B com re-treinamento de Vision Transformer Small sobre o dataset STW.
+\item Anotação estratificada do subset FairFace pela equipe acadêmica interna (Mestrando e Orientador), conforme protocolo descrito na Seção~\ref{sec:validacao_interna}.
+\item Início da execução do Cap.~1 experimental --- auditoria fenotípica MST~$\times$~raça sobre o FairFace \emph{validation set}.
+\item Implementação de referência do pipeline FiLM-\emph{conditioning} sobre ConvNeXt-T, com validação da equivalência funcional da Configuração~B (Seção~\ref{sec:ablation}) contra a formulação original de FiLM~\cite{perez2018film}.
+\item Implementação das Configurações C (FiLM \emph{gated}) e D (FiLM sobre \emph{embedding} CLIP-\emph{text}) para o estudo comparativo arquitetural, conforme OE3 e Contribuição C7.
+\end{enumerate}
+
+\subsection{Considerações finais}
+\label{sec:cronograma_final}
+
+O cronograma apresentado assume a manutenção do escopo definido nos Capítulos~\ref{sec:objetivos} (objetivos, hipóteses e contribuições) e~\ref{sec:metodologia} (metodologia). Alterações substantivas de escopo --- em particular, qualquer mudança que envolva coleta primária de dados de seres humanos --- implicam a suspensão imediata das atividades correspondentes e a submissão de novo protocolo ao Comitê de Ética em Pesquisa da Unifesp, conforme compromisso registrado na Seção~\ref{sec:etica}.

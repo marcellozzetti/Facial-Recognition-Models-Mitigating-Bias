@@ -1,0 +1,43 @@
+% ============================================================
+% newword.tex — definição do comando \newword e ambiente {glossario}
+% ------------------------------------------------------------
+% Sintaxe:  \newword{termo}{explicação}
+%
+% Uso no thesis.tex:
+%   1. No preâmbulo (ou logo antes do glossário):
+%          \input{tex/newword}
+%   2. Como elemento pós-textual (após \postextual):
+%          \input{tex/glossario}
+% ============================================================
+
+% O pacote enumitem já é carregado pela classe icmc.
+
+% ------------------------------------------------------------
+% Cada entrada: termo em negrito na primeira linha, explicação
+% recuada abaixo, com pequena separação vertical.
+% ------------------------------------------------------------
+\newcommand{\newword}[2]{%
+  \item[\textbf{#1}]\hfill\\%
+  \noindent#2%
+  \vspace{0.4em}%
+}
+
+% ------------------------------------------------------------
+% Ambiente {glossario}: envolve as entradas produzindo cabeçalho
+% de capítulo (padrão abntex2 para elementos pós-textuais) com
+% entrada no sumário.
+% ------------------------------------------------------------
+\newenvironment{glossario}
+{%
+  \chapter*{Glossário}%
+  \addcontentsline{toc}{chapter}{Glossário}%
+  \begin{description}[%
+      style=nextline,%
+      leftmargin=0em,%
+      itemsep=0.2em,%
+      parsep=0em%
+  ]%
+}
+{%
+  \end{description}%
+}

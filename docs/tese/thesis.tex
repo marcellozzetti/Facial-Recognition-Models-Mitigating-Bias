@@ -1,0 +1,208 @@
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+% 
+% Modelo de Trabalho Acadêmico (tese de doutorado, dissertação de mestrado e
+% trabalhos monográficos em geral) baseado no ICMC (USP), em conformidade com
+% a ABNT NBR 14724:2011: Informação e documentação - Trabalhos acadêmicos -
+% ------
+
+% Apresentação
+% ------------------------------------------------------------------------
+% ------------------------------------------------------------------------
+
+% Opções: 
+%   Qualificação          = qualificacao 
+%   Curso                 = doutorado/mestrado
+%   Situação do trabalho  = pre-defesa/pos-defesa (exceto para qualificação)
+%   Versão para impressão = impressao
+\documentclass[qualificacao]{packages/icmc}
+
+% ---------------------------------------------------------------------------
+% Pacotes Opcionais
+% ---------------------------------------------------------------------------
+\usepackage{rotating}           % Usado para rotacionar o texto
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage[all,knot,arc,import,poly]{xy}   % Pacote para desenhos gráficos
+% Este pacote pode conflitar com outros pacotes gráficos como o ``pictex''
+% Então é necessário usar apenas um dos pacotes conflitantes
+\newcommand{\VerbL}{0.52\textwidth}
+\newcommand{\LatL}{0.42\textwidth}
+% ---------------------------------------------------------------------------
+
+
+% ---
+% Informações de dados para CAPA e FOLHA DE ROSTO
+% ---
+% Tanto na capa quanto nas folhas de rosto apenas a primeira letra da primeira palavra (ou nomes próprios) devem estar em letra maiúscula, todas as demais devem ser em letra minúscula.
+\tituloPT{Mitigação de Viés Racial em Classificação Facial via Condicionamento por Tom de Pele em Arquiteturas Profundas}
+\tituloEN{Racial Bias Mitigation in Facial Classification via Skin Tone Conditioning in Deep Architectures}
+\autor[Ozzetti, Marcello]{Marcello Vinicius Alves Ozzetti Cruz}
+\genero{M} % Gênero do autor (M = Masculino / F = Feminino)
+\orientador[Orientador]{Prof. Dr.}{Marcos Gonçalves Quiles}
+%\coorientador{Prof. Dr.}{Fulano de Tal}
+\curso{PPGCC}
+\data{01}{07}{2026} % Data do depósito
+\idioma{PT} % Idioma principal do documento (PT = português / EN = inglês)
+% ---
+
+
+% ---
+% RESUMOS
+% ---
+
+% Resumo em PORTUGUÊS
+% conter no máximo 500 palavras
+% conter no mínimo 1 e no máximo 5 palavras-chave
+\textoresumo[brazil]{
+
+\noindent Sistemas de reconhecimento facial passaram, na última década, de tecnologia laboratorial a infraestrutura social, estando hoje presentes em desbloqueio de dispositivos, autenticação bancária, controle de fronteiras e identificação policial. Em escala industrial, a maior auditoria pública já realizada em biometria facial, o relatório NISTIR 8280 do National Institute of Standards and Technology, documentou diferenciais de dez a cem vezes na taxa de falso positivo entre grupos raciais em cento e oitenta e nove algoritmos comerciais. Apesar da consolidação técnica, o problema de \emph{fairness} persiste: o estado da arte atual em classificação racial multi-classe sobre o dataset FairFace, obtido com \emph{Vision-Language Models} \emph{fine-tuned}, atinge F1 macro de setenta e cinco por cento, porém com disparidade severa entre classes --- aproximadamente noventa por cento para faces Black e apenas sessenta por cento para faces Latinx/Hispanic, gap de trinta pontos percentuais estável através de múltiplas arquiteturas e datasets.
+
+\noindent O balanceamento explícito de dados, primeira geração de resposta ao problema, mostra-se insuficiente para resolver essa disparidade. Trabalhos empíricos recentes indicam que parte substantiva do erro reflete heterogeneidade fenotípica intra-categorial que a rotulagem monolítica de raça no FairFace não captura, sustentada por evidência convergente de três disciplinas independentes --- antropologia biológica, genética populacional e sociologia identitária. A literatura sugere ainda que o tom de pele, e não a categoria racial nominal, é o \emph{driver} estrutural do gap.
+
+\noindent Propõe-se, nesta dissertação, desenvolver e avaliar um pipeline de classificação racial em imagens faciais que incorpora o tom de pele explícito, na escala Monk Skin Tone de dez classes, como sinal auxiliar condicionante via mecanismo arquitetural \emph{Feature-wise Linear Modulation} sobre \emph{backbone} ConvNeXt-T. O pipeline é organizado em seis etapas encadeadas: auditoria fenotípica do FairFace via um classificador MST pré-treinado, classificação racial condicionada por FiLM, comparação sistemática contra seis \emph{baselines} de mitigação --- FSCL+, Group DRO, FineFACE, \emph{adversarial debiasing} e dois controles arquiteturais ---, transferência \emph{fair} para tarefa \emph{downstream} de \emph{face recognition} sobre os datasets RFW e BFW, e síntese decompositiva final. A avaliação segue triangulação de métricas, com \emph{Disparity Ratio}, F1 da pior classe (\emph{worst-class} F1) e definições formais de \emph{Equal Opportunity} estratificadas por classe, arranjo desenhado para endereçar o Teorema da Impossibilidade em \emph{fairness} algorítmica e para permitir interpretação simultânea sob múltiplas definições formais de equidade.
+
+\noindent Como contribuições esperadas, delineiam-se três eixos: primeiro, a construção e disponibilização pública da primeira matriz de distribuição cruzada Monk Skin Tone versus classes raciais sobre o \emph{validation set} do FairFace; segundo, a primeira instância empírica documentada do uso de tom de pele como contexto arquitetural em \emph{fairness} facial \emph{multi-class}; e terceiro, uma decomposição quantitativa do erro de classificação Latinx em componente fenotípico irredutível --- derivado do \emph{overlap} MST intra-categoria --- e componente algorítmico mitigável, oferecendo diagnóstico estrutural no lugar de simples redução agregada de F1 macro. O trabalho é conduzido em conformidade com o \emph{European AI Act} de 2024, que estabelece obrigatoriedade de auditoria de \emph{fairness} em sistemas biométricos classificados como de alto risco, e observa integralmente as diretrizes éticas institucionais aplicáveis à pesquisa computacional sobre datasets secundários publicamente disponíveis.
+
+}{Reconhecimento Facial; Equidade Algorítmica; Viés Racial; Monk Skin Tone; Feature-wise Linear Modulation; FairFace.}
+
+
+% resumo em INGLÊS
+% conter no máximo 500 palavras
+% conter no mínimo 1 e no máximo 5 palavras-chave
+\textoresumo[english]{
+ %Traduzir ao final da revisão
+ }
+
+
+% ----------------------------------------------------------
+% ELEMENTOS PRÉ-TEXTUAIS
+% ----------------------------------------------------------
+
+% Inserir a ficha catalográfica
+\incluifichacatalografica{tex/pre-textual/ficha-catalografica.pdf}
+
+% DEDICATÓRIA / AGRADECIMENTO / EPÍGRAFE
+\textodedicatoria*{tex/pre-textual/dedicatoria}
+\textoagradecimentos*{tex/pre-textual/agradecimentos}
+\textoepigrafe*{tex/pre-textual/epigrafe}
+
+% Inclui a lista de figuras
+\incluilistadefiguras
+
+% Inclui a lista de tabelas
+\incluilistadetabelas
+
+% Inclui a lista de quadros
+% \incluilistadequadros
+
+% Inclui a lista de algoritmos
+% \incluilistadealgoritmos
+
+% Inclui a lista de códigos
+% \incluilistadecodigos
+
+% Inclui a lista de siglas e abreviaturas
+% \incluilistadesiglas
+
+
+
+% Inclui a lista de símbolos
+% \incluilistadesimbolos
+
+% ----
+% Início do documento
+% ----
+\begin{document}
+% ----------------------------------------------------------
+% ELEMENTOS TEXTUAIS
+% ----------------------------------------------------------
+\textual
+
+\chapter{Introdução}
+\label{chapter:introducao}
+\input{tex/introducao}
+
+\chapter{Revisão de Literatura}
+\label{chapter:revisao}
+\input{tex/revisao-literatura}
+
+\chapter{Objetivos, Hipóteses e Contribuições}
+\label{chapter:objetivos}
+\input{tex/objetivos}
+
+\chapter{Metodologia}
+\label{chapter:metodologia}
+\input{tex/metodologia}
+
+\chapter{Cronograma e Próximos Passos}
+\label{chapter:cronograma}
+\input{tex/plano-trabalho}
+
+% ---
+% Finaliza a parte no bookmark do PDF, para que se inicie o bookmark na raiz
+% ---
+\bookmarksetup{startatroot}% 
+% ---
+
+% ----------------------------------------------------------
+% ELEMENTOS PÓS-TEXTUAIS
+% ----------------------------------------------------------
+\postextual
+
+% ----------------------------------------------------------
+% Referências bibliográficas
+% ----------------------------------------------------------
+\bibliography{references}
+
+% ---------------------------------------------------------------------
+% GLOSSÁRIO
+% ---------------------------------------------------------------------
+
+% Definição do comando \newword e do ambiente {glossario} usados abaixo
+\input{tex/newword}
+
+% Glossário completo (73 termos organizados em 9 seções temáticas)
+\input{tex/glossario}
+
+% ----------------------------------------------------------
+% Apêndices
+% ----------------------------------------------------------
+
+% ---
+% Inicia os apêndices
+% ---
+% \begin{apendicesenv}
+
+%     \chapter{Documento básico usando a classe \textit{icmc}}
+%     \label{chapter:documento-basico}
+%     \input{tex/appendix/documento-basico}
+    
+%     \chapter{Configuração do programa JabRef}
+%     \label{chapter:configuracao-jabref}
+%     \input{tex/appendix/configuracao-jabref}
+
+% \end{apendicesenv}
+% ---
+
+
+% ----------------------------------------------------------
+% Anexos
+% ----------------------------------------------------------
+
+% ---
+% Inicia os anexos
+% ---
+%\begin{anexosenv}
+%    \chapter{Artigo submetido}
+%    \input{tex/annex/g2simclr_paper}
+%     \chapter{Páginas interessantes na Internet} 
+%     \label{chapter:paginas-interessantes}
+%     \input{tex/annex/paginas-interessantes}
+
+%    \chapter{Artigos aprovados}
+%    \input{tex/annex/papers_aprovados}
+%\end{anexosenv}
+% ---
+
+\end{document}
