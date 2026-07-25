@@ -22,39 +22,8 @@ Apesar do F1 macro de 75\,\% reportado pelo FaceScanPaliGemma~\cite{aldahoul2024
 \begin{figure}[htbp]
 \centering
 \caption{Disparidade de F1 por classe racial no estado da arte (FaceScanPaliGemma sobre FairFace).}
-\begin{tikzpicture}[
-  every node/.style={font=\footnotesize},
-  bar/.style={rectangle, draw=black!70, thick, minimum height=0.6cm, fill=blue!20},
-  gap/.style={rectangle, draw=none, minimum height=0.6cm, fill=red!25}
-]
-% Escala horizontal: 1cm = 10 pontos percentuais
-% Referência de eixo
-\draw[->, thick] (0, -0.4) -- (10.5, -0.4) node[right, font=\small] {F1 (\%)};
-\foreach \x/\l in {0/0, 2/20, 4/40, 6/60, 8/80, 10/100} {
-    \draw[thick] (\x, -0.5) -- (\x, -0.3) node[below=6pt, font=\scriptsize] {\l};
-}
-% Barra "melhor" (Black 90%)
-\node[anchor=east, font=\small] at (-0.15, 4.0) {Black};
-\filldraw[fill=green!35, draw=black!70, thick] (0, 3.7) rectangle (9.0, 4.3);
-\node[right, font=\scriptsize] at (9.05, 4.0) {90\,\%};
-% White 80%
-\node[anchor=east, font=\small] at (-0.15, 3.0) {White};
-\filldraw[fill=blue!25, draw=black!70, thick] (0, 2.7) rectangle (8.0, 3.3);
-\node[right, font=\scriptsize] at (8.05, 3.0) {80\,\%};
-% Southeast Asian 67%
-\node[anchor=east, font=\small] at (-0.15, 2.0) {SE\ Asian};
-\filldraw[fill=blue!20, draw=black!70, thick] (0, 1.7) rectangle (6.7, 2.3);
-\node[right, font=\scriptsize] at (6.75, 2.0) {67\,\%};
-% Latinx 60% (pior)
-\node[anchor=east, font=\small] at (-0.15, 1.0) {\textbf{Latinx}};
-\filldraw[fill=red!35, draw=black!70, thick] (0, 0.7) rectangle (6.0, 1.3);
-\node[right, font=\scriptsize] at (6.05, 1.0) {\textbf{60\,\%}};
-% Anotação do gap
-\draw[<->, red!70!black, very thick] (6.0, 5.0) -- (9.0, 5.0);
-\node[above, font=\scriptsize\bfseries, text=red!70!black] at (7.5, 5.05) {gap $\approx 30$ pp};
-\draw[dashed, red!50] (6.0, 1.3) -- (6.0, 5.0);
-\draw[dashed, red!50] (9.0, 4.3) -- (9.0, 5.0);
-\end{tikzpicture}
+\centering
+\includegraphics[width=13cm]{images/fig_disparidade_racial.png}
 \\ \small Fonte: Autoria própria, com dados reportados por \citeonline{aldahoul2024exploring}. Barras em verde e vermelho destacam a melhor e a pior classe.
 \label{fig:disparidade-sota}
 \end{figure}

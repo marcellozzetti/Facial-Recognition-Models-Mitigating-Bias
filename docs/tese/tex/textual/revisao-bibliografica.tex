@@ -48,30 +48,8 @@ A Figura~\ref{fig:tripe-latinx} sintetiza visualmente o tripé empírico e sua c
 \begin{figure}[htbp]
 \centering
 \caption{Tripé empírico interdisciplinar que sustenta a hipótese de heterogeneidade fenotípica intra-categorial da categoria Latinx no FairFace.}
-\begin{tikzpicture}[
-  every node/.style={font=\footnotesize},
-  disc/.style={rectangle, draw=black!70, thick, rounded corners=2pt,
-               minimum width=3.5cm, minimum height=1.6cm,
-               align=center, fill=blue!8},
-  conv/.style={ellipse, draw=black!90, very thick,
-               minimum width=6.5cm, minimum height=1.4cm,
-               align=center, fill=blue!20},
-  seta/.style={-Stealth, thick, black!70}
-]
-% Três disciplinas em linha
-\node[disc] (antro) at (0, 0) {\textbf{Antropologia biológica}\\Telles (2014) --- PERLA\\4 países LatAm\\pigmentocracia};
-\node[disc, right=0.7cm of antro] (gene) {\textbf{Genética populacional}\\Bryc et al.\ (2015) --- AJHG\\162.721 indivíduos\\ancestralidade variável};
-\node[disc, right=0.7cm of gene] (socio) {\textbf{Sociologia identitária}\\Lopez et al.\ (2017) --- Pew\\4 gerações EUA\\97\,\% $\to$ 50\,\%};
-
-% Convergência
-\node[conv, below=1.4cm of gene] (conv) {\textbf{Heterogeneidade fenotípica intra-Latinx}\\\emph{spread} MST amplo ($\geq 5$ das 10 classes)};
-
-% Setas convergentes
-\draw[seta] (antro.south) -- (conv.north west);
-\draw[seta] (gene.south) -- (conv.north);
-\draw[seta] (socio.south) -- (conv.north east);
-
-\end{tikzpicture}
+\centering
+\includegraphics[width=14cm]{images/fig_tripe_latinx.png}
 \\ \small Fonte: Autoria própria. Convergência de três disciplinas independentes sobre a hipótese central do diagnóstico Latinx.
 \label{fig:tripe-latinx}
 \end{figure}

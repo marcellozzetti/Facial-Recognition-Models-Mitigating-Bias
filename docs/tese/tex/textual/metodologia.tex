@@ -11,44 +11,8 @@ O pipeline metodológico estrutura-se em seis etapas sequenciais, cada uma vincu
 \begin{figure}[htbp]
 \centering
 \caption{Fluxo geral do pipeline experimental em seis etapas.}
-\begin{tikzpicture}[
-  node distance=0.35cm and 0.5cm,
-  every node/.style={font=\footnotesize},
-  etapa/.style={rectangle, draw=black!70, thick, rounded corners=2pt,
-                minimum width=3.1cm, minimum height=1.0cm,
-                align=center, fill=blue!5},
-  destaque/.style={rectangle, draw=black!80, very thick, rounded corners=2pt,
-                minimum width=3.1cm, minimum height=1.0cm,
-                align=center, fill=blue!15},
-  seta/.style={-Stealth, thick, black!70}
-]
-% Linha 1: Etapas 1 e 2
-\node[etapa] (e1) {\textbf{Etapa 1}\\Classificador MST\\(SkinToneNet)};
-\node[etapa, right=of e1] (e2) {\textbf{Etapa 2}\\Auditoria FairFace\\MST $\times$ raça};
-\node[destaque, right=of e2] (e3) {\textbf{Etapa 3}\\Classificador racial\\ConvNeXt-T + FiLM};
-
-% Linha 2: Etapas 4, 5 e 6
-\node[etapa, below=1.0cm of e1] (e4) {\textbf{Etapa 4}\\Comparação\\vs 6 \emph{baselines}};
-\node[etapa, right=of e4] (e5) {\textbf{Etapa 5}\\Transferência \emph{fair}\\RFW / BFW};
-\node[destaque, right=of e5] (e6) {\textbf{Etapa 6}\\Síntese decompositiva\\fenotípico $\times$ algorítmico};
-
-% Setas horizontais superiores
-\draw[seta] (e1) -- (e2);
-\draw[seta] (e2) -- (e3);
-
-% Setas horizontais inferiores
-\draw[seta] (e4) -- (e5);
-\draw[seta] (e5) -- (e6);
-
-% Seta vertical entre linhas (e3 -> e4)
-\draw[seta] (e3.south) |- ($(e4.north)+(0,0.3)$) -- (e4.north);
-
-% Rótulos de dados
-\node[font=\scriptsize\itshape, below=0.05cm of e1, text=black!50] {vetor MST 10-dim};
-\node[font=\scriptsize\itshape, below=0.05cm of e2, text=black!50] {matriz pública};
-\node[font=\scriptsize\itshape, below=0.05cm of e3, text=black!50] {\emph{backbone} \emph{fair}};
-
-\end{tikzpicture}
+\centering
+\includegraphics[width=14cm]{images/fig_pipeline_6etapas.png}
 \\ \small Fonte: Autoria própria. Etapas em destaque (3 e 6) concentram as contribuições metodológica e diagnóstica principais.
 \label{fig:pipeline-6etapas}
 \end{figure}
@@ -178,38 +142,8 @@ A Figura~\ref{fig:configuracoes-abcd} compara visualmente as quatro configuraç�
 \begin{figure}[htbp]
 \centering
 \caption{Quatro configurações comparativas do estudo de \emph{ablation} arquitetural, com \emph{backbone} ConvNeXt-T mantido idêntico entre configurações.}
-\begin{tikzpicture}[
-  every node/.style={font=\footnotesize},
-  bb/.style={rectangle, draw=black!70, thick, minimum width=2.2cm, minimum height=0.8cm, align=center, fill=gray!10},
-  cond/.style={rectangle, draw=black!80, thick, rounded corners=2pt, minimum width=2.2cm, minimum height=0.8cm, align=center, fill=blue!10},
-  destaque/.style={rectangle, draw=black!90, very thick, rounded corners=2pt, minimum width=2.2cm, minimum height=0.8cm, align=center, fill=blue!25},
-  signal/.style={font=\scriptsize\itshape, text=black!60},
-  label/.style={font=\bfseries\small}
-]
-% Config A - Baseline
-\node[label] (labA) at (0, 0) {A --- \emph{Baseline}};
-\node[bb, below=0.2cm of labA] (bbA) {ConvNeXt-T};
-\node[signal, below=0.05cm of bbA] {sem \emph{conditioning}};
-
-% Config B - FiLM linear (destaque)
-\node[label, right=0.9cm of labA] (labB) {B --- FiLM linear};
-\node[destaque, below=0.2cm of labB] (bbB) {ConvNeXt-T\\+ FiLM};
-\node[signal, below=0.05cm of bbB] {MST 10-dim};
-
-% Config C - Gated FiLM
-\node[label, right=0.9cm of labB] (labC) {C --- \emph{Gated} FiLM};
-\node[cond, below=0.2cm of labC] (bbC) {ConvNeXt-T\\+ Gated FiLM};
-\node[signal, below=0.05cm of bbC] {MST 10-dim};
-
-% Config D - FiLM CLIP
-\node[label, right=0.9cm of labC] (labD) {D --- FiLM CLIP};
-\node[cond, below=0.2cm of labD] (bbD) {ConvNeXt-T\\+ FiLM};
-\node[signal, below=0.05cm of bbD] {CLIP-\emph{text} 512-dim};
-
-% Rótulo comum
-\node[font=\scriptsize\itshape, text=black!50, below=1.1cm of bbB, xshift=1.6cm] {Dataset: FairFace | Protocolo: 3 sementes | Métricas: DR + F1 macro + \emph{worst-class} F1 + EO};
-
-\end{tikzpicture}
+\centering
+\includegraphics[width=14cm]{images/fig_configs_abcd.png}
 \\ \small Fonte: Autoria própria. A Configuração B (proposta principal) é destacada em cor mais intensa.
 \label{fig:configuracoes-abcd}
 \end{figure}
