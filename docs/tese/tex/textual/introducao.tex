@@ -6,7 +6,7 @@ Sistemas de reconhecimento facial deixaram, na última década, de ser uma tecno
 
 Do lado científico, a maturação técnica também se intensificou. Modelos modernos combinam grandes datasets faciais~\cite{karkkainen2021fairface,wang2019racial,robinson2020face}, arquiteturas neurais profundas fundadas em ResNet, ConvNeXt e Vision Transformers, e funções de perda especializadas (ArcFace, CosFace), atingindo desempenho próximo ao humano em condições controladas. Em paralelo, \emph{vision-language models} como PaliGemma reformularam a classificação racial como \emph{Visual Question Answering}: o estado da arte atual em classificação racial multi-classe sobre o FairFace, o \textbf{FaceScanPaliGemma}~\cite{aldahoul2024exploring}, atinge F1 macro de 75\,\% e acurácia agregada de 75,7\,\%.
 
-Esta pesquisa parte de uma constatação simples e bem documentada: o reconhecimento facial funciona bem para a maioria das pessoas, mas não funciona igualmente bem para todas. A tecnologia amadureceu; a garantia de equidade, não. É sobre essa diferença que a dissertação foca.
+Esta pesquisa parte da seguinte constatação: o reconhecimento facial funciona bem para a maioria das pessoas, mas não funciona igualmente bem para todas. A tecnologia amadureceu; a garantia de equidade, não. É sobre essa diferença que a dissertação foca.
 
 
 \section{Problema: disparidade demográfica residual}
@@ -30,14 +30,14 @@ Apesar do F1 macro de 75\,\% reportado pelo FaceScanPaliGemma~\cite{aldahoul2024
 
 A disparidade não é artefato de um único modelo. O baseline canônico ResNet-34 originalmente treinado por \citeonline{karkkainen2021fairface} sobre o FairFace apresenta padrão análogo: 72\,\% de acurácia agregada, porém apenas 59,6\,\% em Hispanic contra 83,2\,\% em Black, conforme reportado independentemente por \citeonline{lin2022fairgrape} em experimentos de pruning \emph{fairness-aware}. A hierarquia de dificuldade entre raças mostra-se \textbf{estável através de múltiplos métodos, arquiteturas e datasets}, o que sugere um problema estrutural em vez de algorítmico contingente.
 
-\subsection{Apenas balanceamento de dados não resolve}
+\subsection{Balanceamento de dados}
 \label{sec:problema_balanceamento}
 
 A solução intuitiva de balancear o conjunto de treino por raça já foi exaustivamente testada e demonstrou-se insuficiente. O próprio FairFace foi construído com esse propósito~\cite{karkkainen2021fairface}, distribuindo suas 108.501 imagens de forma aproximadamente equilibrada entre sete categorias raciais. Mesmo assim, a disparidade Latinx \emph{versus} White persiste.
 
 \citeonline{kolla2022impact} conduziram dezesseis experimentos com proporções variáveis de raças no treino, concluindo explicitamente que ``distribuição uniforme de raças nos dados de treinamento não garante face recognition livre de viés''. \citeonline{wang2019racial}, ao introduzir o dataset \emph{Racial Faces in-the-Wild} (RFW), observaram que ``algumas raças permanecem intrinsecamente mais difíceis de reconhecer, mesmo com dados de treinamento balanceados''. Em escala industrial, o mesmo relatório NISTIR 8280 de \citeonline{grother2019face} documentou diferenciais de dez a cem vezes na taxa de falso positivo entre grupos raciais em algoritmos comerciais.
 
-\subsection{Diagnóstico: heterogeneidade fenotípica intra-categorial}
+\subsection{Heterogeneidade fenotípica intra-categorial}
 \label{sec:problema_heterogeneidade}
 
 Trabalhos recentes apontam duas direções complementares para explicar essa disparidade residual. A primeira, empírica, sustenta que a categoria \emph{Latinx/Hispanic} do FairFace mascara heterogeneidade fenotípica interna substantiva. Evidência convergente vem de três disciplinas independentes: a antropologia biológica --- via o projeto PERLA (\emph{Project on Ethnicity and Race in Latin America}) coordenado por \citeonline{telles2014pigmentocrac}, que documentou pigmentocracia em quatro países latino-americanos ---, a genética populacional --- com o estudo de \citeonline{bryc2015genetic} sobre 162.721 indivíduos, evidenciando composição altamente variável de ancestralidade Native American, European e African em Latinos ---, e a sociologia identitária --- com a análise longitudinal do Pew Research Center~\cite{lopez2017hispanic}, que documenta declínio da identidade Hispanic de 97\,\% para 50\,\% ao longo de quatro gerações nos Estados Unidos. A rotulagem monolítica no FairFace, portanto, agrupa em uma única categoria fenótipos que atravessam a totalidade do espectro Monk Skin Tone.
@@ -66,9 +66,7 @@ As contribuições da pesquisa organizam-se em três eixos principais, que sinte
 
 A pesquisa é conduzida em conformidade com o \emph{European AI Act} (2024), que estabelece obrigatoriedade de auditoria de \emph{fairness} em sistemas biométricos classificados como de alto risco.
 
-\section{Organização da dissertação}
+\section{Organização da pesquisa}
 \label{sec:intro_organizacao}
 
-A dissertação está organizada como segue, onde o Capítulo~\ref{chapter:revisao-bibliografica} apresenta a revisão de literatura em seis frentes e identifica cinco lacunas científicas endereçadas por esta dissertação. O Capítulo~\ref{chapter:objetivos} formaliza o objetivo geral, seis objetivos específicos, seis hipóteses testáveis e sete contribuições esperadas. O Capítulo~\ref{chapter:metodologia} descreve o pipeline metodológico em seis etapas, as quatro configurações comparativas de \emph{conditioning}, os seis \emph{baselines} de mitigação, a triangulação de métricas fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent}. O Capítulo~\ref{chapter:cronograma} apresenta o cronograma de execução, riscos identificados e próximos passos.
-
-
+Este trabalho está organizado como segue, onde o Capítulo~\ref{chapter:revisao-bibliografica} apresenta a revisão de literatura em seis frentes e identifica cinco lacunas científicas endereçadas por esta dissertação. O Capítulo~\ref{chapter:objetivos} formaliza o objetivo geral, seis objetivos específicos, seis hipóteses testáveis e sete contribuições esperadas. O Capítulo~\ref{chapter:metodologia} descreve o pipeline metodológico em seis etapas, as quatro configurações comparativas de \emph{conditioning}, os seis \emph{baselines} de mitigação e a triangulação de métricas fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent}. O Capítulo~\ref{chapter:cronograma} apresenta o cronograma de execução, os riscos identificados e as respectivas estratégias de mitigação.
