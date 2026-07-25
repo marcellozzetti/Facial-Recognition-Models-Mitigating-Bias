@@ -1,0 +1,54 @@
+\section{Marcos formais até a defesa}
+\label{sec:cron_marcos}
+
+O cronograma da pesquisa está estruturado em marcos acadêmicos e etapas de desenvolvimento científico, contemplando as atividades previstas desde a qualificação até a defesa da dissertação.
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabular}{p{6.5cm}p{2.8cm}p{5.5cm}}
+\toprule
+\textbf{Etapa} & \textbf{Período} & \textbf{Descrição} \\
+\midrule
+
+Solicitação da qualificação ao PPG-CC & Julho de 2026 & Encaminhamento da documentação conforme normas do Programa de Pós-Graduação. \\
+
+\textbf{Exame de Qualificação} & \textbf{Setembro de 2026 a Outubro de 2026} & Apresentação e avaliação do projeto de pesquisa pela banca examinadora. \\
+
+Implementação da infraestrutura experimental & Novembro de 2026 & Consolidação do ambiente computacional, preparação dos conjuntos de dados e definição dos protocolos experimentais. \\
+
+Avaliação de vieses em modelos de reconhecimento facial & Dezembro de 2026 & Execução dos experimentos iniciais e análise dos resultados obtidos. \\
+
+Desenvolvimento e validação da metodologia proposta & Janeiro de 2027 a Março de 2027 & Implementação da abordagem de mitigação de vieses, estudos comparativos e experimentos de ablação. \\
+
+Avaliação da capacidade de generalização da abordagem & Maio de 2027 & Validação em diferentes modelos e cenários de reconhecimento facial. \\
+
+Análise consolidada dos resultados & Junho de 2027 & Integração dos resultados experimentais, discussão dos achados e avaliação das contribuições da pesquisa. \\
+
+Redação da dissertação & Novembro de 2026 a Julho de 2027 & Elaboração e revisão contínua dos capítulos da dissertação em paralelo ao desenvolvimento da pesquisa. \\
+
+Defesa da dissertação & Segundo semestre de 2027 & Entrega da versão final e defesa pública perante banca examinadora. \\
+\bottomrule
+\end{tabular}
+\caption{Cronograma de execução das atividades da pesquisa.}
+\label{tab:cronograma}
+\end{table}
+
+\section{Riscos identificados e estratégias de mitigação}
+\label{sec:riscos}
+
+Quatro classes principais de risco foram identificadas, com respectivas estratégias de mitigação documentadas:
+
+\begin{description}[font=\bfseries\sffamily]
+\item[Risco~1 --- Refutação de hipóteses.] Qualquer uma das seis hipóteses testáveis (Seção~\ref{sec:hipoteses}) pode ser refutada pelos dados empíricos. \\
+\textbf{Mitigação}: cada hipótese possui plano B documentado; a observação negativa é resultado científico válido, e as refutações, tornam-se contribuição empírica ao debate central da literatura (Seção~\ref{sec:rl_fairrep}).
+
+\item[Risco~2 --- Dependência do SkinToneNet como fonte da verdade.] O pipeline depende da precisão do SkinToneNet~\cite{matias2026large} na Etapa~1; falhas de generalização podem propagar-se para o \emph{conditioning}. \\
+\textbf{Mitigação}: validação humana interna estratificada (Seção~\ref{sec:validacao_interna}) e \emph{sensitivity analysis} com dois ou três classificadores MST alternativos. A limitação de escala da validação interna --- aproximadamente duzentas a trezentas imagens --- é declarada explicitamente na Seção~\ref{sec:validacao_interna}.
+
+\item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \citeonline{pangelinan2023exploring} argumentam que o \emph{driver} estrutural do gap em FR é \emph{pixel information}, não tom de pele. \\
+\textbf{Mitigação}: Hipotese reformulada com controle explícito de \emph{pixel information} via alinhamento e \emph{crop}; Há ainda uma hipotese formalizada como teste direto da tese de Pangelinan (decomposição de variância). Refutação parcial converte-se em contribuição quantitativa.
+
+\item[Risco~4 --- Limitação computacional.] Treinamento múltiplo com três sementes por configuração pode exigir tempo de GPU significativo. \\
+\textbf{Mitigação}: ConvNeXt-T é arquitetura relativamente leve, com 28 milhões de parâmetros; estima-se necessidade de aproximadamente 200 a 400 horas de GPU para a totalidade dos experimentos do Capitulo \ref{chapter:metodologia}, viáveis em infraestrutura de nuvem disponível para este trabalho.
+\end{description}

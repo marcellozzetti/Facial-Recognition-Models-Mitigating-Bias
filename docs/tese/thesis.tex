@@ -24,6 +24,8 @@
 \usepackage{pdfpages}
 \usepackage{graphicx}
 \usepackage[all,knot,arc,import,poly]{xy}   % Pacote para desenhos gráficos
+\usepackage{tikz}               % Diagramas nativos LaTeX
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,backgrounds,calc}
 % Este pacote pode conflitar com outros pacotes gráficos como o ``pictex''
 % Então é necessário usar apenas um dos pacotes conflitantes
 \newcommand{\VerbL}{0.52\textwidth}
@@ -62,9 +64,9 @@
 
 \noindent Propõe-se, nesta dissertação, desenvolver e avaliar um pipeline de classificação racial em imagens faciais que incorpora o tom de pele explícito, na escala Monk Skin Tone de dez classes, como sinal auxiliar condicionante via mecanismo arquitetural \emph{Feature-wise Linear Modulation} sobre \emph{backbone} ConvNeXt-T. O pipeline é organizado em seis etapas encadeadas: auditoria fenotípica do FairFace via um classificador MST pré-treinado, classificação racial condicionada por FiLM, comparação sistemática contra seis \emph{baselines} de mitigação --- FSCL+, Group DRO, FineFACE, \emph{adversarial debiasing} e dois controles arquiteturais ---, transferência \emph{fair} para tarefa \emph{downstream} de \emph{face recognition} sobre os datasets RFW e BFW, e síntese decompositiva final. A avaliação segue triangulação de métricas, com \emph{Disparity Ratio}, F1 da pior classe (\emph{worst-class} F1) e definições formais de \emph{Equal Opportunity} estratificadas por classe, arranjo desenhado para endereçar o Teorema da Impossibilidade em \emph{fairness} algorítmica e para permitir interpretação simultânea sob múltiplas definições formais de equidade.
 
-\noindent Como contribuições esperadas, delineiam-se três eixos: primeiro, a construção e disponibilização pública da primeira matriz de distribuição cruzada Monk Skin Tone versus classes raciais sobre o \emph{validation set} do FairFace; segundo, a primeira instância empírica documentada do uso de tom de pele como contexto arquitetural em \emph{fairness} facial \emph{multi-class}; e terceiro, uma decomposição quantitativa do erro de classificação Latinx em componente fenotípico irredutível --- derivado do \emph{overlap} MST intra-categoria --- e componente algorítmico mitigável, oferecendo diagnóstico estrutural no lugar de simples redução agregada de F1 macro. O trabalho é conduzido em conformidade com o \emph{European AI Act} de 2024, que estabelece obrigatoriedade de auditoria de \emph{fairness} em sistemas biométricos classificados como de alto risco, e observa integralmente as diretrizes éticas institucionais aplicáveis à pesquisa computacional sobre datasets secundários publicamente disponíveis.
+\noindent Como contribuições esperadas, delineiam-se três eixos --- fenotípico-empírico, metodológico-arquitetural e diagnóstico-estrutural --- que agregam sete contribuições específicas detalhadas no corpo do trabalho: primeiro, a construção e disponibilização pública da primeira matriz de distribuição cruzada Monk Skin Tone versus classes raciais sobre o \emph{validation set} do FairFace; segundo, a primeira instância empírica documentada do uso de tom de pele como contexto arquitetural em \emph{fairness} facial \emph{multi-class}; e terceiro, uma decomposição quantitativa do erro de classificação Latinx em componente fenotípico irredutível --- derivado do \emph{overlap} MST intra-categoria --- e componente algorítmico mitigável, oferecendo diagnóstico estrutural no lugar de simples redução agregada de F1 macro. O trabalho é conduzido em conformidade com o \emph{European AI Act} de 2024, que estabelece obrigatoriedade de auditoria de \emph{fairness} em sistemas biométricos classificados como de alto risco, e observa integralmente as diretrizes éticas institucionais aplicáveis à pesquisa computacional sobre datasets secundários publicamente disponíveis.
 
-}{Reconhecimento Facial; Equidade Algorítmica; Viés Racial; Monk Skin Tone; Feature-wise Linear Modulation; FairFace.}
+}{Reconhecimento Facial; Equidade Algorítmica; Viés Racial; Monk Skin Tone; Feature-wise Linear Modulation; FairFace}
 
 
 % resumo em INGLÊS
@@ -105,8 +107,6 @@
 % Inclui a lista de siglas e abreviaturas
 % \incluilistadesiglas
 
-
-
 % Inclui a lista de símbolos
 % \incluilistadesimbolos
 
@@ -123,9 +123,9 @@
 \label{chapter:introducao}
 \input{tex/textual/introducao}
 
-\chapter{Revisão de Literatura}
-\label{chapter:revisao}
-\input{tex/textual/revisao-literatura}
+\chapter{Revisão Bibliográfica}
+\label{chapter:revisao-bibliografica}
+\input{tex/textual/revisao-bibliografica}
 
 \chapter{Objetivos, Hipóteses e Contribuições}
 \label{chapter:objetivos}
@@ -137,7 +137,28 @@
 
 \chapter{Cronograma e Próximos Passos}
 \label{chapter:cronograma}
-\input{tex/textual/plano-trabalho}
+\input{tex/cronograma}
+
+
+%\chapter{Fundamentação Teórica}
+%\label{chapter:fundamentacao}
+%\input{tex/fundamentacao}
+
+%\chapter{Conjuntos de dados e métricas}
+%\label{chapter:dados-metricas}
+%\input{tex/dados-metricas}
+
+%\chapter{Propostas Metodológicas}
+%\label{chapter:propostas}
+%\input{tex/propostas}
+
+%\chapter{Análise Experimental e Resultados}
+%\label{chapter:analise}
+%\input{tex/analise}
+
+%\chapter{Conclusão e Plano de Trabalho}
+%\label{chapter:conclusao}
+%\input{tex/conclusao}
 
 % ---
 % Finaliza a parte no bookmark do PDF, para que se inicie o bookmark na raiz
@@ -159,11 +180,12 @@
 % GLOSSÁRIO
 % ---------------------------------------------------------------------
 
-% Definição do comando \newword e do ambiente {glossario} usados abaixo
-\input{tex/newword}
-
-% Glossário completo (73 termos organizados em 9 seções temáticas)
-\input{tex/glossario}
+% Arquivo que contém as definições que vão aparecer no glossário
+% \input{tex/glossario}
+% Comando para incluir todas as definições do arquivo glossario.tex
+% \glsaddall
+% Impressão do glossário
+% \printglossaries
 
 % ----------------------------------------------------------
 % Apêndices
