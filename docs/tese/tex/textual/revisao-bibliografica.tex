@@ -4,7 +4,7 @@ A revisão resultou em um corpus de \textbf{104 fichas bibliográficas}, cuja di
 
 A organização do capítulo segue seis frentes teórico-empíricas, uma revisão dos paradigmas arquiteturais de \emph{backbone}, uma fundamentação formal de métricas, uma frente instrumental e o mapeamento final de lacunas. As Seções~\ref{sec:rl_datasets} a~\ref{sec:rl_fairrep} percorrem, em ordem cronológica de emergência na literatura, as respostas historicamente propostas ao problema de \emph{fairness} --- termo aqui definido como paridade de desempenho entre grupos demográficos, na acepção formal de \citeonline{hardt2016equality} adotada ao longo do trabalho. A Seção~\ref{sec:rl_backbones} apresenta os dois paradigmas arquiteturais contemporâneos para classificação facial --- o convolucional (linha ResNet e sua modernização ConvNeXt) e o baseado em atenção (Vision Transformers) ---, contextualizando a escolha do ConvNeXt-T adotada nesta pesquisa. A Seção~\ref{sec:rl_metricas} apresenta as métricas formais de \emph{fairness} \emph{group-level} e o Teorema da Impossibilidade de \citeonline{kleinberg2017inherent}, que motivam o princípio metodológico de triangulação de métricas adotado no Capítulo~\ref{chapter:metodologia}. A Seção~\ref{sec:rl_arquit} apresenta a frente instrumental de auditoria automatizada de datasets e de mecanismos arquiteturais de \emph{conditioning}. A Seção~\ref{sec:rl_conditioning_alt} discute alternativas de \emph{conditioning} ponderadas antes da escolha metodológica final. A Seção~\ref{sec:rl_gaps} sintetiza as cinco lacunas científicas identificadas no corpus, as quais orientam diretamente os objetivos formulados no Capítulo~\ref{chapter:objetivos}.
 
-\section{Balanceamento de dados como mitigação da disparidade demográfica}
+\section{Balanceamento de dados}
 \label{sec:rl_datasets}
 
 A primeira geração de respostas ao problema de \emph{fairness} facial consistiu em \textbf{datasets balanceados por design}, ou seja, conjuntos de imagens construídos com a preocupação explícita de manter proporções semelhantes de amostras entre categorias demográficas sensíveis --- especialmente raça e gênero. A premissa subjacente, herdada da estatística clássica, é a de que representações equilibradas no treinamento produziriam desempenho igualmente equilibrado no teste.
@@ -14,10 +14,10 @@ O primeiro marco dessa geração foi o \emph{Racial Faces in-the-Wild} (RFW)~\ci
 Apesar da consolidação dessa geração de datasets, a persistência da disparidade específica de \emph{Latinx} no FairFace, discutida no Capítulo~\ref{chapter:introducao}, evidenciou que o balanceamento amostral, embora condição necessária, não é condição suficiente para mitigar o gap. O reconhecimento explícito dessa insuficiência --- corroborado pelos estudos empíricos de \citeonline{kolla2022impact} e pelas observações metodológicas de \citeonline{wang2019racial} --- deslocou o foco da comunidade científica das intervenções sobre os dados para as intervenções sobre o algoritmo, discutidas na seção seguinte.
 
 
-\section{Mitigação algorítmica via funções de perda e arquiteturas}
+\section{Mitigação algorítmica}
 \label{sec:rl_mitigacao}
 
-Diante da insuficiência do balanceamento amostral, a comunidade científica consolidou uma segunda geração de respostas ao problema, deslocando o esforço para o \textbf{processo de otimização dos modelos}. As técnicas dessa geração agem em três frentes complementares: a \emph{loss functions}, a arquitetura do classificador e o próprio \emph{fine-tuning}, isto é, o ajuste dos pesos de um modelo pré-treinado sobre a tarefa-alvo. Apresentam-se a seguir, em ordem cronológica, os trabalhos que estruturam essa geração e que servirão como \emph{baselines} de comparação para a proposta metodológica desta pesquisa.
+Diante da insuficiência do balanceamento amostral, a comunidade científica consolidou uma segunda geração de respostas ao problema, deslocando o esforço para o \textbf{processo de otimização dos modelos}. As técnicas dessa geração agem em três frentes complementares: a \emph{loss functions}, a arquitetura do classificador e o próprio \emph{fine-tuning}, isto é, o ajuste dos pesos de um modelo pré-treinado sobre a tarefa-alvo. Apresentam-se a seguir, os trabalhos que estruturam essa geração e que servirão como \emph{baselines} de comparação para a proposta metodológica desta pesquisa.
 
 A linha inaugural é a do \emph{adversarial debiasing}, estabelecida por \citeonline{zhang2018mitigating}: um segundo modelo (o adversário) é treinado para prever o atributo sensível a partir das \emph{features} internas do classificador principal, forçando este último a produzir representações das quais o atributo demográfico não seja mais recuperável. Trata-se de referência ainda hoje amplamente utilizada como \emph{baseline} de mitigação. Dois anos depois, \citeonline{sagawa2020distribution} formalizaram a \emph{Distributionally Robust Optimization} (DRO) sobre grupos, técnica que substitui a minimização do erro médio pela minimização do erro do \emph{grupo demográfico de pior desempenho} (\emph{worst-case group}), oferecendo garantia formal de desempenho para o subgrupo mais penalizado.
 
@@ -29,14 +29,14 @@ A Figura~\ref{fig:timeline-mitigacoes} sintetiza cronologicamente as seis contri
 
 \begin{figure}[htbp]
 \centering
-\caption{Linha do tempo das principais contribuições em mitigação algorítmica de viés em classificação facial (2018--2025), com categorização por classe de técnica.}
+\caption{Linha do tempo das principais contribuições em mitigação algorítmica de viés (2018--2025).}
 \centering
 \includegraphics[width=14cm]{images/fig_timeline_mitigacoes.png}
 \\ \small Fonte: Autoria própria, com base nas publicações originais de \citeonline{zhang2018mitigating}, \citeonline{sagawa2020distribution}, \citeonline{park2022fair}, \citeonline{lin2022fairgrape}, \citeonline{manzoor2024fineface} e \citeonline{liu2025component}.
 \label{fig:timeline-mitigacoes}
 \end{figure}
 
-\section{Vision-Language Models como novo paradigma}
+\section{Vision-Language Models}
 \label{sec:rl_vlm}
 
 Uma terceira frente emergiu com os \textbf{\emph{Vision-Language Models} (VLMs)}, arquiteturas multimodais capazes de processar simultaneamente imagens e linguagem natural, treinadas em corpora massivos de pares imagem--texto extraídos da \emph{web}. Modelos como CLIP, PaliGemma e LLaVA reformularam tarefas tradicionais de visão computacional em interfaces baseadas em prompts textuais, o que abriu novos caminhos também para o problema de classificação racial.
@@ -49,14 +49,14 @@ A comparação direta de desempenho por raça entre o \emph{baseline} canônico 
 
 \begin{figure}[htbp]
 \centering
-\caption{Desempenho por classe racial de dois representantes de gerações distintas de arquitetura sobre o FairFace: \emph{baseline} ResNet-34 (2021) e estado da arte VLM (FaceScanPaliGemma, 2024). Apesar do ganho de aproximadamente 3,7 pontos percentuais na acurácia agregada, o gap específico da classe Latinx persiste em torno de sessenta por cento em ambas as arquiteturas.}
+\caption{Desempenho por classe racial no FairFace: \emph{baseline} ResNet-34 (2021) \emph{versus} FaceScanPaliGemma (2024).}
 \centering
 \includegraphics[width=14cm]{images/fig_f1_sota_comparativo.png}
 \\ \small Fonte: Autoria própria, com dados extraídos de \citeonline{lin2022fairgrape} (Tabela 2, \emph{baseline} ResNet-34) e de \citeonline{aldahoul2024exploring} (Tabela 16, FaceScanPaliGemma \emph{7-class}).
 \label{fig:f1-sota-comparativo}
 \end{figure}
 
-\section{Tom de pele como dimensão alternativa à raça}
+\section{Tom de pele como dimensão auditável}
 \label{sec:rl_skintone}
 
 Desde o estudo seminal \emph{Gender Shades}~\cite{buolamwini2018gender}, o \textbf{tom de pele} tem sido proposto na literatura como dimensão alternativa de auditoria de \emph{fairness}, mais estável conceitualmente que a categoria racial nominal. A justificativa é epistemológica: enquanto a raça é uma construção sociopolítica cuja definição varia por contexto histórico e cultural, o tom de pele é uma propriedade fenotípica mensurável de forma reproduzível a partir da própria imagem, funcionando como sinal objetivo para auditoria automatizada.
@@ -67,7 +67,7 @@ Em resposta a essa limitação, \citeonline{schumann2023consensus} estabeleceram
 
 \begin{figure}[htbp]
 \centering
-\caption{Comparação visual entre as escalas Fitzpatrick (1988) e Monk Skin Tone (2023). A escala Fitzpatrick dedica quatro fototipos a peles claras (I a IV) e apenas dois a peles escuras (V e VI), enquanto a MST distribui dez pontos de forma perceptualmente simétrica ao longo do espectro.}
+\caption{Comparação entre as escalas Fitzpatrick (1988) e Monk Skin Tone (2023).}
 \centering
 \includegraphics[width=14cm]{images/fig_fitzpatrick_vs_mst.png}
 \\ \small Fonte: Autoria própria, com cores oficiais da Monk Skin Tone Scale publicadas em \emph{skintone.google}~\cite{schumann2023consensus} e cores Fitzpatrick derivadas de referências dermatológicas públicas com base em \citeonline{fitzpatrick1988validity}.
@@ -76,11 +76,13 @@ Em resposta a essa limitação, \citeonline{schumann2023consensus} estabeleceram
 
 Em 2026, \citeonline{matias2026large} introduziram o \textbf{SkinToneNet}, um classificador MST em larga escala baseado na arquitetura Vision Transformer Small (ViT-S), ajustada (\emph{fine-tuned}) sobre o dataset \emph{Skin Tone in the Wild} (STW), composto por 42.313 imagens de 3.564 indivíduos. O SkinToneNet atinge estado da arte em regime \emph{cross-domain}, isto é, quando avaliado em datasets distintos daquele utilizado no treinamento. Este modelo é adotado como insumo pré-treinado na Etapa~1 do pipeline proposto (Seção~\ref{sec:pipeline}), acompanhado de \emph{sensitivity analysis} a classificadores MST alternativos como salvaguarda contra propagação de viés herdado.
 
+Uma frente emergente de crítica questiona, contudo, o próprio paradigma de rotulagem \textbf{discreta} do tom de pele. \citeonline{neto2025balancing}, em contribuição recente, argumentam que a fragmentação do espectro fenotípico em classes discretas --- seja MST-10, Fitzpatrick-6 ou categorias raciais nominais --- impõe limite estrutural à mitigação de viés, uma vez que identidades dentro de uma mesma categoria não contribuem igualmente ao balanceamento demográfico do dataset. Os autores propõem \emph{rótulos demográficos contínuos}, obtidos como grau de pertencimento produzido por um classificador de etnia treinado sobre um sistema de \emph{face recognition} estado da arte, demonstrando que modelos treinados com balanceamento no espaço contínuo superam consistentemente aqueles treinados no espaço discreto. A presente pesquisa mantém a MST discreta como escolha metodológica principal, por sua consolidação como padrão de auditoria desde 2023 e pela ausência de classificadores contínuos publicamente disponíveis e amplamente validados em 2026, mas registra a linha contínua como direção natural de trabalho futuro, discutida no Capítulo~\ref{chapter:cronograma}.
 
-\section{Heterogeneidade fenotípica intra-categorial: convergência entre antropologia, genética e sociologia}
+
+\section{Heterogeneidade fenotípica intra-categorial}
 \label{sec:rl_latinx}
 
-A persistência do F1 na faixa de 60\,\% para a categoria \emph{Latinx} no estado da arte, apesar do balanceamento amostral e das técnicas de mitigação algorítmica avançada revistas nas seções anteriores, sugere a existência de um limite estrutural que a intervenção puramente computacional não é capaz de ultrapassar. Essa observação motivou a incorporação, ao presente trabalho, de uma frente teórica adicional --- oriunda de disciplinas externas à ciência da computação --- segundo a qual \textbf{a categoria Latinx/Hispanic, tal como operacionalizada no FairFace, mascara heterogeneidade fenotípica interna substantiva}. Três aportes disciplinares independentes convergem para essa hipótese:
+A persistência do F1 na faixa de 60\,\% para a categoria \emph{Latinx} no estado da arte, apesar do balanceamento amostral e das técnicas de mitigação algorítmica avançada revistas nas seções anteriores, sugere a existência de um limite estrutural que a intervenção puramente computacional não é capaz de ultrapassar. Essa observação motivou a incorporação a esta pesquisa de uma frente teórica adicional --- oriunda de disciplinas externas à ciência da computação --- segundo a qual \textbf{a categoria Latinx/Hispanic, tal como operacionalizada no FairFace, mascara heterogeneidade fenotípica interna substantiva}. Três aportes disciplinares independentes convergem para essa hipótese:
 
 \begin{itemize}
 \item \textbf{Antropologia biológica.} \citeonline{telles2014pigmentocrac}, através do projeto PERLA (\emph{Project on Ethnicity and Race in Latin America}), documentou pigmentocracia em quatro países latino-americanos --- Brasil, Colômbia, México e Peru ---, mostrando que tom de pele opera como dimensão social distinta da categoria racial, e que a variabilidade fenotípica intra-país é maior que a variabilidade entre países.
@@ -92,7 +94,7 @@ A persistência do F1 na faixa de 60\,\% para a categoria \emph{Latinx} no estad
 
 Essa triangulação teórica interdisciplinar sustenta uma das hipóteses formalizadas no Capítulo~\ref{chapter:objetivos}, segundo a qual a categoria Latinx no FairFace exibe dispersão ampla ao longo da escala Monk Skin Tone (cobertura de cinco ou mais das dez classes), oferecendo fundamentação empírica externa à ciência da computação para o diagnóstico de heterogeneidade estrutural que motiva o pipeline proposto. Trata-se de deslocamento epistemológico deliberado: a hipótese passa a ser testada com evidência produzida por antropologia, genética e sociologia, e não apenas por métricas internas ao próprio benchmark computacional.
 
-\section{Refutação central e fair representation learning}
+\section{Fair representation learning}
 \label{sec:rl_fairrep}
 
 Parte da literatura recente contesta o uso do tom de pele como principal \emph{driver} explicativo da disparidade racial. A contribuição mais relevante nessa direção é a de \citeonline{pangelinan2023exploring}, que sustenta que o gap racial em \emph{face recognition} é primariamente explicado por diferenças de \emph{pixel information} --- a fração de área útil da face contida na imagem, obtida por segmentação semântica com a rede BiSeNet ---, colocando o tom de pele em segundo plano na hierarquia causal. A presente pesquisa incorpora essa crítica de forma explícita sob duas formas complementares: primeiro, mediante controle de \emph{pixel information} como \emph{confounder} --- variável correlacionada tanto com o atributo sensível quanto com o desempenho --- na Etapa~5 do pipeline (Seção~\ref{sec:pipeline}); segundo, por meio de uma hipótese formalizada no Capítulo~\ref{chapter:objetivos} desenhada como teste direto da tese de \citeauthoronline{pangelinan2023exploring}. A inclusão explícita da refutação é decisão metodológica deliberada: fortalece a validade externa do resultado positivo, caso obtido, e o expõe honestamente à possibilidade de refutação, caso não obtido.
@@ -101,12 +103,12 @@ Em uma linhagem teórica complementar, \citeonline{zemel2013learning} inaugurara
 
 \citeonline{madras2018learning} estenderam o paradigma com o LAFTR (\emph{Learning Adversarially Fair and Transferable Representations}), demonstrando teoricamente que se a representação intermediária $Z$ satisfaz uma propriedade de \emph{fairness} em uma tarefa, então qualquer classificador \emph{downstream} treinado sobre $Z$ herda um limite superior formal para a violação daquela propriedade. Trata-se de garantia teórica de \emph{transferência de fairness} entre tarefas. \citeonline{aguirre2023transferring} corroboraram empiricamente essa transferência no domínio de Processamento de Linguagem Natural (NLP), em arquitetura \emph{multi-task} (múltiplas tarefas treinadas conjuntamente), obtendo reduções relativas de quinze a quarenta e quatro por cento na métrica $\varepsilon$-DEO (\emph{$\varepsilon$-Differential Equalized Odds}, medida da maior violação de \emph{Equalized Odds} entre grupos) sem perda de F1. A definição formal de \emph{Equal Opportunity} e de \emph{Equalized Odds} que estrutura toda essa literatura foi estabelecida por \citeonline{hardt2016equality} e é retomada formalmente na Seção~\ref{sec:rl_metricas} deste capítulo.
 
-\section{Arquiteturas \emph{backbone} para classificação facial: dois paradigmas}
+\section{Arquiteturas \emph{backbone}}
 \label{sec:rl_backbones}
 
 A escolha do \emph{backbone} --- rede neural responsável por produzir representações intermediárias das imagens antes da camada final de classificação --- é decisão metodológica central em qualquer sistema de reconhecimento facial, e impacta diretamente tanto o desempenho agregado quanto o comportamento de \emph{fairness} entre subgrupos demográficos. Do ponto de vista computacional, a literatura contemporânea de visão computacional organiza-se em torno de \textbf{dois paradigmas complementares}: o paradigma \emph{convolucional}, que opera por meio de filtros locais e estrutura hierárquica, e o paradigma \emph{baseado em atenção}, que opera por meio de \emph{self-attention} sobre representações tokenizadas da imagem. Esta seção percorre ambos os paradigmas para contextualizar a escolha metodológica formalizada no Capítulo~\ref{chapter:metodologia}.
 
-\subsection{Paradigma convolucional: da ResNet ao ConvNeXt}
+\subsection{Paradigma convolucional}
 \label{sec:rl_backbones_conv}
 
 O paradigma convolucional é o mais antigo e o dominante em visão computacional. Desde LeNet, AlexNet e VGG, as \emph{Convolutional Neural Networks} (CNNs) profundas foram sucessivamente aperfeiçoadas até que, em 2015, a família ResNet introduziu o mecanismo de \emph{conexões residuais} que viabilizou o treinamento estável de redes com dezenas a centenas de camadas, tornando-se o padrão de \emph{backbone} para a década seguinte. No contexto da literatura de \emph{fairness} facial revisada, a variante ResNet-34 foi adotada por \citeonline{karkkainen2021fairface} como \emph{baseline} original do FairFace e, consequentemente, tornou-se referência recorrente ao longo do corpus: foi retomada por \citeonline{lin2022fairgrape} como \emph{baseline} de comparação do FairGRAPE e por \citeonline{aldahoul2024exploring} como controle contra o qual o FaceScanPaliGemma foi comparado.
@@ -115,21 +117,21 @@ A face contemporânea deste mesmo paradigma é a família \textbf{ConvNeXt}, pro
 
 \begin{figure}[htbp]
 \centering
-\caption{À esquerda, comparação de acurácia \emph{Top-1} sobre ImageNet-1K entre as principais arquiteturas de \emph{backbone} contemporâneas (ResNet, DeiT, Swin Transformer, ViT e ConvNeXt), sob dois regimes de treinamento; o diâmetro das bolhas corresponde ao custo em GFLOPs. À direita, comparação estrutural dos blocos internos do Swin Transformer, do ResNet e do ConvNeXt, evidenciando que o bloco ConvNeXt não incorpora \emph{Multi-Head Self-Attention} --- permanecendo, portanto, dentro do paradigma convolucional.}
+\caption{Comparação entre \emph{backbones} contemporâneos: acurácia \emph{Top-1} em ImageNet-1K (esquerda) e estrutura dos blocos internos de Swin, ResNet e ConvNeXt (direita).}
 \centering
 \includegraphics[width=15cm]{images/fig_convnext_teaser_meta.png}
 \\ \small Fonte: \citeonline{liu2022convnet} --- teaser oficial do repositório \emph{facebookresearch/ConvNeXt}, disponível em \emph{github.com/facebookresearch/ConvNeXt}. Reprodução com finalidade acadêmica sob os termos de uso permitido para citação.
 \label{fig:convnext-teaser}
 \end{figure}
 
-\subsection{Paradigma baseado em atenção: Vision Transformers}
+\subsection{Paradigma de atenção}
 \label{sec:rl_backbones_vit}
 
 O paradigma baseado em atenção emergiu em visão computacional em 2020, com a proposta dos \emph{Vision Transformers} (ViTs) --- aplicação do mecanismo de \emph{self-attention} originalmente desenvolvido para processamento de linguagem natural ao domínio visual, por meio da tokenização de imagens em \emph{patches} tratados como sequências. Variantes hierárquicas subsequentes, como o Swin Transformer, incorporaram estrutura \emph{multi-scale} para reduzir custo computacional e ampliar aplicabilidade em tarefas de detecção e segmentação.
 
 No corpus revisado, ViTs aparecem tanto em propostas específicas de \emph{fairness} arquitetural --- como o FairViT de \citeonline{tian2024fairvit} --- quanto como \emph{backbone} de referência para classificação de tom de pele, notadamente no SkinToneNet~\cite{matias2026large}, que adota Vision Transformer Small (ViT-S). Contudo, ViTs apresentam três limitações relevantes em relação a esta pesquisa: (i) exigência de datasets massivos de pré-treinamento para atingir desempenho competitivo em regime de \emph{fine-tuning} sobre datasets de escala média como o FairFace; (ii) custo computacional elevado em inferência; e (iii) natureza \emph{non-hierarchical} da variante padrão, o que dificulta a inserção de mecanismos de \emph{conditioning} como FiLM originalmente projetados para redes convolucionais em quatro estágios.
 
-\subsection{Justificativa da escolha e impacto sobre \emph{fairness}}
+\subsection{Justificativa da escolha}
 \label{sec:rl_backbones_escolha}
 
 A escolha metodológica adotada neste trabalho é o ConvNeXt-T --- a variante \emph{Tiny} (aproximadamente 28 milhões de parâmetros) da família ConvNeXt. Trata-se, conforme discutido na Seção~\ref{sec:rl_backbones_conv}, de uma CNN moderna dentro do paradigma convolucional, e não de uma alternativa paradigmática a ele. Essa posição é conveniente porque permite manter a comparabilidade estrutural direta com o \emph{baseline} canônico ResNet-34 --- ambos são CNNs hierárquicas, permitindo isolar o efeito da modernização arquitetural sem confundi-lo com uma mudança de paradigma computacional.
@@ -137,12 +139,12 @@ A escolha metodológica adotada neste trabalho é o ConvNeXt-T --- a variante \e
 O impacto do \emph{backbone} sobre o comportamento de \emph{fairness} não é neutro: \citeonline{dooley2022rethinking}, por meio de \emph{Neural Architecture Search}, demonstraram empiricamente que decisões arquiteturais específicas afetam diretamente o padrão de disparidade demográfica observado, reforçando a exigência metodológica de justificar formalmente a escolha do \emph{backbone} em contextos sensíveis a \emph{fairness}. A justificativa detalhada da adoção do ConvNeXt-T --- que considera paridade competitiva com ViTs, estabilidade de treinamento em \emph{fine-tuning}, compatibilidade nativa com o mecanismo FiLM e comparabilidade com o \emph{baseline} canônico ResNet-34 --- é apresentada na Seção~\ref{sec:backbone} do Capítulo de Metodologia.
 
 
-\section{Métricas de \emph{fairness} algorítmico e o Teorema da Impossibilidade}
+\section{Métricas de \emph{fairness}}
 \label{sec:rl_metricas}
 
 Toda a literatura revisada nas seções anteriores depende de definições formais para a noção de \emph{fairness} algorítmico. A ausência de uma métrica única e universalmente aceita é, ela própria, uma característica estrutural do campo, com consequência metodológica direta para o desenho experimental proposto nesta dissertação.
 
-\subsection{Definições formais canônicas em nível de grupo}
+\subsection{Definições canônicas em nível de grupo}
 \label{sec:rl_metricas_defs}
 
 Seja um classificador $h: \mathcal{X} \to \mathcal{Y}$, um atributo sensível $A$ (raça, no contexto deste trabalho), o rótulo verdadeiro $Y$ e a predição $\widehat{Y} = h(X)$. As três definições \emph{group-level} mais adotadas na literatura de \emph{fairness} são:
@@ -164,12 +166,14 @@ O resultado formal mais influente da literatura contemporânea de \emph{fairness
 
 A consequência metodológica é direta e incontornável: qualquer intervenção que otimize uma das definições formais de \emph{fairness} violará necessariamente ao menos uma outra. Não existe, portanto, \emph{classificador universalmente justo}; existem, apenas, classificadores que satisfazem trade-offs explícitos entre definições concorrentes. Esta observação motiva o princípio metodológico de \textbf{triangulação de métricas} adotado nesta pesquisa.
 
-\subsection{Adaptações multi-classe e a lacuna de padronização}
+\subsection{Adaptações multi-classe}
 \label{sec:rl_metricas_multiclasse}
 
-Todas as definições formais apresentadas foram originalmente formuladas em contexto binário ($\mathcal{Y} = \{0, 1\}$). Para a classificação racial \emph{multi-classe} do FairFace (sete categorias), a literatura revisada \textbf{não converge em um protocolo único de adaptação}: algumas abordagens reduzem o problema a agregações binárias por classe (\emph{one-vs-rest}), outras empregam extensões macro/micro, e outras ainda avaliam apenas o pior subgrupo sem \emph{cross-tabulation} sistemática. Esta fragmentação é retomada explicitamente como Lacuna~G5 na Seção~\ref{sec:rl_gaps} e motiva a proposta metodológica de triangulação apresentada na Seção~\ref{sec:metricas} do Capítulo de Metodologia, na qual três métricas complementares são reportadas simultaneamente para cada configuração experimental como salvaguarda operacional contra o Teorema da Impossibilidade.
+Todas as definições formais apresentadas foram originalmente formuladas em contexto binário ($\mathcal{Y} = \{0, 1\}$). Para a classificação racial \emph{multi-classe} do FairFace (sete categorias), a literatura revisada \textbf{não converge em um protocolo único de adaptação}: algumas abordagens reduzem o problema a agregações binárias por classe (\emph{one-vs-rest}), outras empregam extensões macro/micro, e outras ainda avaliam apenas o pior subgrupo sem \emph{cross-tabulation} sistemática. Esta fragmentação é retomada explicitamente como a Lacuna 5 na Seção~\ref{sec:rl_gaps} e motiva a proposta metodológica de triangulação apresentada na Seção~\ref{sec:metricas} do Capítulo de Metodologia, na qual três métricas complementares são reportadas simultaneamente para cada configuração experimental como salvaguarda operacional contra o Teorema da Impossibilidade.
 
-\section{Auditoria de datasets, mecanismos arquiteturais e \emph{conditioning} moderno}
+Cabe registrar que, em 2024, o esforço internacional de padronização convergiu com a publicação da norma \textbf{ISO/IEC 19795-10:2024}~\cite{iso2024biometric}, que estabelece diretrizes formais para o reporte de variação de desempenho de sistemas biométricos entre grupos demográficos. A norma consolida, em linguagem regulatória, a prática de triangulação de métricas já emergente na literatura acadêmica revisada, e converge com as obrigações de auditoria de \emph{fairness} estabelecidas pelo \emph{European AI Act} para sistemas biométricos classificados como de alto risco. O protocolo experimental proposto no Capítulo~\ref{chapter:metodologia} adere a essas diretrizes ao reportar sistematicamente desempenho estratificado por grupo racial em três métricas complementares.
+
+\section{Auditoria de datasets e mecanismos de \emph{conditioning}}
 \label{sec:rl_arquit}
 
 Paralelamente às frentes teórico-empíricas percorridas até aqui, consolida-se uma \textbf{frente instrumental} organizada em torno de duas classes de ferramentas: procedimentos automatizados de auditoria de datasets e mecanismos arquiteturais de \emph{conditioning}. A primeira classe fornece diagnósticos sobre onde e como o viés se manifesta; a segunda oferece intervenções concretas para incorporar informação auxiliar ao processamento interno das redes.
@@ -180,7 +184,7 @@ Quanto a \textbf{mecanismos arquiteturais de \emph{conditioning}} --- entendidos
 
 \begin{figure}[htbp]
 \centering
-\caption{Diagrama conceitual do mecanismo \emph{Feature-wise Linear Modulation} (FiLM) aplicado ao contexto desta pesquisa. Uma camada FiLM recebe o \emph{feature map} $\mathbf{x}$ produzido pelo estágio anterior do \emph{backbone} e o vetor condicionante $\mathbf{z}_{\mathrm{MST}}$ (saída \emph{softmax} do classificador MST), gerando os parâmetros $\gamma$ e $\beta$ que modulam $\mathbf{x}$ por transformação afim canal a canal.}
+\caption{Diagrama conceitual do mecanismo \emph{Feature-wise Linear Modulation} (FiLM).}
 \centering
 \includegraphics[width=14cm]{images/fig_film_conceitual.png}
 \\ \small Fonte: Autoria própria, adaptado da formulação e da representação gráfica originais de \citeonline{perez2018film} (Figura 2 do artigo).
@@ -210,11 +214,11 @@ LoRA e Adaptadores & \emph{Parameter-efficient fine-tuning} & Categoria metodol�
 \textbf{FiLM} (adotado) & \citeonline{perez2018film} & Adequação dimensional ao sinal MST 10-dim; \emph{overhead} paramétrico de aproximadamente 1\,\% sobre o \emph{backbone}; interpretabilidade direta de $\gamma$ e $\beta$ por canal; compatibilidade com a estrutura de \emph{LayerNorm} do ConvNeXt-T; e ausência de aplicação documentada em \emph{fairness} facial em \emph{race classification} multi-classe. \\
 \bottomrule
 \end{tabular}
-\caption{Alternativas de \emph{conditioning} avaliadas e critérios de não adoção como linha principal.}
+\caption{Alternativas de \emph{conditioning} avaliadas.}
 \label{tab:cond_alternativas}
 \end{table}
 
-Em consonância com o princípio metodológico de exposição das limitações da própria proposta, reconhecem-se três restrições do FiLM padrão como escolha metodológica, discutidas em maior profundidade no Capítulo~\ref{chapter:metodologia}: (i) a natureza afim das transformações --- escala e deslocamento aplicados linearmente às \emph{features} --- não captura, por definição, interações não-lineares entre tom de pele e categoria racial, limitação endereçada por uma variante denominada \emph{Gated FiLM} (FiLM com porta multiplicativa dependente da entrada), incluída no estudo comparativo da Seção~\ref{sec:ablation}; (ii) a modulação opera globalmente por canal, sem incorporar informação espacial, o que é coerente com a natureza global do tom de pele mas restringe análises com granularidade regional; e (iii) o mecanismo opera em passo único, sem iteração de refinamento entre \emph{conditioning} e representação. Duas das configurações comparativas descritas na Seção~\ref{sec:ablation} foram desenhadas especificamente para isolar empiricamente o impacto das duas primeiras limitações.
+Em consonância com o princípio metodológico de exposição das limitações da própria proposta, reconhecem-se três restrições do FiLM padrão como escolha metodológica, discutidas em maior profundidade no Capítulo~\ref{chapter:metodologia}: (i) a natureza afim das transformações --- escala e deslocamento aplicados linearmente às \emph{features} --- não captura, por definição, interações não-lineares entre tom de pele e categoria racial, limitação endereçada por uma variante interna proposta como \emph{ablation} nesta pesquisa (FiLM combinada com porta multiplicativa sigmoide, inspirada na discussão de mecanismos de \emph{gating} como caso restrito de FiLM apresentada por \citeonline{dumoulin2018featurewise}), incluída no estudo comparativo da Seção~\ref{sec:ablation}; (ii) a modulação opera globalmente por canal, sem incorporar informação espacial, o que é coerente com a natureza global do tom de pele mas restringe análises com granularidade regional; e (iii) o mecanismo opera em passo único, sem iteração de refinamento entre \emph{conditioning} e representação. Duas das configurações comparativas descritas na Seção~\ref{sec:ablation} foram desenhadas especificamente para isolar empiricamente o impacto das duas primeiras limitações.
 
 \section{Lacunas científicas identificadas}
 \label{sec:rl_gaps}

@@ -15,15 +15,17 @@ Solicitação da qualificação ao PPG-CC & Julho de 2026 & Encaminhamento da do
 
 \textbf{Exame de Qualificação} & \textbf{Setembro de 2026 a Outubro de 2026} & Apresentação e avaliação do projeto de pesquisa pela banca examinadora. \\
 
-Implementação da infraestrutura experimental & Novembro de 2026 & Consolidação do ambiente computacional, preparação dos conjuntos de dados e definição dos protocolos experimentais. \\
+Implementação da infraestrutura experimental (Etapa~1 do pipeline, Seção~\ref{sec:pipeline}) & Novembro de 2026 & Consolidação do ambiente computacional, adoção do SkinToneNet pré-treinado, preparação dos conjuntos de dados e definição dos protocolos. \\
 
-Avaliação de vieses em modelos de reconhecimento facial & Dezembro de 2026 & Execução dos experimentos iniciais e análise dos resultados obtidos. \\
+Auditoria fenotípica do FairFace (Etapa~2) & Dezembro de 2026 & Construção da matriz pública Monk Skin Tone~$\times$~classes raciais e validação humana interna prevista na Seção~\ref{sec:validacao_interna}. \\
 
-Desenvolvimento e validação da metodologia proposta & Janeiro de 2027 a Março de 2027 & Implementação da abordagem de mitigação de vieses, estudos comparativos e experimentos de ablação. \\
+Classificador racial condicionado (Etapa~3) & Janeiro de 2027 a Março de 2027 & Treinamento do ConvNeXt-T com camadas FiLM sobre o FairFace \emph{train}, incluindo as quatro configurações do estudo de \emph{ablation} (Seção~\ref{sec:ablation}). \\
 
-Avaliação da capacidade de generalização da abordagem & Maio de 2027 & Validação em diferentes modelos e cenários de reconhecimento facial. \\
+Comparação contra \emph{baselines} de mitigação (Etapa~4) & Abril de 2027 & Avaliação sistemática das quatro configurações contra os seis \emph{baselines} (Seção~\ref{sec:baselines}), com triangulação de métricas (Seção~\ref{sec:metricas}). \\
 
-Análise consolidada dos resultados & Junho de 2027 & Integração dos resultados experimentais, discussão dos achados e avaliação das contribuições da pesquisa. \\
+Transferência \emph{fair} para \emph{face recognition} (Etapa~5) & Maio de 2027 & Validação da propriedade \emph{fair} do \emph{backbone} sobre RFW/BFW, com controle de \emph{pixel information} e descritores de qualidade de imagem. \\
+
+Síntese decompositiva e análise consolidada (Etapa~6) & Junho de 2027 & Decomposição do erro Latinx em componente fenotípico irredutível \emph{versus} componente algorítmico mitigável, com integração dos achados das etapas anteriores. \\
 
 Redação da dissertação & Novembro de 2026 a Julho de 2027 & Elaboração e revisão contínua dos capítulos da dissertação em paralelo ao desenvolvimento da pesquisa. \\
 
@@ -47,8 +49,8 @@ Quatro classes principais de risco foram identificadas, com respectivas estraté
 \textbf{Mitigação}: validação humana interna estratificada (Seção~\ref{sec:validacao_interna}) e \emph{sensitivity analysis} com dois ou três classificadores MST alternativos. A limitação de escala da validação interna --- aproximadamente duzentas a trezentas imagens --- é declarada explicitamente na Seção~\ref{sec:validacao_interna}.
 
 \item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \citeonline{pangelinan2023exploring} argumentam que o \emph{driver} estrutural do gap em FR é \emph{pixel information}, não tom de pele. \\
-\textbf{Mitigação}: Hipotese reformulada com controle explícito de \emph{pixel information} via alinhamento e \emph{crop}; Há ainda uma hipotese formalizada como teste direto da tese de Pangelinan (decomposição de variância). Refutação parcial converte-se em contribuição quantitativa.
+\textbf{Mitigação}: hipótese reformulada com controle explícito de \emph{pixel information} via alinhamento e \emph{crop}; há ainda uma hipótese formalizada como teste direto da tese de Pangelinan (decomposição de variância). Refutação parcial converte-se em contribuição quantitativa.
 
 \item[Risco~4 --- Limitação computacional.] Treinamento múltiplo com três sementes por configuração pode exigir tempo de GPU significativo. \\
-\textbf{Mitigação}: ConvNeXt-T é arquitetura relativamente leve, com 28 milhões de parâmetros; estima-se necessidade de aproximadamente 200 a 400 horas de GPU para a totalidade dos experimentos do Capitulo \ref{chapter:metodologia}, viáveis em infraestrutura de nuvem disponível para este trabalho.
+\textbf{Mitigação}: ConvNeXt-T é arquitetura relativamente leve, com 28 milhões de parâmetros; estima-se necessidade de aproximadamente 200 a 400 horas de GPU para a totalidade dos experimentos do Capítulo~\ref{chapter:metodologia}.
 \end{description}
