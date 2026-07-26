@@ -1,5 +1,5 @@
 
-\section{Contexto: reconhecimento facial como infraestrutura social}
+\section{Contexto}
 \label{sec:contexto}
 
 Sistemas de reconhecimento facial deixaram, na última década, de ser uma tecnologia restrita a laboratórios de pesquisa para integrar a infraestrutura cotidiana de identificação humana. Aplicam-se em desbloqueio de dispositivos pessoais, autenticação bancária e identidade digital, controle de acesso a ambientes corporativos, controle de fronteiras em aeroportos e identificação policial em vias públicas. Em escala industrial, o programa \emph{Face Recognition Vendor Test} do National Institute of Standards and Technology (NIST) conduziu, em 2019, sob a coordenação de \citeonline{grother2019face}, a maior auditoria pública já realizada em biometria facial --- cento e oitenta e nove algoritmos comerciais avaliados sobre dezoito milhões de imagens de oito milhões e meio de pessoas.
@@ -9,10 +9,10 @@ Do lado científico, a maturação técnica também se intensificou. Modelos mod
 Esta pesquisa parte da seguinte constatação: o reconhecimento facial funciona bem para a maioria das pessoas, mas não funciona igualmente bem para todas. A tecnologia amadureceu; a garantia de equidade, não. É sobre essa diferença que a dissertação foca.
 
 
-\section{Problema: disparidade demográfica residual}
+\section{Problemática}
 \label{sec:problema}
 
-O problema central que motiva a presente pesquisa enuncia-se de forma direta: \textbf{sistemas de reconhecimento facial apresentam disparidade demográfica significativa em acurácia entre grupos raciais, mesmo quando treinados sobre datasets explicitamente balanceados por design}.
+A problemática central que motiva a presente pesquisa enuncia-se de forma direta: \textbf{sistemas de reconhecimento facial apresentam disparidade demográfica significativa em acurácia entre grupos raciais, mesmo quando treinados sobre datasets explicitamente balanceados por design}.
 
 \subsection{Disparidade documentada no estado da arte}
 \label{sec:problema_disparidade}
@@ -51,7 +51,7 @@ A disparidade tem consequências concretas: quando um sistema é utilizado em ca
 
 A questão científica, portanto, deixou de ser ``existe viés?'' --- está documentada desde o estudo seminal \emph{Gender Shades}~\cite{buolamwini2018gender}. A questão atual é: \textbf{qual é o mecanismo gerador desse viés residual mesmo em datasets balanceados, e como mitigá-lo de forma cientificamente defensável?}
 
-\section{Objetivo e contribuições da pesquisa}
+\section{Objetivo e contribuições}
 \label{sec:intro_objetivo}
 
 A pesquisa propõe-se desenvolver e avaliar um pipeline de classificação racial em imagens faciais que incorpora o tom de pele explícito (escala Monk Skin Tone, dez classes) como sinal auxiliar condicionante, por meio do mecanismo arquitetural \emph{Feature-wise Linear Modulation} (FiLM)~\cite{perez2018film}, aplicado sobre \emph{backbone} ConvNeXt-T. A escolha da escala MST em detrimento da escala Fitzpatrick fundamenta-se no viés fototípico documentado desta última~\cite{fitzpatrick1988validity} e na consolidação da MST como padrão moderno para auditoria de \emph{fairness}~\cite{schumann2023consensus,matias2026large}. A escolha do mecanismo FiLM em detrimento de concatenação simples fundamenta-se em sua capacidade de modular \emph{features} intermediárias por escala e deslocamento, discutida em detalhe na Seção~\ref{sec:film} do Capítulo de Metodologia.
@@ -66,7 +66,7 @@ As contribuições da pesquisa organizam-se em três eixos principais, que sinte
 
 A pesquisa é conduzida em conformidade com o \emph{European AI Act} (2024), que estabelece obrigatoriedade de auditoria de \emph{fairness} em sistemas biométricos classificados como de alto risco.
 
-\section{Organização da pesquisa}
+\section{Organização}
 \label{sec:intro_organizacao}
 
-Este trabalho está organizado como segue, onde o Capítulo~\ref{chapter:revisao-bibliografica} apresenta a revisão de literatura em seis frentes e identifica cinco lacunas científicas endereçadas por esta dissertação. O Capítulo~\ref{chapter:objetivos} formaliza o objetivo geral, seis objetivos específicos, seis hipóteses testáveis e sete contribuições esperadas. O Capítulo~\ref{chapter:metodologia} descreve o pipeline metodológico em seis etapas, as quatro configurações comparativas de \emph{conditioning}, os seis \emph{baselines} de mitigação e a triangulação de métricas fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent}. O Capítulo~\ref{chapter:cronograma} apresenta o cronograma de execução, os riscos identificados e as respectivas estratégias de mitigação.
+Este trabalho está organizado como segue. O Capítulo~\ref{chapter:revisao-bibliografica} apresenta a revisão de literatura em seis frentes teórico-empíricas, complementadas pela discussão de paradigmas arquiteturais de \emph{backbone}, pela fundamentação formal das métricas de \emph{fairness} sob o Teorema da Impossibilidade~\cite{kleinberg2017inherent} e pelo mapeamento de cinco lacunas científicas endereçadas por esta pesquisa. O Capítulo~\ref{chapter:objetivos} formaliza o objetivo geral, seis objetivos específicos, seis hipóteses testáveis e sete contribuições esperadas. O Capítulo~\ref{chapter:metodologia} descreve o pipeline metodológico em seis etapas, as quatro configurações comparativas de \emph{conditioning}, os seis \emph{baselines} de mitigação e a triangulação de métricas sob os dois cenários de avaliação (\emph{race} apenas e \emph{race}~$\times$~\emph{gender}), aderente à norma ISO/IEC 19795-10:2024. O Capítulo~\ref{chapter:cronograma} apresenta o cronograma de execução, os riscos identificados e as respectivas estratégias de mitigação.
