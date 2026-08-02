@@ -55,7 +55,7 @@
 \DeclareOption{mestrado}{
     \setboolean{opt-doutorado}{false}
 }
-\ExecuteOptions{doutorado}
+\ExecuteOptions{qualificacao}
 
 \newboolean{opt-pre-defesa}
 \DeclareOption{pre-defesa}{

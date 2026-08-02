@@ -1,77 +1,16 @@
-# Tese — Qualificação de Mestrado (Marcello Ozzetti / Unifesp-ICT)
+Modelo de Teses e Dissertações ICMC/USP
+=================
 
-Estrutura oficial da dissertação em **LaTeX/abnTeX2**, seguindo o
-template ICMC adaptado ao padrão Unifesp-ICT.
+Baseado no modelo proposto pela USP de São Carlos, este modelo visa atender as exigências do Programa de Pós-Graduação em Ciência da Computação do Instituto de Ciência e Tecnologia da UNIFESP. As normas principais estão baseadas na ABNT, com algumas adaptações em relação aos estilos dos capítulos, capa e folhas de rostos.
 
-## Arquivo principal
+O requisito básico para utilização da classe **_icmc_** é criar um documento desta classe com o comando
+`\documentclass[@parameters]{icmc}` e ter, no diretório de trabalho, o arquivo *icmc.cls* presente. Entretanto, recomenda-se fortemente manter a estrutura de diretório inicial fornecida por este modelo. 
 
-- **`thesis.tex`** — arquivo a compilar (comando `pdflatex + bibtex + pdflatex + pdflatex`, ou `latexmk -pdf` no Overleaf)
+Para que o documento esteja em conformidade com as normas exigidas pelo programa de Pós-Graduação, o **projeto deve ser compilado utilizando *XeLaTeX* ou *LuaLaTeX***. Esse processo de compilação é necessário para que as fontes externas utilizadas para gerar a capa sejam incluídas.
 
-## Estrutura de diretórios
-
-```
-docs/tese/
-├── thesis.tex                    ← arquivo mestre
-├── references.bib                ← bibliografia (104 entradas verificadas)
-├── packages/
-│   ├── icmc.cls                  ← classe LaTeX (abnTeX2 + adaptações ICMC)
-│   ├── abntexalfenglish.bst      ← estilo bibliográfico ABNT
-│   ├── capa.pdf                  ← capa institucional
-│   ├── contra-capa.png
-│   └── fonts/
-├── images/
-│   └── Unifesp_completa_policromia_RGB.png
-└── tex/
-    ├── pre-textual/                     ← Elementos pré-textuais
-    │   ├── dedicatoria.tex
-    │   ├── agradecimentos.tex
-    │   ├── epigrafe.tex
-    │   └── ficha-catalografica.pdf
-    ├── textual/                         ← Elementos textuais (5 capítulos)
-    │   ├── introducao.tex               ← Capítulo 1
-    │   ├── revisao-literatura.tex       ← Capítulo 2
-    │   ├── objetivos.tex                ← Capítulo 3
-    │   ├── metodologia.tex              ← Capítulo 4
-    │   └── plano-trabalho.tex           ← Capítulo 5 (Cronograma)
-    ├── newword.tex                      ← comando \newword + ambiente {glossario}
-    └── glossario.tex                    ← 73 termos técnicos (pós-textual)
-```
-
-## Padrão de citação
-
-Sistema **autor-data ABNT** (NBR 10520) via BibTeX clássico + `abntexalfenglish.bst`:
-
-| Comando | Renderização | Uso |
-|---|---|---|
-| `\cite{X}` | (KÄRKKÄINEN, 2021) | Citação implícita |
-| `\citeonline{X}` | Kärkkäinen (2021) | Citação nominal (autor no texto) |
-| `\citeauthoronline{X}` | Kärkkäinen | Só o autor, sem ano |
-| `\citeyear{X}` | 2021 | Só o ano |
-
-**Não usar** `\autocite` nem `\textcite` (são do `biblatex`, incompatíveis com esta classe).
-
-## Como compilar
-
-### No Overleaf
-1. Fazer upload da pasta `docs/tese/` inteira
-2. Configurar `thesis.tex` como arquivo principal
-3. TeX Live 2021+ (padrão do Overleaf)
-4. Compilador: **pdfLaTeX** (não LuaLaTeX nem XeLaTeX)
-
-### Localmente (MiKTeX / TeXLive)
-```bash
-cd docs/tese
-pdflatex thesis
-bibtex thesis
-pdflatex thesis
-pdflatex thesis
-```
-
-Ou:
-```bash
-latexmk -pdf thesis
-```
-
-## Histórico
-
-- **`docs/historico/tese_biblatex_backup/`** — versão anterior em biblatex (antes da migração para o template abnTeX2/ICMC). Preservada para consulta.
+Os parâmetros possíveis utilizados pelo `\documentclass` são:
+- **[qualificacao]** Exclusivamente para monografias de qualificação em geral;
+- **[mestrado / doutorado]** Identifica o curso ao qual o aluno pertence, sendo utilizado apenas uma das duas opções disponíveis. O valor padrão é **doutorado**;
+- **[pre-defesa / pos-defesa]** Identifica a situação do documento (exceto para qualificação), sedo necessário apenas uma das duas opções. O valor padrão é **pos-defesa**;
+- **[impressao]** Gera exclusivamente uma versão para impressão do documento;
+- **[french, spanish, english, brazil]** Adiciona o idioma para correta hifenização correta no documento. Os idiomas bases para o modelo (português e inglês) não precisam ser declarados.

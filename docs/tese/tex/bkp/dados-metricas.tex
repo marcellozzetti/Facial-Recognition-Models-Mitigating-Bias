@@ -1,0 +1,65 @@
+\section{Conjunto de dados}
+
+\subsection{LOOPS}
+
+Um dos conjuntos de dados utilizados neste estudo (denominado LOOPS) foi obtido em parceria com duas instituições brasileiras: a Faculdade de Odontologia de Piracicaba (FOP), em Piracicaba, São Paulo, e a Universidade Federal de Minas Gerais (UFMG), em Belo Horizonte, Minas Gerais. Este conjunto de dados consiste em 799 fotografias clínicas, capturadas por câmeras profissionais e dispositivos móveis.
+
+A rotulagem das imagens foi realizada por um grupo de especialistas médicos. Este processo envolveu a análise histopatológica das lâminas correspondentes a cada fotografia, visando revisar o diagnóstico e garantir um diagnóstico-base (\textit{ground-truth}) preciso. Além do diagnóstico em nível de imagem, os especialistas também forneceram máscaras de segmentação, demarcando a região exata da lesão em cada fotografia.
+
+O conjunto de dados é dividido em duas classes principais: 
+i) Desordens Orais Potencialmente Malignas (OPMD), que inclui casos desde nenhuma evidência até displasia epitelial oral (OED) leve ou moderada; e 
+ii) Carcinoma Espinocelular Oral (OSCC), que inclui casos desde OED grave e OSCC microinvasivo até tipos abertamente invasivos, convencionais e verrucosos.
+
+É importante notar que, em alguns casos, distinguir OSCC de OPMD com base apenas nas fotografias clínicas pode ser desafiador. Isso torna a avaliação histopatológica essencial para o diagnóstico definitivo. Até onde sabemos, este tipo de confirmação diagnóstica detalhada não é comumente encontrado em conjuntos de dados públicos disponíveis.
+
+Para os experimentos, o conjunto de dados foi dividido em aproximadamente 90\% para treinamento e 10\% para teste. Esta divisão não foi estritamente rigorosa, pois foi priorizado o agrupamento de amostras do mesmo paciente dentro do mesmo conjunto (treinamento ou teste). Esta abordagem foi adotada para evitar o vazamento de dados.
+
+Especificamente, o conjunto de treinamento incluiu 369 amostras de OPMD e 354 amostras de OSCC, enquanto o conjunto de teste continha 35 amostras de OPMD e 41 amostras de OSCC.
+
+\subsection{Waterbirds-95}
+
+O conjunto de dados \textit{Waterbirds-95} \cite{group_dro} é um \textit{benchmark} para testar a robustez de modelos contra correlações espúrias. Ele consiste em um total de 11.788 imagens divididas em duas classes: ``\textit{Landbird}'' (ave terrestre) e ``\textit{Waterbird}'' (ave aquática). Cada imagem também apresenta um fundo de ``\textit{land}'' (terra) ou ``\textit{water}'' (água). A característica principal deste conjunto de dados está na sua divisão: o conjunto de treinamento, com 4.795 imagens, é intencionalmente enviesado. Nele, 95\% das aves terrestres estão em fundos de terra (3.498 imagens) e 95\% das aves aquáticas estão em fundos de água (1.057 imagens), criando uma forte (e falsa) correlação entre a classe e o fundo. Em contraste, os conjuntos de validação (1.199 imagens) e teste (5.794 imagens) são balanceados: cada classe de ave é dividida igualmente (50/50) entre os dois tipos de fundo. Essa estrutura é projetada para avaliar se um modelo aprendeu a característica essencial ou se apenas se baseou no atalho enganoso do fundo.
+
+Além da estrutura de classes e fundos, o \textit{dataset} é enriquecido com dois tipos de anotações adicionais cruciais. Primeiro, ele fornece máscaras de segmentação que identificam a localização precisa da ave em cada imagem. Segundo, anotações de texto foram coletadas para cada imagem em um estudo posterior \cite{waterbirds_text}. Conforme descrito pelos autores, esse processo coletou dez descrições visuais de sentença única por imagem, com instruções explícitas para que os anotadores: (i) usassem pelo menos 10 palavras; (ii) descrevessem apenas a aparência visual (ex: cores, formas); (iii) evitassem nomear a espécie; e (iv) crucialmente, não descrevessem o fundo.
+
+\subsection{Futuros datasets a explorar}
+
+
+Além dos conjuntos de dados aplicados e analisados nas seções anteriores, o campo de pesquisa em correlações espúrias dispõe de um crescente ecossistema de \textit{benchmarks} públicos.  Conforme catalogado em um recente trabalho de \textit{survey} da área \cite{spurious_correlations_survey}, esses \textit{benchmarks} cobrem diversas modalidades. A Tabela \ref{tab:spurious_benchmarks_pt} resume os principais \textit{datasets} pertencentes às modalidades de imagem e texto, que são o foco de interesse deste trabalho. Embora a avaliação exaustiva nesses conjuntos de dados esteja fora do escopo imediato desta qualificação, eles representam uma valiosa oportunidade para trabalhos futuros.
+
+
+\begin{table}[htbp]
+\centering
+\footnotesize % <-- Adicione esta linha
+\caption{Resumo dos principais \textit{benchmarks} para avaliação de correlações espúrias nas modalidades de Visão e Texto, adaptado de \cite{spurious_correlations_survey}.}
+\label{tab:spurious_benchmarks_pt}
+\begin{tabular}{llcll}
+\toprule
+\textbf{Dataset} & \textbf{Nº de Classes} & \textbf{Nº de Amostras} & \textbf{Descrição} & \textbf{Domínio} \\
+\midrule
+Colored MNIST & - & 60,000 & Dataset Sintético & Visão \\
+Corrupted CIFAR-10 & - & 60,000 & Dataset Sintético & Visão \\
+CelebA & 2 $\times$ 2 & 202,599 & Atributo Facial & Visão \\
+Waterbirds & 2 $\times$ 2 & 11,788 & Pássaro & Visão \\
+ImageNet-9 & 9 & 5,495 & Subconjunto do ImageNet & Visão \\
+ImageNet-A & 200 & 7,500 & Subconjunto do ImageNet & Visão \\
+ImageNet-C & 75 & - & Subconjunto do ImageNet & Visão \\
+BAR & 6 & 2,595 & Ação & Visão \\
+NICO & 19 & 24,214 & Animal e Veículo & Visão \\
+MetaShift & 410 & 12,868 & Imagens Naturais & Visão \\
+FMWOW & 63 & 1,047,691 & Imagens de Satélite & Visão \\
+Spawrious & 6 $\times$ 4 & 152,064 & Cachorro & Visão \\
+CivilComments & 7 & 1,999,514 & Comentário Público & Texto \\
+MultiNLI & 3 $\times$ 2 & 206,175 & Inferência de Linguagem & Texto \\
+FDCL18 & 7 & 80,000 & Comportamento Abusivo & Texto \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Métricas de avaliação}
+
+Para avaliar rigorosamente a robustez de um modelo contra correlações espúrias, a Acurácia Média é insuficiente, pois frequentemente mascara falhas catastróficas em subpopulações de dados. A prática correta exige a estratificação do conjunto de teste em grupos discretos, formados pela combinação da classe-alvo e do atributo de viés. Usando o exemplo clássico do \textit{Waterbirds}, os grupos seriam: [pássaro aquático, fundo de água], [pássaro aquático, fundo de floresta], [pássaro terrestre, fundo de água], etc. Essa decomposição nos permite ir além da média e inspecionar onde o modelo realmente falha.
+
+A métrica central para esse diagnóstico é a Acurácia do Pior Grupo (\textit{Worst-Group Accuracy} - WGA) \cite{wga_reference}. Sua definição é exatamente o que o nome sugere: é a menor acurácia obtida em qualquer um dos grupos predefinidos. A WGA funciona como um ``teste de estresse'', identificando o elo mais fraco do modelo. Se um modelo utiliza um atalho (ex: ``água'' implica ``pássaro aquático''), ele terá uma performance baixíssima no grupo conflitante (ex: ``pássaro terrestre, fundo de água''), e a WGA evidenciará imediatamente essa dependência, fornecendo uma medida quantitativa direta da robustez do modelo.
+
+Embora a WGA seja crucial, ela é avaliada em conjunto com a Acurácia Média global, pois buscamos modelos que sejam simultaneamente robustos (alto WGA) e úteis (alta Acurácia Média). Adicionalmente, métricas como a Acurácia Média dos Grupos (que pondera igualmente cada grupo, independentemente do seu tamanho) e a Acurácia de Conflito de Viés (focada apenas nos grupos minoritários e desafiadores) fornecem diagnósticos complementares sobre como o modelo lida com os subconjuntos de dados mais difíceis, garantindo uma avaliação completa.

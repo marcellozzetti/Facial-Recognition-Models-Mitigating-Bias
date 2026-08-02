@@ -1,0 +1,421 @@
+\section[Avaliação da Proposta A]{Avaliação da Proposta A\footnote{Um primeiro artigo descrevendo os resultados iniciais do G\textsuperscript{2}SimCLR já encontra-se submetido para publicação.}}
+\subsection{Hiperparâmetros}
+
+Todos os experimentos foram conduzidos em uma \textit{workstation} com um processador Intel Xeon Silver 4214R @ 2.40GHz, 256GB de RAM e uma GPU NVIDIA RTX A6000. Para o treinamento do modelo SimCLR, utilizamos o \textit{backbone} ConvNeXt Base \cite{convnext}, pré-treinado no conjunto de dados ImageNet \cite{imagenet}. Esse \textit{backbone} foi escolhido pois, em estudos prévios do nosso grupo de pesquisa, ele demonstrou os resultados mais promissores. A cabeça de projeção era composta por três camadas com 1024, 512 e 256 neurônios, respectivamente. As transformações de dados aplicadas foram transformações geométricas simples: \textit{random cropping} com \textit{padding} de 64 pixels, \textit{flip} horizontal e \textit{flip} vertical, cada uma aplicada com probabilidade de 0,5. O tamanho do lote foi definido como 32, embora outros valores também tenham sido testados, e as taxas de aprendizado exploradas foram 0,01, 0,001 e 0,0001. O parâmetro de temperatura foi ajustado para 0,1, e o treinamento contrastivo foi conduzido por 100 épocas.
+
+Para avaliar a robustez do treinamento contrastivo, conduzimos 10 execuções independentes usando diferentes sementes aleatórias, variando de 32 a 8192 (em potências de 2). A execução de melhor desempenho foi obtida com a \textit{seed} 4096, que foi então utilizada nos demais experimentos e análises.
+
+Após o treinamento contrastivo, realizamos a etapa de avaliação linear. Isso envolveu a substituição das camadas finais da cabeça de projeção — no nosso caso, as camadas de 512 e 256 neurônios — por uma nova camada de classificação linear. Essa camada foi treinada com dados rotulados usando o otimizador Adam com uma taxa de aprendizado de 0,001. O treinamento foi realizado por até 500 épocas, com \textit{early stopping} baseada na perda no conjunto de teste, utilizando uma \textit{patience} de 10 épocas e uma \textit{seed} fixa de 32.
+
+Realizamos diversas execuções com o SimCLR padrão e, a partir delas, selecionamos aquela que alcançou a melhor acurácia. Usando esse modelo selecionado, aplicamos a estratégia de EGL para avaliar o impacto das nossas modificações nas métricas de desempenho. O valor alfa, que pondera a perda de localização, foi definido como 0,001, pois foi o que gerou os melhores resultados em nossos experimentos. Adicionalmente, usamos as máscaras de segmentação das anotações e as transformamos em \textit{bounding boxes} para definir as regiões de interesse na função \textit{Energy Loss}.
+
+Para avaliar de forma abrangente os benefícios da aprendizagem contrastiva, também conduzimos experimentos totalmente supervisionados, realizando \textit{fine-tuning} do modelo ConvNeXt Base. Sempre que possível, utilizamos os mesmos hiperparâmetros do SimCLR para garantir uma comparação justa. A principal diferença foi o limite de treinamento de até 500 épocas, com \textit{early stopping} baseada no desempenho do conjunto de teste.
+
+\subsection{Baseline com SimCLR}
+
+Realizamos os experimentos iniciais de otimização no conjunto de dados LOOPS, utilizando a estrutura padrão do SimCLR. Começamos pelo otimizador LARS \cite{lars}, conforme sugerido no trabalho original que propõe o SimCLR, e em seguida avaliamos alternativas.
+
+Identificamos que o RMSProp, quando configurado com uma taxa de aprendizado adequada, apresentou melhorias consistentes. Para garantir a robustez estatística e mitigar a variabilidade da inicialização aleatória, avaliamos cada otimizador ao longo de 10 execuções com diferentes \textit{seeds}. O RMSProp demonstrou ser superior, alcançando uma acurácia média de 79,60\% (com desvio padrão de 1,55), enquanto o LARS obteve 74,60\% (com desvio padrão de 2,15).
+
+Como o conjunto de dados LOOPS apresenta um leve desbalanceamento de classes e ambas são semanticamente importantes, utilizamos a \textit{macro average} para as demais métricas. Essa abordagem fornece uma avaliação balanceada e é uma prática comum nesses cenários. Comparado ao LARS, o RMSProp também proporcionou ganhos de 4,34\% na precisão, 5,70\% no recall e 2,51\% no F1-score. Os resultados detalhados desta comparação são apresentados na Tabela~\ref{tab:optimizer_comparison}.
+
+\begin{table}[htbp]
+  \caption{Comparação dos resultados de otimização usando LARS e RMSProp com diferentes taxas de aprendizado.}
+  \label{tab:optimizer_comparison}
+  \small
+  \centering
+  \setlength{\tabcolsep}{3pt} % diminuir espaço entre colunas
+  \begin{tabular}{lccccc}
+    \toprule
+    Otimizador & Taxa de aprendizado & Acurácia & Precisão & Recall & F1-score \\
+    \midrule
+    LARS     & 0.01   & 0.7237 & 0.7358 & 0.7314 & 0.7233 \\
+    LARS     & 0.001  & 0.7632 & 0.7731 & 0.7700 & 0.7630 \\
+    LARS     & 0.0001 & 0.7368 & 0.7463 & 0.7436 & 0.7367 \\
+    \midrule
+    RMSProp  & 0.01   & 0.4605 & 0.2303 & 0.5000 & 0.3153 \\
+    RMSProp  & 0.001  & 0.4605 & 0.2303 & 0.5000 & 0.3153 \\
+    \textbf{RMSProp} & \textbf{0.0001} & \textbf{0.7895} & \textbf{0.8166} & \textbf{0.8007} & \textbf{0.7882} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{ConvNeXt Supervisionado}
+
+O \textit{fine-tuning} supervisionado do modelo ConvNeXt Base também foi feito, para avaliar a influência do aprendizado contrastivo nas métricas de avaliação. Os resultados, apresentados na Tabela \ref{tab:supervised_results}, indicam que o melhor desempenho foi obtido com uma taxa de aprendizado de 0.0001, o que é consistente com a configuração ideal encontrada para o SimCLR. Ainda assim, o desempenho geral foi inferior, com uma queda na acurácia (3,95\%), além de reduções notáveis na precisão (6,37\%), no recall (4,70\%) e no F1-score (3,82\%) em comparação com o SimCLR.
+
+\begin{table}[htbp]
+  \caption{Comparação do treinamento supervisionado e contrastivo usando diferentes taxas de aprendizado.}
+  \label{tab:supervised_results}
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lccccc}
+    \toprule
+    Método & Taxa de aprendizado & Acurácia & Precisão & Recall & F1-score \\
+    \midrule
+    \textbf{Contrastivo} & \textbf{0.0001} & \textbf{0.7895} & \textbf{0.8166} & \textbf{0.8007} & \textbf{0.7882} \\
+    \midrule
+    Supervisionado & 0.01   & 0.5394 & 0.2697 & 0.5000 & 0.3504 \\
+    Supervisionado & 0.001  & 0.5394 & 0.2697 & 0.5000 & 0.3504 \\
+    Supervisionado & 0.0001 & 0.7500 & 0.7528 & 0.7537 & 0.7500 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Aplicação do Explanation-Guided Learning}
+\label{sec:applying_model_guidance}
+Para avaliar a eficácia do método proposto, selecionamos a melhor configuração de treinamento identificada para o SimCLR. Os experimentos foram conduzidos em dois cenários: utilizando anotações de \textit{bounding box} para definir as regiões de interesse para o cálculo da \textit{Loss Energy}, e utilizando anotações em nível de segmentação. Ao usar \textit{bounding boxes}, observamos ganhos modestos de desempenho: a acurácia aumentou 1,31\%, o recall 1,01\%, enquanto a precisão permaneceu quase inalterada, e o F1-score melhorou 1,41\%. No entanto, os resultados obtidos com o uso de máscaras foram significativamente mais promissores, com melhorias de 7,73\% na acurácia, 5,31\% na precisão, 7,11\% no recall e 8,01\% no F1-score. Esses achados sugerem que o emprego de regiões de interesse mais restritivas, em nível de pixel, é mais adequado para o nosso cenário.
+
+Assim como nos experimentos anteriores, cada configuração foi avaliada ao longo de 10 execuções com diferentes \textit{seeds}. Ao usar \textit{bounding boxes}, a acurácia média foi de 80,50\%, com desvio padrão de 1,84. Com o uso de máscaras de segmentação, a acurácia média subiu para 81,31\%, com um desvio padrão mais alto, de 3,20. Para fins de comparação, a configuração padrão do SimCLR sem o EGL, discutida anteriormente, alcançou uma acurácia média de 79,60\% com desvio padrão de 1,55. Os resultados completos são reportados na Tabela~\ref{tab:method_comparison}.
+
+A análise das 10 execuções do G²SimCLR com máscaras demonstrou uma melhoria média geral de 1,84\% sobre o \textit{baseline}. Contudo, identificamos uma execução específica que se comportou como um \textit{outlier} estatístico: nela, nosso método atingiu 76,32\% de acurácia, ficando aquém do \textit{baseline} (80,26\%) para a mesma \textit{seed}. Ao removermos essa execução atípica para um cálculo ajustado, a robustez da nossa abordagem tornou-se mais clara. A acurácia média ajustada do G²SimCLR alcançou 82,01\% (com desvio padrão de 2,79), superando significativamente a média do \textit{baseline}, que foi de 79,53\% (com desvio padrão de 1,62).
+
+Para avaliar a robustez das predições frente à variabilidade estocástica do treinamento, geramos a Figura~\ref{fig:multiple-run}. Nela, comparamos o desempenho de múltiplas execuções do modelo, inicializadas com sementes distintas. Se uma amostra está ``visível'', o modelo fez uma predição incorreta; se está opaca, o modelo previu corretamente aquela amostra. A borda azul representa a classe OPMD, e a borda vermelha representa a classe OSCC (\textit{ground truths}). A partir disso, observamos que os erros do modelo são sistemáticos, o que significa que múltiplas execuções classificam incorretamente as mesmas amostras. Isso sugere que essas amostras podem estar na fronteira de decisão, e qualquer pequena perturbação ou ruído pode deslocar a predição de uma classe para outra. Clinicamente, não encontramos um padrão discernível dentro dessas imagens.
+
+\begin{table}[htbp]
+  \caption{Resultados da avaliação para o SimCLR e o G\textsuperscript{2}SimCLR com diferentes níveis de anotação.}
+  \label{tab:method_comparison}
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lccccc}
+    \toprule
+    Método & Anotação & Acurácia & Precisão & Recall & F1-score \\
+    \midrule
+    SimCLR & - & 0,7895 & 0,8166 & 0,8007 & 0,7882 \\
+    G\textsuperscript{2}SimCLR & BBox & 0,8026 & 0,8168 & 0,8108 & 0,8023 \\
+    \textbf{G\textsuperscript{2}SimCLR} & \textbf{Máscara} & \textbf{0,8684} & \textbf{0,8697} & \textbf{0,8718} & \textbf{0,8683} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure*}
+  \centering
+  \includegraphics[width=0.95\linewidth]{multiple_run_figure.png}
+  \caption{Erros do método proposto ao longo de 10 execuções com diferentes \textit{seeds}. Cada linha é uma execução, cada coluna uma amostra de teste. Imagens opacas indicam predições corretas; imagens 100\% visíveis indicam erros. Bordas azuis representam o \textit{ground truth} OPMD, e vermelhas o OSCC. Apenas amostras com pelo menos um erro são exibidas.}
+  \label{fig:multiple-run}
+\end{figure*}
+
+\subsection{Impacto nas explicações do Grad-CAM}
+
+Para avaliar se o EGL impactou positivamente a explicabilidade do modelo, geramos mapas de atribuição usando Grad-CAM para todas as imagens de teste, tanto com o SimCLR quanto com o G²SimCLR (este último foi treinado usando anotações em nível de máscara, que apresentaram o melhor desempenho). A primeira observação foi que os modelos focaram em regiões distintas da imagem ao fazer suas predições. Para quantificar essa diferença, binarizamos os mapas de atribuição usando um limiar de 0,5 e, em seguida, calculamos o \textit{Dice Score} \cite{dice} entre os métodos. Obtivemos uma pontuação média de 0,486 com desvio padrão de 0,246, reforçando que os modelos exibem padrões de atenção distintos, o que evidencia o impacto da regularização.
+
+Embora o conjunto de teste seja pequeno (76 imagens), realizar uma análise qualitativa comparando os mapas de atribuição de ambos os modelos é uma tarefa desafiadora. Na Figura~\ref{fig:gradcam_explanations}, apresentamos esses resultados lado a lado para 12 amostras selecionadas aleatoriamente. De modo geral, os mapas de atribuição produzidos pelo método proposto parecem estar mais precisamente focados nas regiões da lesão nas amostras examinadas. No entanto, esse comportamento não é consistente em todos os casos.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1\linewidth]{gradcam_overview.png}
+  \caption{Explicações visuais geradas com Grad-CAM. A primeira linha mostra o \textit{ground truth} com as regiões de interesse anotadas em ciano. A segunda linha exibe o modelo \textit{baseline} (SimCLR), e a terceira linha mostra o método proposto (G²SimCLR).}
+  \label{fig:gradcam_explanations}
+\end{figure}
+
+\subsection{Métricas de Localização}
+
+Para quantificar o impacto do EGL na qualidade dos mapas de atribuição do Grad-CAM, realizamos um experimento motivado pela observação de que as diferenças visuais não eram facilmente perceptíveis. Geramos mapas Grad-CAM para todas as amostras de teste usando os modelos SimCLR e G²SimCLR. Esses mapas foram então binarizados usando limiares no intervalo de 0,1 a 0,9 (com incrementos de 0,1), e a precisão e o \textit{recall} foram calculados com base nas máscaras de \textit{ground truth} correspondentes.
+
+Um gráfico de \textit{recall}-precisão foi produzido, onde cada ponto representa a média das métricas no conjunto de teste para um determinado limiar. Os pontos correspondentes ao método G²SimCLR são mostrados em azul, enquanto o SimCLR é representado em vermelho. O valor do limiar usado para a binarização é indicado dentro de cada ponto.
+
+Como mostrado na Figura~\ref{fig:precision_recall_localization}, os resultados sugerem que, de modo geral, o método proposto gera mapas de atribuição mais precisos, mantendo um \textit{recall} comparável ou ligeiramente superior, especialmente no limiar de 0,4. Essa melhoria na precisão tende a se manter na maioria dos limiares, exceto em valores muito baixos (0,1 e 0,2). A precisão média entre os limiares foi de 0,3896 para o G²SimCLR em comparação com 0,3573 para o SimCLR, enquanto o recall médio foi de 0,2305 para o G²SimCLR e 0,2247 para o SimCLR.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.95\linewidth]{precision_recall_localization.png}
+  \caption{Gráfico mostrando o trade-off recall-precisão para os mapas de atribuição Grad-CAM gerados usando SimCLR e G²SimCLR. O eixo x representa o recall, enquanto o eixo y representa a precisão, com cada ponto correspondendo às métricas médias sobre o conjunto de teste para um limiar de binarização específico. Pontos azuis representam o G²SimCLR, enquanto pontos vermelhos representam o SimCLR. O valor numérico dentro de cada ponto indica o limiar aplicado durante a binarização, variando de 0,1 a 0,9.}
+  \label{fig:precision_recall_localization}
+\end{figure}
+
+\subsection{Estudos de Ablação}
+
+\subsubsection{Ajuste do Parâmetro Alfa para a Função de Energy Loss}
+
+Para avaliar o impacto do parâmetro alfa na função de \textit{Energy Loss}, conduzimos uma série de experimentos variando seu valor entre 0.1, 0.01, 0.001 e 0.0001. Esses experimentos foram realizados tanto para a variante da função de perda baseada em máscaras quanto para a baseada em \textit{bounding boxes}. Todos os demais hiperparâmetros foram mantidos fixos, seguindo a mesma configuração de base adotada neste trabalho. Os resultados estão resumidos na Tabela \ref{tab:linear_eval_annotation_alpha}.
+
+Para as \textit{bounding boxes}, é notável o ganho de desempenho ao utilizar valores de alfa menores, com 0.001 e 0.0001 atingindo uma acurácia de 80.26\%. Ao usar máscaras, observamos que, para todas as escolhas de alfa, os resultados foram superiores aos seus respectivos equivalentes com caixas delimitadoras. Contudo, diferentemente do observado com as caixas delimitadoras, reduzir o alfa excessivamente levou a uma queda no desempenho, que caiu de 86.84\% para 78.95\%.
+
+\begin{table}[h] % O [h] é sugestão, pode remover.
+  \centering
+  \caption{Avaliação do impacto na acurácia de acordo com o parâmetro alfa da função de Energy Loss.}
+  \label{tab:linear_eval_annotation_alpha}
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{lcc}
+    \toprule
+    Nível de Anotação & Alfa & Acurácia \\
+    \midrule
+    Bounding box & 0.1    & 0.7895 \\
+    Bounding box & 0.01   & 0.7632 \\
+    Bounding box & 0.001  & 0.8026 \\
+    Bounding box & 0.0001 & 0.8026 \\
+    Máscara            & 0.1    & 0.8158 \\
+    Máscara            & 0.01   & 0.8026 \\
+    \textbf{Máscara}   & \textbf{0.001}  & \textbf{0.8684} \\
+    Máscara            & 0.0001 & 0.7895 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\subsubsection{Desempenho em Todas as Camadas da Cabeça de Projeção}
+
+Nas seções anteriores, optamos por focar nos resultados obtidos da avaliação linear utilizando apenas a saída da primeira camada do cabeça de projeção. No entanto, é possível estender essa avaliação de desempenho para as demais camadas — em nosso caso, temos um total de três. A Tabela \ref{tab:linear_eval_projection_layers} resume os resultados obtidos para as três camadas, considerando as métricas de acurácia, precisão, \textit{recall} e \textit{f1-score}, tanto para o melhor modelo SimCLR quanto para o melhor modelo G²SimCLR.
+
+Passando diretamente aos resultados da segunda camada — visto que a primeira já foi discutida — observamos que, mais uma vez, o método proposto supera o SimCLR original em todas as métricas. Em geral, ao comparar os resultados da primeira e da segunda camada, notamos uma queda de desempenho para ambos os métodos; contudo, essa redução foi menos pronunciada no método proposto. A superioridade do nosso método também é evidente na terceira camada, onde todas as métricas do \textit{baseline} estão abaixo de 70\%, enquanto a menor métrica do nosso método proposto (\textit{F1-score}) ainda atingiu 74.96\%.
+
+\begin{table}[h]
+  \centering
+  \caption{Avaliação do desempenho do SimCLR e G²SimCLR variando a camada de saída da cabeça de projeção para a avaliação linear.}
+  \label{tab:linear_eval_projection_layers}
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{lcccc}
+    \toprule
+    Método & Acurácia & Precisão & Recall & F1-score \\
+    \midrule
+    \multicolumn{5}{c}{\textbf{Camada 1}} \\
+    \midrule
+    SimCLR   & 0.7895 & 0.8166 & 0.8007 & 0.7882 \\
+    G²SimCLR & \textbf{0.8684} & \textbf{0.8697} & \textbf{0.8718} & \textbf{0.8683} \\
+    \midrule
+    \multicolumn{5}{c}{\textbf{Camada 2}} \\
+    \midrule
+    SimCLR   & 0.7105 & 0.7329 & 0.7213 & 0.7087 \\
+    G²SimCLR & \textbf{0.8026} & \textbf{0.8026} & \textbf{0.8045} & \textbf{0.8023} \\
+    \midrule
+    \multicolumn{5}{c}{\textbf{Camada 3}} \\
+    \midrule
+    SimCLR   & 0.6842 & 0.6982 & 0.6927 & 0.6833 \\
+    G²SimCLR & \textbf{0.7500} & \textbf{0.7628} & \textbf{0.7578} & \textbf{0.7496} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\subsubsection{Substituição da cabeça de classificação por similaridade de cossenos}
+
+Ao aplicar o Grad-CAM para gerar explicações, a cabeça de classificação congelada no G²SimCLR é usada para gerar os \textit{scores} de classificação. No entanto, outros métodos podem ser utilizados para gerar as entradas necessárias para o Grad-CAM, especialmente no contexto de aprendizado contrastivo. Uma dessas abordagens envolve calcular a similaridade de cossenos entre os vetores de projeção de pares positivos e usar esse valor como entrada para o Grad-CAM \cite{sammani2023visualizing}.
+
+Avaliamos esse método quanto à sua compatibilidade com o EGL. Os resultados, utilizando a mesma \textit{seed} dos melhores resultados anteriores, são apresentados na Tabela \ref{tab:linear_eval_cosine}. Para todas as escolhas de alfa ($\alpha$), esse método teve um desempenho inferior ao uso da cabeça de classificação congelada, atingindo uma acurácia máxima de 80.26\%. Além disso, conduzimos 10 execuções com um alfa fixo de 0.001, que resultou em uma acurácia média de 79.08\% com um desvio padrão de 2.07.
+
+\begin{table}[h] % O [h] é uma sugestão de posicionamento, pode ser removido.
+  \centering
+  \caption{Avaliação dos resultados ao substituir o cabeçote de classificação pela similaridade de cossenos entre as projeções.}
+  \label{tab:linear_eval_cosine}
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{lcc}
+    \toprule
+    Nível de Anotação & Alfa & Acurácia \\
+    \midrule
+    Máscara            & 0.1    & 0.7895 \\
+    Máscara            & 0.01   & 0.7895 \\
+    \textbf{Máscara}   & \textbf{0.001}  & \textbf{0.8026} \\
+    Máscara            & 0.0001 & 0.7368 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+\subsubsection{Análise com tamanhos de lote maiores}
+
+Uma das premissas centrais do artigo original do SimCLR é a forte correlação entre o tamanho do \textit{batch size} e o desempenho, com o método geralmente se beneficiando de lotes maiores, especialmente quando combinado com o otimizador LARS. Para investigar isso, conduzimos experimentos usando três tamanhos de lote distintos: 32, 96 (que utilizou plenamente a VRAM disponível em nossa infraestrutura) e 180, que também ocupou plenamente a VRAM, mas exigiu treinamento com precisão mista \cite{micikevicius2017mixed}.
+
+Os resultados, apresentados na Tabela \ref{tab:linear_eval_results}, indicam que essa correlação não foi observada em nosso conjunto de dados específico. O tamanho de lote 32 obteve resultados melhores que o 96 e foi comparável ao 180. Além disso, independentemente do tamanho do lote, o otimizador RMSprop superou consistentemente o LARS em todas as configurações.
+
+\begin{table}[h] % O [h] é uma sugestão de posicionamento, pode ser removido.
+  \caption{Avaliação do SimCLR usando diferentes taxas de aprendizado, otimizadores e tamanhos de lote.}
+  \label{tab:linear_eval_results}
+  \centering
+  \setlength{\tabcolsep}{6pt}
+  \begin{tabular}{lcc}
+    \toprule
+    Otimizador & Taxa de Aprendizado & Acurácia \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Tamanho do Lote = 32}} \\
+    \midrule
+    RMSProp  & 0.01     & 0.4605 \\
+    RMSProp  & 0.001    & 0.4605 \\
+    \textbf{RMSProp}  & \textbf{0.0001}   & \textbf{0.7895} \\
+    LARS     & 0.01     & 0.7237 \\
+    LARS     & 0.001    & 0.7632 \\
+    LARS     & 0.0001   & 0.7368 \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Tamanho do Lote = 96}} \\
+    \midrule
+    RMSProp  & 0.01     & 0.4605 \\
+    RMSProp  & 0.001    & 0.5395 \\
+    \textbf{RMSProp}  & \textbf{0.0001}   & \textbf{0.7763} \\
+    LARS     & 0.01     & 0.7500 \\
+    LARS     & 0.001    & 0.7632 \\
+    LARS     & 0.0001   & 0.7368 \\
+    \midrule
+    \multicolumn{3}{c}{\textbf{Tamanho do Lote = 180}} \\
+    \midrule
+    RMSProp  & 0.01     & 0.4605 \\
+    RMSProp  & 0.001    & 0.5395 \\
+    \textbf{RMSProp}  & \textbf{0.0001}   & \textbf{0.7895} \\
+    LARS     & 0.01     & 0.7500 \\
+    LARS     & 0.001    & 0.7632 \\
+    LARS     & 0.0001   & 0.7500 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsubsection{Análise em Dados com Correlações Espúrias: Waterbirds}
+
+Embora os resultados no conjunto de dados LOOPS sejam satisfatórios (especialmente por se tratar de dados clínicos reais e bem curados) sua natureza pode não expor correlações espúrias de forma evidente. Isso torna difícil validar conclusivamente que o método proposto de fato mitiga o aprendizado desses atalhos. Para endereçar essa limitação e avaliar rigorosamente a robustez do modelo, conduzimos experimentos adicionais no \textit{dataset] Waterbirds-95}.
+
+Inicialmente, estabelecemos um \textit{baseline} treinando o SimCLR com as mesmas configurações dos experimentos anteriores. A mudança significativa residiu no protocolo de avaliação linear. Conforme apontado em \cite{ssl_spurious_correlation}, em dados com grupos minoritários e correlações espúrias, os classificadores lineares treinados sobre as representações podem ser enviesados pelos grupos majoritários e sofrer com distorções geométricas.
+
+Para diagnosticar isso, a literatura sugere balancear os grupos durante o treinamento do classificador linear. Portanto, conduzimos as avaliações lineares de duas formas: (1) sem balanceamento de grupos e (2) com balanceamento de grupos via \textit{downsampling}. Os conjuntos de validação e teste permaneceram inalterados e não balanceados.
+
+Os resultados deste \textit{baseline} são apresentados na Tabela \ref{tab:waterbirds_baseline}.
+
+\begin{table}[h]
+\centering
+\caption{Resultados do SimCLR (\textit{baseline}) no \textit{Waterbirds-95}. A avaliação ``Balanceada'' refere-se a avaliação linear com balanceamento de grupos.}
+\label{tab:waterbirds_baseline}
+\setlength{\tabcolsep}{8pt} % Ajuste de espaçamento
+\begin{tabular}{lccc}
+\toprule
+Método & Acurácia & WGA & Balanceada \\
+\midrule
+SimCLR & 0.6861 & 0.1667 & Não \\
+SimCLR & 0.7140 & 0.6758 & Sim \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Os resultados na Tabela \ref{tab:waterbirds_baseline} expõem o impacto da correlação espúria de forma inequívoca. Quando a avaliação linear é treinada sem balanceamento, a representação do SimCLR atinge uma acurácia geral de 68.61\%, mas o WGA colapsa para 16.67\%. Isso indica que o modelo base depende massivamente do atalho correlacional e falha em generalizar para os grupos minoritários. Contudo, quando a avaliação linear é treinada com balanceamento de grupos, o WGA salta para 67.58\%, quase se alinhando à acurácia geral. Esta discrepância massiva no WGA (67.58\% vs. 16.67\%) entre o desempenho com e sem balanceamento serve como uma \textit{proxy} clara da dependência do modelo na correlação espúria. 
+
+Para comparar de maneira justa o G²SimCLR com o \textit{baseline} do SimCLR, também realizamos a avaliação linear nos mesmos dois protocolos. Os resultados estão sumarizados na Tabela \ref{tab:waterbirds_g2simclr}.
+
+\begin{table}[h]
+\centering
+\caption{Resultados do \textbf{G²SimCLR} no Waterbirds-95, variando o protocolo de treinamento da avaliação linear.}
+\label{tab:waterbirds_g2simclr}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lccc}
+\toprule
+Método & Acurácia & WGA & Balanceada \\
+\midrule
+G²SimCLR & 0.7365 & 0.2243 & Não \\
+G²SimCLR & 0.7546 & 0.7419 & Sim \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Ao analisar os dados da Tabela \ref{tab:waterbirds_g2simclr} e compará-los com o \textit{baseline} anterior (Tabela \ref{tab:waterbirds_baseline}), observamos melhorias consistentes. Com a avaliação balanceada, nosso método G²SimCLR alcança um WGA de 74.19\%, superando os 67.58\% do SimCLR padrão. Isso sugere que nosso método proposto de fato aprendeu representações \textit{features} ainda mais robustas e menos dependentes de atalhos do que o método original.
+
+No entanto, o problema central persiste, embora de forma atenuada. Quando utilizamos a avaliação linear padrão, o WGA do G²SimCLR (22.43\%) é superior à do SimCLR (16.67\%), mas ambas permanecem em níveis muito baixos. Assim como no \textit{baseline}, existe uma lacuna substancial entre o desempenho real da representação (exposto pela avaliação balanceada, 74.19\%) e o desempenho obtido por um classificador linear simples (22.43\%).
+
+Isso indica que, embora o G²SimCLR tenha melhorado a qualidade intrínseca das \textit{features} de robustez, as \textit{features} espúrias ainda são proeminentes o suficiente para dominar a solução encontrada pelo classificador linear quando este não é forçado via balanceamento a considerar os grupos minoritários.
+
+\subsubsection{Aprimorando com Aprendizado Contrastivo Supervisionado}
+
+Nas seções anteriores (Tabelas \ref{tab:waterbirds_baseline} e \ref{tab:waterbirds_g2simclr}), identificamos que, embora as representações do G²SimCLR fossem robustas quando avaliadas com uma avaliação linear balanceada (WGA de 74.19\%), essa robustez não era acessada por uma avaliação padrão (WGA de 22.43\%). Isso sugere que as \textit{features} espúrias, embora talvez atenuadas, ainda dominavam a representação de forma linearmente separável.
+
+Uma abordagem lógica para direcionar o modelo a priorizar \textit{features} semânticas, em vez de focar em \textit{features} de atalho, é modificar o próprio \textit{framework} contrastivo para que ele utilize os rótulos das classes. Conforme detalhamos na Seção \ref{sec:supclr}. Os resultados obtidos com essa estratégia, detalhando o impacto da avaliação linear balanceada e padrão (não balanceada), estão apresentados na Tabela \ref{tab:waterbirds_supervised}.
+
+\begin{table}[h]
+\centering
+\caption{Resultados do SimCLR e G²SimCLR treinados com o \textit{framework} contrastivo supervisionado. A avaliação linear é apresentada tanto na versão balanceada (Sim) quanto na padrão/não balanceada (Não).}
+\label{tab:waterbirds_supervised}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lccc}
+\toprule
+Método & Acurácia & WGA & Balanceada \\
+\midrule
+SimCLR & 0.8334 & 0.5545 & Sim \\
+SimCLR & 0.8707 & 0.5826 & Não \\
+\textbf{G²SimCLR} & \textbf{0.9075} & \textbf{0.8022} & \textbf{Sim} \\
+G²SimCLR & 0.9139 & 0.7492 & Não \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Os resultados são notáveis. Primeiramente, o G²SimCLR supervisionado demonstra uma melhoria substancial em relação à sua contraparte não supervisionada (Tabela \ref{tab:waterbirds_g2simclr}), saltando de 74.19\% para 80.22\% no WGA quando se utiliza a avaliação balanceada. Curiosamente, o SimCLR padrão não obteve o mesmo benefício, vendo seu WGA cair de 67.58\% (não supervisionado, avaliação balanceada) para 55.45\% (supervisionado, avaliação balanceada).
+
+Os resultados também revelam o impacto do tipo de avaliação linear: o G²SimCLR alcança seu melhor desempenho de WGA (80.22\%) com a avaliação balanceada, superando a avaliação padrão (74.92\%). Inversamente, o SimCLR padrão apresenta um WGA ligeiramente melhor na avaliação padrão (58.26\%) do que na balanceada (55.45\%). Isso sugere uma forte sinergia positiva entre o EGL do G²SimCLR e o sinal explícito dos rótulos, um benefício que não se traduz para o SimCLR e que é mais bem capturado pela métrica de avaliação balanceada.
+
+
+\section{Avaliando Proposta B}
+
+\subsection{Hiperparâmetros}
+
+O modelo base para o \textit{fine-tuning} do BERT foi o \texttt{bert-base-uncased} \cite{bert}. Definimos a sequência máxima em 128 \textit{tokens} e o tamanho do lote em 16. O modelo foi otimizado com {AdamW, utilizando uma taxa de aprendizado de $2 \times 10^{-5}$ para a etapa inicial de classificação.
+
+Para tentar mitigar o viés do \textit{dataset}, implementamos o \textbf{Weighted Random Sampler} durante o treinamento do BERT. Essa técnica atribui pesos de amostragem inversamente proporcionais à frequência de cada classe, garantindo assim a superamostragem das classes minoritárias.
+
+Na fase de treinamento do M²SimCLR, a taxa de aprendizado foi ajustada para $1 \times 10^{-5}$. Para a inicialização dos pesos, exploramos duas abordagens: a inicialização padrão do \texttt{bert-base-uncased} ou o uso dos pesos do \textit{checkpoint} do treino anterior, que funciona como uma estratégia de pré-treinamento específica ao domínio. Por fim, todos os treinamentos tiveram um \textit{early stopping} baseado na \textit{loss} de validação.
+
+\subsection{Resultados preliminares}
+
+Inicialmente, buscamos validar a intuição de que o texto, por si só, contém um sinal robusto e livre das correlações espúrias visuais presentes no conjunto de dados. Para isso, realizamos um experimento preliminar de \textit{fine-tuning} do modelo BERT para a tarefa de classificação binária do \textit{Waterbirds-95}. Os resultados são apresentados na Tabela \ref{tab:bert_waterbirds}.
+
+\begin{table}[h]
+\centering
+\caption{Resultados do \textit{fine-tuning} do BERT no Waterbirds-95.}
+\label{tab:bert_waterbirds}
+\begin{tabular}{lcc}
+\toprule
+Acurácia & WGA & Weighted Sampling \\
+\midrule
+0.8964 & 0.6763 & Não \\
+0.8823 & 0.7290 & Sim \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Como observado, o modelo de texto atinge um WGA de 0.7290 (com \textit{weighted sampling}). Este resultado sugere que as descrições textuais fornecem um sinal semântico robusto e podem ser um guia valioso para o modelo de imagens.
+
+Em seguida, avaliamos esta arquitetura multimodal testando duas variáveis principais: (1) o uso de uma avaliação linear balanceada por grupo, em linha com os experimentos das seções anteriores, e (2) o impacto de usar os pesos do BERT padrão versus os pesos do BERT que já foi ajustado para a tarefa textual do Waterbirds (o modelo com \textit{weighted sampling} citado na Tabela \ref{tab:bert_waterbirds}).
+
+Os resultados desta ablação são apresentados na Tabela \ref{tab:multimodal_results}.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Resultados do modelo multimodal (Imagem-Texto) variando o método de avaliação linear e a inicialização do \textit{encoder} de texto.}
+\label{tab:multimodal_results}
+\setlength{\tabcolsep}{8pt}
+\begin{tabular}{lccc}
+\toprule
+Acurácia & WGA & Balanceada & BERT Ajustado \\
+\midrule
+0.8856 & 0.6526 & Não & Não \\
+0.8889 & 0.6370 & Sim & Não \\
+0.8875 & 0.6791 & Não & Sim \\
+0.8804 & 0.6745 & Sim & Sim \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A análise dos resultados revela que a estratégia mais eficaz para o WGA foi a utilização do BERT ajustado combinada com uma avaliação linear padrão, atingindo 0.6791 de WGA.
+
+É notável que, em ambas as configurações de avaliação (balanceada ou não), o uso do BERT previamente ajustado para o \textit{Waterbirds} superou consistentemente o BERT com pesos padrão. Isso reforça a hipótese de que fornecer um sinal textual mais ``especializado'', que já aprendeu a lidar com os vieses do domínio textual, oferece um guia de maior qualidade para o ramo de imagem, melhorando a robustez do modelo multimodal. Além disso, independente da configuração, o WGA foi superior ao SimCLR supervisionado (com 0.5545 de WGA), reforçando a hipótese inicial.
+
+\section{Estado da arte}
+
+Para avaliar a eficácia de nossas propostas no contexto mais amplo, comparamos seus resultados com métodos do estado da arte recentes no conjunto de dados\textit{Waterbirds-95}. A Tabela \ref{tab:waterbirds_sota} resume esse comparativo, focando na acurácia geral e, crucialmente, no WGA.
+
+\begin{table}[h]
+\centering
+\caption{Comparação das propostas do trabalho com o estado da arte no Waterbirds-95.}
+\label{tab:waterbirds_sota}
+\setlength{\tabcolsep}{8pt}
+% O pacote 'booktabs' é necessário para as linhas \toprule, \midrule, \bottomrule
+\begin{tabular}{lcc}
+\toprule
+Método & Acurácia & WGA \\
+\midrule
+Energy Loss & 0.8585 & 0.6636 \\
+CRAYON & 0.8603 & 0.7604 \\
+GALS & 0.8905 & 0.7654 \\
+Correct-N-Contrast & 0.9090 & 0.8550 \\
+\textbf{G²SimCLR (Supervisionado)} & \textbf{0.8921} & \textbf{0.7996} \\
+\textbf{M²SimCLR} & \textbf{0.8875} & \textbf{0.6791} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Os resultados demonstram que nossas abordagens são altamente competitivas. O G²SimCLR (Supervisionado), por exemplo, alcança 89,21\% de acurácia e 79,96\% de WGA, superando métodos robustos como GALS e CRAYON em ambas as métricas. O M²SimCLR também se mostra eficaz, ultrapassando o Energy Loss na Acurácia do Pior Grupo (67,91\% vs. 66,36\%).
+
+Embora o Correct-N-Contrast represente atualmente o topo do \textit{ranking}, nosso G²SimCLR (Supervisionado) apresenta um desempenho muito próximo, posicionando-se como uma alternativa relevante e robusta no cenário atual.

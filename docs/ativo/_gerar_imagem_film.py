@@ -79,7 +79,7 @@ def build_figure(out_path: Path) -> None:
     # ====== Linha 2 (superior) — SkinToneNet + contexto z + MLPs ======
     # SkinToneNet
     _box(ax, 16, 44, 12, 6, "SkinToneNet\n(ViT-Small)\nCONGELADO", fc=GREEN, ec=GREEN, fs=10, fw="bold", tc=WHITE)
-    _label(ax, 22, 51.5, "Pereira et al. 2026", fs=8)
+    _label(ax, 22, 51.5, "Matias et al. 2026", fs=8)
 
     _arrow(ax, 28, 47, 33, 47)
 

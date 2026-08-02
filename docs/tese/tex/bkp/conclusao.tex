@@ -1,0 +1,104 @@
+\section{Conclusão}
+
+Este trabalho de qualificação investigou a vulnerabilidade crítica dos modelos contrastivos, especificamente o SimCLR, ao aprendizado de correlações espúrias, que comprometem a generalização e robustez dos modelos. A pesquisa propôs ativamente modificar o processo de treinamento contrastivo para guiar o modelo em direção a características causais, explorando duas abordagens principais.
+
+A primeira abordagem, G²SimCLR, introduziu um \textit{framework} de \textit{Explanation-Guided Learning} no laço de treinamento. Ao utilizar uma \textit{Energy Loss} baseada em mapas de Grad-CAM e anotações espaciais (máscaras), o G²SimCLR demonstrou melhorias significativas. No dataset clínico LOOPS, o método não apenas aumentou a acurácia de classificação, mas, mais importante, melhorou drasticamente a precisão e o \textit{recall} dos mapas de localização, provando que o modelo passou a focar nas regiões de lesão corretas. No \textit{benchmark Waterbirds}, a versão supervisionada do G²SimCLR alcançou um WGA de 79.96\%, superando métodos de ponta e demonstrando alta robustez ao viés de fundo.
+
+A segunda abordagem, M²SimCLR, explorou o aprendizado multimodal como uma forma de desenviesamento. A hipótese central, validada experimentalmente, é que a modalidade de texto atua como uma ``âncora semântica'' que é inerentemente menos suscetível aos vieses visuais. Ao forçar o alinhamento entre as representações de imagem e texto por meio de uma perda contrastiva \textit{cross-modal}, o M²SimCLR também demonstrou melhorias na robustez, validando que diferentes modalidades podem regularizar umas às outras.
+
+Em suma, esta qualificação validou com sucesso que a aprendizagem contrastiva padrão não é suficiente para evitar atalhos. No entanto, ao guiar ativamente as representações---seja através de explicações espaciais (G²SimCLR) ou de âncoras semânticas multimodais (M²SimCLR)---é possível mitigar significativamente o impacto das correlações espúrias, produzindo modelos mais robustos e confiáveis.
+
+\section{Plano de trabalho}
+
+O plano de trabalho para os próximos dois anos foca em três eixos principais, derivados diretamente das conclusões deste trabalho:
+\begin{enumerate}
+    \item \textbf{Aprofundamento e Generalização do G²SimCLR:} Explorar a fundo a relação entre XAI e Aprendizado Contrastivo.
+    \item \textbf{Otimização do M²SimCLR:} Melhorar a eficácia da guiagem multimodal, que se mostrou uma frente de pesquisa viável, mas que ainda necessita de otimização para atingir seu potencial máximo.
+    \item \textbf{Validação e Publicação:} Validar as metodologias propostas em um espectro mais amplo de desafios e publicar os achados.
+\end{enumerate}
+
+\subsection{Atividades a Serem Desempenhadas}
+
+As atividades detalhadas, divididas por eixo de pesquisa, são:
+
+\subsection{Eixo 1: Aprofundamento e Generalização do G²SimCLR}
+\begin{itemize}
+    \item \textbf{Análise de Métodos XAI Alternativos:} Implementar e comparar métodos de XAI alternativos ao Grad-CAM (e.g., Grad-CAM++ \cite{gradcamplusplus}, Score-CAM \cite{epg_score}, Layer-CAM \cite{layercam}) como fontes de sinal para o \textit{Explanation-Guided Learning}, avaliando o impacto de diferentes métodos de atribuição na robustez final.
+    \item \textbf{Estudo de Profundidade de Camada:} Investigar o impacto de extrair mapas de atribuição de diferentes profundidades da rede convolucional, testando a hipótese de que camadas mais profundas (mais semânticas) ou mais rasas (mais texturais) podem oferecer sinais de guiagem distintos.
+    \item \textbf{Otimização da Função de Perda Espacial:} Desenvolver novas formulações para a \textit{Energy Loss} ou funções de perda de localização alternativas. O objetivo é criar perdas mais robustas a ruídos nas máscaras de anotação ou que operem de forma totalmente \textit{unsupervised} (sem depender de máscaras \textit{ground-truth}).
+    \item \textbf{Generalização para outras Arquiteturas SSL:} Implementar os mecanismos de \textit{Explanation-Guided Learning} em outras arquiteturas proeminentes de SSL (e.g., BYOL \cite{byol}, MoCo \cite{moco}, DINO \cite{dino}), verificando se a técnica de guiagem espacial é agnóstica à arquitetura contrastiva.
+\end{itemize}
+
+\subsection{Eixo 2: Otimização do M²SimCLR}
+\begin{itemize}
+    \item \textbf{Otimização da Perda Cross-modal:} Desenvolver e testar novas formulações para a \textit{loss} contrastiva entre modalidades (Imagem-Texto). O objetivo é investigar por que o desempenho de WGA foi inferior ao do G²SimCLR Supervisionado e propor modificações que melhorem a transferência de robustez da modalidade de texto para a de imagem.
+    \item \textbf{Expansão para Múltiplas Modalidades:} Expandir o \textit{framework} M²SimCLR para integrar dados multimodais mais diversos, como dados tabulares (e.g., idade do paciente, histórico clínico) em conjunto com imagens médicas.
+\end{itemize}
+
+\subsection{Eixo 3: Validação, Escrita e Defesa}
+\begin{itemize}
+    \item \textbf{Conclusão de Disciplinas:} Concluir as disciplinas e créditos restantes do programa de doutorado.
+    \item \textbf{Revisão Bibliográfica Contínua:} Manter a revisão da literatura atualizada, com foco especial em métodos de robustez e SSL multimodal.
+    \item \textbf{Validação em Benchmarks Adicionais:} Testar as abordagens desenvolvidas em outros \textit{datasets} do estado da arte para detecção de correlações espúrias (e.g., CelebA, conforme Tabela 1).
+    \item \textbf{Validação em Novos Datasets Médicos:} Aplicar os métodos em novos \textit{datasets} médicos multimodais que estão sendo construídos em parceria com outras instituições, validando a eficácia em cenários clínicos reais.
+    \item \textbf{Produção Científica:} Redigir e submeter os artigos científicos detalhando as contribuições do G²SimCLR e M²SimCLR (e suas extensões) para periódicos e conferências de alto impacto (e.g., CVPR, ICCV, NeurIPS).
+    \item \textbf{Redação da Tese:} Consolidar todos os resultados, metodologias e análises no documento final da tese.
+    \item \textbf{Defesa do Doutorado:} Preparar a documentação e a apresentação final para a defesa do doutorado.
+\end{itemize}
+
+\subsection{Cronograma}
+
+O cronograma a seguir detalha a execução das atividades planejadas para os próximos dois anos, culminando na defesa do doutorado ao final de 2027.
+
+% Para esta tabela funcionar, garanta que os pacotes abaixo estão no seu preâmbulo:
+% \usepackage[table]{xcolor}
+% \usepackage{graphicx}
+
+\begin{table*}[h!]
+\centering
+\caption{Cronograma de atividades do Doutorado (2026-2027).}
+\label{tab:cronograma}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{|l|c|c|c|c|c|c|c|c|}
+\hline
+\rowcolor[HTML]{EFEFEF}
+ & \multicolumn{4}{c|}{\textbf{2026}} & \multicolumn{4}{c|}{\textbf{2027}} \\
+\cline{2-9}
+\rowcolor[HTML]{EFEFEF}
+\multirow{-2}{*}{\textbf{Atividade / Eixo de Pesquisa}} & \textbf{T1} & \textbf{T2} & \textbf{T3} & \textbf{T4} & \textbf{T1} & \textbf{T2} & \textbf{T3} & \textbf{T4} \\
+\hline
+\textbf{Administrativo e Revisão} & & & & & & & & \\
+\hline
+Concluir disciplinas restantes & \cellcolor{gray!40} & \cellcolor{gray!40} & & & & & & \\
+\hline
+Revisão bibliográfica contínua & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & \\
+\hline
+\textbf{Eixo 1: G²SimCLR} & & & & & & & & \\
+\hline
+Análise de métodos XAI alternativos & \cellcolor{gray!40} & \cellcolor{gray!40} & & & & & & \\
+\hline
+Otimização da Função de Perda Espacial & & \cellcolor{gray!40} & \cellcolor{gray!40} & & & & & \\
+\hline
+Generalização para outras arquiteturas SSL & & & \cellcolor{gray!40} & \cellcolor{gray!40} & & & & \\
+\hline
+\textbf{Eixo 2: M²SimCLR} & & & & & & & & \\
+\hline
+Otimização da Perda Cross-modal & & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & & & & \\
+\hline
+Expansão para múltiplas modalidades (e.g., tabular) & & & & \cellcolor{gray!40} & \cellcolor{gray!40} & & & \\
+\hline
+\textbf{Eixo 3: Validação e Publicação} & & & & & & & & \\
+\hline
+Validação em benchmarks adicionais (SOTA) & & & & \cellcolor{gray!40} & \cellcolor{gray!40} & & & \\
+\hline
+Validação em novos datasets médicos & & & & & \cellcolor{gray!40} & \cellcolor{gray!40} & & \\
+\hline
+Produção Científica (Artigos) & & & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & \cellcolor{gray!40} & \\
+\hline
+Redação da Tese & & & & & & \cellcolor{gray!40} & \cellcolor{gray!40} & \\
+\hline
+Preparação e Defesa do Doutorado & & & & & & & & \cellcolor[HTML]{B0E0B0} \\
+\hline
+\end{tabular}%
+}
+\end{table*}
