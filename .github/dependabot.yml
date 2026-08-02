@@ -1,0 +1,69 @@
+# Dependabot configuration for automated dependency security updates.
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Este arquivo instrui o Dependabot a monitorar dependências Python e
+# GitHub Actions do repositório, abrindo PRs automaticamente quando novas
+# vulnerabilidades (CVEs) forem descobertas ou quando novas versões
+# estáveis forem publicadas.
+#
+# Histórico de auditorias manuais anteriores em docs/historico/security_audit.md
+# (Waves 1 e 2 em maio/2026, Wave 3 em agosto/2026).
+
+version: 2
+updates:
+  # ------------------------------------------------------------------
+  # Python — pyproject.toml e requirements.txt
+  # ------------------------------------------------------------------
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    # Agrupa updates menores (patch/minor) em um único PR por semana
+    # para reduzir ruído. Updates major continuam individuais para
+    # facilitar revisão manual.
+    groups:
+      python-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      security-updates:
+        applies-to: security-updates
+        patterns:
+          - "*"
+    # Ignora pacotes com pin específico controlado manualmente
+    # (torch requer wheel CUDA — trocar apenas em security_audit.md)
+    ignore:
+      - dependency-name: "torch"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "torchvision"
+        update-types: ["version-update:semver-major"]
+
+  # ------------------------------------------------------------------
+  # GitHub Actions — workflows em .github/workflows/
+  # ------------------------------------------------------------------
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+      include: "scope"

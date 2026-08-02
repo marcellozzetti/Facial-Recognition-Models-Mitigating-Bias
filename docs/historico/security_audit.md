@@ -1,23 +1,85 @@
 # Security Audit — Dependency Vulnerabilities
 
-**Last audit:** 2026-05-14
+**Last audit:** 2026-08-01
 **Tool:** `pip-audit` against the working virtualenv
 **Trigger:** GitHub Dependabot alerts on https://github.com/marcellozzetti/Facial-Recognition-Models-Mitigating-Bias/security/dependabot
 
 ## Summary
 
-This file tracks two waves of patches:
+This file tracks three waves of patches:
 
 **Wave 1 (2026-05-11).** 21 alerts open → 20 patched, 1 residual (`diskcache`, no upstream fix).
 **Wave 2 (2026-05-14).** 4 new alerts (3 PyTorch CVEs + a re-flagged `diskcache`) → 3 patched, 1 residual (same `diskcache`).
+**Wave 3 (2026-08-01).** 73 novos alertas em 13 pacotes (drift natural desde maio) → 72 endereçadas via bumps declarativos em `pyproject.toml`, 1 residual (mesmo `diskcache`) e 1 aberto pendente (starlette 1.x aguardando compatibilidade FastAPI).
 
-After both waves, **only the `diskcache` advisory remains**, and it is documented as accepted with mitigation rationale below.
+Após as três ondas, permanecem: (i) o alerta clássico do `diskcache` (aceito como risco) e (ii) o de `starlette` (aguardando bump coordenado com FastAPI).
 
 | Wave | Date | Opened | Patched | Residual |
 |---|---|---|---|---|
 | 1 | 2026-05-11 | 21 | 20 | 1 (diskcache) |
 | 2 | 2026-05-14 |  4 |  3 | 1 (same diskcache) |
-| **Net state today** | — | — | — | **1** |
+| 3 | 2026-08-01 | 73 | 72 | 2 (diskcache + starlette pendente) |
+| **Net state today** | — | — | — | **2** |
+
+**Automação futura**: `.github/dependabot.yml` (Wave 3) configurado para abrir PRs automáticos semanais para atualizações de segurança, agrupando patch/minor em um único PR e mantendo torch/torchvision sob controle manual devido às wheels CUDA.
+
+---
+
+## Wave 3 — 2026-08-01 (drift trimestral pós-Wave 2)
+
+### Contexto
+
+Entre 14/mai/2026 (Wave 2) e 01/ago/2026, o Dependabot acumulou 60 alertas visíveis no painel (contra 4 na Wave 2). Um `pip-audit` local rodou contra o venv ativo e identificou **73 vulnerabilidades em 13 pacotes** — o número visível no Dependabot conta por advisory, o número do pip-audit conta por (pacote × advisory). Todas exceto uma têm fix upstream disponível.
+
+### Pacotes atualizados via `pyproject.toml`
+
+| Pacote | Versão anterior | Novo pin | CVEs fechadas |
+|---|---|---|---|
+| **Pillow** | 12.2.0 | ≥12.3.0 | **20** (20 CVEs consolidadas) |
+| aiohttp | 3.13.5 | ≥3.14.1 | 11 (inclui CVE-2026-54275 TLS SNI bypass, CVE-2026-34993 RCE via `CookieJar.load`) |
+| pypdf | 6.12.1 | ≥6.13.1 | 10 |
+| GitPython | 3.1.50 | ≥3.1.54 | 8 |
+| dulwich | 1.2.1 | ≥1.2.5 | 5 (transitivo via GitPython/DVC) |
+| pyasn1 | 0.6.3 | ≥0.6.4 | 4 (transitivo via google-auth/cryptography) |
+| setuptools | 78.1.1 → 83.0.0 | ≥83.0.0 | 2 |
+| cryptography | 46.0.7 | ≥48.0.1 | 1 |
+| msgpack | 1.1.2 | ≥1.2.1 | 1 |
+| pydantic-settings | 2.14.0 | ≥2.14.2 | 1 |
+| **Total** | — | — | **63** |
+
+Após bump: reinstalar via `pip install --upgrade -e .` (que resolve os novos mínimos declarados em `pyproject.toml`) e regenerar `requirements.txt` via `pip freeze > requirements.txt`.
+
+### Pacotes atualizáveis fora de `pyproject.toml`
+
+- **`pip` (26.1.1 → 26.1.2)**: 2 CVEs. Atualizar via `python -m pip install --upgrade pip`. Não é dependência declarada; é o próprio gerenciador.
+
+### Residual pendente: `starlette 0.52.1` (7 CVEs)
+
+A versão que fecha as 7 CVEs é **starlette ≥ 1.0.1** — um bump major (0.x → 1.x). O projeto usa `fastapi==0.136.1`, cuja compatibilidade com starlette 1.x precisa ser verificada. **Ação:** consultar a matriz de compatibilidade FastAPI ↔ starlette e, se necessário, bumpar também FastAPI (potencialmente para 0.140+) em uma auditoria futura (Wave 3.1). Enquanto isso:
+- Exposição real: `starlette` é dependência de `fastapi`, que só é usado em CLIs internas (`face-bias-*`) — nenhum endpoint web exposto em produção.
+- Impacto operacional: baixo (superfície local, sem servidor rodando publicamente).
+
+### Residual mantido: `diskcache 5.6.3` (1 CVE)
+
+Situação idêntica à Wave 1 e Wave 2 — nenhum fix upstream disponível. Mitigações originais permanecem válidas (transitivo via MLflow; backend `file://` local; conteúdo produzido pelo próprio treinamento, não por input externo).
+
+### Comandos executados
+
+```powershell
+# Auditoria completa (venv ativo)
+.\.venv\Scripts\python.exe -m pip_audit --format=json > audit_2026-08-01.json
+
+# Parsing dos 13 pacotes vulneráveis
+python -c "import json; ..."  # ver acima
+
+# Após atualização de pyproject.toml (a fazer localmente):
+.\.venv\Scripts\python.exe -m pip install --upgrade -e .
+.\.venv\Scripts\python.exe -m pip freeze > requirements.txt
+```
+
+### Automação futura
+
+Novo arquivo `.github/dependabot.yml` habilita PRs automáticos semanais (segunda-feira, 09:00 America/Sao_Paulo), agrupando updates minor/patch em um único PR e mantendo `torch`/`torchvision` fora do fluxo automático (dependem de wheels CUDA específicas — vide Wave 2).
 
 ---
 

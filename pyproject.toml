@@ -38,7 +38,7 @@ dependencies = [
   "boto3>=1.28",
   "tqdm>=4.65",
   "matplotlib>=3.7",
-  "Pillow>=12.2.0",          # security: CVE-2024-28219, CVE-2026-42308, CVE-2026-42310
+  "Pillow>=12.3.0",          # security: 20 CVEs (Wave 3, ago/2026), inclui CVE-2024-28219, CVE-2026-42308, CVE-2026-42310
   "requests>=2.31",
   "mlflow>=2.10",
   # Transitive deps pinned to security-patched minima so a fresh
@@ -48,7 +48,16 @@ dependencies = [
   "Jinja2>=3.1.6",           # security: CVE-2025-27516
   "fonttools>=4.60.2",       # security: CVE-2025-66034
   "filelock>=3.20.3",        # security: CVE-2025-68146, CVE-2026-22701
-  "setuptools>=78.1.1",      # security: PYSEC-2025-49, CVE-2024-6345
+  "setuptools>=83.0.0",      # security Wave 3 (ago/2026): 2 CVEs; anterior >=78.1.1 (PYSEC-2025-49, CVE-2024-6345)
+  # Wave 3 (2026-08-01) - novos pins de segurança pós pip-audit:
+  "aiohttp>=3.14.1",         # security Wave 3: 11 CVEs (CVE-2026-54275, CVE-2026-34993 e outros)
+  "cryptography>=48.0.1",    # security Wave 3: 1 CVE
+  "dulwich>=1.2.5",          # security Wave 3: 5 CVEs (transitivo via GitPython/DVC)
+  "GitPython>=3.1.54",       # security Wave 3: 8 CVEs
+  "msgpack>=1.2.1",          # security Wave 3: 1 CVE
+  "pyasn1>=0.6.4",           # security Wave 3: 4 CVEs (transitivo via google-auth/cryptography)
+  "pydantic-settings>=2.14.2", # security Wave 3: 1 CVE
+  "pypdf>=6.13.1",           # security Wave 3: 10 CVEs
 ]
 
 [project.optional-dependencies]
