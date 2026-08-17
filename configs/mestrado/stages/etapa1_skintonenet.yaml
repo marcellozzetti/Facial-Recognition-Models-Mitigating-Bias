@@ -3,11 +3,19 @@
 etapa: 1
 title: "Adoção SkinToneNet + validação humana"
 inputs:
+  # Weights oficiais Matias 2026 (arXiv 2603.02475). Ainda não publicados
+  # em 2026-08 — ver docs/ativo/etapa1_report.md para status e alternativas.
   skintonenet_weights: models_pretrained/skintonenet_vits.pt
   fairface_val: !include ../common/datasets.yaml#datasets.fairface.val
 outputs:
   mst_predictions: outputs/etapa1/fairface_val_mst.parquet
+  cache_dir: outputs/etapa1/cache/
   human_agreement_report: outputs/etapa1/human_agreement.md
+  sensitivity_report: outputs/etapa1/sensitivity.md
+inference:
+  batch_size: 32
+  device: cuda
+  allow_imagenet_only: false   # opt-in explícito para smoke apenas
 protocolo_validacao:
   n_imagens_target: 250
   estratificacao:
@@ -19,5 +27,11 @@ protocolo_validacao:
   metricas:
     - cohen_kappa
     - categorical_accuracy_bootstrap_95ci
+  labels_store: outputs/etapa1/human_labels.jsonl
 sensitivity_analysis:
   n_classificadores_alternativos: 2  # ou 3, per Cap 3 Objetivo 2
+  backends:
+    - name: skintonenet
+      type: primary
+    - name: stone_monk
+      type: classic_cv    # ChenglongMa/SkinToneClassifier, paleta Monk
