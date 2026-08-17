@@ -1,0 +1,14 @@
+# Configuração A — Baseline sem conditioning
+# Cap. 4, §4.7 (Ablation arquitetural) — CONTROLE
+etapa: 3
+config_id: A
+title: "ConvNeXt-T puro (sem conditioning)"
+backbone:
+  name: convnext_tiny
+  pretrained: imagenet1k
+conditioning: null
+hyperparams: !include ../common/hyperparams.yaml
+seeds: !include ../common/seeds.yaml
+outputs:
+  metrics: outputs/etapa3/A_baseline/metrics_seed{seed}.json
+  checkpoint: outputs/etapa3/A_baseline/model_seed{seed}.pt

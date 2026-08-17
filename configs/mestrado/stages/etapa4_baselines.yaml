@@ -1,0 +1,44 @@
+# Etapa 4 — Comparação contra 6 baselines de mitigação
+# Cap. 4, §4.4 + §4.8 (triangulação de métricas)
+etapa: 4
+title: "6 baselines + triangulação + Pareto"
+depends_on:
+  - etapa3_ablation_A_baseline
+  - etapa3_ablation_B_film_linear
+  - etapa3_ablation_C_film_gated
+  - etapa3_ablation_D_film_clip
+baselines:
+  - name: resnet34_karkkainen
+    module: src.face_bias.models.backbones
+    ref: "Kärkkäinen & Joo 2021"
+  - name: convnext_tiny_pure  # Configuração A da ablation
+    module: src.face_bias.models.backbones
+  - name: fscl_plus
+    module: src.face_bias.baselines.fscl_plus
+    ref: "Park et al. 2022"
+  - name: group_dro
+    module: src.face_bias.baselines.group_dro
+    ref: "Sagawa et al. 2020"
+  - name: fineface
+    module: src.face_bias.baselines.fineface
+    ref: "Manzoor & Rattani 2024"
+  - name: adversarial_debias
+    module: src.face_bias.baselines.adversarial_debias
+    ref: "Zhang, Lemoine & Mitchell 2018"
+metricas:
+  cenario_A:
+    - f1_macro
+    - f1_per_class
+    - disparity_ratio
+    - worst_class_f1
+  cenario_B:
+    - equal_opportunity_per_race
+    - equalized_odds_per_race
+  pareto:
+    x: "1 - f1_macro"
+    y: "1 - disparity_ratio"
+iso_reporte: "ISO/IEC 19795-10:2024"
+outputs:
+  comparativo: outputs/etapa4/comparativo.parquet
+  pareto_plot: outputs/etapa4/pareto.png
+  relatorio: outputs/etapa4/relatorio.md

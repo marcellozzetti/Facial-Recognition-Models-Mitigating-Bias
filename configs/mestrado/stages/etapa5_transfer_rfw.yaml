@@ -1,0 +1,20 @@
+# Etapa 5a — Transferência fair para face recognition (RFW)
+# Cap. 4, §4.2 (Etapa 5). Aplicação do backbone fair-trained.
+etapa: 5
+sub: a
+title: "Downstream RFW + controle pixel information"
+depends_on: [etapa3_ablation_B_film_linear]  # backbone fair da Config B
+inputs:
+  backbone_fair: outputs/etapa3/B_film_linear/model_seed42.pt
+  rfw_pairs: !include ../common/datasets.yaml#datasets.downstream.rfw
+controles:
+  pixel_information:
+    tool: bisenet
+    weights: models_pretrained/bisenet.pt
+  qualidade_imagem:
+    - luminancia_L_cielab
+    - nitidez_laplaciano
+    - resolucao_efetiva_pixels
+outputs:
+  metrics: outputs/etapa5/rfw_verification.parquet
+  strat_by_pixel: outputs/etapa5/rfw_by_pixel_info.parquet

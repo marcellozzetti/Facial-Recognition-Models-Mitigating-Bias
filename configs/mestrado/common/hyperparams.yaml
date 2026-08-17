@@ -1,0 +1,27 @@
+# Hiperparâmetros unificados — Cap. 4, §4.6.4 (Detalhes de treinamento)
+# Fixados a priori, idênticos entre A/B/C/D e entre baselines.
+optimizer:
+  name: AdamW
+  backbone_lr: 1.0e-4
+  film_lr: 1.0e-3
+  weight_decay: 0.05
+
+scheduler:
+  name: cosine
+  warmup_pct: 0.05
+
+training:
+  batch_size: 64
+  image_size: 224
+  early_stopping_patience: 5
+  early_stopping_metric: f1_macro
+
+regularization:
+  film_dropout: 0.1
+  augment:
+    - flip_horizontal
+    - color_jitter_moderate
+
+framework:
+  pytorch_version: ">=2.11,<3.0"
+  torchvision_version: ">=0.26,<1.0"

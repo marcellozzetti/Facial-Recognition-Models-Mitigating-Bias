@@ -1,0 +1,24 @@
+# Configuração D — FiLM sobre embedding CLIP-text (512-dim)
+# Cap. 4, §4.7. Alternativa moderna com prompt ensembling
+etapa: 3
+config_id: D
+title: "ConvNeXt-T + FiLM sobre CLIP-text (512-dim)"
+backbone:
+  name: convnext_tiny
+  pretrained: imagenet1k
+conditioning:
+  type: film_linear
+  cond_dim: 512
+  cond_source: clip_text_ensemble
+  clip:
+    model: openai/clip-vit-base-patch16
+    n_templates: 10
+    template: "a photo of a person with Monk Skin Tone {k}"
+    weight_by_mst_softmax: true
+  film_mlp_hidden: 256
+  init_identity: true
+hyperparams: !include ../common/hyperparams.yaml
+seeds: !include ../common/seeds.yaml
+outputs:
+  metrics: outputs/etapa3/D_film_clip/metrics_seed{seed}.json
+  checkpoint: outputs/etapa3/D_film_clip/model_seed{seed}.pt

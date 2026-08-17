@@ -1,0 +1,17 @@
+# Etapa 6 — Síntese decompositiva (Contribuição 6)
+# Cap. 4, §4.2 (Etapa 6). Fenotípico irredutível vs algorítmico mitigável.
+etapa: 6
+title: "Decomposição do erro Latinx"
+depends_on: [etapa2_fairface_audit, etapa4_baselines, etapa5_transfer_rfw]
+inputs:
+  matriz_mst_raca: outputs/etapa2/matriz_mst_x_raca.parquet
+  resultados_configs: outputs/etapa4/comparativo.parquet
+  transfer_rfw: outputs/etapa5/rfw_verification.parquet
+metodo:
+  variance_decomposition: anova_r2
+  test_hipotese_H4: "latinx_error_concentration_in_overlap_zones >= 0.50"
+  test_hipotese_H6: "variance_explained_by_pixel_info >= 0.70"
+outputs:
+  decomposicao: outputs/etapa6/decomposicao_latinx.parquet
+  visualizacao: outputs/etapa6/decomposicao.png
+  relatorio: outputs/etapa6/sintese.md

@@ -1,0 +1,13 @@
+# Etapa 2 — Auditoria fenotípica FairFace + matriz MST × raça (Contribuição 2)
+# Cap. 4, §4.2 (Etapa 2)
+etapa: 2
+title: "Matriz pública MST × classes raciais"
+depends_on: [etapa1_skintonenet]
+inputs:
+  mst_predictions: outputs/etapa1/fairface_val_mst.parquet
+outputs:
+  matriz: outputs/etapa2/matriz_mst_x_raca.parquet
+  heatmap: outputs/etapa2/matriz_mst_x_raca.png
+  relatorio: outputs/etapa2/relatorio.md
+teste_hipotese_H3:
+  latinx_spread_min_mst_classes: 5  # Cap. 3, H3

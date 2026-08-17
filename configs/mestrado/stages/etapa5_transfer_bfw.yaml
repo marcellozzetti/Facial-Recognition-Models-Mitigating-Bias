@@ -1,0 +1,11 @@
+# Etapa 5b — Transferência fair para face recognition (BFW - intersectional)
+# Cap. 4, §4.2 (Etapa 5) + §4.8.2 (Cenário B)
+etapa: 5
+sub: b
+title: "Downstream BFW — 8 subgrupos race × gender"
+depends_on: [etapa3_ablation_B_film_linear]
+inputs:
+  backbone_fair: outputs/etapa3/B_film_linear/model_seed42.pt
+  bfw_pairs: !include ../common/datasets.yaml#datasets.downstream.bfw
+outputs:
+  metrics: outputs/etapa5/bfw_intersectional.parquet

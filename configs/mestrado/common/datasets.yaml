@@ -1,0 +1,21 @@
+# Datasets — Cap. 4, §4.3
+datasets:
+  fairface:
+    train: FairFace/train_labels.csv    # 86.744 imagens, 7 classes raciais
+    val: FairFace/val_labels.csv        # ~10.954 imagens
+    test: FairFace/test_labels.csv      # 10.954 imagens
+    n_classes: 7
+    class_names:
+      - White
+      - Black
+      - Indian
+      - East Asian
+      - Southeast Asian
+      - Middle Eastern
+      - Latinx/Hispanic
+  mst_validation:
+    stw: STW/                           # Matias 2026 (Skin Tone in the Wild)
+    ccv2: CasualConversations_v2/       # Porgali 2023
+  downstream:
+    rfw: RFW/                           # Wang 2019 — 4 categorias
+    bfw: BFW/                           # Robinson 2020 — 8 subgrupos race×gender

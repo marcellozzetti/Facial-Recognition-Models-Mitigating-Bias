@@ -1,0 +1,23 @@
+# Etapa 1 — Classificador MST (SkinToneNet pré-treinado)
+# Cap. 4, §4.2 (Etapa 1) + §4.9 (Validação humana interna)
+etapa: 1
+title: "Adoção SkinToneNet + validação humana"
+inputs:
+  skintonenet_weights: models_pretrained/skintonenet_vits.pt
+  fairface_val: !include ../common/datasets.yaml#datasets.fairface.val
+outputs:
+  mst_predictions: outputs/etapa1/fairface_val_mst.parquet
+  human_agreement_report: outputs/etapa1/human_agreement.md
+protocolo_validacao:
+  n_imagens_target: 250
+  estratificacao:
+    - race
+    - mst_predicted
+  anotadores:
+    - mestrando
+    - orientador
+  metricas:
+    - cohen_kappa
+    - categorical_accuracy_bootstrap_95ci
+sensitivity_analysis:
+  n_classificadores_alternativos: 2  # ou 3, per Cap 3 Objetivo 2

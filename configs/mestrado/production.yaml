@@ -1,0 +1,21 @@
+# Config raiz — orquestra as 6 etapas em produção
+# Uso: face-bias-train --config configs/mestrado/production.yaml
+project: face-bias-mestrado
+version: 0.3.0.dev0
+pipeline:
+  - !include stages/etapa1_skintonenet.yaml
+  - !include stages/etapa2_fairface_audit.yaml
+  - !include stages/etapa3_ablation_A_baseline.yaml
+  - !include stages/etapa3_ablation_B_film_linear.yaml
+  - !include stages/etapa3_ablation_C_film_gated.yaml
+  - !include stages/etapa3_ablation_D_film_clip.yaml
+  - !include stages/etapa4_baselines.yaml
+  - !include stages/etapa5_transfer_rfw.yaml
+  - !include stages/etapa5_transfer_bfw.yaml
+  - !include stages/etapa6_decomposition.yaml
+tracking:
+  mlflow_uri: outputs/mlruns
+  dvc_remote: s3://face-bias-mestrado  # a configurar
+observability:
+  log_level: INFO
+  save_intermediate_features: false  # true apenas para debug

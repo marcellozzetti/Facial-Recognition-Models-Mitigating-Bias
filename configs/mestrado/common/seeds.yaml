@@ -1,0 +1,6 @@
+# Rigor experimental — 3 sementes independentes
+# Cap. 4, §4.10 (Rigor experimental) + feedback do usuário sobre metodologia
+seeds:
+  - 42
+  - 1
+  - 2
