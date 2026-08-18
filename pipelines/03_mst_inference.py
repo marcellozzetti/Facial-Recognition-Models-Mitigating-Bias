@@ -30,6 +30,7 @@ if str(REPO_ROOT / "src") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "src"))
 
 from face_bias.mst import MSTClassifier  # noqa: E402
+from face_bias.mst.preprocessing import MSTFromRawImage  # noqa: E402
 
 logger = logging.getLogger("pipelines.03_mst_inference")
 
@@ -53,7 +54,24 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument(
         "--allow-imagenet-only",
         action="store_true",
-        help="Permite rodar sem weights STW (WARN: head aleatória).",
+        help="Permite rodar sem weights (WARN: head aleatória).",
+    )
+    p.add_argument(
+        "--auto-preprocess",
+        action="store_true",
+        help=(
+            "Ativa a camada auto-suficiente (detect+align+crop) via MSTFromRawImage. "
+            "Necessário para datasets crus (RFW/BFW). Sem esta flag, assume que as "
+            "imagens já estão pré-cortadas em rostos centralizados 224x224."
+        ),
+    )
+    p.add_argument(
+        "--min-face-size", type=int, default=40,
+        help="(auto-preprocess) tamanho mínimo do menor lado da bbox.",
+    )
+    p.add_argument(
+        "--min-confidence", type=float, default=0.9,
+        help="(auto-preprocess) confiança mínima do detector.",
     )
     return p.parse_args(argv)
 
@@ -107,7 +125,21 @@ def main(argv: list[str] | None = None) -> int:
         cache_dir=args.cache_dir,
         allow_imagenet_only=args.allow_imagenet_only,
     ) as infer:
-        df = infer.infer_batch(paths, batch_size=args.batch_size)
+        if args.auto_preprocess:
+            logger.info(
+                "Modo auto-preprocess ATIVO: detect+align antes da inferência. "
+                "min_face_size=%d min_conf=%.2f",
+                args.min_face_size, args.min_confidence,
+            )
+            raw_pipeline = MSTFromRawImage(
+                infer,
+                min_face_size=args.min_face_size,
+                min_confidence=args.min_confidence,
+            )
+            results = raw_pipeline.process_batch(paths, workers=args.batch_size)
+            df = pd.DataFrame([r.as_row() for r in results])
+        else:
+            df = infer.infer_batch(paths, batch_size=args.batch_size)
     elapsed = time.time() - t0
     df["split"] = args.split
     df.to_parquet(args.output, index=False)

@@ -1,6 +1,6 @@
 # Etapa 1 — Classificador MST (relatório de preparação)
 
-**Última atualização:** 2026-08-17
+**Última atualização:** 2026-08-18
 **Referência:** Cap. 4 §4.2 (Etapa 1) e §4.9 (validação humana interna)
 **Prazo formal do cronograma:** Nov/2026
 **Prazo real de trabalho:** Ago–Out/2026 (preparação); Nov/2026 (relatório final)
@@ -8,111 +8,115 @@
 Este documento registra o estado do código, decisões e pendências da
 Etapa 1 antes da execução formal.
 
-## 1. Estado dos recursos externos
+## 1. Estratégia (revisada pós-reunião Ago/2026)
 
-### SkinToneNet (Matias, Costa, Neto & Novello de Brito 2026)
+**Decisão de escopo (reunião com Prof. Marcos Quiles, 17-Ago/2026):**
+adotar **classificador MST próprio treinado internamente** como método
+principal, em vez de depender do release do SkinToneNet (Matias 2026).
+Motivos:
 
-- Paper: [arXiv:2603.02475](https://arxiv.org/abs/2603.02475) — CC BY 4.0
-- Autores: **ICMC/USP + IMPA** (mesma instituição do template LaTeX)
-- Arquitetura: **ViT-Small** pretrained ImageNet, fine-tuned na STW
-- Dataset STW: 42.313 imagens / 3.564 indivíduos, escala Monk 10 tons
-- Loss: cross-entropy (10 classes)
-- **Weights: `"code and data available soon"` — NÃO publicados em 2026-08**
-- **Ação pendente:** contatar autores via ICMC/USP para solicitar acesso
-  antecipado (afinal, é a mesma universidade do template — canal
-  institucional facilita). Se não vier a tempo do prazo formal, avaliar
-  reprodução do treinamento assim que STW for divulgado.
+- Independência do cronograma de release externo (não bloqueia)
+- Controle total do preprocessamento (pipeline auto-suficiente)
+- Desbloqueia Etapa 5 (RFW/BFW não têm anotação MST — precisamos gerar)
 
-### Alternativa clássica CV — `stone` (ChenglongMa/SkinToneClassifier)
+O SkinToneNet permanece como:
+- **Comparação externa condicional** — se acesso ao STW for concedido,
+  reportamos acurácia comparativa no mesmo protocolo de teste
+- **Backend do sensitivity analysis** — se os pesos forem publicados,
+  entram como um dos 2-3 backends alternativos
 
-- PyPI: `pip install skin-tone-classifier` (≥ v1.2.6, palette Monk)
-- Método: detecção facial + segmentação + k-means (não é DL)
-- License: GPL-3.0 (compatível com uso acadêmico; **não linkar código-fonte
-  próprio ao GPL**; usar como serviço externo/dep opcional)
-- **Papel na Etapa 1:** um dos 2 backends do sensitivity analysis
-  declarado em Cap. 3 Objetivo 2
+## 2. Datasets de treino
 
-## 2. Código entregue nesta preparação
+| Dataset | Fonte | Tamanho | Status |
+|---|---|---|---|
+| **MSTE** (Monk Skin Tone Examples) | Google | ~1.500 imgs | ✅ público |
+| **Casual Conversations v2** | Meta / Porgali 2023 | ~5.500 vídeos | ✅ público c/ EULA |
+| **STW** (Skin Tone in the Wild) | Matias 2026, ICMC/USP | 42.313 imgs | ⏳ "available soon" (validação externa condicional) |
 
-| Arquivo | Papel | Testes |
-|---|---|---|
-| [src/face_bias/mst/skintonenet.py](../../src/face_bias/mst/skintonenet.py) | wrapper de inferência (ViT + head 10-classes + cache SQLite) | 6 unit tests |
-| [src/face_bias/mst/sensitivity.py](../../src/face_bias/mst/sensitivity.py) | `MSTSensitivityRunner` + backend `stone_monk` + κ pairwise | 2 unit tests |
-| [src/face_bias/mst/validation.py](../../src/face_bias/mst/validation.py) | amostragem estratificada, `HumanLabelStore`, κ + bootstrap CI, CLI de rotulagem | 7 unit tests |
-| [src/face_bias/mst/__init__.py](../../src/face_bias/mst/__init__.py) | exports públicos do subpacote | — |
-| [tests/mestrado/unit/test_mst_wrapper.py](../../tests/mestrado/unit/test_mst_wrapper.py) | **16 unit tests reais** (todos passando) | ✅ |
-| [pipelines/03_mst_inference.py](../../pipelines/03_mst_inference.py) | CLI end-to-end: `--config`, `--dataset-root`, `--split`, `--output`, `--cache-dir`, `--allow-imagenet-only` | smoke ok |
-| [configs/mestrado/stages/etapa1_skintonenet.yaml](../../configs/mestrado/stages/etapa1_skintonenet.yaml) | config atualizada com `inference:` + `labels_store` + `backends` | — |
+## 3. Código entregue
 
-Total: **+800 linhas de código funcional, 16 testes passando, smoke test
-CLI executando em CPU.**
+### Novos módulos
 
-## 3. Decisões técnicas
+| Arquivo | Papel |
+|---|---|
+| [src/face_bias/mst/datasets.py](../../src/face_bias/mst/datasets.py) | loaders MSTE, CCv2, STW + `build_mst_dataset` factory + `class_balance` |
+| [src/face_bias/mst/trainer.py](../../src/face_bias/mst/trainer.py) | `MSTTrainer` + `stratified_split` + F1 macro; early stopping por F1 macro em val |
+| [src/face_bias/mst/preprocessing.py](../../src/face_bias/mst/preprocessing.py) | `MSTFromRawImage` — detect → align → crop → normalize → classify; `MSTResult` com fallback explicativo |
+| [pipelines/03a_train_mst_classifier.py](../../pipelines/03a_train_mst_classifier.py) | CLI de treino end-to-end |
 
-1. **Backbone**: torchvision `vit_b_16` como stand-in temporário. Trocar
-   por timm `vit_small_patch16_224` quando os weights STW oficiais forem
-   divulgados (o paper usa ViT-Small). O pipeline 224×224 + ImageNet
-   norm é compatível com ambos.
-2. **Weights ausentes**: `WeightsUnavailableError` por default; opt-in
-   explícito via `allow_imagenet_only=True` para smoke tests. Modo é
-   logado com WARN loud para não vazar em métricas científicas.
-3. **Cache**: SQLite por SHA-256 do arquivo. Chave composta com
-   `model_id` para evitar contaminação cruzada entre versões de weights.
-4. **Sensitivity backend**: `stone` (ChenglongMa) é a única alternativa
-   MST 10-classes com licença clara e pip-installable disponível hoje.
-   `MST-KD` (Caldeira 2024) e HuggingFace models candidatos ficam como
-   registros para plug-in via `runner.register(name, callable)`.
-5. **Validação humana**: `HumanLabelStore` JSONL append-only + CLI
-   `label_cli` que abre imagens via viewer do SO. Sem GUI própria —
-   simplicidade > polish. `stratified_sample` garante piso 1 por
-   (raça, mst_pred) para não perder tons raros.
-6. **Bootstrap**: 10.000 réplicas, percentile CI 95%, seeds fixas.
-   Coerente com [feedback_experimental_rigor](../../../../.claude/projects/c--Users-KABUM-Documents-workspace-github-Facial-Recognition-Models-Mitigating-Bias/memory/feedback_experimental_rigor.md).
+### Módulos revisados
 
-## 4. Como executar (quando FairFace estiver disponível)
+| Arquivo | Mudança |
+|---|---|
+| [src/face_bias/mst/classifier.py](../../src/face_bias/mst/classifier.py) | Ex-`skintonenet.py`. Classe `MSTClassifier` (aceita qualquer state_dict compatível). |
+| [pipelines/03_mst_inference.py](../../pipelines/03_mst_inference.py) | Flag `--auto-preprocess` que ativa `MSTFromRawImage` para datasets crus |
+| [src/face_bias/mst/sensitivity.py](../../src/face_bias/mst/sensitivity.py) | SkinToneNet listado como um dos backends (não mais como referência única) |
+| [pipelines/03b_train_mst_reproduction.py](../../pipelines/03b_train_mst_reproduction.py) | Mantém como opção de reprodução do SkinToneNet específico (se STW sair) |
+
+### Cobertura de testes
+
+**50 unit tests reais passando**, distribuídos:
+- 16 tests em `test_mst_wrapper.py` (classifier)
+- 8 tests em `test_mst_datasets.py`
+- 6 tests em `test_mst_trainer.py`
+- 10 tests em `test_mst_preprocessing.py`
+- 10 tests em `test_cross_matrix.py` (Etapa 2)
+
+## 4. Como executar
+
+### Treino do classificador próprio (Etapa 1)
 
 ```bash
-# Inferência sobre FairFace val (10.954 imagens)
-python pipelines/03_mst_inference.py \
-    --config configs/mestrado/stages/etapa1_skintonenet.yaml \
-    --dataset-root data/FairFace \
-    --labels-csv data/FairFace/val_labels.csv \
-    --split val \
-    --output outputs/etapa1/fairface_val_mst.parquet \
-    --cache-dir outputs/etapa1/cache/
+# Uma vez por seed (rigor experimental exige 3 seeds)
+python pipelines/03a_train_mst_classifier.py \
+    --mste-root data/MSTE \
+    --ccv2-root data/CCv2 \
+    --output outputs/etapa1_own/ \
+    --seed 42 --max-epochs 30
 
-# Sensitivity analysis (após instalar `pip install skin-tone-classifier`)
-python - <<'PY'
-from pathlib import Path
-from face_bias.mst import MSTSensitivityRunner, SkinToneNetInference
-runner = MSTSensitivityRunner()
-runner.register_stone_monk()
-infer = SkinToneNetInference("models_pretrained/skintonenet_vits.pt", device="cuda")
-runner.register_skintonenet("skintonenet", infer.infer, infer.preprocess)
-preds = runner.run(list(Path("outputs/etapa1/sample").glob("*.jpg")))
-print(runner.pairwise_kappa(preds))
-PY
+python pipelines/03a_train_mst_classifier.py --seed 1 ...
+python pipelines/03a_train_mst_classifier.py --seed 2 ...
 ```
 
-## 5. Pendências para execução formal (Nov/2026)
+### Inferência sobre FairFace (Etapa 2 → 3)
 
-- [ ] Contatar autores do SkinToneNet (canal ICMC/USP) ou aguardar
-  divulgação dos weights
-- [ ] Download do FairFace completo (~13 GB) para o volume DVC
-- [ ] Rodar inferência sobre FairFace train+val+test (~108k imagens)
-- [ ] Amostragem estratificada para validação humana (250 imagens)
-- [ ] Sessão de rotulagem (Mestrando + Orientador) — estimar 3–4 h por
-  anotador
-- [ ] Sensitivity analysis com `stone_monk` + 1 backend adicional a definir
-- [ ] Gerar `outputs/etapa1/relatorio.md` final (para anexo da dissertação)
+```bash
+python pipelines/03_mst_inference.py \
+    --config configs/mestrado/stages/etapa1_skintonenet.yaml \
+    --weights outputs/etapa1_own/best_seed42.pt \
+    --dataset-root data/FairFace \
+    --labels-csv data/FairFace/val_labels.csv \
+    --output outputs/etapa1/fairface_val_mst.parquet \
+    --cache-dir outputs/etapa1/cache/
+```
+
+### Inferência em dataset cru (Etapa 5 — RFW/BFW)
+
+```bash
+# COM --auto-preprocess: MTCNN detecta o rosto, alinha, e passa para o MST
+python pipelines/03_mst_inference.py \
+    --weights outputs/etapa1_own/best_seed42.pt \
+    --dataset-root data/RFW/images \
+    --output outputs/etapa5/rfw_mst.parquet \
+    --auto-preprocess \
+    --min-face-size 40 --min-confidence 0.9
+```
+
+## 5. Pendências para execução formal
+
+- [ ] Baixar MSTE (~1500 imgs, público)
+- [ ] Baixar Casual Conversations v2 (requer aceitar EULA da Meta)
+- [ ] Treinar 3 seeds do classificador próprio
+- [ ] Amostragem estratificada para validação humana (250 imagens FairFace)
+- [ ] Sessão de rotulagem (Mestrando + Orientador) — 3-4 h por anotador
+- [ ] Sensitivity analysis com `stone_monk` (ChenglongMa) + eventual SkinToneNet
+- [ ] Envio do email institucional ao ICMC/USP (docs/ativo/email_skintonenet_authors.md)
+- [ ] Se acesso ao STW for concedido: benchmark externo comparativo
 
 ## 6. Riscos remapeados
 
-- **Risco 2 (Cap. 5) — dependência SkinToneNet**: mitigação executada
-  parcialmente. Wrapper aceita qualquer state_dict compatível; sensitivity
-  runner permite trocar backend em 1 linha. Modo `allow_imagenet_only`
-  garante que o pipeline downstream (Etapas 2+) não fica bloqueado à
-  espera dos weights.
-- **Novo risco**: dependência de licença GPL do `stone` — não linkar ao
-  código próprio; usar como dep opcional invocada out-of-process
-  (import lazy já implementado).
+- **Risco 2 (Cap. 5, revisado) — qualidade do classificador MST próprio**:
+  mitigação via validação humana interna + sensitivity com `stone_monk`
+  + eventual benchmark externo no STW.
+- **Novo risco menor — licença GPL do `stone`**: uso como dep opcional,
+  invocação out-of-process (lazy import já implementado).

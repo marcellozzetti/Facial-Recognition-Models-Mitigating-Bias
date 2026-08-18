@@ -40,16 +40,30 @@ Tone), tendo o **SkinToneNet como classificador MST de referência** na
 etapa inicial do método.
 
 O trabalho de vocês — *"Large-Scale Dataset and Benchmark for Skin Tone
-Classification in the Wild"* (arXiv:2603.02475) — é a base metodológica
-central do Capítulo 4 da dissertação e a referência declarada no Objetivo
-2 (validação estratificada por tom de pele). No documento consta que
+Classification in the Wild"* (arXiv:2603.02475) — é referência
+declarada no Capítulo 4 da dissertação (Etapa 1) e no Objetivo 2
+(validação estratificada por tom de pele). No documento consta que
 "code and data will be available soon", e temos acompanhado a página do
 paper aguardando a divulgação pública.
 
-**Nosso pedido:** seria possível obter acesso antecipado (i) aos pesos
-pré-treinados do SkinToneNet (ViT-Small fine-tuned em STW) e (ii),
-idealmente, ao dataset STW, exclusivamente para uso acadêmico no escopo
-da dissertação do Marcello?
+**Estratégia adotada:** para não bloquear o cronograma da dissertação,
+o Marcello está treinando um classificador MST próprio sobre datasets
+já disponíveis publicamente (MSTE do Google, Casual Conversations v2
+da Meta). O acesso ao trabalho de vocês, portanto, não é bloqueante
+para a execução — mas seria de grande valor para o rigor científico da
+tese em dois pontos:
+
+- **(i) Dataset STW** como *benchmark externo de validação*: permitiria
+  reportar a acurácia do nosso classificador sobre a partição de teste
+  do STW, oferecendo comparação direta com o SkinToneNet no mesmo
+  protocolo;
+- **(ii) Pesos pré-treinados do SkinToneNet**, se possível: permitiriam
+  incluí-lo como *baseline* no *sensitivity analysis* previsto na Seção
+  §4.9 da dissertação, fortalecendo a robustez do resultado.
+
+**Nosso pedido**, portanto, é o acesso antecipado ao dataset STW e
+(idealmente) aos pesos, exclusivamente para uso acadêmico no escopo
+da dissertação do Marcello.
 
 Comprometemo-nos formalmente com:
 
@@ -62,7 +76,13 @@ Comprometemo-nos formalmente com:
 4. **Feedback experimental**: podemos compartilhar métricas de
    generalização do SkinToneNet sobre o subconjunto de validação
    FairFace (~10.954 imagens, 7 grupos raciais) que vamos utilizar,
-   caso seja de interesse para o benchmark de vocês.
+   caso seja de interesse para o benchmark de vocês;
+5. **Co-autoria em publicações derivadas**: caso o SkinToneNet ou o
+   dataset STW venham a ter papel material em qualquer contribuição
+   científica desta pesquisa --- seja em artigos, capítulos, eventos
+   acadêmicos ou apresentações técnicas ---, comprometemo-nos a
+   estender formalmente convite de co-autoria aos autores originais,
+   nos termos que julgarem apropriados.
 
 Para contexto adicional, o pipeline do Marcello envolve **6 etapas
 metodológicas** (Cap. 4 §4.2 da dissertação): (1) classificador MST via
