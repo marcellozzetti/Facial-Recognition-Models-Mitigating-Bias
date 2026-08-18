@@ -1,19 +1,16 @@
-"""SkinToneNet wrapper — classificador MST 10-classes para a Etapa 1.
+"""Classificador MST 10-classes para a Etapa 1.
 
-Referência: Matias, Costa, Neto & Novello de Brito (2026), arXiv 2603.02475.
-Cap. 4, §4.2 (Etapa 1) e §4.9 (validação humana interna).
+Cap. 4 §4.2 (Etapa 1) e §4.9 (validação humana interna).
 
-Status dos weights (2026-08):
-    O paper anuncia "code and data available soon"; os pesos oficiais do
-    SkinToneNet (ViT-Small fine-tuned em STW) ainda não estão publicados.
-    Este módulo aceita um ``weights_path`` opcional e valida o state_dict
-    quando ele existir. Enquanto isso, o modo ``allow_imagenet_only=True``
-    permite smoke tests com o backbone ImageNet como stand-in (softmax
-    aleatório sobre uma projeção não treinada — NÃO usar para reportar
-    resultados científicos).
+O classificador principal desta pesquisa é treinado internamente sobre
+MSTE (Google) + Casual Conversations v2 (Meta); ver ``trainer.py`` e
+``pipelines/03a_train_mst_classifier.py``. Esta classe é o wrapper de
+inferência: aceita qualquer state_dict compatível (nosso classificador,
+o SkinToneNet oficial quando disponível, ou qualquer variante treinada
+externamente).
 
 Interface pública:
-    class SkinToneNetInference:
+    class MSTClassifier:
         __init__(weights_path, device="cuda", cache_dir=None,
                  backbone="vit_b_16", allow_imagenet_only=False)
         infer(images: torch.Tensor) -> torch.Tensor            # (N, 10)
@@ -21,9 +18,10 @@ Interface pública:
         preprocess(pil_or_path) -> torch.Tensor                # (3, 224, 224)
 
 Ver também:
-    - src/face_bias/mst/validation.py — protocolo humano interno
-    - src/face_bias/mst/sensitivity.py — comparação com MST alternativos
-    - src/face_bias/audit/fairface_mst.py — consumidor da Etapa 2
+    - src/face_bias/mst/trainer.py       — treinamento do modelo próprio
+    - src/face_bias/mst/preprocessing.py — camada auto-suficiente
+    - src/face_bias/mst/validation.py    — protocolo humano interno
+    - src/face_bias/mst/sensitivity.py   — comparação com MST alternativos
 """
 
 from __future__ import annotations
@@ -50,10 +48,11 @@ IMAGE_SIZE = 224
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
 IMAGENET_STD = (0.229, 0.224, 0.225)
 
-PAPER_URL = "https://arxiv.org/abs/2603.02475"
+SKINTONENET_PAPER_URL = "https://arxiv.org/abs/2603.02475"
 CONTACT_HINT = (
-    "Weights ainda não publicados. Consulte "
-    f"{PAPER_URL} ou contate os autores (ICMC/USP)."
+    "Weights não encontrados. Treine o classificador próprio via "
+    "``pipelines/03a_train_mst_classifier.py`` ou aponte para um "
+    "state_dict externo compatível (10 classes)."
 )
 
 
@@ -72,16 +71,16 @@ def _build_head(embed_dim: int) -> nn.Module:
     return nn.Linear(embed_dim, MST_N_CLASSES)
 
 
-def build_skintonenet(
+def build_mst_backbone(
     backbone: str = "vit_b_16",
     pretrained_imagenet: bool = True,
 ) -> tuple[nn.Module, int]:
-    """Instancia o backbone + head 10-classes (weights STW carregados à parte).
+    """Instancia o backbone + head 10-classes MST.
 
-    O paper usa ViT-Small. Torchvision expõe apenas ViT-B/16; ``vit_b_16``
-    é o default pragmático (mesma família, mesmo pipeline 224x224 ImageNet).
-    Trocar para timm ``vit_small_patch16_224`` quando os weights oficiais
-    (que virão em formato específico) forem divulgados.
+    Usado tanto pela inferência (``MSTClassifier``) quanto pelo treino
+    (``MSTTrainer``). ViT-B/16 é o default por estar em ``torchvision``;
+    trocar para ``timm`` ``vit_small_patch16_224`` quando se quiser
+    reproduzir exatamente a arquitetura ViT-S do SkinToneNet.
     """
     if backbone != "vit_b_16":
         raise NotImplementedError(
@@ -95,7 +94,7 @@ def build_skintonenet(
 
 
 class WeightsUnavailableError(RuntimeError):
-    """Levantado quando SkinToneNet é chamado sem weights nem opt-in ImageNet."""
+    """Levantado quando MSTClassifier é chamado sem weights nem opt-in ImageNet."""
 
 
 class InferenceCache:
@@ -150,7 +149,7 @@ class InferenceCache:
         self._conn.close()
 
 
-class SkinToneNetInference:
+class MSTClassifier:
     """Inferência MST 10-classes com cache opcional.
 
     Parâmetros
@@ -163,7 +162,7 @@ class SkinToneNetInference:
     cache_dir:
         Diretório para o cache SQLite; se ``None``, cache é desabilitado.
     backbone:
-        Ver ``build_skintonenet``.
+        Ver ``build_mst_backbone``.
     allow_imagenet_only:
         Opt-in explícito para rodar sem weights STW (útil só para testes).
     """
@@ -180,19 +179,19 @@ class SkinToneNetInference:
         self.backbone_name = backbone
         self.transform = _default_transform()
 
-        net, _ = build_skintonenet(backbone=backbone, pretrained_imagenet=True)
+        net, _ = build_mst_backbone(backbone=backbone, pretrained_imagenet=True)
 
         if weights_path is not None:
             weights_path = Path(weights_path)
             if not weights_path.exists():
                 raise FileNotFoundError(f"weights_path não encontrado: {weights_path}")
             self._load_state_dict(net, weights_path)
-            self.model_id = f"skintonenet_stw::{weights_path.name}"
+            self.model_id = f"mst_trained::{weights_path.name}"
         else:
             if not allow_imagenet_only:
                 raise WeightsUnavailableError(CONTACT_HINT)
             logger.warning(
-                "SkinToneNet rodando com head aleatória (ImageNet backbone only). "
+                "MSTClassifier rodando com head aleatória (ImageNet backbone only). "
                 "Uso permitido APENAS para smoke tests. %s",
                 CONTACT_HINT,
             )
@@ -296,7 +295,7 @@ class SkinToneNetInference:
         if self.cache is not None:
             self.cache.close()
 
-    def __enter__(self) -> "SkinToneNetInference":
+    def __enter__(self) -> "MSTClassifier":
         return self
 
     def __exit__(self, *_exc) -> None:

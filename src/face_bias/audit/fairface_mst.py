@@ -1,4 +1,4 @@
-"""Auditoria fenotípica do FairFace via SkinToneNet — Etapa 2.
+"""Auditoria fenotípica do FairFace via MSTClassifier — Etapa 2.
 
 Cap. 4 §4.2 (Etapa 2). Combina a inferência MST da Etapa 1 (parquet
 gerado por ``pipelines/03_mst_inference.py``) com os rótulos raciais do
@@ -10,7 +10,7 @@ inferência + junção em uma única chamada (útil para testes).
 
 Ver também:
     - src/face_bias/audit/cross_matrix.py — consumidor
-    - src/face_bias/mst/skintonenet.py — provedor da inferência
+    - src/face_bias/mst/classifier.py — provedor da inferência
     - pipelines/04_fairface_audit.py — orquestração CLI
 """
 
@@ -91,13 +91,13 @@ def audit_from_files(
 
 
 def audit_fairface(
-    skintonenet,
+    classifier,
     fairface_val_dir: Path,
     fairface_labels_csv: Path,
     batch_size: int = 32,
     limit: int = 0,
 ) -> pd.DataFrame:
-    """Roda inferência SkinToneNet sobre imagens do FairFace + junta labels.
+    """Roda inferência MSTClassifier sobre imagens do FairFace + junta labels.
 
     Útil quando se quer rodar Etapa 1 + Etapa 2 em um único processo
     (por exemplo, em smoke tests). Para produção use o parquet gerado
@@ -107,5 +107,5 @@ def audit_fairface(
     if limit > 0:
         labels = labels.head(limit).copy()
     paths = [Path(fairface_val_dir) / rel for rel in labels[FAIRFACE_FILE_COL].tolist()]
-    predictions = skintonenet.infer_batch(paths, batch_size=batch_size)
+    predictions = classifier.infer_batch(paths, batch_size=batch_size)
     return join_predictions(predictions, labels, dataset_root=fairface_val_dir)

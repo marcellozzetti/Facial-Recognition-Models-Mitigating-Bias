@@ -29,7 +29,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT / "src") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "src"))
 
-from face_bias.mst import SkinToneNetInference  # noqa: E402
+from face_bias.mst import MSTClassifier  # noqa: E402
 
 logger = logging.getLogger("pipelines.03_mst_inference")
 
@@ -101,7 +101,7 @@ def main(argv: list[str] | None = None) -> int:
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
-    with SkinToneNetInference(
+    with MSTClassifier(
         weights_path=weights_path,
         device=args.device,
         cache_dir=args.cache_dir,

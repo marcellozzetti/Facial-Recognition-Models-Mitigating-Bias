@@ -110,7 +110,7 @@ class MSTSensitivityRunner:
         infer,
         preprocess,
     ) -> None:
-        """Adapta um ``SkinToneNetInference.infer`` para a interface path->int."""
+        """Adapta um ``MSTClassifier.infer`` para a interface path->int."""
         import torch
 
         def _predict(path: Path) -> int:

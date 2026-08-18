@@ -26,7 +26,7 @@ Saídas:
 
 Compatibilidade com o wrapper:
     O ``best.pt`` gerado aqui carrega diretamente em
-    ``SkinToneNetInference(weights_path=".../best.pt")`` — o wrapper aceita
+    ``MSTClassifier(weights_path=".../best.pt")`` — o wrapper aceita
     dicts com chave "state_dict" e faz load com strict=False.
 """
 
@@ -60,7 +60,7 @@ from face_bias.mst.skintonenet import (  # noqa: E402
     IMAGENET_STD,
     IMAGE_SIZE,
     MST_N_CLASSES,
-    build_skintonenet,
+    build_mst_backbone,
 )
 
 logger = logging.getLogger("pipelines.03b_train_mst_reproduction")
@@ -229,7 +229,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         pin_memory=(device.type == "cuda"),
     )
 
-    model, _ = build_skintonenet(pretrained_imagenet=True)
+    model, _ = build_mst_backbone(pretrained_imagenet=True)
     model = model.to(device)
     optimizer = build_optimizer(model, args.optimizer, args.lr, args.weight_decay)
     scheduler = ReduceLROnPlateau(optimizer, mode="max", factor=0.5, patience=args.patience)

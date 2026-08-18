@@ -16,10 +16,10 @@ from face_bias.mst import (
     HumanLabelStore,
     InferenceCache,
     MSTSensitivityRunner,
-    SkinToneNetInference,
+    MSTClassifier,
     WeightsUnavailableError,
     bootstrap_agreement,
-    build_skintonenet,
+    build_mst_backbone,
     categorical_accuracy,
     cohens_kappa,
     stratified_sample,
@@ -32,8 +32,8 @@ from face_bias.mst import (
 
 
 @pytest.mark.unit
-def test_build_skintonenet_head_shape():
-    net, embed_dim = build_skintonenet(pretrained_imagenet=False)
+def test_build_mst_backbone_head_shape():
+    net, embed_dim = build_mst_backbone(pretrained_imagenet=False)
     assert embed_dim == 768
     assert net.heads.out_features == 10  # 10 classes MST
 
@@ -41,13 +41,13 @@ def test_build_skintonenet_head_shape():
 @pytest.mark.unit
 def test_skintonenet_raises_without_weights_and_optout():
     with pytest.raises(WeightsUnavailableError):
-        SkinToneNetInference(weights_path=None, device="cpu")
+        MSTClassifier(weights_path=None, device="cpu")
 
 
 @pytest.mark.unit
 def test_skintonenet_smoke_mode_produces_softmax(tmp_path):
     """Modo ImageNet-only precisa gerar softmax válido para 10 classes."""
-    infer = SkinToneNetInference(
+    infer = MSTClassifier(
         weights_path=None,
         device="cpu",
         allow_imagenet_only=True,
@@ -61,7 +61,7 @@ def test_skintonenet_smoke_mode_produces_softmax(tmp_path):
 
 @pytest.mark.unit
 def test_skintonenet_infer_bad_shape():
-    infer = SkinToneNetInference(
+    infer = MSTClassifier(
         weights_path=None,
         device="cpu",
         allow_imagenet_only=True,
@@ -72,7 +72,7 @@ def test_skintonenet_infer_bad_shape():
 
 @pytest.mark.unit
 def test_skintonenet_preprocess_shape(tmp_path):
-    infer = SkinToneNetInference(
+    infer = MSTClassifier(
         weights_path=None,
         device="cpu",
         allow_imagenet_only=True,
@@ -86,7 +86,7 @@ def test_skintonenet_preprocess_shape(tmp_path):
 
 @pytest.mark.unit
 def test_infer_batch_cache_hit(tmp_path):
-    infer = SkinToneNetInference(
+    infer = MSTClassifier(
         weights_path=None,
         device="cpu",
         cache_dir=tmp_path,

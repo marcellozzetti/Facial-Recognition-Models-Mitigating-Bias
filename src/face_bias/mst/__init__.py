@@ -3,13 +3,13 @@
 Exporta as classes e funções públicas do subpacote MST.
 """
 
-from face_bias.mst.skintonenet import (
+from face_bias.mst.classifier import (
     MST_N_CLASSES,
-    PAPER_URL,
+    SKINTONENET_PAPER_URL,
     InferenceCache,
-    SkinToneNetInference,
+    MSTClassifier,
     WeightsUnavailableError,
-    build_skintonenet,
+    build_mst_backbone,
 )
 from face_bias.mst.sensitivity import MSTSensitivityRunner, stone_monk_predictor
 from face_bias.mst.validation import (
@@ -25,11 +25,11 @@ from face_bias.mst.validation import (
 
 __all__ = [
     "MST_N_CLASSES",
-    "PAPER_URL",
+    "SKINTONENET_PAPER_URL",
     "InferenceCache",
-    "SkinToneNetInference",
+    "MSTClassifier",
     "WeightsUnavailableError",
-    "build_skintonenet",
+    "build_mst_backbone",
     "MSTSensitivityRunner",
     "stone_monk_predictor",
     "HumanLabel",
