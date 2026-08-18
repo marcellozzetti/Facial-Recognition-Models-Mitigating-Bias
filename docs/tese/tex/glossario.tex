@@ -46,21 +46,21 @@
 % 4. Mecanismos de conditioning
 % ============================================================
 
-\newword{FiLM}{Feature-wise Linear Modulation --- mecanismo arquitetural de \emph{conditioning} proposto por Perez et al. (2018). Aplica transformação afim $\gamma \odot F + \beta$ por canal sobre \emph{feature maps} intermediárias, com $\gamma$ e $\beta$ derivados do sinal condicionante.}
+\newword{FiLM}{Feature-wise Linear Modulation --- mecanismo arquitetural de condicionamento proposto por Perez et al. (2018). Aplica transformação afim $\gamma \odot F + \beta$ por canal sobre \emph{feature maps} intermediárias, com $\gamma$ e $\beta$ derivados do sinal condicionante.}
 
 \newword{Gated FiLM}{Variante não-linear do FiLM padrão que aplica \emph{gating} sigmoide sobre as funções de modulação: $F' = \sigma(\gamma_g) \odot \tanh(\gamma_t) \odot F + \beta$.}
 
-\newword{Conditional Batch Normalization}{Mecanismo de \emph{conditioning} anterior ao FiLM, generalizado por este último. Modula os parâmetros de normalização de batch com base em sinal externo.}
+\newword{Conditional Batch Normalization}{Mecanismo de condicionamento anterior ao FiLM, generalizado por este último. Modula os parâmetros de normalização de batch com base em sinal externo.}
 
 \newword{Cross-attention}{Mecanismo de \emph{attention} entre duas sequências distintas (\emph{query} de uma, \emph{key/value} da outra), típico de \emph{Transformers}.}
 
 \newword{AdaIN}{Adaptive Instance Normalization --- técnica de \emph{style transfer} que modula estatísticas de instância.}
 
-\newword{SPADE}{Spatially Adaptive Normalization --- técnica de \emph{conditioning} espacial.}
+\newword{SPADE}{Spatially Adaptive Normalization --- técnica de condicionamento espacial.}
 
 \newword{HyperNetworks}{Meta-arquitetura em que uma rede neural gera os pesos de outra rede.}
 
-\newword{LoRA}{Low-Rank Adaptation --- técnica de \emph{parameter-efficient fine-tuning} que injeta matrizes de baixo posto nas camadas do \emph{backbone}. Modifica pesos, não realiza \emph{conditioning} de \emph{features} por sinal externo.}
+\newword{LoRA}{Low-Rank Adaptation --- técnica de \emph{parameter-efficient fine-tuning} que injeta matrizes de baixo posto nas camadas do \emph{backbone}. Modifica pesos, não realiza condicionamento de \emph{features} por sinal externo.}
 
 % ============================================================
 % 5. Métricas de fairness e estatística
@@ -134,7 +134,7 @@
 
 \newword{Downstream task}{Tarefa aplicada após a \emph{upstream} (tipicamente pré-treinamento ou treinamento inicial).}
 
-\newword{Pixel information}{Quantidade de informação facial útil na imagem, tipicamente medida pela fração da imagem ocupada pela face após alinhamento e \emph{crop}. Identificada por Pangelinan et al. (2023) como possível \emph{driver} estrutural da disparidade em \emph{face recognition}.}
+\newword{Pixel information}{Quantidade de informação facial útil na imagem, tipicamente medida pela fração da imagem ocupada pela face após alinhamento e \emph{crop}. Identificada por Pangelinan et al. (2023) como possível principal fator estrutural da disparidade em \emph{face recognition}.}
 
 \newword{Confounder}{Variável que se correlaciona simultaneamente com a variável independente e com a variável dependente, podendo produzir associações espúrias caso não seja controlada.}
 

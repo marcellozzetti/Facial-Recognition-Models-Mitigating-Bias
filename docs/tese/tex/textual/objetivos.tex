@@ -15,13 +15,13 @@ Seis objetivos específicos estruturam a execução da pesquisa, cada um vincula
 
 \item[Objetivo 2.] Conduzir avaliação metodológica comparativa de modelos pré-treinados disponíveis para classificação MST --- SkinToneNet~\cite{matias2026large}, Casual Conversations \emph{baseline}~\cite{hazirbas2021towards,porgali2023casual} e alternativas disponíveis publicamente ---, justificando a escolha do modelo adotado por critérios de desempenho, generalização e disponibilidade. Inclui \emph{sensitivity analysis} a dois ou três classificadores MST alternativos como salvaguarda contra propagação de viés.
 
-\item[Objetivo 3.] Implementar e avaliar o pipeline \emph{SkinToneNet} $\rightarrow$ ConvNeXt-T com camadas FiLM $\rightarrow$ \emph{race classifier} sobre o FairFace, em comparação sistemática contra seis \emph{baselines} de mitigação. Inclui \emph{ablation} arquitetural com quatro configurações comparativas de \emph{conditioning}, detalhadas na Seção~\ref{sec:ablation}.
+\item[Objetivo 3.] Implementar e avaliar o pipeline \emph{SkinToneNet} $\rightarrow$ ConvNeXt-T com camadas FiLM $\rightarrow$ \emph{race classifier} sobre o FairFace, em comparação sistemática contra seis \emph{baselines} de mitigação. Inclui \emph{ablation} arquitetural com quatro configurações comparativas de condicionamento, detalhadas na Seção~\ref{sec:ablation}.
 
 \item[Objetivo 4.] Demonstrar empiricamente que o \emph{backbone} \emph{fair-trained} obtido no Objetivo 3 transfere a propriedade \emph{fair} para tarefa \emph{downstream} de \emph{face recognition} nos datasets RFW~\cite{wang2019racial} e/ou BFW~\cite{robinson2020face}, com controle explícito de \emph{pixel information} como \emph{confounder}, conforme metodologia estabelecida por \citeonline{pangelinan2023exploring}.
 
-\item[Objetivo 5.] Formalizar e publicar a triangulação de métricas multi-classe adotada --- \emph{Disparity Ratio}, \emph{worst-class} F1 e \emph{Equal Opportunity} estratificada por classe ---, oferecendo protocolo consensual ao gap metodológico identificado na literatura (Seção~\ref{sec:rl_gaps}).
+\item[Objetivo 5.] Formalizar e publicar a triangulação de métricas multi-classe adotada --- \emph{Disparity Ratio}, pior classe F1 e \emph{Equal Opportunity} estratificada por classe ---, oferecendo protocolo consensual ao gap metodológico identificado na literatura (Seção~\ref{sec:rl_gaps}).
 
-\item[Objetivo 6.] Decompor quantitativamente o erro de classificação racial Latinx em componente fenotípico (irredutível, associado ao \emph{overlap} MST intra-categoria) \emph{versus} componente algorítmico (mitigável por conditioning arquitetural), quantificando a fronteira estrutural de classificação multi-classe.
+\item[Objetivo 6.] Decompor quantitativamente o erro de classificação racial Latinx em componente fenotípico (irredutível, associado ao sobreposição MST intra-categoria) \emph{versus} componente algorítmico (mitigável por conditioning arquitetural), quantificando a fronteira estrutural de classificação multi-classe.
 \end{description}
 
 \section{Hipóteses de pesquisa}
@@ -37,11 +37,11 @@ Seis hipóteses testáveis, com critérios formais de confirmação e refutaçã
 \textbf{ID} & \textbf{Hipótese} & \textbf{Confirmação} & \textbf{Refutação} \\
 \midrule
 H1 & Pipeline com tom de pele como contexto arquitetural supera \emph{baseline} ResNet-34 em F1 macro em pelo menos dois pontos percentuais e reduz \emph{Disparity Ratio} em pelo menos vinte por cento & Ambos os critérios simultaneamente & Qualquer critério não atingido \\
-H2 & ConvNeXt-T sem \emph{conditioning} obtém ganho de dois a cinco pontos percentuais em F1 macro sobre ResNet-34; Latinx permanece em aproximadamente 60\,\% ($\pm$3 pp) & Ganho no \emph{range} previsto e Latinx invariante & Fora do \emph{range} ou Latinx muda significativamente \\
+H2 & ConvNeXt-T sem condicionamento obtém ganho de dois a cinco pontos percentuais em F1 macro sobre ResNet-34; Latinx permanece em aproximadamente 60\,\% ($\pm$3 pp) & Ganho no \emph{range} previsto e Latinx invariante & Fora do \emph{range} ou Latinx muda significativamente \\
 H3 & A categoria Latinx no FairFace exibe \emph{spread} MST em cinco ou mais das dez classes MST & \emph{Spread} $\geq 5$ & \emph{Spread} $< 5$ \\
-H4 & Ao menos 50\,\% das classificações incorretas em Latinx pelo \emph{baseline} concentram-se em zonas MST de sobreposição com outras raças & Concentração $\geq 50\,\%$ em zonas de \emph{overlap} & Concentração $< 50\,\%$ \\
+H4 & Ao menos 50\,\% das classificações incorretas em Latinx pelo \emph{baseline} concentram-se em zonas MST de sobreposição com outras raças & Concentração $\geq 50\,\%$ em zonas de sobreposição & Concentração $< 50\,\%$ \\
 H5 & \emph{Conditioning} MST melhora \emph{fairness} em \emph{face recognition} \emph{quando pixel information é controlada} via alinhamento e \emph{crop} & Black/African $\geq +3$ pp em RFW/BFW após normalização de \emph{pixel information} & $< +3$ pp ou degradação \\
-H6 & A disparidade residual em FR após \emph{conditioning} é explicada predominantemente por \emph{pixel information} & $\geq 70\,\%$ da variância explicada por \emph{pixel information} & $< 70\,\%$ (indica viés algorítmico residual) \\
+H6 & A disparidade residual em FR após condicionamento é explicada predominantemente por \emph{pixel information} & $\geq 70\,\%$ da variância explicada por \emph{pixel information} & $< 70\,\%$ (indica viés algorítmico residual) \\
 \bottomrule
 \end{tabular}
 \caption{Hipóteses de pesquisa e critérios de confirmação/refutação.}
@@ -56,9 +56,9 @@ Sete contribuições estruturais são pretendidas, organizadas nos três eixos a
 \begin{description}[font=\bfseries\sffamily]
 \item[Contribuição 1.] Avaliação metodológica comparativa de modelos pré-treinados de classificação de tom de pele, com protocolo de escolha justificado e \emph{sensitivity analysis} contra alternativas.
 \item[Contribuição 2.] Matriz pública de distribuição cruzada Monk Skin Tone $\times$ classes raciais sobre o FairFace \emph{validation set}.
-\item[Contribuição 3.] Primeira aplicação documentada, na literatura consultada, de FiLM-\emph{conditioning}~\cite{perez2018film} a \emph{fairness} facial em \emph{race classification} multi-classe.
-\item[Contribuição 4.] Triangulação de métricas multi-classe --- \emph{Disparity Ratio} $+$ \emph{worst-class} F1 $+$ \emph{Equal Opportunity} por classe $+$ \emph{Equalized Odds} por classe ---, fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent} e nas definições formais de \emph{fairness} de \citeonline{hardt2016equality}.
+\item[Contribuição 3.] Primeira aplicação documentada, na literatura consultada, de FiLM-condicionamento~\cite{perez2018film} a \emph{fairness} facial em \emph{race classification} multi-classe.
+\item[Contribuição 4.] Triangulação de métricas multi-classe --- \emph{Disparity Ratio} $+$ pior classe F1 $+$ \emph{Equal Opportunity} por classe $+$ \emph{Equalized Odds} por classe ---, fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent} e nas definições formais de \emph{fairness} de \citeonline{hardt2016equality}.
 \item[Contribuição 5.] Demonstração empírica de transferência \emph{fair} de \emph{classification} para \emph{face recognition} em visão computacional facial, com controle explícito de \emph{pixel information} como \emph{confounder}.
 \item[Contribuição 6.] Decomposição quantitativa do erro Latinx em componente fenotípico irredutível \emph{versus} componente algorítmico mitigável, oferecendo diagnóstico estrutural além da mera redução agregada de F1.
-\item[Contribuição 7.] Estudo comparativo arquitetural entre três configurações de \emph{conditioning} --- \emph{baseline} sem \emph{conditioning}, ConvNeXt-T com FiLM alimentado pelo vetor MST direto, e ConvNeXt-T com FiLM alimentado por \emph{embedding} semântico CLIP-\emph{text} ---, oferecendo evidência sobre o valor relativo da natureza discreta \emph{versus} semântica do sinal condicionante.
+\item[Contribuição 7.] Estudo comparativo arquitetural entre três configurações de condicionamento --- \emph{baseline} sem condicionamento, ConvNeXt-T com FiLM alimentado pelo vetor MST direto, e ConvNeXt-T com FiLM alimentado por \emph{embedding} semântico CLIP-\emph{text} ---, oferecendo evidência sobre o valor relativo da natureza discreta \emph{versus} semântica do sinal condicionante.
 \end{description}

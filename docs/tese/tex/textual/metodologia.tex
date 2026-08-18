@@ -23,13 +23,13 @@ O pipeline metodológico estrutura-se em seis etapas sequenciais, cada uma vincu
 
 \item \textbf{Etapa 2 --- Auditoria fenotípica do FairFace}: aplicação do SkinToneNet sobre o FairFace \emph{validation set} e construção da matriz pública Monk Skin Tone~$\times$~classes raciais.
 
-\item \textbf{Etapa 3 --- Classificador racial com \emph{conditioning}}: treinamento de ConvNeXt-T \emph{fine-tuned} em FairFace \emph{train}, com camadas FiLM~\cite{perez2018film} por estágio recebendo como contexto o vetor MST produzido na Etapa~1.
+\item \textbf{Etapa 3 --- Classificador racial com condicionamento}: treinamento de ConvNeXt-T \emph{fine-tuned} em FairFace \emph{train}, com camadas FiLM~\cite{perez2018film} por estágio recebendo como contexto o vetor MST produzido na Etapa~1.
 
 \item \textbf{Etapa 4 --- Comparação contra \emph{baselines}}: avaliação sistemática do pipeline contra seis \emph{baselines} de mitigação (Seção~\ref{sec:baselines}), com triangulação completa de métricas (Seção~\ref{sec:metricas}).
 
 \item \textbf{Etapa 5 --- Transferência \emph{fair}}: aplicação do \emph{backbone} \emph{fair-trained} para tarefa \emph{downstream} de \emph{face recognition} nos datasets RFW~\cite{wang2019racial} e/ou BFW~\cite{robinson2020face}, com controle explícito de \emph{pixel information} (fração de pixels úteis da face obtida por segmentação BiSeNet) como \emph{confounder} principal, conforme metodologia proposta por \citeonline{pangelinan2023exploring}. Como salvaguarda adicional, estratificam-se os resultados por três descritores complementares de qualidade de imagem --- luminância média (canal $L^*$ da escala CIELAB), nitidez (variância do Laplaciano) e resolução efetiva da face em pixels ---, permitindo verificar se a disparidade residual persiste após controle desses fatores ópticos e blindando a Etapa~6 contra a crítica de que o erro Latinx seria puramente sensorial em vez de fenotípico.
 
-\item \textbf{Etapa 6 --- Síntese decompositiva}: combinação dos resultados obtidos nas Etapas~2 e~5 para quantificar a contribuição relativa do componente fenotípico (irredutível, associado ao \emph{overlap} MST intra-categoria) \emph{versus} componente algorítmico (mitigável) do erro de classificação Latinx.
+\item \textbf{Etapa 6 --- Síntese decompositiva}: combinação dos resultados obtidos nas Etapas~2 e~5 para quantificar a contribuição relativa do componente fenotípico (irredutível, associado ao sobreposição MST intra-categoria) \emph{versus} componente algorítmico (mitigável) do erro de classificação Latinx.
 \end{enumerate}
 
 \section{Datasets utilizados}
@@ -51,7 +51,7 @@ Seis \emph{baselines} de mitigação algorítmica compõem o quadro comparativo,
 
 \begin{enumerate}
 \item ResNet-34, \emph{baseline} canônico originalmente treinado por \citeonline{karkkainen2021fairface} sobre o FairFace~\cite{aldahoul2024exploring};
-\item ConvNeXt-T puro, sem \emph{conditioning}, como controle arquitetural moderno;
+\item ConvNeXt-T puro, sem condicionamento, como controle arquitetural moderno;
 \item FSCL+~\cite{park2022fair};
 \item Group DRO~\cite{sagawa2020distribution};
 \item FineFACE~\cite{manzoor2024fineface};
@@ -64,13 +64,13 @@ Seis \emph{baselines} de mitigação algorítmica compõem o quadro comparativo,
 O \emph{backbone} adotado é o ConvNeXt-T (variante \emph{Tiny}, aproximadamente 28 milhões de parâmetros), da família ConvNeXt proposta como sucessora arquitetural moderna da linha ResNet. A escolha deste \emph{backbone}, em detrimento de outras arquiteturas modernas de igual ou menor porte, fundamenta-se em quatro critérios objetivos:
 
 \begin{enumerate}
-\item \textbf{Paridade competitiva com Vision Transformers a custo convolucional.} A família ConvNeXt demonstrou, em ImageNet-1K, desempenho comparável a Swin Transformers com custo de inferência inferior, mantendo a estrutura hierárquica em quatro estágios característica de ResNets, o que permite reaproveitamento imediato de mecanismos de \emph{conditioning} projetados originalmente para redes convolucionais como o FiLM.
+\item \textbf{Paridade competitiva com Vision Transformers a custo convolucional.} A família ConvNeXt demonstrou, em ImageNet-1K, desempenho comparável a Swin Transformers com custo de inferência inferior, mantendo a estrutura hierárquica em quatro estágios característica de ResNets, o que permite reaproveitamento imediato de mecanismos de condicionamento projetados originalmente para redes convolucionais como o FiLM.
 \item \textbf{Estabilidade de treinamento em \emph{fine-tuning}.} O uso de \emph{LayerNorm} no lugar de \emph{BatchNorm} confere robustez a variações de \emph{batch size}, comportamento relevante em cenários de treinamento com múltiplas configurações e três sementes independentes (Seção~\ref{sec:rigor}).
 \item \textbf{Compatibilidade com o mecanismo FiLM.} A estrutura hierárquica em quatro estágios do ConvNeXt-T oferece pontos de inserção naturais para camadas FiLM logo após cada bloco convolucional principal, sem exigir modificação de \emph{depthwise convolutions} ou de \emph{inverted bottleneck blocks}.
-\item \textbf{Comparabilidade com o \emph{baseline} canônico da literatura de \emph{fairness} facial.} A adoção do ConvNeXt-T como controle arquitetural moderno (Configuração A, Seção~\ref{sec:ablation}) permite isolar o efeito do \emph{conditioning} sem confundi-lo com ganhos derivados apenas da modernização do \emph{backbone} sobre o ResNet-34 usado por \citeonline{karkkainen2021fairface}.
+\item \textbf{Comparabilidade com o \emph{baseline} canônico da literatura de \emph{fairness} facial.} A adoção do ConvNeXt-T como controle arquitetural moderno (Configuração A, Seção~\ref{sec:ablation}) permite isolar o efeito do condicionamento sem confundi-lo com ganhos derivados apenas da modernização do \emph{backbone} sobre o ResNet-34 usado por \citeonline{karkkainen2021fairface}.
 \end{enumerate}
 
-Como \emph{sanity check} arquitetural, o trabalho reporta explicitamente o desempenho do ConvNeXt-T puro (Configuração A) em separado do desempenho do ConvNeXt-T com FiLM (Configuração B), permitindo à banca examinadora avaliar de forma independente a contribuição do \emph{backbone} e a contribuição do mecanismo de \emph{conditioning}.
+Como verificação básica arquitetural, o trabalho reporta explicitamente o desempenho do ConvNeXt-T puro (Configuração A) em separado do desempenho do ConvNeXt-T com FiLM (Configuração B), permitindo à banca examinadora avaliar de forma independente a contribuição do \emph{backbone} e a contribuição do mecanismo de condicionamento.
 
 \section{Mecanismo FiLM}
 \label{sec:film}
@@ -90,13 +90,13 @@ onde $F_i \in \mathbb{R}^{H_i \times W_i \times C_i}$ é a \emph{feature map} in
 
 \subsection{Implementação de $f_\gamma$ e $f_\beta$}
 
-As funções $f_\gamma$ e $f_\beta$ são implementadas por duas \emph{Multi-Layer Perceptrons} independentes com arquitetura de duas camadas ($\mathbb{R}^{10} \to \mathbb{R}^{128} \to \mathbb{R}^{C_i}$) e ativação intermediária ReLU. A camada final é inicializada de forma a produzir $\gamma_i \approx 1$ e $\beta_i \approx 0$ no início do treinamento (transformação identidade), garantindo que o modelo inicie o treinamento operando efetivamente como o \emph{backbone} sem \emph{conditioning}, estratégia consistente com práticas de estabilidade de treinamento em mecanismos aditivos residuais~\cite{perez2018film}.
+As funções $f_\gamma$ e $f_\beta$ são implementadas por duas \emph{Multi-Layer Perceptrons} independentes com arquitetura de duas camadas ($\mathbb{R}^{10} \to \mathbb{R}^{128} \to \mathbb{R}^{C_i}$) e ativação intermediária ReLU. A camada final é inicializada de forma a produzir $\gamma_i \approx 1$ e $\beta_i \approx 0$ no início do treinamento (transformação identidade), garantindo que o modelo inicie o treinamento operando efetivamente como o \emph{backbone} sem condicionamento, estratégia consistente com práticas de estabilidade de treinamento em mecanismos aditivos residuais~\cite{perez2018film}.
 
-Considerando os quatro estágios do ConvNeXt-T com $C_i \in \{96, 192, 384, 768\}$, o \emph{overhead} paramétrico agregado é de aproximadamente 380.000 parâmetros adicionais, o que corresponde a cerca de 1{,}3\,\% do total de parâmetros do \emph{backbone} (28 milhões). Este \emph{overhead} é substancialmente inferior a alternativas como \emph{cross-attention} (aproximadamente 3\,$\times$ o custo) e mesmo a \emph{Conditional Batch Normalization} implementada com MLPs de mesma capacidade, mantendo a compatibilidade computacional com \emph{fine-tuning} em GPUs de porte comum (Seção~\ref{sec:riscos}, Risco~4).
+Considerando os quatro estágios do ConvNeXt-T com $C_i \in \{96, 192, 384, 768\}$, o custo adicional paramétrico agregado é de aproximadamente 380.000 parâmetros adicionais, o que corresponde a cerca de 1{,}3\,\% do total de parâmetros do \emph{backbone} (28 milhões). Este custo adicional é substancialmente inferior a alternativas como \emph{cross-attention} (aproximadamente 3\,$\times$ o custo) e mesmo a \emph{Conditional Batch Normalization} implementada com MLPs de mesma capacidade, mantendo a compatibilidade computacional com \emph{fine-tuning} em GPUs de porte comum (Seção~\ref{sec:riscos}, Risco~4).
 
 \subsection{Racional da escolha}
 
-A escolha de FiLM sobre alternativas de \emph{conditioning} é justificada pela combinação de eficiência paramétrica, capacidade demonstrada de modulação por escala e deslocamento em nível de canal e histórico de sucesso em \emph{Visual Question Answering}~\cite{perez2018film}. A análise comparativa completa contra sete alternativas (\emph{Concatenação}, \emph{Conditional Batch Normalization}, \emph{Cross-attention}, AdaIN, SPADE, \emph{HyperNetworks}, LoRA/Adaptadores) é apresentada na Seção~\ref{sec:rl_conditioning_alt} da Revisão Bibliográfica. Variantes de implementação da modulação, como a introdução de portas multiplicativas nas funções $f_\gamma$ e $f_\beta$, são exploradas como escolhas empíricas na fase experimental da Configuração~B, sem constituir configurações separadas no estudo de \emph{ablation} (Seção~\ref{sec:ablation}).
+A escolha de FiLM sobre alternativas de condicionamento é justificada pela combinação de eficiência paramétrica, capacidade demonstrada de modulação por escala e deslocamento em nível de canal e histórico de sucesso em \emph{Visual Question Answering}~\cite{perez2018film}. A análise comparativa completa contra sete alternativas (\emph{Concatenação}, \emph{Conditional Batch Normalization}, \emph{Cross-attention}, AdaIN, SPADE, \emph{HyperNetworks}, LoRA/Adaptadores) é apresentada na Seção~\ref{sec:rl_conditioning_alt} da Revisão Bibliográfica. Variantes de implementação da modulação, como a introdução de portas multiplicativas nas funções $f_\gamma$ e $f_\beta$, são exploradas como escolhas empíricas na fase experimental da Configuração~B, sem constituir configurações separadas no estudo de \emph{ablation} (Seção~\ref{sec:ablation}).
 
 A Figura~\ref{fig:mecanismo-film} ilustra a integração do mecanismo FiLM à arquitetura ConvNeXt-T proposta, evidenciando os pontos de inserção da camada de modulação por estágio.
 
@@ -119,20 +119,20 @@ Todos os experimentos das três configurações (Seção~\ref{sec:ablation}) sã
 \item \textbf{\emph{Batch size}}: 64 imagens de $224 \times 224$ pixels.
 \item \textbf{Regularização}: \emph{dropout} $0{,}1$ nas MLPs de $f_\gamma$ e $f_\beta$; augmentação padrão (flip horizontal, \emph{color jitter} moderado).
 \item \textbf{Critério de parada}: \emph{early stopping} baseado em F1 macro no \emph{validation set} com paciência de 5 épocas.
-\item \textbf{\emph{Framework}}: PyTorch 2.x sobre implementação de referência de ConvNeXt disponível em \emph{TorchVision}, com camadas FiLM implementadas como \emph{PyTorch modules} customizados.
+\item \textbf{Biblioteca}: PyTorch 2.x sobre implementação de referência de ConvNeXt disponível em \emph{TorchVision}, com camadas FiLM implementadas como módulos PyTorch customizados.
 \end{itemize}
 
-Estes hiperparâmetros são fixados a priori e mantidos idênticos entre as três configurações (A, B, C) descritos na Seção~\ref{sec:ablation} e entre os seis \emph{baselines} (Seção~\ref{sec:baselines}), garantindo que diferenças de desempenho observadas sejam atribuíveis exclusivamente à variação do mecanismo de \emph{conditioning} ou da arquitetura do \emph{baseline}, e não a diferenças de otimização.
+Estes hiperparâmetros são fixados a priori e mantidos idênticos entre as três configurações (A, B, C) descritos na Seção~\ref{sec:ablation} e entre os seis \emph{baselines} (Seção~\ref{sec:baselines}), garantindo que diferenças de desempenho observadas sejam atribuíveis exclusivamente à variação do mecanismo de condicionamento ou da arquitetura do \emph{baseline}, e não a diferenças de otimização.
 
 
 \section{\emph{Ablation} arquitetural}
 \label{sec:ablation}
 
-Esta pesquisa conduzirá \emph{ablation} arquitetural comparando três configurações do estágio de \emph{conditioning}, mantidos idênticos o \emph{backbone} (ConvNeXt-T), o dataset (FairFace) e o protocolo de avaliação:
+Esta pesquisa conduzirá \emph{ablation} arquitetural comparando três configurações do estágio de condicionamento, mantidos idênticos o \emph{backbone} (ConvNeXt-T), o dataset (FairFace) e o protocolo de avaliação:
 
 \begin{description}[font=\bfseries\sffamily]
-\item[Configuração A --- Baseline sem \emph{conditioning}]: ConvNeXt-T \emph{fine-tuned} sem qualquer sinal auxiliar, como controle arquitetural.
-\item[Configuração B --- ConvNeXt-T com FiLM (proposta principal)]: sinal condicionante é o vetor MST 10-dim produzido pelo classificador da Etapa~1. Corresponde ao teste da hipótese central de que o \emph{conditioning} arquitetural por tom de pele reduz a disparidade demográfica sem sacrificar acurácia agregada. Variantes de implementação das funções $f_\gamma$ e $f_\beta$ (arquitetura das MLPs geradoras, presença ou não de portas multiplicativas) são exploradas como escolhas empíricas durante a fase experimental, sem alterar a definição da configuração.
+\item[Configuração A --- Baseline sem condicionamento]: ConvNeXt-T \emph{fine-tuned} sem qualquer sinal auxiliar, como controle arquitetural.
+\item[Configuração B --- ConvNeXt-T com FiLM (proposta principal)]: sinal condicionante é o vetor MST 10-dim produzido pelo classificador da Etapa~1. Corresponde ao teste da hipótese central de que o condicionamento arquitetural por tom de pele reduz a disparidade demográfica sem sacrificar acurácia agregada. Variantes de implementação das funções $f_\gamma$ e $f_\beta$ (arquitetura das MLPs geradoras, presença ou não de portas multiplicativas) são exploradas como escolhas empíricas durante a fase experimental, sem alterar a definição da configuração.
 \item[Configuração C --- ConvNeXt-T com FiLM sobre \emph{embedding} CLIP-\emph{text}]: alternativa em que o sinal condicionante é um \emph{embedding} semântico 512-dim produzido por CLIP-\emph{text}~\cite{luo2024fairclip} em vez do vetor MST discreto. O \emph{prompt} adotado é a média de \emph{embeddings} de dez \emph{templates} equivalentes na forma \emph{``a photo of a person with Monk Skin Tone $k$''}, com $k \in \{1, \ldots, 10\}$, ponderados pela probabilidade \emph{softmax} de cada classe MST produzida pelo classificador da Etapa~1. Esta estratégia de \emph{prompt ensembling}, alinhada às práticas de \citeonline{dehdashtian2024fairerclip}, evita a sensibilidade do CLIP a formulações isoladas e produz sinal condicionante mais robusto que \emph{prompts} estáticos únicos.
 \end{description}
 
@@ -172,7 +172,7 @@ O protocolo de reporte estratificado adotado nos dois cenários segue as diretri
 \subsection{Visualização Pareto-eficiente}
 \label{sec:pareto}
 
-Complementando a triangulação, os resultados das três configurações (Seção~\ref{sec:ablation}) e dos seis \emph{baselines} (Seção~\ref{sec:baselines}) são projetados no plano \emph{acurácia $\times$ fairness} para diagnóstico visual de dominância Pareto. Cada modelo é representado por um ponto de coordenadas $(1 - \mathrm{F1_{macro}},\; 1 - \mathrm{DR})$, correspondendo respectivamente a erro agregado e disparidade entre grupos. Uma configuração é dita \textbf{Pareto-superior} quando reduz simultaneamente ambas as coordenadas em relação a outra --- isto é, melhora \emph{fairness} sem degradar utilidade, ou vice-versa. A projeção conjunta permite responder de forma inequívoca se o \emph{conditioning} FiLM sobre MST domina os \emph{baselines} de mitigação ou se opera em um trade-off, alinhando-se à recomendação metodológica de \citeonline{manzoor2024fineface} e \citeonline{dominguezcatena2024dsap} de reportar sistemas de \emph{fairness} sob a lente de fronteira de Pareto.
+Complementando a triangulação, os resultados das três configurações (Seção~\ref{sec:ablation}) e dos seis \emph{baselines} (Seção~\ref{sec:baselines}) são projetados no plano \emph{acurácia $\times$ fairness} para diagnóstico visual de dominância Pareto. Cada modelo é representado por um ponto de coordenadas $(1 - \mathrm{F1_{macro}},\; 1 - \mathrm{DR})$, correspondendo respectivamente a erro agregado e disparidade entre grupos. Uma configuração é dita \textbf{Pareto-superior} quando reduz simultaneamente ambas as coordenadas em relação a outra --- isto é, melhora \emph{fairness} sem degradar utilidade, ou vice-versa. A projeção conjunta permite responder de forma inequívoca se o condicionamento FiLM sobre MST domina os \emph{baselines} de mitigação ou se opera em um trade-off, alinhando-se à recomendação metodológica de \citeonline{manzoor2024fineface} e \citeonline{dominguezcatena2024dsap} de reportar sistemas de \emph{fairness} sob a lente de fronteira de Pareto.
 
 \section{Validação humana interna}
 \label{sec:validacao_interna}
