@@ -96,7 +96,7 @@ Considerando os quatro estágios do ConvNeXt-T com $C_i \in \{96, 192, 384, 768\
 
 \subsection{Racional da escolha}
 
-A escolha de FiLM sobre alternativas de \emph{conditioning} é justificada pela combinação de eficiência paramétrica, capacidade demonstrada de modulação por escala e deslocamento em nível de canal e histórico de sucesso em \emph{Visual Question Answering}~\cite{perez2018film}. A análise comparativa completa contra sete alternativas (\emph{Concatenação}, \emph{Conditional Batch Normalization}, \emph{Cross-attention}, AdaIN, SPADE, \emph{HyperNetworks}, LoRA/Adaptadores) é apresentada na Seção~\ref{sec:rl_conditioning_alt} da Revisão Bibliográfica, e a limitação de linearidade do FiLM padrão é endereçada empiricamente pela Configuração~C (FiLM com porta multiplicativa) do estudo de \emph{ablation} (Seção~\ref{sec:ablation}).
+A escolha de FiLM sobre alternativas de \emph{conditioning} é justificada pela combinação de eficiência paramétrica, capacidade demonstrada de modulação por escala e deslocamento em nível de canal e histórico de sucesso em \emph{Visual Question Answering}~\cite{perez2018film}. A análise comparativa completa contra sete alternativas (\emph{Concatenação}, \emph{Conditional Batch Normalization}, \emph{Cross-attention}, AdaIN, SPADE, \emph{HyperNetworks}, LoRA/Adaptadores) é apresentada na Seção~\ref{sec:rl_conditioning_alt} da Revisão Bibliográfica. Variantes de implementação da modulação, como a introdução de portas multiplicativas nas funções $f_\gamma$ e $f_\beta$, são exploradas como escolhas empíricas na fase experimental da Configuração~B, sem constituir configurações separadas no estudo de \emph{ablation} (Seção~\ref{sec:ablation}).
 
 A Figura~\ref{fig:mecanismo-film} ilustra a integração do mecanismo FiLM à arquitetura ConvNeXt-T proposta, evidenciando os pontos de inserção da camada de modulação por estágio.
 
@@ -111,7 +111,7 @@ A Figura~\ref{fig:mecanismo-film} ilustra a integração do mecanismo FiLM à ar
 
 \subsection{Detalhes de treinamento}
 
-Todos os experimentos das quatro configurações (Seção~\ref{sec:ablation}) são conduzidos sob protocolo unificado:
+Todos os experimentos das três configurações (Seção~\ref{sec:ablation}) são conduzidos sob protocolo unificado:
 
 \begin{itemize}
 \item \textbf{Otimizador}: AdamW com \emph{learning rate} $1 \times 10^{-4}$ para o \emph{backbone} e $1 \times 10^{-3}$ para as camadas FiLM, \emph{weight decay} de $0{,}05$.
@@ -122,26 +122,25 @@ Todos os experimentos das quatro configurações (Seção~\ref{sec:ablation}) s�
 \item \textbf{\emph{Framework}}: PyTorch 2.x sobre implementação de referência de ConvNeXt disponível em \emph{TorchVision}, com camadas FiLM implementadas como \emph{PyTorch modules} customizados.
 \end{itemize}
 
-Estes hiperparâmetros são fixados a priori e mantidos idênticos entre as quatro configurações (A, B, C, D) descritos na Seção~\ref{sec:ablation} e entre os seis \emph{baselines} (Seção~\ref{sec:baselines}), garantindo que diferenças de desempenho observadas sejam atribuíveis exclusivamente à variação do mecanismo de \emph{conditioning} ou da arquitetura do \emph{baseline}, e não a diferenças de otimização.
+Estes hiperparâmetros são fixados a priori e mantidos idênticos entre as três configurações (A, B, C) descritos na Seção~\ref{sec:ablation} e entre os seis \emph{baselines} (Seção~\ref{sec:baselines}), garantindo que diferenças de desempenho observadas sejam atribuíveis exclusivamente à variação do mecanismo de \emph{conditioning} ou da arquitetura do \emph{baseline}, e não a diferenças de otimização.
 
 
 \section{\emph{Ablation} arquitetural}
 \label{sec:ablation}
 
-Este pesquisa conduzirá \emph{ablation} arquitetural comparando quatro configurações do estágio de \emph{conditioning}, mantidos idênticos o \emph{backbone} (ConvNeXt-T), o dataset (FairFace) e o protocolo de avaliação:
+Esta pesquisa conduzirá \emph{ablation} arquitetural comparando três configurações do estágio de \emph{conditioning}, mantidos idênticos o \emph{backbone} (ConvNeXt-T), o dataset (FairFace) e o protocolo de avaliação:
 
 \begin{description}[font=\bfseries\sffamily]
-\item[Configuração A --- Baseline sem \emph{conditioning}]: ConvNeXt-T \emph{fine-tuned} sem qualquer sinal auxiliar, como controle.
-\item[Configuração B --- FiLM linear com MST 10-dim]: proposta principal do trabalho, com $f_\gamma$ e $f_\beta$ implementadas por \emph{Multi-Layer Perceptrons} lineares. Corresponde ao teste da hipótese central de que o \emph{conditioning} arquitetural por tom de pele reduz a disparidade demográfica sem sacrificar acurácia agregada.
-\item[Configuração C --- FiLM com porta multiplicativa (\emph{gating} sigmoide)]: variante não-linear proposta como \emph{ablation} nesta pesquisa, inspirada na formulação de mecanismos de \emph{gating} como caso restrito de FiLM discutida por \citeonline{dumoulin2018featurewise}, aplicada para isolar o efeito da linearidade das funções de modulação.
-\item[Configuração D --- FiLM sobre \emph{embedding} CLIP-\emph{text} 512-dim]: alternativa moderna, com sinal condicionante em \emph{embedding} semântico produzido por CLIP-\emph{text}~\cite{luo2024fairclip} em vez do vetor MST discreto. O \emph{prompt} adotado é a média de \emph{embeddings} de dez \emph{templates} equivalentes na forma \emph{``a photo of a person with Monk Skin Tone $k$''}, com $k \in \{1, \ldots, 10\}$, ponderados pela probabilidade \emph{softmax} de cada classe MST produzida pelo SkinToneNet. Esta estratégia de \emph{prompt ensembling}, alinhada às práticas de \citeonline{dehdashtian2024fairerclip}, evita a sensibilidade do CLIP a formulações isoladas e produz sinal condicionante mais robusto que \emph{prompts} estáticos únicos.
+\item[Configuração A --- Baseline sem \emph{conditioning}]: ConvNeXt-T \emph{fine-tuned} sem qualquer sinal auxiliar, como controle arquitetural.
+\item[Configuração B --- ConvNeXt-T com FiLM (proposta principal)]: sinal condicionante é o vetor MST 10-dim produzido pelo classificador da Etapa~1. Corresponde ao teste da hipótese central de que o \emph{conditioning} arquitetural por tom de pele reduz a disparidade demográfica sem sacrificar acurácia agregada. Variantes de implementação das funções $f_\gamma$ e $f_\beta$ (arquitetura das MLPs geradoras, presença ou não de portas multiplicativas) são exploradas como escolhas empíricas durante a fase experimental, sem alterar a definição da configuração.
+\item[Configuração C --- ConvNeXt-T com FiLM sobre \emph{embedding} CLIP-\emph{text}]: alternativa em que o sinal condicionante é um \emph{embedding} semântico 512-dim produzido por CLIP-\emph{text}~\cite{luo2024fairclip} em vez do vetor MST discreto. O \emph{prompt} adotado é a média de \emph{embeddings} de dez \emph{templates} equivalentes na forma \emph{``a photo of a person with Monk Skin Tone $k$''}, com $k \in \{1, \ldots, 10\}$, ponderados pela probabilidade \emph{softmax} de cada classe MST produzida pelo classificador da Etapa~1. Esta estratégia de \emph{prompt ensembling}, alinhada às práticas de \citeonline{dehdashtian2024fairerclip}, evita a sensibilidade do CLIP a formulações isoladas e produz sinal condicionante mais robusto que \emph{prompts} estáticos únicos.
 \end{description}
 
-A Figura~\ref{fig:configuracoes-abcd} compara visualmente as quatro configurações, evidenciando as dimensões variadas (mecanismo de \emph{conditioning} e sinal condicionante) e as dimensões controladas (\emph{backbone}, dataset, protocolo de avaliação).
+A Figura~\ref{fig:configuracoes-abcd} compara visualmente as três configurações, evidenciando a dimensão variada (natureza do sinal condicionante) e as dimensões controladas (\emph{backbone}, dataset, protocolo de avaliação).
 
 \begin{figure}[htbp]
 \centering
-\caption{Quatro configurações comparativas do estudo de \emph{ablation} arquitetural.}
+\caption{Três configurações comparativas do estudo de \emph{ablation} arquitetural.}
 \centering
 \includegraphics[width=14cm]{images/fig_configs_abcd.png}
 \\ \small Fonte: Autoria própria. A Configuração B (proposta principal) é destacada em cor mais intensa.
@@ -173,7 +172,7 @@ O protocolo de reporte estratificado adotado nos dois cenários segue as diretri
 \subsection{Visualização Pareto-eficiente}
 \label{sec:pareto}
 
-Complementando a triangulação, os resultados das quatro configurações (Seção~\ref{sec:ablation}) e dos seis \emph{baselines} (Seção~\ref{sec:baselines}) são projetados no plano \emph{acurácia $\times$ fairness} para diagnóstico visual de dominância Pareto. Cada modelo é representado por um ponto de coordenadas $(1 - \mathrm{F1_{macro}},\; 1 - \mathrm{DR})$, correspondendo respectivamente a erro agregado e disparidade entre grupos. Uma configuração é dita \textbf{Pareto-superior} quando reduz simultaneamente ambas as coordenadas em relação a outra --- isto é, melhora \emph{fairness} sem degradar utilidade, ou vice-versa. A projeção conjunta permite responder de forma inequívoca se o \emph{conditioning} FiLM sobre MST domina os \emph{baselines} de mitigação ou se opera em um trade-off, alinhando-se à recomendação metodológica de \citeonline{manzoor2024fineface} e \citeonline{dominguezcatena2024dsap} de reportar sistemas de \emph{fairness} sob a lente de fronteira de Pareto.
+Complementando a triangulação, os resultados das três configurações (Seção~\ref{sec:ablation}) e dos seis \emph{baselines} (Seção~\ref{sec:baselines}) são projetados no plano \emph{acurácia $\times$ fairness} para diagnóstico visual de dominância Pareto. Cada modelo é representado por um ponto de coordenadas $(1 - \mathrm{F1_{macro}},\; 1 - \mathrm{DR})$, correspondendo respectivamente a erro agregado e disparidade entre grupos. Uma configuração é dita \textbf{Pareto-superior} quando reduz simultaneamente ambas as coordenadas em relação a outra --- isto é, melhora \emph{fairness} sem degradar utilidade, ou vice-versa. A projeção conjunta permite responder de forma inequívoca se o \emph{conditioning} FiLM sobre MST domina os \emph{baselines} de mitigação ou se opera em um trade-off, alinhando-se à recomendação metodológica de \citeonline{manzoor2024fineface} e \citeonline{dominguezcatena2024dsap} de reportar sistemas de \emph{fairness} sob a lente de fronteira de Pareto.
 
 \section{Validação humana interna}
 \label{sec:validacao_interna}

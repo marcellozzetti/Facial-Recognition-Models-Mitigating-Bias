@@ -45,7 +45,7 @@ Facial-Recognition-Models-Mitigating-Bias/
 │
 ├── configs/mestrado/                 🆕 (14 arquivos)
 │   ├── common/                       (seeds, hyperparams, datasets)
-│   ├── stages/                       (10 configs: 1 por etapa + 4 ablations)
+│   ├── stages/                       (9 configs: 1 por etapa + 3 ablations)
 │   └── production.yaml               (orquestração root)
 │
 ├── tests/mestrado/                   🆕 (7 arquivos + __init__)
@@ -146,7 +146,7 @@ configs `stages/etapa3_ablation_*.yaml` via `!include`.
 
 - `etapa1_report.md` — protocolo humano + resultados sensitivity
 - `etapa2_report.md` — matriz MST × raça publicada (Contribuição 2)
-- `etapa3_report.md` — ablation A/B/C/D com IC 95% e ranks
+- `etapa3_report.md` — ablation A/B/C (baseline, FiLM+MST, FiLM+CLIP) com IC 95% e ranks
 - `etapa4_report.md` — comparativo baselines + Pareto
 - `etapa5_report.md` — transferência fair RFW/BFW + confounders
 - `etapa6_report.md` — decomposição final (Contribuição 6)
