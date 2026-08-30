@@ -1,126 +1,65 @@
-# Rascunho de email — solicitação de acesso antecipado ao SkinToneNet
+# Rascunho de email — solicitação de acesso ao STW
 
-**Contexto para o Marcello:**
-Este é um rascunho para envio pelo **orientador (Prof. Marcos Quiles)** aos autores
-do SkinToneNet (Matias, Costa, Neto & Novello de Brito, 2026 —
-[arXiv:2603.02475](https://arxiv.org/abs/2603.02475)). Envio institucional
-(orientador → orientadores) tem taxa de resposta muito maior que cold
-email discente. Ajustar o texto conforme preferência do Prof. Quiles
-antes do envio.
+**Rascunho para envio pelo Marcello aos autores do SkinToneNet**
+(Matias, Costa, Neto & Novello de Brito, 2026 —
+[arXiv:2603.02475](https://arxiv.org/abs/2603.02475)).
 
-**Destinatários sugeridos:**
-- Prof. **João Batista Neto** (ICMC/USP) — provável orientador do trabalho
-- Prof. **Tiago Novello de Brito** (IMPA) — coautor sênior
-- CC: Vitor Pereira Matias (primeiro autor) e Márcus Vinícius Lobo Costa
-
-**Endereços a confirmar:** procurar nos sites institucionais
-(icmc.usp.br, impa.br) — não os incluí aqui para não vazar dados errados.
+**Destinatários sugeridos:** Prof. João Batista Neto (ICMC/USP) e
+Prof. Tiago Novello de Brito (IMPA); cc: Vitor Pereira Matias e
+Márcus Vinícius Lobo Costa. Confirmar emails institucionais antes do
+envio.
 
 ---
 
 ## Assunto
 
-Solicitação de acesso antecipado — pesos SkinToneNet (arXiv:2603.02475)
-para pesquisa de mestrado sobre mitigação de viés racial em RF
+Solicitação de acesso ao dataset STW para pesquisa de mestrado em
+mitigação de viés facial
 
 ---
 
-## Corpo do email
+## Corpo
 
 Prezado Prof. João Batista Neto,
 Prezado Prof. Tiago Novello de Brito,
-(cc: Vitor Pereira Matias, Márcus Vinícius Lobo Costa)
 
-Escrevo em nome do meu orientando de mestrado, **Marcello Vinicius Alves
-Ozzetti Cruz**, aluno regular do Programa de Pós-Graduação em Ciência da
-Computação da UNIFESP/ICT. Sua dissertação, com qualificação agendada
-para 30 de setembro de 2026, propõe um pipeline de mitigação de viés
-racial em classificação facial condicionado ao tom de pele (Monk Skin
-Tone), tendo o **SkinToneNet como classificador MST de referência** na
-etapa inicial do método.
+Sou aluno de mestrado no PPG-CC UNIFESP/ICT, sob orientação do
+Prof. Marcos Gonçalves Quiles, com qualificação agendada para
+30/09/2026. Minha dissertação propõe mitigação de viés racial em
+classificação facial com condicionamento por tom de pele Monk.
 
-O trabalho de vocês — *"Large-Scale Dataset and Benchmark for Skin Tone
-Classification in the Wild"* (arXiv:2603.02475) — é referência
-declarada no Capítulo 4 da dissertação (Etapa 1) e no Objetivo 2
-(validação estratificada por tom de pele). No documento consta que
-"code and data will be available soon", e temos acompanhado a página do
-paper aguardando a divulgação pública.
+O trabalho de vocês (arXiv:2603.02475) é referência central do Cap. 4
+da dissertação. Para não bloquear o cronograma, estou treinando um
+classificador MST próprio sobre datasets já públicos (MSTE e Casual
+Conversations v2). Ainda assim, o acesso ao STW seria de grande valor:
 
-**Estratégia adotada:** para não bloquear o cronograma da dissertação,
-o Marcello está treinando um classificador MST próprio sobre datasets
-já disponíveis publicamente (MSTE do Google, Casual Conversations v2
-da Meta). O acesso ao trabalho de vocês, portanto, não é bloqueante
-para a execução — mas seria de grande valor para o rigor científico da
-tese em dois pontos:
+- **Dataset STW** como benchmark externo de validação — permitiria
+  reportar acurácia do meu classificador na mesma partição de teste
+  que vocês, oferecendo comparação direta.
+- **Pesos do SkinToneNet**, se disponíveis, entrariam como um dos
+  backends do *sensitivity analysis* previsto na §4.9 da dissertação.
 
-- **(i) Dataset STW** como *benchmark externo de validação*: permitiria
-  reportar a acurácia do nosso classificador sobre a partição de teste
-  do STW, oferecendo comparação direta com o SkinToneNet no mesmo
-  protocolo;
-- **(ii) Pesos pré-treinados do SkinToneNet**, se possível: permitiriam
-  incluí-lo como *baseline* no *sensitivity analysis* previsto na Seção
-  §4.9 da dissertação, fortalecendo a robustez do resultado.
+**Compromissos:** citação correta, não redistribuição, adesão à
+licença que definirem, feedback experimental sobre o FairFace, e —
+caso o material tenha papel relevante em qualquer publicação derivada
+(artigos, eventos, apresentações) — convite formal de co-autoria aos
+autores originais, nos termos que julgarem apropriados.
 
-**Nosso pedido**, portanto, é o acesso antecipado ao dataset STW e
-(idealmente) aos pesos, exclusivamente para uso acadêmico no escopo
-da dissertação do Marcello.
-
-Comprometemo-nos formalmente com:
-
-1. **Citação correta** em todos os artefatos derivados (dissertação,
-   eventuais publicações, código publicado no GitHub);
-2. **Não redistribuição** dos pesos ou do dataset — uso restrito ao
-   grupo de pesquisa (Marcello + orientador);
-3. **Aderência à licença** que vocês eventualmente definirem
-   (CC BY 4.0, MIT ou outra);
-4. **Feedback experimental**: podemos compartilhar métricas de
-   generalização do SkinToneNet sobre o subconjunto de validação
-   FairFace (~10.954 imagens, 7 grupos raciais) que vamos utilizar,
-   caso seja de interesse para o benchmark de vocês;
-5. **Co-autoria em publicações derivadas**: caso o SkinToneNet ou o
-   dataset STW venham a ter papel material em qualquer contribuição
-   científica desta pesquisa --- seja em artigos, capítulos, eventos
-   acadêmicos ou apresentações técnicas ---, comprometemo-nos a
-   estender formalmente convite de co-autoria aos autores originais,
-   nos termos que julgarem apropriados.
-
-Para contexto adicional, o pipeline do Marcello envolve **6 etapas
-metodológicas** (Cap. 4 §4.2 da dissertação): (1) classificador MST via
-SkinToneNet, (2) auditoria fenotípica FairFace × MST, (3) classificador
-racial condicionado por FiLM alimentado pela saída softmax do
-SkinToneNet, (4) comparação contra 6 baselines de *fairness*
-(ResNet-34, ConvNeXt-T puro, FSCL+, Group DRO, FineFACE, Adversarial
-Debiasing), (5) transferência para verificação (RFW/BFW), e (6)
-decomposição de erros. O SkinToneNet é o **insumo crítico da Etapa 1**;
-sem os pesos, precisaríamos reproduzir o treinamento a partir do
-STW quando este estiver disponível — o que atrasaria o cronograma em
-pelo menos dois meses.
-
-Se preferirem canal formal — carta institucional assinada pela
-coordenação do PPG-CC UNIFESP/ICT ou via nossa área de convênios
-acadêmicos — podemos providenciar. Estamos abertos, também, a discutir
-qualquer forma de colaboração ou reconhecimento que julguem apropriada.
-
-Ficamos à disposição para esclarecimentos e agradecemos, desde já, pela
-atenção.
+Se preferirem canal formal (carta institucional do PPG-CC UNIFESP/ICT
+ou via convênios acadêmicos), podemos providenciar.
 
 Cordialmente,
 
-**Prof. Dr. Marcos Gonçalves Quiles**
-Programa de Pós-Graduação em Ciência da Computação
+**Marcello Vinicius Alves Ozzetti Cruz**
+Mestrando — Programa de Pós-Graduação em Ciência da Computação
 Instituto de Ciência e Tecnologia — UNIFESP
 São José dos Campos — SP
-
-_Orientando: Marcello Vinicius Alves Ozzetti Cruz_
-_Repositório de trabalho: [placeholder — decidir se compartilhar]_
+Orientador: Prof. Dr. Marcos Gonçalves Quiles
 
 ---
 
-## Checklist antes do envio
+## Checklist antes de enviar
 
 - [ ] Confirmar emails institucionais dos destinatários (icmc.usp.br / impa.br)
-- [ ] Revisar com Prof. Quiles (formatação e tom)
-- [ ] Decidir se anexa o Cap. 4 da dissertação (proposta metodológica formal)
-- [ ] Decidir se compartilha URL do repositório GitHub ou mantém privado
-- [ ] Assinatura institucional formatada do Prof. Quiles
-- [ ] Prazo mental de resposta: 2 semanas; se sem retorno até 2026-09-01, reenvio cortês
+- [ ] Alinhar com o Prof. Quiles antes do envio (ele fica ciente do compromisso institucional)
+- [ ] Preencher seu email de contato na assinatura

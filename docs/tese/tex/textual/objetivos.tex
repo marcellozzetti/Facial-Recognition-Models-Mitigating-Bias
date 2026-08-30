@@ -11,17 +11,17 @@ A contribuição principal projetada é \textbf{a primeira instância empírica 
 Seis objetivos específicos estruturam a execução da pesquisa, cada um vinculado a hipóteses testáveis (Seção~\ref{sec:hipoteses}) e a contribuições esperadas (Seção~\ref{sec:contribuicoes}):
 
 \begin{description}[font=\bfseries\sffamily]
-\item[Objetivo 1.] Quantificar a distribuição cruzada Monk Skin Tone $\times$ classes raciais sobre o FairFace por meio de classificador MST pré-treinado, com validação interna de concordância em subset estratificado, entregando a primeira matriz pública dessa distribuição.
+\item[Objetivo 1.] Quantificar a distribuição cruzada Monk Skin Tone $\times$ classes raciais sobre o FairFace com classificador MST treinado internamente sobre datasets públicos de referência, acompanhado de validação interna de concordância em subset estratificado, entregando a primeira matriz pública dessa distribuição.
 
-\item[Objetivo 2.] Conduzir avaliação metodológica comparativa de modelos pré-treinados disponíveis para classificação MST --- SkinToneNet~\cite{matias2026large}, Casual Conversations \emph{baseline}~\cite{hazirbas2021towards,porgali2023casual} e alternativas disponíveis publicamente ---, justificando a escolha do modelo adotado por critérios de desempenho, generalização e disponibilidade. Inclui \emph{sensitivity analysis} a dois ou três classificadores MST alternativos como salvaguarda contra propagação de viés.
+\item[Objetivo 2.] Treinar e avaliar um classificador MST próprio sobre datasets públicos de tom de pele --- Monk Skin Tone Examples~\cite{monk2019scale}, Casual Conversations v2~\cite{hazirbas2021towards,porgali2023casual} e alternativas complementares ---, comparado a referências externas quando publicamente acessíveis, incluindo o SkinToneNet~\cite{matias2026large}. Inclui \emph{sensitivity analysis} com dois ou três classificadores MST alternativos como salvaguarda contra propagação de viés.
 
-\item[Objetivo 3.] Implementar e avaliar o pipeline \emph{SkinToneNet} $\rightarrow$ ConvNeXt-T com camadas FiLM $\rightarrow$ \emph{race classifier} sobre o FairFace, em comparação sistemática contra seis \emph{baselines} de mitigação. Inclui \emph{ablation} arquitetural com quatro configurações comparativas de condicionamento, detalhadas na Seção~\ref{sec:ablation}.
+\item[Objetivo 3.] Implementar e avaliar o pipeline classificador MST $\rightarrow$ ConvNeXt-T com camadas FiLM $\rightarrow$ \emph{race classifier} sobre o FairFace, em comparação sistemática contra seis \emph{baselines} de mitigação. Inclui \emph{ablation} arquitetural com três configurações comparativas de condicionamento, detalhadas na Seção~\ref{sec:ablation}.
 
 \item[Objetivo 4.] Demonstrar empiricamente que o \emph{backbone} \emph{fair-trained} obtido no Objetivo 3 transfere a propriedade \emph{fair} para tarefa \emph{downstream} de \emph{face recognition} nos datasets RFW~\cite{wang2019racial} e/ou BFW~\cite{robinson2020face}, com controle explícito de \emph{pixel information} como \emph{confounder}, conforme metodologia estabelecida por \citeonline{pangelinan2023exploring}.
 
-\item[Objetivo 5.] Formalizar e publicar a triangulação de métricas multi-classe adotada --- \emph{Disparity Ratio}, pior classe F1 e \emph{Equal Opportunity} estratificada por classe ---, oferecendo protocolo consensual ao gap metodológico identificado na literatura (Seção~\ref{sec:rl_gaps}).
+\item[Objetivo 5.] Formalizar e publicar a triangulação de métricas multi-classe adotada --- \emph{Disparity Ratio}, F1 da pior classe e \emph{Equal Opportunity} estratificada por classe ---, oferecendo protocolo consensual à lacuna metodológica identificada na literatura (Seção~\ref{sec:rl_gaps}).
 
-\item[Objetivo 6.] Decompor quantitativamente o erro de classificação racial Latinx em componente fenotípico (irredutível, associado ao sobreposição MST intra-categoria) \emph{versus} componente algorítmico (mitigável por conditioning arquitetural), quantificando a fronteira estrutural de classificação multi-classe.
+\item[Objetivo 6.] Decompor quantitativamente o erro de classificação racial Latinx em componente fenotípico (irredutível, associado à sobreposição MST intra-categoria) \emph{versus} componente algorítmico (mitigável por condicionamento arquitetural), quantificando a fronteira estrutural de classificação multi-classe.
 \end{description}
 
 \section{Hipóteses de pesquisa}
@@ -54,7 +54,7 @@ H6 & A disparidade residual em FR após condicionamento é explicada predominant
 Sete contribuições estruturais são pretendidas, organizadas nos três eixos apresentados no Capítulo~\ref{chapter:introducao} e mapeadas aos objetivos específicos: o \textbf{eixo fenotípico-empírico} (Contribuições 1 e 2), o \textbf{eixo metodológico-arquitetural} (Contribuições 3, 4 e 7) e o \textbf{eixo diagnóstico-estrutural} (Contribuições 5 e 6).
 
 \begin{description}[font=\bfseries\sffamily]
-\item[Contribuição 1.] Avaliação metodológica comparativa de modelos pré-treinados de classificação de tom de pele, com protocolo de escolha justificado e \emph{sensitivity analysis} contra alternativas.
+\item[Contribuição 1.] Treinamento e avaliação metodológica de classificador MST próprio, sobre datasets públicos de referência, com camada de preprocessamento auto-suficiente aplicável a datasets faciais não anotados e \emph{sensitivity analysis} contra alternativas externas.
 \item[Contribuição 2.] Matriz pública de distribuição cruzada Monk Skin Tone $\times$ classes raciais sobre o FairFace \emph{validation set}.
 \item[Contribuição 3.] Primeira aplicação documentada, na literatura consultada, de FiLM-condicionamento~\cite{perez2018film} a \emph{fairness} facial em \emph{race classification} multi-classe.
 \item[Contribuição 4.] Triangulação de métricas multi-classe --- \emph{Disparity Ratio} $+$ pior classe F1 $+$ \emph{Equal Opportunity} por classe $+$ \emph{Equalized Odds} por classe ---, fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent} e nas definições formais de \emph{fairness} de \citeonline{hardt2016equality}.

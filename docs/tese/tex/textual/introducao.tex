@@ -12,7 +12,7 @@ Esta pesquisa parte da seguinte constatação: o reconhecimento facial funciona 
 \section{Problemática}
 \label{sec:problema}
 
-A problemática central que motiva a presente pesquisa pode ser expressa de forma direta: \textbf{sistemas de reconhecimento facial apresentam disparidade demográfica significativa em acurácia entre grupos raciais, mesmo quando treinados sobre datasets explicitamente balanceados por design}.
+A problemática central desta pesquisa é direta: \textbf{sistemas de reconhecimento facial apresentam disparidade demográfica significativa em acurácia entre grupos raciais, mesmo quando treinados sobre datasets explicitamente balanceados por design}.
 
 \subsection{Disparidade documentada no estado da arte}
 \label{sec:problema_disparidade}
@@ -23,7 +23,7 @@ Apesar do F1 macro de 75\,\% reportado pelo FaceScanPaliGemma~\cite{aldahoul2024
 \centering
 \caption{Disparidade de F1 por classe racial no estado da arte (FaceScanPaliGemma sobre FairFace).}
 \centering
-\includegraphics[width=13cm]{images/fig_disparidade_racial.png}
+\includegraphics[width=16cm]{images/fig_disparidade_racial.png}
 \\ \small Fonte: Autoria própria, com dados reportados por \citeonline{aldahoul2024exploring}. Barras em verde e vermelho destacam a melhor e a pior classe.
 \label{fig:disparidade-sota}
 \end{figure}
@@ -69,4 +69,4 @@ A pesquisa é conduzida em conformidade com o \emph{European AI Act} (2024), que
 \section{Organização}
 \label{sec:intro_organizacao}
 
-Este trabalho está organizado como segue. O Capítulo~\ref{chapter:revisao-bibliografica} apresenta a revisão de literatura em seis frentes teórico-empíricas, complementadas pela discussão de paradigmas arquiteturais de \emph{backbone}, pela fundamentação formal das métricas de \emph{fairness} sob o Teorema da Impossibilidade~\cite{kleinberg2017inherent} e pelo mapeamento de cinco lacunas científicas endereçadas por esta pesquisa. O Capítulo~\ref{chapter:objetivos} formaliza o objetivo geral, seis objetivos específicos, seis hipóteses testáveis e sete contribuições esperadas. O Capítulo~\ref{chapter:metodologia} descreve o pipeline metodológico em seis etapas, as quatro configurações comparativas de condicionamento, os seis \emph{baselines} de mitigação e a triangulação de métricas sob os dois cenários de avaliação (\emph{race} apenas e \emph{race}~$\times$~\emph{gender}), aderente à norma ISO/IEC 19795-10:2024. O Capítulo~\ref{chapter:cronograma} apresenta o cronograma de execução, os riscos identificados e as respectivas estratégias de mitigação.
+Este trabalho está organizado como segue. O Capítulo~\ref{chapter:revisao-bibliografica} apresenta a revisão de literatura em seis frentes teórico-empíricas, complementadas pela discussão de paradigmas arquiteturais de \emph{backbone}, pela fundamentação formal das métricas de \emph{fairness} sob o Teorema da Impossibilidade~\cite{kleinberg2017inherent} e pelo mapeamento de cinco lacunas científicas endereçadas por esta pesquisa. O Capítulo~\ref{chapter:objetivos} formaliza o objetivo geral, seis objetivos específicos, seis hipóteses testáveis e sete contribuições esperadas. O Capítulo~\ref{chapter:metodologia} descreve o pipeline metodológico em seis etapas, as três configurações comparativas de condicionamento, os seis \emph{baselines} de mitigação e a triangulação de métricas sob os dois cenários de avaliação (\emph{race} apenas e \emph{race}~$\times$~\emph{gender}), aderente à norma ISO/IEC 19795-10:2024. O Capítulo~\ref{chapter:cronograma} apresenta o cronograma de execução, os riscos identificados e as respectivas estratégias de mitigação.

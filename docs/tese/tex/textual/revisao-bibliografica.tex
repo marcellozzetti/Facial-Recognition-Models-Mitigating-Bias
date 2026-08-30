@@ -31,7 +31,7 @@ A Figura~\ref{fig:timeline-mitigacoes} sintetiza cronologicamente as seis contri
 \centering
 \caption{Linha do tempo das principais contribuições em mitigação algorítmica de viés (2018--2025).}
 \centering
-\includegraphics[width=14cm]{images/fig_timeline_mitigacoes.png}
+\includegraphics[width=16cm]{images/fig_timeline_mitigacoes.png}
 \\ \small Fonte: Autoria própria, com base nas publicações originais de \citeonline{zhang2018mitigating}, \citeonline{sagawa2020distribution}, \citeonline{park2022fair}, \citeonline{lin2022fairgrape}, \citeonline{manzoor2024fineface} e \citeonline{liu2025component}.
 \label{fig:timeline-mitigacoes}
 \end{figure}
@@ -51,7 +51,7 @@ A comparação direta de desempenho por raça entre o \emph{baseline} canônico 
 \centering
 \caption{Desempenho por classe racial no FairFace: \emph{baseline} ResNet-34 (2021) \emph{versus} FaceScanPaliGemma (2024).}
 \centering
-\includegraphics[width=14cm]{images/fig_f1_sota_comparativo.png}
+\includegraphics[width=16cm]{images/fig_f1_sota_comparativo.png}
 \\ \small Fonte: Autoria própria, com dados extraídos de \citeonline{lin2022fairgrape} (Tabela 2, \emph{baseline} ResNet-34) e de \citeonline{aldahoul2024exploring} (Tabela 16, FaceScanPaliGemma \emph{7-class}).
 \label{fig:f1-sota-comparativo}
 \end{figure}
@@ -59,7 +59,7 @@ A comparação direta de desempenho por raça entre o \emph{baseline} canônico 
 \section{Tom de pele como dimensão auditável}
 \label{sec:rl_skintone}
 
-Desde o estudo seminal \emph{Gender Shades}~\cite{buolamwini2018gender}, o \textbf{tom de pele} tem sido proposto na literatura como dimensão alternativa de auditoria de \emph{fairness}, mais estável conceitualmente que a categoria racial nominal. A justificativa é epistemológica: enquanto a raça é uma construção sociopolítica cuja definição varia por contexto histórico e cultural, o tom de pele é uma propriedade fenotípica mensurável de forma reproduzível a partir da própria imagem, funcionando como sinal objetivo para auditoria automatizada.
+Desde o estudo seminal \emph{Gender Shades}~\cite{buolamwini2018gender}, o \textbf{tom de pele} tem sido proposto na literatura como dimensão alternativa de auditoria de \emph{fairness}, mais estável conceitualmente que a categoria racial nominal. A justificativa é conceitual: enquanto a raça é uma construção sociopolítica cuja definição varia por contexto histórico e cultural, o tom de pele é uma propriedade fenotípica mensurável de forma reproduzível a partir da própria imagem, funcionando como sinal objetivo para auditoria automatizada.
 
 A primeira escala amplamente adotada foi a de \citeonline{fitzpatrick1988validity}, originalmente desenvolvida na dermatologia para determinar tolerância à fototerapia com radiação ultravioleta. A escala Fitzpatrick classifica a pele em seis fototipos (I a VI) segundo reatividade à exposição solar, e foi transferida à pesquisa de \emph{fairness} em inteligência artificial apesar de seu \textbf{viés caucasiano-cêntrico documentado} --- os quatro primeiros fototipos (I a IV) discriminam finamente peles claras, ao passo que apenas dois fototipos (V e VI) cobrem todo o espectro de peles escuras, produzindo resolução assimétrica indesejável para auditoria demográfica.
 
@@ -69,12 +69,12 @@ Em resposta a essa limitação, \citeonline{schumann2023consensus} estabeleceram
 \centering
 \caption{Comparação entre as escalas Fitzpatrick (1988) e Monk Skin Tone (2023).}
 \centering
-\includegraphics[width=14cm]{images/fig_fitzpatrick_vs_mst.png}
+\includegraphics[width=16cm]{images/fig_fitzpatrick_vs_mst.png}
 \\ \small Fonte: Autoria própria, com cores oficiais da Monk Skin Tone Scale publicadas em \emph{skintone.google}~\cite{schumann2023consensus} e cores Fitzpatrick derivadas de referências dermatológicas públicas com base em \citeonline{fitzpatrick1988validity}.
 \label{fig:fitzpatrick-mst}
 \end{figure}
 
-Em 2026, \citeonline{matias2026large} introduziram o \textbf{SkinToneNet}, um classificador MST em larga escala baseado na arquitetura Vision Transformer Small (ViT-S), ajustada (\emph{fine-tuned}) sobre o dataset \emph{Skin Tone in the Wild} (STW), composto por 42.313 imagens de 3.564 indivíduos. O SkinToneNet atinge estado da arte em regime \emph{cross-domain}, isto é, quando avaliado em datasets distintos daquele utilizado no treinamento. Este modelo é adotado como insumo pré-treinado na Etapa~1 do pipeline proposto (Seção~\ref{sec:pipeline}), acompanhado de \emph{sensitivity analysis} a classificadores MST alternativos como salvaguarda contra propagação de viés herdado.
+Em 2026, \citeonline{matias2026large} introduziram o \textbf{SkinToneNet}, um classificador MST em larga escala baseado na arquitetura Vision Transformer Small (ViT-S), ajustada (\emph{fine-tuned}) sobre o dataset \emph{Skin Tone in the Wild} (STW), composto por 42.313 imagens de 3.564 indivíduos. O SkinToneNet atinge estado da arte em regime \emph{cross-domain}, isto é, quando avaliado em datasets distintos daquele utilizado no treinamento. Este modelo permanece como referência externa de comparação para o classificador MST próprio treinado na Etapa~1 do pipeline (Seção~\ref{sec:pipeline}), quando publicamente acessível; o pipeline inclui \emph{sensitivity analysis} a classificadores MST alternativos como salvaguarda contra propagação de viés herdado.
 
 Uma frente emergente de crítica questiona, contudo, o próprio paradigma de rotulagem \textbf{discreta} do tom de pele. \citeonline{neto2025balancing}, em contribuição recente, argumentam que a fragmentação do espectro fenotípico em classes discretas --- seja MST-10, Fitzpatrick-6 ou categorias raciais nominais --- impõe limite estrutural à mitigação de viés, uma vez que identidades dentro de uma mesma categoria não contribuem igualmente ao balanceamento demográfico do dataset. Os autores propõem \emph{rótulos demográficos contínuos}, obtidos como grau de pertencimento produzido por um classificador de etnia treinado sobre um sistema de \emph{face recognition} estado da arte, demonstrando que modelos treinados com balanceamento no espaço contínuo superam consistentemente aqueles treinados no espaço discreto. A presente pesquisa mantém a MST discreta como escolha metodológica principal, por sua consolidação como padrão de auditoria desde 2023 e pela ausência de classificadores contínuos publicamente disponíveis e amplamente validados em 2026, mas registra a linha contínua como direção natural de trabalho futuro, discutida no Capítulo~\ref{chapter:cronograma}.
 
@@ -92,12 +92,12 @@ A persistência do F1 na faixa de 60\,\% para a categoria \emph{Latinx} no estad
 \item \textbf{Sociologia identitária.} O Pew Research Center~\cite{lopez2017hispanic} documentou que a identidade Hispanic declina de 97\,\% para 50\,\% ao longo de quatro gerações nos Estados Unidos, caracterizando a categoria como sociopolítica e fluida, e não como fenotípica ou biológica estável.
 \end{itemize}
 
-Essa triangulação teórica interdisciplinar sustenta uma das hipóteses formalizadas no Capítulo~\ref{chapter:objetivos}, segundo a qual a categoria Latinx no FairFace exibe dispersão ampla ao longo da escala Monk Skin Tone (cobertura de cinco ou mais das dez classes), oferecendo fundamentação empírica externa à ciência da computação para o diagnóstico de heterogeneidade estrutural que motiva o pipeline proposto. Esse é um deslocamento epistemológico deliberado: a hipótese passa a ser testada com evidência produzida por antropologia, genética e sociologia, e não apenas por métricas internas ao próprio benchmark computacional.
+Essa triangulação teórica interdisciplinar sustenta uma das hipóteses formalizadas no Capítulo~\ref{chapter:objetivos}, segundo a qual a categoria Latinx no FairFace exibe dispersão ampla ao longo da escala Monk Skin Tone (cobertura de cinco ou mais das dez classes), oferecendo fundamentação empírica externa à ciência da computação para o diagnóstico de heterogeneidade estrutural que motiva o pipeline proposto. Essa é uma escolha metodológica explícita: a hipótese passa a ser testada com evidência produzida por antropologia, genética e sociologia, e não apenas por métricas internas ao próprio benchmark computacional.
 
 \section{Fair representation learning}
 \label{sec:rl_fairrep}
 
-Parte da literatura recente contesta o uso do tom de pele como principal principal fator explicativo da disparidade racial. A contribuição mais relevante nessa direção é a de \citeonline{pangelinan2023exploring}, que sustenta que o gap racial em \emph{face recognition} é primariamente explicado por diferenças de \emph{pixel information} --- a fração de área útil da face contida na imagem, obtida por segmentação semântica com a rede BiSeNet ---, colocando o tom de pele em segundo plano na hierarquia causal. A presente pesquisa incorpora essa crítica de forma explícita sob duas formas complementares: primeiro, mediante controle de \emph{pixel information} como \emph{confounder} --- variável correlacionada tanto com o atributo sensível quanto com o desempenho --- na Etapa~5 do pipeline (Seção~\ref{sec:pipeline}); segundo, por meio de uma hipótese formalizada no Capítulo~\ref{chapter:objetivos} desenhada como teste direto da tese de \citeauthoronline{pangelinan2023exploring}. A inclusão explícita da refutação é decisão metodológica deliberada: fortalece a validade externa do resultado positivo, caso obtido, e o expõe honestamente à possibilidade de refutação, caso não obtido.
+Parte da literatura recente contesta o uso do tom de pele como principal fator explicativo da disparidade racial. A contribuição mais relevante nessa direção é a de \citeonline{pangelinan2023exploring}, que sustenta que o gap racial em \emph{face recognition} é primariamente explicado por diferenças de \emph{pixel information} --- a fração de área útil da face contida na imagem, obtida por segmentação semântica com a rede BiSeNet ---, colocando o tom de pele em segundo plano na hierarquia causal. A presente pesquisa incorpora essa crítica de forma explícita sob duas formas complementares: primeiro, mediante controle de \emph{pixel information} como \emph{confounder} --- variável correlacionada tanto com o atributo sensível quanto com o desempenho --- na Etapa~5 do pipeline (Seção~\ref{sec:pipeline}); segundo, por meio de uma hipótese formalizada no Capítulo~\ref{chapter:objetivos} desenhada como teste direto da tese de \citeauthoronline{pangelinan2023exploring}. A inclusão explícita da refutação é uma escolha metodológica: fortalece a validade externa do resultado positivo, caso obtido, e o expõe à possibilidade de refutação, caso não obtido.
 
 Em uma linhagem teórica complementar, \citeonline{zemel2013learning} inauguraram, com o paradigma de \emph{Learning Fair Representations}, a ideia de \textbf{representações intermediárias com propriedade de \emph{fairness}} --- vetores latentes cuja construção incorpora restrições explícitas de equidade e que preservam informação útil para a tarefa-alvo enquanto suprimem informação sobre o atributo sensível. O trabalho recebeu, em 2023, o \emph{Test-of-Time Award} da ICML, prêmio concedido pela conferência a artigos cujo impacto sustentado ao longo de uma década é reconhecido pela comunidade.
 
@@ -106,7 +106,7 @@ Em uma linhagem teórica complementar, \citeonline{zemel2013learning} inaugurara
 \section{Arquiteturas \emph{backbone}}
 \label{sec:rl_backbones}
 
-A escolha do \emph{backbone} --- rede neural responsável por produzir representações intermediárias das imagens antes da camada final de classificação --- é decisão metodológica central em qualquer sistema de reconhecimento facial, e impacta diretamente tanto o desempenho agregado quanto o comportamento de \emph{fairness} entre subgrupos demográficos. Do ponto de vista computacional, a literatura contemporânea de visão computacional organiza-se em torno de \textbf{dois paradigmas complementares}: o paradigma \emph{convolucional}, que opera por meio de filtros locais e estrutura hierárquica, e o paradigma \emph{baseado em atenção}, que opera por meio de \emph{self-attention} sobre representações tokenizadas da imagem. Esta seção percorre ambos os paradigmas para contextualizar a escolha metodológica formalizada no Capítulo~\ref{chapter:metodologia}.
+A escolha do \emph{backbone} --- rede neural responsável por produzir representações intermediárias das imagens antes da camada final de classificação --- é decisão metodológica central em qualquer sistema de reconhecimento facial, e impacta diretamente tanto o desempenho agregado quanto o comportamento de \emph{fairness} entre subgrupos demográficos. Do ponto de vista computacional, a literatura contemporânea de visão computacional organiza-se em torno de \textbf{dois paradigmas complementares}: o \emph{convolucional}, que opera com filtros locais e estrutura hierárquica, e o \emph{baseado em atenção}, que opera com \emph{self-attention} sobre representações tokenizadas da imagem. Esta seção percorre ambos os paradigmas para contextualizar a escolha metodológica formalizada no Capítulo~\ref{chapter:metodologia}.
 
 \subsection{Paradigma convolucional}
 \label{sec:rl_backbones_conv}
@@ -119,7 +119,7 @@ A face contemporânea deste mesmo paradigma é a família \textbf{ConvNeXt}, pro
 \centering
 \caption{Comparação entre \emph{backbones} contemporâneos: acurácia \emph{Top-1} em ImageNet-1K (esquerda) e estrutura dos blocos internos de Swin, ResNet e ConvNeXt (direita).}
 \centering
-\includegraphics[width=15cm]{images/fig_convnext_teaser_meta.png}
+\includegraphics[width=16cm]{images/fig_convnext_teaser_meta.png}
 \\ \small Fonte: \citeonline{liu2022convnet} --- teaser oficial do repositório \emph{facebookresearch/ConvNeXt}, disponível em \emph{github.com/facebookresearch/ConvNeXt}. Reprodução com finalidade acadêmica sob os termos de uso permitido para citação.
 \label{fig:convnext-teaser}
 \end{figure}
@@ -186,7 +186,7 @@ Quanto a \textbf{mecanismos arquiteturais de condicionamento} --- entendidos com
 \centering
 \caption{Diagrama conceitual do mecanismo \emph{Feature-wise Linear Modulation} (FiLM).}
 \centering
-\includegraphics[width=14cm]{images/fig_film_conceitual.png}
+\includegraphics[width=16cm]{images/fig_film_conceitual.png}
 \\ \small Fonte: Autoria própria, adaptado da formulação e da representação gráfica originais de \citeonline{perez2018film} (Figura 2 do artigo).
 \label{fig:film-conceitual}
 \end{figure}
@@ -211,7 +211,7 @@ SPADE (\emph{Spatially Adaptive Normalization}) & Síntese de imagens & Requer m
 \emph{HyperNetworks} & Meta-aprendizagem & Instabilidade de treinamento documentada; sobredimensionado para o tamanho de sinal e de \emph{backbone} desta pesquisa. \\
 LoRA e Adaptadores & \emph{Parameter-efficient fine-tuning} & Categoria metodológica distinta: modificam pesos de camadas do \emph{backbone}, não realizam condicionamento de \emph{features} por sinal externo. Cobertos parcialmente pela literatura recente de \emph{fairness}~\cite{sukumaran2024fairlora,bian2025lora}, tratados como direção complementar de trabalho futuro. \\
 \midrule
-\textbf{FiLM} (adotado) & \citeonline{perez2018film} & Adequação dimensional ao sinal MST 10-dim; custo adicional paramétrico de aproximadamente 1\,\% sobre o \emph{backbone}; interpretabilidade direta de $\gamma$ e $\beta$ por canal; compatibilidade com a estrutura de \emph{LayerNorm} do ConvNeXt-T; e ausência de aplicação documentada em \emph{fairness} facial em \emph{race classification} multi-classe. \\
+\textbf{FiLM} (adotado) & \citeonline{perez2018film} & Adequação dimensional ao sinal MST 10-dim; custo paramétrico de aproximadamente 1\,\% sobre o \emph{backbone}; interpretabilidade direta de $\gamma$ e $\beta$ por canal; compatibilidade com a estrutura de \emph{LayerNorm} do ConvNeXt-T; e ausência de aplicação documentada em \emph{fairness} facial em \emph{race classification} multi-classe. \\
 \bottomrule
 \end{tabular}
 \caption{Alternativas de condicionamento avaliadas.}
@@ -223,7 +223,7 @@ Em consonância com o princípio metodológico de exposição das limitações d
 \section{Lacunas científicas identificadas}
 \label{sec:rl_gaps}
 
-A análise sistemática do corpus revisado nas seções anteriores permite identificar cinco lacunas científicas que a presente pesquisa endereça de forma direta:
+A análise do corpus revisado nas seções anteriores permite identificar cinco lacunas científicas que esta pesquisa aborda diretamente:
 
 \begin{enumerate}[label=\textbf{Lacuna \arabic*}.]
 \item \textbf{Ausência de matriz pública Monk Skin Tone \emph{versus} classes raciais no FairFace.} Apesar da consolidação da MST como padrão moderno de auditoria de \emph{fairness} desde 2023~\cite{schumann2023consensus} e da disponibilização, em 2026, do SkinToneNet pré-treinado~\cite{matias2026large}, nenhum trabalho da literatura consultada publicou a distribuição cruzada entre as dez classes MST e as sete categorias raciais do FairFace. Auditorias como a de \citeonline{matias2026large} reportam distribuições agregadas, sem \emph{cross-tabulation} (tabulação cruzada) por raça, o que impede o diagnóstico quantitativo de heterogeneidade intra-categorial.

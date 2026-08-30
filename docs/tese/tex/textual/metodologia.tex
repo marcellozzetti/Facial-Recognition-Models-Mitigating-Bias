@@ -12,14 +12,14 @@ O pipeline metodológico estrutura-se em seis etapas sequenciais, cada uma vincu
 \centering
 \caption{Fluxo geral do pipeline experimental em seis etapas.}
 \centering
-\includegraphics[width=14cm]{images/fig_pipeline_6etapas.png}
+\includegraphics[width=16cm]{images/fig_pipeline_6etapas.png}
 \\ \small Fonte: Autoria própria. Etapas em destaque (3 e 6) concentram as contribuições metodológica e diagnóstica principais.
 \label{fig:pipeline-6etapas}
 \end{figure}
 
 
 \begin{enumerate}
-\item \textbf{Etapa 1 --- Classificador MST}: adoção do SkinToneNet~\cite{matias2026large} como insumo pré-treinado. A modalidade de validação é detalhada na Seção~\ref{sec:validacao_interna}.
+\item \textbf{Etapa 1 --- Classificador MST}: treinamento de classificador MST próprio a partir de datasets públicos de referência (Monk Skin Tone Examples e Casual Conversations v2), acompanhado de camada de preprocessamento auto-suficiente que viabiliza inferência em datasets faciais não anotados. O SkinToneNet~\cite{matias2026large} é adotado como referência externa de comparação quando publicamente acessível. A modalidade de validação é detalhada na Seção~\ref{sec:validacao_interna}.
 
 \item \textbf{Etapa 2 --- Auditoria fenotípica do FairFace}: aplicação do SkinToneNet sobre o FairFace \emph{validation set} e construção da matriz pública Monk Skin Tone~$\times$~classes raciais.
 
@@ -29,7 +29,7 @@ O pipeline metodológico estrutura-se em seis etapas sequenciais, cada uma vincu
 
 \item \textbf{Etapa 5 --- Transferência \emph{fair}}: aplicação do \emph{backbone} \emph{fair-trained} para tarefa \emph{downstream} de \emph{face recognition} nos datasets RFW~\cite{wang2019racial} e/ou BFW~\cite{robinson2020face}, com controle explícito de \emph{pixel information} (fração de pixels úteis da face obtida por segmentação BiSeNet) como \emph{confounder} principal, conforme metodologia proposta por \citeonline{pangelinan2023exploring}. Como salvaguarda adicional, estratificam-se os resultados por três descritores complementares de qualidade de imagem --- luminância média (canal $L^*$ da escala CIELAB), nitidez (variância do Laplaciano) e resolução efetiva da face em pixels ---, permitindo verificar se a disparidade residual persiste após controle desses fatores ópticos e blindando a Etapa~6 contra a crítica de que o erro Latinx seria puramente sensorial em vez de fenotípico.
 
-\item \textbf{Etapa 6 --- Síntese decompositiva}: combinação dos resultados obtidos nas Etapas~2 e~5 para quantificar a contribuição relativa do componente fenotípico (irredutível, associado ao sobreposição MST intra-categoria) \emph{versus} componente algorítmico (mitigável) do erro de classificação Latinx.
+\item \textbf{Etapa 6 --- Síntese decompositiva}: combinação dos resultados obtidos nas Etapas~2 e~5 para quantificar a contribuição relativa do componente fenotípico (irredutível, associado à sobreposição MST intra-categoria) \emph{versus} componente algorítmico (mitigável) do erro de classificação Latinx.
 \end{enumerate}
 
 \section{Datasets utilizados}
@@ -77,7 +77,7 @@ Como verificação básica arquitetural, o trabalho reporta explicitamente o des
 
 \subsection{Formulação matemática}
 
-Para cada um dos quatro estágios hierárquicos do \emph{backbone} ConvNeXt-T, insere-se uma camada FiLM~\cite{perez2018film} imediatamente após o bloco convolucional principal do estágio. A camada recebe como sinal condicionante o vetor $z \in \mathbb{R}^{10}$ correspondente à saída \emph{softmax} do SkinToneNet pré-treinado~\cite{matias2026large}, e produz parâmetros de modulação $(\gamma_i, \beta_i) \in \mathbb{R}^{C_i} \times \mathbb{R}^{C_i}$ por canal, onde $C_i$ é o número de canais da \emph{feature map} intermediária do estágio $i$. A modulação é aplicada como transformação afim canal a canal:
+Para cada um dos quatro estágios hierárquicos do \emph{backbone} ConvNeXt-T, insere-se uma camada FiLM~\cite{perez2018film} imediatamente após o bloco convolucional principal do estágio. A camada recebe como sinal condicionante o vetor $z \in \mathbb{R}^{10}$ correspondente à saída \emph{softmax} do classificador MST da Etapa~1, e produz parâmetros de modulação $(\gamma_i, \beta_i) \in \mathbb{R}^{C_i} \times \mathbb{R}^{C_i}$ por canal, onde $C_i$ é o número de canais da \emph{feature map} intermediária do estágio $i$. A modulação é aplicada como transformação afim canal a canal:
 
 \begin{equation}
 \mathrm{FiLM}(F_i \mid \gamma_i, \beta_i) = \gamma_i \odot F_i + \beta_i,
@@ -92,7 +92,7 @@ onde $F_i \in \mathbb{R}^{H_i \times W_i \times C_i}$ é a \emph{feature map} in
 
 As funções $f_\gamma$ e $f_\beta$ são implementadas por duas \emph{Multi-Layer Perceptrons} independentes com arquitetura de duas camadas ($\mathbb{R}^{10} \to \mathbb{R}^{128} \to \mathbb{R}^{C_i}$) e ativação intermediária ReLU. A camada final é inicializada de forma a produzir $\gamma_i \approx 1$ e $\beta_i \approx 0$ no início do treinamento (transformação identidade), garantindo que o modelo inicie o treinamento operando efetivamente como o \emph{backbone} sem condicionamento, estratégia consistente com práticas de estabilidade de treinamento em mecanismos aditivos residuais~\cite{perez2018film}.
 
-Considerando os quatro estágios do ConvNeXt-T com $C_i \in \{96, 192, 384, 768\}$, o custo adicional paramétrico agregado é de aproximadamente 380.000 parâmetros adicionais, o que corresponde a cerca de 1{,}3\,\% do total de parâmetros do \emph{backbone} (28 milhões). Este custo adicional é substancialmente inferior a alternativas como \emph{cross-attention} (aproximadamente 3\,$\times$ o custo) e mesmo a \emph{Conditional Batch Normalization} implementada com MLPs de mesma capacidade, mantendo a compatibilidade computacional com \emph{fine-tuning} em GPUs de porte comum (Seção~\ref{sec:riscos}, Risco~4).
+Considerando os quatro estágios do ConvNeXt-T com $C_i \in \{96, 192, 384, 768\}$, o custo paramétrico agregado é de aproximadamente 380.000 parâmetros, o que corresponde a cerca de 1{,}3\,\% do total de parâmetros do \emph{backbone} (28 milhões). Esse custo é bastante inferior ao de alternativas como \emph{cross-attention} (aproximadamente 3\,$\times$ o custo) e mesmo ao de \emph{Conditional Batch Normalization} implementada com MLPs de mesma capacidade, mantendo compatibilidade computacional com \emph{fine-tuning} em GPUs de porte comum (Seção~\ref{sec:riscos}, Risco~4).
 
 \subsection{Racional da escolha}
 
@@ -104,7 +104,7 @@ A Figura~\ref{fig:mecanismo-film} ilustra a integração do mecanismo FiLM à ar
     \centering
     \caption{Integração do mecanismo FiLM à arquitetura ConvNeXt-T.}
     \centering
-    \includegraphics[width=14cm]{images/film_pipeline.png}
+    \includegraphics[width=16cm]{images/film_pipeline.png}
     \\ \small Fonte: Autoria própria.
     \label{fig:mecanismo-film}
 \end{figure}
@@ -142,7 +142,7 @@ A Figura~\ref{fig:configuracoes-abcd} compara visualmente as três configuraçõ
 \centering
 \caption{Três configurações comparativas do estudo de \emph{ablation} arquitetural.}
 \centering
-\includegraphics[width=14cm]{images/fig_configs_abcd.png}
+\includegraphics[width=16cm]{images/fig_configs_abcd.png}
 \\ \small Fonte: Autoria própria. A Configuração B (proposta principal) é destacada em cor mais intensa.
 \label{fig:configuracoes-abcd}
 \end{figure}
