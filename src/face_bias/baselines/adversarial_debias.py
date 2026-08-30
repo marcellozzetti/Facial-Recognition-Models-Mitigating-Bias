@@ -1,25 +1,73 @@
-"""Baseline: adversarial_debias — Etapa 4 (comparação sistemática).
+"""Adversarial debiasing — Zhang et al. (2018).
 
-Cap. 4, §4.4 (Baselines de comparação). Implementa referência para
-comparação contra o pipeline FiLM+MST proposto (Config B).
+Cap. 4 §Baselines. Segundo modelo (adversário) tenta prever o atributo
+sensível a partir das features internas do classificador principal; o
+principal é treinado para MAXIMIZAR a perda do adversário.
 
-TODO Etapa 4 (Abr/2027):
-    [ ] Implementar treinamento fiel ao paper original
-    [ ] Reproduzir hiperparâmetros documentados
-    [ ] Rodar sobre FairFace 7-class in-domain
-    [ ] Reportar 3 sementes (rigor: 42, 1, 2)
-    [ ] Métricas: F1 macro, DR, worst-class F1, EO/EqOdds
+Fluxo:
+    features = encoder(x)
+    logits   = classifier(features)
+    adv_pred = adversary(gradient_reverse(features))
 
-Referências:
-    - fscl_plus:            Park et al. (2022), CVPR — Fair SupCon Learning
-    - group_dro:            Sagawa et al. (2020), ICLR — Distributionally Robust Optim
-    - fineface:             Manzoor & Rattani (2024), ICPR — cross-layer attention
-    - adversarial_debias:   Zhang, Lemoine & Mitchell (2018), AIES
-
-Ver também:
-    - src/face_bias/models/contrastive.py — SupCon base (herdar para FSCL+)
+    L_total = L_class - λ * L_adversary
+    (o gradient reverse layer inverte o sinal do gradiente no backward)
 """
 
 from __future__ import annotations
 
-# TODO: implementação
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+
+class GradientReverse(torch.autograd.Function):
+    """Camada identidade no forward, inverte o gradiente no backward."""
+
+    @staticmethod
+    def forward(ctx, x: torch.Tensor, lambda_: float) -> torch.Tensor:
+        ctx.lambda_ = float(lambda_)
+        return x.view_as(x)
+
+    @staticmethod
+    def backward(ctx, grad_output):
+        return grad_output.neg() * ctx.lambda_, None
+
+
+def gradient_reverse(x: torch.Tensor, lambda_: float = 1.0) -> torch.Tensor:
+    return GradientReverse.apply(x, lambda_)
+
+
+class AdversarialHead(nn.Module):
+    """Cabeça adversária simples: MLP prevê o atributo sensível."""
+
+    def __init__(self, in_dim: int, n_sensitive: int, hidden: int = 128):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(in_dim, hidden),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.1),
+            nn.Linear(hidden, n_sensitive),
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.net(x)
+
+
+class AdversarialDebiasLoss(nn.Module):
+    """Combina cross-entropy da tarefa principal com a perda adversária."""
+
+    def __init__(self, lambda_adv: float = 1.0):
+        super().__init__()
+        self.lambda_adv = float(lambda_adv)
+
+    def forward(
+        self,
+        logits_main: torch.Tensor,      # (N, C_main)
+        y_main: torch.Tensor,           # (N,)
+        logits_adv: torch.Tensor,       # (N, C_sensitive)
+        y_sensitive: torch.Tensor,      # (N,)
+    ) -> torch.Tensor:
+        loss_main = F.cross_entropy(logits_main, y_main)
+        loss_adv = F.cross_entropy(logits_adv, y_sensitive)
+        # GRL já inverteu o gradiente; aqui somamos normalmente.
+        return loss_main + self.lambda_adv * loss_adv
