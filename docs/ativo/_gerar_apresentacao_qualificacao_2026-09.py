@@ -1,18 +1,18 @@
 """Gera apresentação PowerPoint da defesa da qualificação (30/09/2026).
 
-27 slides, formato 16:9, ~15-20 min de fala.
+29 slides, formato 16:9, ~15-20 min de fala.
 Linguagem clara, sem jargão desnecessário, com referências acadêmicas
 fortes inline (Autor Ano) e figuras integradas para tangibilizar.
 
 Estrutura:
     1  Capa (com logo UNIFESP)
-    2  Agenda
-    3  Motivação — contexto (NIST 2019, Gender Shades)
-    4  Motivação — regulação (European AI Act 2024)
+    2  Agenda (títulos objetivos, sem subexplicações)
+    3  Motivação — contexto (KPIs visuais + citação de destaque)
+    4  Motivação — regulação (timeline visual das regulações)
     5  Problema — disparidade racial (figura)
     6  Problema — comparativo SOTA (figura)
-    7  Problema — heterogeneidade fenotípica (figura MST vs Fitzpatrick)
-    8  Problema — refutação Pangelinan
+    7  Problema — heterogeneidade fenotípica (layout balanceado)
+    8  Problema — refutação Pangelinan (2 colunas: crítica × resposta)
     9  Objetivo geral
     10 Objetivos específicos (6)
     11 Hipóteses (6)
@@ -22,16 +22,18 @@ Estrutura:
     15 Revisão — 5 lacunas identificadas
     16 Metodologia — pipeline 6 etapas (figura)
     17 Metodologia — Etapa 1 (classificador MST próprio)
-    18 Metodologia — mecanismo FiLM (figura)
-    19 Metodologia — 3 configurações A/B/C
-    20 Metodologia — baselines + cenários
-    21 Metodologia — triangulação de métricas
-    22 Contribuições (3 eixos, 7 contribuições)
-    23 Cronograma
-    24 Riscos + mitigações
-    25 Estado atual — adiantamento (KPIs visuais)
-    26 Considerações finais
-    27 Perguntas / obrigado
+    18 Metodologia — por que ConvNeXt-T (4 critérios vs ResNet vs ViT)  [NOVO]
+    19 Metodologia — por que FiLM (comparação com 7 alternativas)      [NOVO]
+    20 Metodologia — mecanismo FiLM (figura)
+    21 Metodologia — 3 configurações A/B/C
+    22 Metodologia — baselines + cenários
+    23 Metodologia — triangulação de métricas
+    24 Contribuições (3 eixos, 7 contribuições)
+    25 Cronograma
+    26 Riscos + mitigações
+    27 Estado atual — adiantamento (KPIs visuais)
+    28 Considerações finais
+    29 Perguntas / obrigado
 
 Uso:
     python docs/ativo/_gerar_apresentacao_qualificacao_2026-09.py
@@ -61,7 +63,7 @@ AMBER = RGBColor(0xF5, 0xB7, 0x00)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 
 QUALIFICACAO = date(2026, 9, 30)
-TOTAL_SLIDES = 27
+TOTAL_SLIDES = 29
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IMG_DIR = REPO_ROOT / "docs" / "tese" / "images"
@@ -349,43 +351,264 @@ def slide_capa(prs: Presentation) -> None:
 # SLIDE 2 — Agenda
 # ============================================================
 def slide_agenda(prs: Presentation) -> None:
-    add_bullets(prs, 2, "Roteiro da apresentação", [
-        ("1.  Motivação", "por que esse problema importa hoje"),
-        ("2.  Problema", "o que exatamente está errado"),
-        ("3.  Objetivos e hipóteses", "o que vamos investigar"),
-        ("4.  Revisão da literatura", "o que a comunidade já tentou"),
-        ("5.  Metodologia", "como pretendemos resolver"),
-        ("6.  Contribuições esperadas", "o que ficará para a área"),
-        ("7.  Cronograma e riscos", "quando e o que pode dar errado"),
-        ("8.  Estado atual", "o que já está feito"),
-    ])
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Roteiro")
+
+    # 8 blocos em 2 colunas x 4 linhas
+    items = [
+        "Motivação",
+        "Problema",
+        "Objetivos e hipóteses",
+        "Revisão da literatura",
+        "Metodologia",
+        "Contribuições esperadas",
+        "Cronograma e riscos",
+        "Estado atual",
+    ]
+    box_w = 5.8
+    box_h = 1.05
+    gap_x = 0.3
+    gap_y = 0.15
+    start_x = (13.33 - 2 * box_w - gap_x) / 2
+    start_y = 1.7
+
+    for i, label in enumerate(items):
+        col = i % 2
+        row = i // 2
+        x = start_x + col * (box_w + gap_x)
+        y = start_y + row * (box_h + gap_y)
+
+        # número em círculo/quadrado navy
+        num = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE, Inches(x), Inches(y), Inches(0.9), Inches(box_h),
+        )
+        num.fill.solid()
+        num.fill.fore_color.rgb = NAVY
+        num.line.fill.background()
+        tx = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(0.9), Inches(box_h))
+        p = tx.text_frame.paragraphs[0]
+        p.text = str(i + 1)
+        p.font.size = Pt(26)
+        p.font.bold = True
+        p.font.color.rgb = WHITE
+        p.alignment = 2
+
+        # rótulo em caixa cinza
+        lab = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x + 0.9 + 0.05), Inches(y), Inches(box_w - 0.9 - 0.05), Inches(box_h),
+        )
+        lab.fill.solid()
+        lab.fill.fore_color.rgb = GRAY_LT
+        lab.line.color.rgb = GRAY_LT
+        tx = slide.shapes.add_textbox(
+            Inches(x + 0.9 + 0.2), Inches(y), Inches(box_w - 0.9 - 0.2), Inches(box_h),
+        )
+        p = tx.text_frame.paragraphs[0]
+        p.text = label
+        p.font.size = Pt(18)
+        p.font.bold = True
+        p.font.color.rgb = NAVY
+        # vertical centering via paragraph spacing hack não é trivial; deixamos top-aligned
+    add_footer(slide)
+    add_page_number(slide, 2)
 
 
 # ============================================================
 # SLIDE 3 — Motivação: contexto
 # ============================================================
 def slide_motivacao_contexto(prs: Presentation) -> None:
-    add_bullets(prs, 3, "Reconhecimento facial está em toda parte", [
-        "Desbloqueio de celular, autenticação bancária, controle de fronteiras, identificação policial.",
-        "Deixou de ser tecnologia de laboratório: virou infraestrutura social.",
-        ("NIST 2019 (Grother et al.):", "maior auditoria pública já feita em biometria facial — 189 algoritmos comerciais, 18 milhões de imagens."),
-        ("Achado central:", "diferença de 10 a 100 vezes na taxa de falso positivo entre grupos raciais."),
-        ("Buolamwini & Gebru (2018) — Gender Shades:", "estudo fundacional que colocou o viés racial-de-gênero na agenda pública."),
-        "Conclusão: a tecnologia funciona bem para a maioria, mas não funciona igualmente bem para todos.",
-    ])
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Reconhecimento facial já é infraestrutura social")
+
+    # 4 cards visuais de uso
+    usos = [
+        ("Dispositivos", "Desbloqueio\nde celular"),
+        ("Bancos", "Autenticação\nfinanceira"),
+        ("Fronteiras", "Controle\nmigratório"),
+        ("Segurança", "Identificação\npolicial"),
+    ]
+    box_w = 2.6
+    gap = 0.25
+    start_x = (13.33 - 4 * box_w - 3 * gap) / 2
+    top_y = 1.6
+
+    for i, (kicker, label) in enumerate(usos):
+        x = start_x + i * (box_w + gap)
+        box = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(top_y), Inches(box_w), Inches(1.8),
+        )
+        box.fill.solid()
+        box.fill.fore_color.rgb = GRAY_LT
+        box.line.color.rgb = GRAY_LT
+        # kicker
+        tx = slide.shapes.add_textbox(Inches(x), Inches(top_y + 0.25), Inches(box_w), Inches(0.4))
+        p = tx.text_frame.paragraphs[0]
+        p.text = kicker.upper()
+        p.font.size = Pt(11)
+        p.font.bold = True
+        p.font.color.rgb = ACCENT
+        p.alignment = 2
+        # label
+        tx2 = slide.shapes.add_textbox(Inches(x + 0.1), Inches(top_y + 0.75), Inches(box_w - 0.2), Inches(0.9))
+        tf = tx2.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        for j, line in enumerate(label.split("\n")):
+            para = p if j == 0 else tf.add_paragraph()
+            para.text = line
+            para.font.size = Pt(16)
+            para.font.bold = True
+            para.font.color.rgb = NAVY
+            para.alignment = 2
+
+    # Bloco NIST em destaque (KPI grande)
+    kpi_y = 3.9
+    kpi_box = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE, Inches(0.7), Inches(kpi_y), Inches(4.5), Inches(2.6),
+    )
+    kpi_box.fill.solid()
+    kpi_box.fill.fore_color.rgb = NAVY
+    kpi_box.line.fill.background()
+    tx = slide.shapes.add_textbox(Inches(0.7), Inches(kpi_y + 0.25), Inches(4.5), Inches(1.1))
+    p = tx.text_frame.paragraphs[0]
+    p.text = "10 – 100 ×"
+    p.font.size = Pt(46)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.alignment = 2
+    tx2 = slide.shapes.add_textbox(Inches(0.9), Inches(kpi_y + 1.5), Inches(4.1), Inches(1.0))
+    tf = tx2.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = "diferença na taxa de\nfalso positivo entre\ngrupos raciais"
+    p.font.size = Pt(14)
+    p.font.color.rgb = BLUE_LIGHT
+    p.alignment = 2
+
+    # Texto explicativo à direita
+    tx3 = slide.shapes.add_textbox(Inches(5.5), Inches(kpi_y), Inches(7.4), Inches(2.6))
+    tf = tx3.text_frame
+    tf.word_wrap = True
+    linhas = [
+        ("NIST 2019 (Grother et al.):", "maior auditoria pública já feita em biometria facial — 189 algoritmos comerciais avaliados sobre 18 milhões de imagens."),
+        ("Gender Shades (Buolamwini & Gebru, 2018):", "estudo fundacional que colocou o viés racial-de-gênero na agenda pública."),
+        ("Conclusão:", "a tecnologia funciona bem para a maioria, mas não funciona igualmente bem para todos."),
+    ]
+    for i, (head, body) in enumerate(linhas):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        r1 = p.add_run()
+        r1.text = head + " "
+        r1.font.size = Pt(13)
+        r1.font.bold = True
+        r1.font.color.rgb = NAVY
+        r2 = p.add_run()
+        r2.text = body
+        r2.font.size = Pt(13)
+        r2.font.color.rgb = GRAY_DK
+        p.space_after = Pt(7)
+
+    add_footer(slide)
+    add_page_number(slide, 3)
 
 
 # ============================================================
 # SLIDE 4 — Motivação: regulação
 # ============================================================
 def slide_motivacao_regulacao(prs: Presentation) -> None:
-    add_bullets(prs, 4, "O tema virou obrigação regulatória", [
-        ("European AI Act (2024):", "primeira lei que regula sistemas de IA de alto risco na União Europeia."),
-        ("Auditoria de equidade:", "requisito formal para sistemas biométricos — não mais opcional."),
-        ("Lafargue et al. (2025):", "propõem pipeline de auditoria com testes estatísticos que propagam incerteza amostral (FAccT)."),
-        ("Consequências práticas:", "casos documentados de prisão errada por falso match já resultaram em processos e moratórias em múltiplas jurisdições."),
-        "A pergunta científica mudou. Não é mais “existe viés?” — está provado. É “como mitigar de forma defensável?”",
-    ])
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "O tema virou obrigação regulatória")
+
+    # Timeline horizontal
+    marcos = [
+        ("2018", "Gender Shades", "Buolamwini & Gebru colocam o viés na agenda."),
+        ("2019", "NIST FRVT", "Grother et al. documentam disparidade 10–100× em escala industrial."),
+        ("2024", "EU AI Act", "Auditoria de equidade vira REQUISITO FORMAL para sistemas biométricos.", True),
+        ("2025", "FAccT", "Lafargue et al. propõem pipeline de auditoria com propagação de incerteza."),
+    ]
+    n = len(marcos)
+    total_w = 12.0
+    start_x = (13.33 - total_w) / 2
+    line_y = 2.4
+    node_r = 0.35
+
+    # linha horizontal
+    line = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE,
+        Inches(start_x + 0.5), Inches(line_y - 0.03),
+        Inches(total_w - 1.0), Inches(0.06),
+    )
+    line.fill.solid()
+    line.fill.fore_color.rgb = GRAY_MD
+    line.line.fill.background()
+
+    step = (total_w - 1.0) / (n - 1)
+    for i, marco in enumerate(marcos):
+        year, title, body = marco[0], marco[1], marco[2]
+        highlight = marco[3] if len(marco) > 3 else False
+
+        cx = start_x + 0.5 + i * step
+        # nó
+        node_color = ACCENT if highlight else NAVY
+        node = slide.shapes.add_shape(
+            MSO_SHAPE.OVAL,
+            Inches(cx - node_r), Inches(line_y - node_r),
+            Inches(2 * node_r), Inches(2 * node_r),
+        )
+        node.fill.solid()
+        node.fill.fore_color.rgb = node_color
+        node.line.color.rgb = WHITE
+
+        # ano acima do nó
+        tx = slide.shapes.add_textbox(Inches(cx - 0.75), Inches(line_y - 1.0), Inches(1.5), Inches(0.5))
+        p = tx.text_frame.paragraphs[0]
+        p.text = year
+        p.font.size = Pt(20)
+        p.font.bold = True
+        p.font.color.rgb = ACCENT if highlight else NAVY
+        p.alignment = 2
+
+        # título abaixo do nó
+        tx = slide.shapes.add_textbox(Inches(cx - 1.35), Inches(line_y + 0.5), Inches(2.7), Inches(0.5))
+        p = tx.text_frame.paragraphs[0]
+        p.text = title
+        p.font.size = Pt(14)
+        p.font.bold = True
+        p.font.color.rgb = NAVY
+        p.alignment = 2
+
+        # corpo abaixo
+        tx = slide.shapes.add_textbox(Inches(cx - 1.4), Inches(line_y + 1.05), Inches(2.8), Inches(2.0))
+        tf = tx.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.text = body
+        p.font.size = Pt(11)
+        p.font.color.rgb = GRAY_DK
+        p.alignment = 2
+
+    # Bloco de conclusão inferior
+    bottom = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.7), Inches(5.6), Inches(11.9), Inches(1.1),
+    )
+    bottom.fill.solid()
+    bottom.fill.fore_color.rgb = NAVY
+    bottom.line.fill.background()
+    tx = slide.shapes.add_textbox(Inches(0.9), Inches(5.72), Inches(11.5), Inches(0.9))
+    tf = tx.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = ("A pergunta científica mudou. Já não é “existe viés?” — está provado. "
+              "É “como mitigar de forma defensável e auditável?”")
+    p.font.size = Pt(15)
+    p.font.italic = True
+    p.font.color.rgb = WHITE
+    p.alignment = 2
+
+    add_footer(slide)
+    add_page_number(slide, 4)
 
 
 # ============================================================
@@ -418,31 +641,176 @@ def slide_problema_sota_comparativo(prs: Presentation) -> None:
 # SLIDE 7 — Problema: heterogeneidade (figura MST vs Fitzpatrick)
 # ============================================================
 def slide_problema_heterogeneidade(prs: Presentation) -> None:
-    add_image_plus_bullets(
-        prs, 7,
-        "Por que “Latinx” é a classe mais difícil?",
-        IMG_DIR / "fig_fitzpatrick_vs_mst.png",
-        [
-            ("Rótulo monolítico:", "a categoria agrupa fenótipos muito diferentes em uma única etiqueta."),
-            ("Escala Monk (Ellis Monk, 2019):", "10 tons — sucessora moderna da escala Fitzpatrick (que tende a sub-representar tons escuros)."),
-            ("Schumann et al. (2023):", "consolida MST como padrão de auditoria em fairness."),
-            ("Consequência:", "a rotulagem monolítica de raça esconde essa diversidade e prejudica o modelo."),
-        ],
-        image_width_in=5.5,
-    )
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Por que “Latinx” é a classe mais difícil?")
+
+    # Imagem alinhada à esquerda com moldura de espaço reservado
+    img = IMG_DIR / "fig_fitzpatrick_vs_mst.png"
+    if img.exists():
+        pic = slide.shapes.add_picture(
+            str(img), Inches(0.5), Inches(2.0), width=Inches(6.2)
+        )
+    # Caption abaixo da imagem
+    cap = slide.shapes.add_textbox(Inches(0.5), Inches(6.4), Inches(6.2), Inches(0.4))
+    p = cap.text_frame.paragraphs[0]
+    p.text = "Fitzpatrick (esq., 6 tons) × Monk (dir., 10 tons)."
+    p.font.size = Pt(10)
+    p.font.italic = True
+    p.font.color.rgb = GRAY_MD
+    p.alignment = 2
+
+    # Coluna de bullets alinhados verticalmente com a imagem
+    tx = slide.shapes.add_textbox(Inches(7.1), Inches(1.7), Inches(5.8), Inches(5.3))
+    tf = tx.text_frame
+    tf.word_wrap = True
+    bullets = [
+        ("Rótulo monolítico:",
+         "a categoria agrupa fenótipos muito diferentes em uma única etiqueta."),
+        ("Escala Monk (Ellis Monk, 2019):",
+         "10 tons — sucessora moderna da escala Fitzpatrick, que sub-representa tons escuros."),
+        ("Schumann et al. (2023):",
+         "consolida a MST como padrão moderno de auditoria em fairness facial."),
+        ("Consequência:",
+         "a rotulagem monolítica de raça esconde essa diversidade e prejudica o modelo em grupos heterogêneos como Latinx."),
+    ]
+    for i, (head, body) in enumerate(bullets):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        r1 = p.add_run()
+        r1.text = head + "  "
+        r1.font.size = Pt(14)
+        r1.font.bold = True
+        r1.font.color.rgb = NAVY
+        r2 = p.add_run()
+        r2.text = body
+        r2.font.size = Pt(14)
+        r2.font.color.rgb = GRAY_DK
+        p.space_after = Pt(10)
+
+    add_footer(slide)
+    add_page_number(slide, 7)
 
 
 # ============================================================
 # SLIDE 8 — Problema: refutação
 # ============================================================
 def slide_problema_refutacao(prs: Presentation) -> None:
-    add_bullets(prs, 8, "E se o problema não for “raça” e sim “tom de pele”?", [
-        ("Pangelinan et al. (2023, FAccT):", "argumenta que a fração de face útil na imagem (pixel information) explica melhor o gap do que o rótulo de raça."),
-        ("Matias et al. (2026, arXiv 2603.02475):", "publica o SkinToneNet — primeiro classificador de tom de pele Monk em larga escala (STW, 42.313 imagens)."),
-        "Se a refutação estiver certa, a pesquisa em equidade facial deveria olhar mais para tom de pele do que para raça nominal.",
-        ("Nossa aposta:", "o tom de pele não substitui a raça — funciona como sinal de contexto que ajuda a rede a decidir melhor."),
-        "Vamos testar isso como hipótese formal, incluindo os cenários em que a refutação ganha.",
-    ])
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Contra-argumento: e se o problema não for “raça”?")
+
+    # Duas colunas com títulos coloridos: crítica (ACCENT) x resposta (NAVY)
+    col_w = 6.0
+    col_h = 5.4
+    gap = 0.4
+    start_x = (13.33 - 2 * col_w - gap) / 2
+    top_y = 1.55
+
+    # Coluna 1: A crítica (vermelho)
+    header1 = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(start_x), Inches(top_y), Inches(col_w), Inches(0.55),
+    )
+    header1.fill.solid()
+    header1.fill.fore_color.rgb = ACCENT
+    header1.line.fill.background()
+    tx = slide.shapes.add_textbox(Inches(start_x), Inches(top_y + 0.06), Inches(col_w), Inches(0.5))
+    p = tx.text_frame.paragraphs[0]
+    p.text = "A CRÍTICA DA LITERATURA"
+    p.font.size = Pt(13)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.alignment = 2
+
+    body1 = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(start_x), Inches(top_y + 0.65), Inches(col_w), Inches(col_h - 0.65),
+    )
+    body1.fill.solid()
+    body1.fill.fore_color.rgb = GRAY_LT
+    body1.line.color.rgb = GRAY_LT
+
+    tx = slide.shapes.add_textbox(
+        Inches(start_x + 0.25), Inches(top_y + 0.85),
+        Inches(col_w - 0.5), Inches(col_h - 1.0),
+    )
+    tf = tx.text_frame
+    tf.word_wrap = True
+    criticas = [
+        ("Pangelinan et al. (2023, FAccT):",
+         "o gap racial em face recognition é primariamente explicado pela FRAÇÃO DE FACE ÚTIL na imagem, não pelo rótulo de raça."),
+        ("Matias et al. (2026):",
+         "publica o SkinToneNet e reforça o tom de pele como dimensão auditável — pressiona a comunidade a abandonar rótulos nominais."),
+        ("Implicação forte:",
+         "se a refutação vale, condicionar por raça é injustificável — o sinal correto seria puramente fenotípico."),
+    ]
+    for i, (head, body) in enumerate(criticas):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        r1 = p.add_run()
+        r1.text = head + "  "
+        r1.font.size = Pt(12)
+        r1.font.bold = True
+        r1.font.color.rgb = ACCENT
+        r2 = p.add_run()
+        r2.text = body
+        r2.font.size = Pt(12)
+        r2.font.color.rgb = GRAY_DK
+        p.space_after = Pt(8)
+
+    # Coluna 2: Nossa resposta (azul)
+    x2 = start_x + col_w + gap
+    header2 = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(x2), Inches(top_y), Inches(col_w), Inches(0.55),
+    )
+    header2.fill.solid()
+    header2.fill.fore_color.rgb = NAVY
+    header2.line.fill.background()
+    tx = slide.shapes.add_textbox(Inches(x2), Inches(top_y + 0.06), Inches(col_w), Inches(0.5))
+    p = tx.text_frame.paragraphs[0]
+    p.text = "NOSSA POSIÇÃO"
+    p.font.size = Pt(13)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.alignment = 2
+
+    body2 = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(x2), Inches(top_y + 0.65), Inches(col_w), Inches(col_h - 0.65),
+    )
+    body2.fill.solid()
+    body2.fill.fore_color.rgb = BLUE_LIGHT
+    body2.line.color.rgb = BLUE_LIGHT
+
+    tx = slide.shapes.add_textbox(
+        Inches(x2 + 0.25), Inches(top_y + 0.85),
+        Inches(col_w - 0.5), Inches(col_h - 1.0),
+    )
+    tf = tx.text_frame
+    tf.word_wrap = True
+    respostas = [
+        ("Tom de pele COMPLEMENTA, não substitui a raça:",
+         "usamos MST como sinal de contexto que ajuda a rede — o rótulo racial continua sendo o alvo de predição."),
+        ("Incorporamos a crítica formalmente:",
+         "H6 testa diretamente a tese de Pangelinan (≥ 70 % da variância do erro explicada por pixel information)."),
+        ("Controle explícito de pixel information (Etapa 5):",
+         "avaliamos com e sem esse confounder — se a crítica vencer, a refutação vira contribuição quantitativa."),
+        ("Ganho esperado se a nossa tese estiver certa:",
+         "redução de disparidade + explicação estrutural de quanto do erro é irredutível vs mitigável."),
+    ]
+    for i, (head, body) in enumerate(respostas):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        r1 = p.add_run()
+        r1.text = head + "  "
+        r1.font.size = Pt(12)
+        r1.font.bold = True
+        r1.font.color.rgb = NAVY
+        r2 = p.add_run()
+        r2.text = body
+        r2.font.size = Pt(12)
+        r2.font.color.rgb = GRAY_DK
+        p.space_after = Pt(6)
+
+    add_footer(slide)
+    add_page_number(slide, 8)
 
 
 # ============================================================
@@ -622,11 +990,81 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
 
 
 # ============================================================
-# SLIDE 18 — Metodologia: mecanismo FiLM (figura)
+# SLIDE 18 — Por que ConvNeXt-T (justificativa vs ResNet e vs ViT)
+# ============================================================
+def slide_por_que_convnext(prs: Presentation) -> None:
+    add_table_slide(
+        prs, 18,
+        "Por que ConvNeXt-T (Liu et al., 2022) e não ResNet ou ViT?",
+        ["Critério", "ResNet-34 (Kärkkäinen 2021)", "ViT-B (Swin, DeiT)", "ConvNeXt-T (adotado)"],
+        [
+            [
+                "Desempenho ImageNet",
+                "76 % top-1 — 5 anos atrás",
+                "81–83 % top-1 — SOTA moderno",
+                "82 % top-1 — paridade com ViT a custo convolucional",
+            ],
+            [
+                "Estabilidade em fine-tuning",
+                "BatchNorm — sensível a batch pequeno",
+                "Boa, mas exige mais dados",
+                "LayerNorm — robusto a variação de batch (importante p/ 3 sementes)",
+            ],
+            [
+                "Compatibilidade com FiLM",
+                "4 estágios naturais",
+                "Estrutura por tokens — inserção não trivial",
+                "4 estágios hierárquicos — inserção direta após bloco principal",
+            ],
+            [
+                "Comparabilidade científica",
+                "É o baseline canônico de fairness facial (FairFace)",
+                "Sem baseline consolidado em fairness facial",
+                "Controle arquitetural moderno vs ResNet — isola efeito do FiLM",
+            ],
+            [
+                "Custo computacional",
+                "22 M params",
+                "86 M params (ViT-B)",
+                "28 M params — leve, viabiliza 3 sementes × 3 configs em GPU comum",
+            ],
+        ],
+        col_widths=[2.2, 3.0, 3.0, 4.3],
+        highlight_rows=[],
+        font_size=10,
+    )
+
+
+# ============================================================
+# SLIDE 19 — Por que FiLM (comparação com 7 alternativas de conditioning)
+# ============================================================
+def slide_por_que_film(prs: Presentation) -> None:
+    add_table_slide(
+        prs, 19,
+        "Por que FiLM (Perez et al., 2018) e não outras técnicas de condicionamento?",
+        ["Alternativa avaliada", "Referência / origem", "Por que descartada"],
+        [
+            ["Concatenação direta MST → features", "Prática comum", "Explosão paramétrica e diluição do sinal — sem modulação explícita."],
+            ["Conditional Batch Normalization", "Anterior a FiLM", "Caso particular do FiLM — generalizado por Perez et al. (2018)."],
+            ["Cross-attention", "Transformer decoders", "Superdimensionado para sinal 10-dim — ~3× o custo de FiLM sem ganho."],
+            ["AdaIN", "Style transfer", "Projetado p/ transferência de estilo — incompatível com sinal demográfico."],
+            ["SPADE", "Síntese de imagens", "Requer mapa espacial denso — incompatível com vetor MST global."],
+            ["HyperNetworks", "Meta-aprendizagem", "Instabilidade documentada — sobredimensionado para nosso porte."],
+            ["LoRA / Adaptadores", "Parameter-efficient fine-tuning", "Modifica pesos, não condiciona features — categoria distinta (trab. futuro)."],
+            ["FiLM (adotado)", "Perez et al. (2018)", "★ 10-dim ideal + ~1 % overhead + interpretabilidade γ,β + compatível com LayerNorm."],
+        ],
+        col_widths=[3.5, 3.0, 6.0],
+        highlight_rows=[7],
+        font_size=10,
+    )
+
+
+# ============================================================
+# SLIDE 20 — Metodologia: mecanismo FiLM (figura)
 # ============================================================
 def slide_metodologia_film(prs: Presentation) -> None:
     add_image_slide(
-        prs, 18,
+        prs, 20,
         "Mecanismo FiLM — como o tom entra como contexto",
         IMG_DIR / "film_pipeline.png",
         caption="FiLM (Perez et al., 2018) modula as features intermediárias do ConvNeXt-T canal a canal, condicionadas ao vetor MST. Overhead: ~1,3 % do backbone.",
@@ -635,11 +1073,11 @@ def slide_metodologia_film(prs: Presentation) -> None:
 
 
 # ============================================================
-# SLIDE 19 — Metodologia: 3 configurações
+# SLIDE 21 — Metodologia: 3 configurações
 # ============================================================
 def slide_metodologia_configs(prs: Presentation) -> None:
     add_table_slide(
-        prs, 19,
+        prs, 21,
         "Três configurações comparadas no estudo de ablation",
         ["ID", "Configuração", "O que testa"],
         [
@@ -657,7 +1095,7 @@ def slide_metodologia_configs(prs: Presentation) -> None:
 # SLIDE 20 — Baselines + Cenários
 # ============================================================
 def slide_baselines_cenarios(prs: Presentation) -> None:
-    add_bullets(prs, 20, "Como validamos — cenários e norma", [
+    add_bullets(prs, 22, "Como validamos — cenários e norma", [
         ("Cenário A — apenas raça:", "métricas por classe racial (7 classes do FairFace)."),
         ("Cenário B — raça × gênero:", "análise interseccional (8 subgrupos, seguindo Gender Shades — Buolamwini & Gebru, 2018)."),
         ("Norma seguida:", "ISO/IEC 19795-10:2024 — padrão internacional para reporte de desempenho biométrico entre grupos."),
@@ -670,7 +1108,7 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
 # SLIDE 21 — Triangulação de métricas
 # ============================================================
 def slide_metricas(prs: Presentation) -> None:
-    add_bullets(prs, 21, "Triangulação de métricas — nenhuma métrica isolada basta", [
+    add_bullets(prs, 23, "Triangulação de métricas — nenhuma métrica isolada basta", [
         ("Por que triangular — Kleinberg et al. (2017):", "Teorema da Impossibilidade — não existe métrica única de equidade que satisfaça todos os critérios simultaneamente."),
         ("Disparity Ratio:", "razão entre pior e melhor F1. Mede o quão desigual é o desempenho entre grupos."),
         ("F1 da pior classe:", "protege o grupo mais fraco — garante que a melhoria não vem só no meio."),
@@ -685,7 +1123,7 @@ def slide_metricas(prs: Presentation) -> None:
 # ============================================================
 def slide_contribuicoes(prs: Presentation) -> None:
     add_table_slide(
-        prs, 22,
+        prs, 24,
         "Contribuições esperadas — 3 eixos, 7 contribuições",
         ["Eixo", "Contribuições", "Foco"],
         [
@@ -703,7 +1141,7 @@ def slide_contribuicoes(prs: Presentation) -> None:
 # ============================================================
 def slide_cronograma(prs: Presentation) -> None:
     add_table_slide(
-        prs, 23,
+        prs, 25,
         "Cronograma",
         ["Período", "Etapa", "Entrega"],
         [
@@ -729,7 +1167,7 @@ def slide_cronograma(prs: Presentation) -> None:
 # ============================================================
 def slide_riscos(prs: Presentation) -> None:
     add_table_slide(
-        prs, 24,
+        prs, 26,
         "Riscos identificados e mitigações",
         ["#", "Risco", "Mitigação"],
         [
@@ -827,14 +1265,14 @@ def slide_estado_atual(prs: Presentation) -> None:
         p.space_after = Pt(6)
 
     add_footer(slide)
-    add_page_number(slide, 25)
+    add_page_number(slide, 27)
 
 
 # ============================================================
 # SLIDE 26 — Considerações finais
 # ============================================================
 def slide_consideracoes(prs: Presentation) -> None:
-    add_bullets(prs, 26, "Por que este trabalho é oportuno agora", [
+    add_bullets(prs, 28, "Por que este trabalho é oportuno agora", [
         "Regulação europeia recém-aprovada (AI Act, 2024) exige auditoria de equidade em sistemas biométricos.",
         "Literatura de 2023–2026 converge para tom de pele como pista central (Pangelinan 2023, Matias 2026, Schumann 2023).",
         "Ferramentas necessárias amadureceram: MSTE, Casual Conversations v2, FairFace, RFW, BFW.",
@@ -904,6 +1342,8 @@ def build_presentation() -> Presentation:
     slide_revisao_lacunas(prs)
     slide_metodologia_pipeline(prs)
     slide_metodologia_etapa1(prs)
+    slide_por_que_convnext(prs)      # NOVO - slide 18
+    slide_por_que_film(prs)          # NOVO - slide 19
     slide_metodologia_film(prs)
     slide_metodologia_configs(prs)
     slide_baselines_cenarios(prs)
