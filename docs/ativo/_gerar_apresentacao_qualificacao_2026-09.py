@@ -82,12 +82,12 @@ def add_page_number(slide, number: int) -> None:
 
 
 def add_title(slide, text: str) -> None:
-    tx = slide.shapes.add_textbox(Inches(0.5), Inches(0.35), Inches(12.5), Inches(0.9))
+    tx = slide.shapes.add_textbox(Inches(0.5), Inches(0.3), Inches(12.5), Inches(1.0))
     tf = tx.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.text = text
-    p.font.size = Pt(26)
+    p.font.size = Pt(28)
     p.font.bold = True
     p.font.color.rgb = NAVY
 
@@ -115,7 +115,7 @@ def _blank(prs: Presentation):
 def add_bullets(prs: Presentation, number: int, title: str, bullets: list) -> None:
     slide = prs.slides.add_slide(_blank(prs))
     add_title(slide, title)
-    tx = slide.shapes.add_textbox(Inches(0.5), Inches(1.5), Inches(12.5), Inches(5.4))
+    tx = slide.shapes.add_textbox(Inches(0.5), Inches(1.55), Inches(12.5), Inches(5.4))
     tf = tx.text_frame
     tf.word_wrap = True
     for i, item in enumerate(bullets):
@@ -124,18 +124,18 @@ def add_bullets(prs: Presentation, number: int, title: str, bullets: list) -> No
             head, body = item
             r1 = p.add_run()
             r1.text = head + "  "
-            r1.font.size = Pt(15)
+            r1.font.size = Pt(18)
             r1.font.bold = True
             r1.font.color.rgb = NAVY
             r2 = p.add_run()
             r2.text = body
-            r2.font.size = Pt(15)
+            r2.font.size = Pt(18)
             r2.font.color.rgb = GRAY_DK
         else:
             p.text = "•  " + item
-            p.font.size = Pt(15)
+            p.font.size = Pt(18)
             p.font.color.rgb = GRAY_DK
-        p.space_after = Pt(6)
+        p.space_after = Pt(10)
     add_footer(slide)
     add_page_number(slide, number)
 
@@ -173,7 +173,7 @@ def add_table_slide(
         cell.fill.fore_color.rgb = NAVY
         for para in cell.text_frame.paragraphs:
             for run in para.runs:
-                run.font.size = Pt(13)
+                run.font.size = Pt(15)
                 run.font.bold = True
                 run.font.color.rgb = WHITE
 
@@ -219,7 +219,7 @@ def add_image_slide(
         cap = slide.shapes.add_textbox(Inches(0.5), Inches(6.55), Inches(12.5), Inches(0.4))
         p = cap.text_frame.paragraphs[0]
         p.text = caption
-        p.font.size = Pt(11)
+        p.font.size = Pt(13)
         p.font.italic = True
         p.font.color.rgb = GRAY_MD
         p.alignment = 2
@@ -258,18 +258,18 @@ def add_image_plus_bullets(
             head, body = item
             r1 = p.add_run()
             r1.text = head + "  "
-            r1.font.size = Pt(13)
+            r1.font.size = Pt(16)
             r1.font.bold = True
             r1.font.color.rgb = NAVY
             r2 = p.add_run()
             r2.text = body
-            r2.font.size = Pt(13)
+            r2.font.size = Pt(16)
             r2.font.color.rgb = GRAY_DK
         else:
             p.text = "•  " + item
-            p.font.size = Pt(13)
+            p.font.size = Pt(16)
             p.font.color.rgb = GRAY_DK
-        p.space_after = Pt(6)
+        p.space_after = Pt(8)
     add_footer(slide)
     add_page_number(slide, number)
 
@@ -337,12 +337,12 @@ def slide_capa(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = k + "  "
-        r1.font.size = Pt(14)
+        r1.font.size = Pt(16)
         r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = v
-        r2.font.size = Pt(14)
+        r2.font.size = Pt(16)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(4)
 
@@ -372,9 +372,11 @@ def slide_agenda(prs: Presentation) -> None:
     start_x = (13.33 - 2 * box_w - gap_x) / 2
     start_y = 1.7
 
+    # Column-major: item 1 topo-esquerda, item 2 abaixo, ... item 5 topo-direita
+    n_rows = 4
     for i, label in enumerate(items):
-        col = i % 2
-        row = i // 2
+        col = i // n_rows
+        row = i % n_rows
         x = start_x + col * (box_w + gap_x)
         y = start_y + row * (box_h + gap_y)
 
@@ -500,12 +502,12 @@ def slide_motivacao_contexto(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = head + " "
-        r1.font.size = Pt(13)
+        r1.font.size = Pt(15)
         r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(13)
+        r2.font.size = Pt(15)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(7)
 
@@ -677,12 +679,12 @@ def slide_problema_heterogeneidade(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = head + "  "
-        r1.font.size = Pt(14)
+        r1.font.size = Pt(16)
         r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(14)
+        r2.font.size = Pt(16)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(10)
 
@@ -746,12 +748,12 @@ def slide_problema_refutacao(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = head + "  "
-        r1.font.size = Pt(12)
+        r1.font.size = Pt(14)
         r1.font.bold = True
         r1.font.color.rgb = ACCENT
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(12)
+        r2.font.size = Pt(14)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(8)
 
@@ -800,12 +802,12 @@ def slide_problema_refutacao(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = head + "  "
-        r1.font.size = Pt(12)
+        r1.font.size = Pt(14)
         r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(12)
+        r2.font.size = Pt(14)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(6)
 
@@ -871,7 +873,7 @@ def slide_objetivos_especificos(prs: Presentation) -> None:
         ],
         col_widths=[0.5, 12.0],
         highlight_rows=[2, 5],
-        font_size=13,
+        font_size=15,
     )
 
 
@@ -892,7 +894,7 @@ def slide_hipoteses(prs: Presentation) -> None:
             ["H6", "Parte substancial do gap é explicada por pixel information (Pangelinan 2023).", "R² explicado ≥ 70 %"],
         ],
         col_widths=[0.7, 7.5, 4.3],
-        font_size=11,
+        font_size=13,
     )
 
 
@@ -926,7 +928,7 @@ def slide_revisao_mitigacao(prs: Presentation) -> None:
             ["ConvNeXt-T puro", "Liu et al. (2022)", "Controle arquitetural moderno — efeito da rede base sem condicionamento."],
         ],
         col_widths=[3.0, 3.0, 6.5],
-        font_size=11,
+        font_size=13,
     )
 
 
@@ -959,7 +961,7 @@ def slide_revisao_lacunas(prs: Presentation) -> None:
             ["L5", "Não há decomposição quantitativa do gap Latinx (fenótipo × algoritmo).", "Etapa 6 — Contribuição 6."],
         ],
         col_widths=[0.6, 6.5, 5.4],
-        font_size=11,
+        font_size=13,
     )
 
 
@@ -1031,7 +1033,7 @@ def slide_por_que_convnext(prs: Presentation) -> None:
         ],
         col_widths=[2.2, 3.0, 3.0, 4.3],
         highlight_rows=[],
-        font_size=10,
+        font_size=12,
     )
 
 
@@ -1055,7 +1057,7 @@ def slide_por_que_film(prs: Presentation) -> None:
         ],
         col_widths=[3.5, 3.0, 6.0],
         highlight_rows=[7],
-        font_size=10,
+        font_size=12,
     )
 
 
@@ -1087,7 +1089,7 @@ def slide_metodologia_configs(prs: Presentation) -> None:
         ],
         col_widths=[0.6, 5.4, 6.5],
         highlight_rows=[1],
-        font_size=12,
+        font_size=14,
     )
 
 
@@ -1132,7 +1134,7 @@ def slide_contribuicoes(prs: Presentation) -> None:
             ["Diagnóstico-estrutural", "5, 6", "Decompor o erro em fenotípico (irredutível) e algorítmico (mitigável)."],
         ],
         col_widths=[3.5, 2.0, 7.0],
-        font_size=13,
+        font_size=15,
     )
 
 
@@ -1158,7 +1160,7 @@ def slide_cronograma(prs: Presentation) -> None:
         ],
         col_widths=[2.5, 3.0, 7.0],
         highlight_rows=[0, 1, 9],
-        font_size=11,
+        font_size=13,
     )
 
 
@@ -1178,7 +1180,7 @@ def slide_riscos(prs: Presentation) -> None:
         ],
         col_widths=[0.6, 4.5, 7.4],
         highlight_rows=[1],
-        font_size=12,
+        font_size=14,
     )
 
 
@@ -1255,12 +1257,12 @@ def slide_estado_atual(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = "•  " + head + "  "
-        r1.font.size = Pt(13)
+        r1.font.size = Pt(15)
         r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(13)
+        r2.font.size = Pt(15)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(6)
 
