@@ -99,7 +99,7 @@ def add_title(slide, text: str) -> None:
     line.line.fill.background()
 
 
-def add_footer(slide, text: str = "Qualificação · Marcello Ozzetti · Prof. Marcos Quiles · UNIFESP/ICT") -> None:
+def add_footer(slide, text: str = "Exame de Qualificação · Marcello Ozzetti · Orientação: Prof. Dr. Marcos G. Quiles · PPG-CC UNIFESP/ICT") -> None:
     ft = slide.shapes.add_textbox(Inches(0.5), Inches(7.05), Inches(11.5), Inches(0.4))
     pf = ft.text_frame.paragraphs[0]
     pf.text = text
@@ -421,7 +421,7 @@ def slide_agenda(prs: Presentation) -> None:
 # ============================================================
 def slide_motivacao_contexto(prs: Presentation) -> None:
     slide = prs.slides.add_slide(_blank(prs))
-    add_title(slide, "Reconhecimento facial já é infraestrutura social")
+    add_title(slide, "Reconhecimento facial: adoção sociotécnica em larga escala")
 
     # 4 cards visuais de uso
     usos = [
@@ -484,7 +484,7 @@ def slide_motivacao_contexto(prs: Presentation) -> None:
     tf = tx2.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = "diferença na taxa de\nfalso positivo entre\ngrupos raciais"
+    p.text = "disparidade na taxa de\nfalso positivo entre\ngrupos demográficos"
     p.font.size = Pt(14)
     p.font.color.rgb = BLUE_LIGHT
     p.alignment = 2
@@ -496,7 +496,7 @@ def slide_motivacao_contexto(prs: Presentation) -> None:
     linhas = [
         ("NIST 2019 (Grother et al.):", "maior auditoria pública já feita em biometria facial — 189 algoritmos comerciais avaliados sobre 18 milhões de imagens."),
         ("Gender Shades (Buolamwini & Gebru, 2018):", "estudo fundacional que colocou o viés racial-de-gênero na agenda pública."),
-        ("Conclusão:", "a tecnologia funciona bem para a maioria, mas não funciona igualmente bem para todos."),
+        ("Conclusão:", "desempenho agregado favorável coexiste com disparidade sistemática entre subgrupos demográficos."),
     ]
     for i, (head, body) in enumerate(linhas):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
@@ -520,13 +520,13 @@ def slide_motivacao_contexto(prs: Presentation) -> None:
 # ============================================================
 def slide_motivacao_regulacao(prs: Presentation) -> None:
     slide = prs.slides.add_slide(_blank(prs))
-    add_title(slide, "O tema virou obrigação regulatória")
+    add_title(slide, "Regulação formal em vigor: European AI Act (2024)")
 
     # Timeline horizontal
     marcos = [
         ("2018", "Gender Shades", "Buolamwini & Gebru colocam o viés na agenda."),
         ("2019", "NIST FRVT", "Grother et al. documentam disparidade 10–100× em escala industrial."),
-        ("2024", "EU AI Act", "Auditoria de equidade vira REQUISITO FORMAL para sistemas biométricos.", True),
+        ("2024", "EU AI Act", "Auditoria de equidade torna-se requisito formal para sistemas biométricos.", True),
         ("2025", "FAccT", "Lafargue et al. propõem pipeline de auditoria com propagação de incerteza."),
     ]
     n = len(marcos)
@@ -602,8 +602,8 @@ def slide_motivacao_regulacao(prs: Presentation) -> None:
     tf = tx.text_frame
     tf.word_wrap = True
     p = tf.paragraphs[0]
-    p.text = ("A pergunta científica mudou. Já não é “existe viés?” — está provado. "
-              "É “como mitigar de forma defensável e auditável?”")
+    p.text = ("A questão científica desloca-se da constatação do viés — empiricamente estabelecida — "
+              "para o desenvolvimento de mecanismos de mitigação defensáveis e auditáveis.")
     p.font.size = Pt(15)
     p.font.italic = True
     p.font.color.rgb = WHITE
@@ -619,9 +619,9 @@ def slide_motivacao_regulacao(prs: Presentation) -> None:
 def slide_problema_disparidade(prs: Presentation) -> None:
     add_image_slide(
         prs, 4,
-        "Disparidade estável de ~30 pontos entre grupos raciais",
+        "Disparidade sistemática de aproximadamente 30 pontos percentuais entre grupos raciais",
         IMG_DIR / "fig_disparidade_racial.png",
-        caption="FaceScanPaliGemma (AlDahoul et al., 2024) sobre o dataset FairFace (Kärkkäinen & Joo, 2021). Diferença entre Black e Latinx = 30 pontos percentuais.",
+        caption="FaceScanPaliGemma (AlDahoul et al., 2024) avaliado sobre o dataset FairFace (Kärkkäinen & Joo, 2021). Diferencial entre Black e Latinx: 30 pontos percentuais em F1.",
         height_in=4.8,
     )
 
@@ -644,7 +644,7 @@ def slide_problema_sota_comparativo(prs: Presentation) -> None:
 # ============================================================
 def slide_problema_heterogeneidade(prs: Presentation) -> None:
     slide = prs.slides.add_slide(_blank(prs))
-    add_title(slide, "Por que “Latinx” é a classe mais difícil?")
+    add_title(slide, "Heterogeneidade fenotípica intra-categorial: o caso Latinx")
 
     # Imagem alinhada à esquerda com moldura de espaço reservado
     img = IMG_DIR / "fig_fitzpatrick_vs_mst.png"
@@ -667,13 +667,13 @@ def slide_problema_heterogeneidade(prs: Presentation) -> None:
     tf.word_wrap = True
     bullets = [
         ("Rótulo monolítico:",
-         "a categoria agrupa fenótipos muito diferentes em uma única etiqueta."),
+         "a rotulagem monolítica agrega fenótipos heterogêneos sob única categoria discreta."),
         ("Escala Monk (Ellis Monk, 2019):",
-         "10 tons — sucessora moderna da escala Fitzpatrick, que sub-representa tons escuros."),
+         "escala de 10 tons — sucessora moderna da escala Fitzpatrick, que sub-representa tons escuros."),
         ("Schumann et al. (2023):",
-         "consolida a MST como padrão moderno de auditoria em fairness facial."),
+         "consolida a MST como padrão moderno de auditoria de equidade em análise facial."),
         ("Consequência:",
-         "a rotulagem monolítica de raça esconde essa diversidade e prejudica o modelo em grupos heterogêneos como Latinx."),
+         "a rotulagem monolítica compromete a acurácia condicional em grupos com maior variabilidade fenotípica, como Latinx."),
     ]
     for i, (head, body) in enumerate(bullets):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
@@ -697,7 +697,7 @@ def slide_problema_heterogeneidade(prs: Presentation) -> None:
 # ============================================================
 def slide_problema_refutacao(prs: Presentation) -> None:
     slide = prs.slides.add_slide(_blank(prs))
-    add_title(slide, "Contra-argumento: e se o problema não for “raça”?")
+    add_title(slide, "Refutação concorrente: tom de pele como principal fator (Pangelinan, 2023)")
 
     # Duas colunas com títulos coloridos: crítica (ACCENT) x resposta (NAVY)
     col_w = 6.0
@@ -738,11 +738,11 @@ def slide_problema_refutacao(prs: Presentation) -> None:
     tf.word_wrap = True
     criticas = [
         ("Pangelinan et al. (2023, FAccT):",
-         "o gap racial em face recognition é primariamente explicado pela FRAÇÃO DE FACE ÚTIL na imagem, não pelo rótulo de raça."),
+         "a disparidade racial em face recognition é primariamente explicada pela fração de área facial útil na imagem (pixel information), não pelo rótulo racial."),
         ("Matias et al. (2026):",
-         "publica o SkinToneNet e reforça o tom de pele como dimensão auditável — pressiona a comunidade a abandonar rótulos nominais."),
+         "publica o SkinToneNet e reforça o tom de pele como dimensão auditável, tensionando o uso de rótulos nominais."),
         ("Implicação forte:",
-         "se a refutação vale, condicionar por raça é injustificável — o sinal correto seria puramente fenotípico."),
+         "se a refutação se sustenta, o condicionamento por rótulo racial nominal perde sustentação teórica em favor do sinal fenotípico direto."),
     ]
     for i, (head, body) in enumerate(criticas):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
@@ -789,12 +789,12 @@ def slide_problema_refutacao(prs: Presentation) -> None:
     tf = tx.text_frame
     tf.word_wrap = True
     respostas = [
-        ("Tom de pele COMPLEMENTA a raça:",
-         "usamos MST como contexto — o rótulo racial continua sendo o alvo de predição."),
+        ("O tom de pele complementa o rótulo racial:",
+         "o vetor MST atua como sinal condicionante; o rótulo racial permanece como alvo de predição."),
         ("Incorporamos a crítica formalmente:",
-         "H6 testa diretamente a tese de Pangelinan (R² ≥ 70 % explicado por pixel information)."),
-        ("Refutação vira contribuição:",
-         "se a crítica vencer, entregamos decomposição quantitativa do erro — resultado científico válido."),
+         "a hipótese H6 testa diretamente a tese de Pangelinan (R² ≥ 70 % explicado por pixel information)."),
+        ("Refutação convertida em contribuição:",
+         "eventual confirmação da refutação produz decomposição quantitativa do erro, resultado científico válido em si."),
     ]
     for i, (head, body) in enumerate(respostas):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
@@ -970,7 +970,7 @@ def slide_objetivos_hipoteses(prs: Presentation) -> None:
 def slide_revisao_timeline(prs: Presentation) -> None:
     add_image_slide(
         prs, 9,
-        "Timeline das principais respostas ao problema (2018–2026)",
+        "Linha do tempo das principais respostas ao problema (2018–2026)",
         IMG_DIR / "fig_timeline_mitigacoes.png",
         caption="Frentes cronológicas: dados balanceados → funções de perda → arquiteturas Pareto-eficientes → modelos vision-language → escalas MST → heterogeneidade fenotípica.",
         height_in=4.8,
@@ -983,7 +983,7 @@ def slide_revisao_timeline(prs: Presentation) -> None:
 def slide_revisao_mitigacao(prs: Presentation) -> None:
     add_table_slide(
         prs, 10,
-        "Seis baselines de mitigação (comparação sistemática planejada)",
+        "Baselines de mitigação para comparação sistemática",
         ["Método", "Referência", "Ideia central"],
         [
             ["Adversarial debiasing", "Zhang et al. (2018)", "Segundo modelo tenta “ler” o atributo sensível — o primeiro se defende."],
@@ -1017,7 +1017,7 @@ def slide_revisao_heterogeneidade(prs: Presentation) -> None:
 def slide_revisao_lacunas(prs: Presentation) -> None:
     add_table_slide(
         prs, 11,
-        "Cinco lacunas científicas identificadas na literatura",
+        "Lacunas científicas identificadas na literatura",
         ["#", "Lacuna", "Como endereçamos"],
         [
             ["L1", "Não existe matriz pública MST × classes raciais no FairFace.", "Etapa 2 — Contribuição 2."],
@@ -1037,9 +1037,9 @@ def slide_revisao_lacunas(prs: Presentation) -> None:
 def slide_metodologia_pipeline(prs: Presentation) -> None:
     add_image_slide(
         prs, 12,
-        "Pipeline em 6 etapas",
+        "Pipeline experimental em seis etapas",
         IMG_DIR / "fig_pipeline_6etapas.png",
-        caption="Fluxo top-down organizado em 3 fases: diagnóstico (etapas 1-2), método proposto (etapa 3) e validação/síntese (etapas 4-6).",
+        caption="Fluxo top-down organizado em três fases: diagnóstico (etapas 1 e 2), método proposto (etapa 3) e validação e síntese (etapas 4 a 6).",
         height_in=5.4,
     )
 
@@ -1048,12 +1048,12 @@ def slide_metodologia_pipeline(prs: Presentation) -> None:
 # SLIDE 17 — Metodologia: Etapa 1
 # ============================================================
 def slide_metodologia_etapa1(prs: Presentation) -> None:
-    add_bullets(prs, 13, "Etapa 1 — Classificador de tom de pele (próprio)", [
-        ("O que faz:", "recebe uma foto de rosto e devolve as 10 probabilidades da escala Monk."),
-        ("Decisão pós-reunião Ago/2026:", "treinar nosso próprio classificador — não depender do SkinToneNet (Matias 2026), cujos pesos e dataset STW ainda não foram liberados."),
-        ("Datasets de treino:", "MSTE — Monk Skin Tone Examples (Monk, 2019, Google) e Casual Conversations v2 (Porgali et al., 2023, Meta)."),
-        ("Camada auto-suficiente:", "detecta o rosto (MTCNN, Zhang et al. 2016), alinha, corta e classifica — funciona em qualquer dataset, até os que não têm anotação."),
-        ("Validação:", "protocolo humano interno (~250 imagens do FairFace) + sensitivity analysis com 2 a 3 classificadores alternativos."),
+    add_bullets(prs, 13, "Etapa 1: classificador MST treinado internamente", [
+        ("O que faz:", "produz, para cada imagem facial, o vetor softmax sobre os dez tons da escala Monk."),
+        ("Decisão pós-reunião Ago/2026:", "adotar treinamento interno do classificador, reduzindo dependência do release do SkinToneNet (Matias, 2026), cujos pesos e dataset STW ainda não foram divulgados publicamente."),
+        ("Datasets de treino:", "Monk Skin Tone Examples (Monk, 2019) e Casual Conversations v2 (Porgali et al., 2023)."),
+        ("Camada auto-suficiente:", "detecção facial (MTCNN, Zhang et al., 2016), alinhamento, recorte e classificação — viabiliza inferência em datasets sem anotação MST."),
+        ("Validação:", "protocolo humano interno (aproximadamente 250 imagens do FairFace) e sensitivity analysis com dois a três classificadores alternativos."),
     ])
 
 
@@ -1061,7 +1061,7 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
 # SLIDE 18 — Por que ConvNeXt-T (justificativa vs ResNet e vs ViT)
 # ============================================================
 def slide_por_que_convnext(prs: Presentation) -> None:
-    add_bullets(prs, 14, "Por que ConvNeXt-T (Liu et al., 2022)?", [
+    add_bullets(prs, 14, "Racional da escolha do backbone: ConvNeXt-T (Liu et al., 2022)", [
         ("Paridade com ViTs a custo convolucional:",
          "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos params."),
         ("Estável em fine-tuning:",
@@ -1079,7 +1079,7 @@ def slide_por_que_convnext(prs: Presentation) -> None:
 # SLIDE 19 — Por que FiLM (comparação com 7 alternativas de conditioning)
 # ============================================================
 def slide_por_que_film(prs: Presentation) -> None:
-    add_bullets(prs, 15, "Por que FiLM (Perez et al., 2018)?", [
+    add_bullets(prs, 15, "Racional do mecanismo de condicionamento: FiLM (Perez et al., 2018)", [
         ("Adequação dimensional ao sinal MST:",
          "sinal 10-dim casa naturalmente com γ, β — sem explosão paramétrica."),
         ("Eficiência:",
@@ -1101,9 +1101,9 @@ def slide_por_que_film(prs: Presentation) -> None:
 def slide_metodologia_film(prs: Presentation) -> None:
     add_image_slide(
         prs, 16,
-        "Mecanismo FiLM — como o tom entra como contexto",
+        "Mecanismo FiLM: modulação de features condicionada ao tom de pele",
         IMG_DIR / "film_pipeline.png",
-        caption="FiLM (Perez et al., 2018) modula as features intermediárias do ConvNeXt-T canal a canal, condicionadas ao vetor MST. Overhead: ~1,3 % do backbone.",
+        caption="FiLM (Perez et al., 2018) modula as features intermediárias do ConvNeXt-T canal a canal, condicionadas ao vetor MST. Overhead paramétrico: aproximadamente 1,3 % do backbone.",
         height_in=4.6,
     )
 
@@ -1114,7 +1114,7 @@ def slide_metodologia_film(prs: Presentation) -> None:
 def slide_metodologia_configs(prs: Presentation) -> None:
     add_table_slide(
         prs, 17,
-        "Três configurações comparadas no estudo de ablation",
+        "Configurações do estudo de ablation arquitetural",
         ["ID", "Configuração", "O que testa"],
         [
             ["A", "ConvNeXt-T puro (baseline)", "Sem condicionamento — controle arquitetural."],
@@ -1131,12 +1131,12 @@ def slide_metodologia_configs(prs: Presentation) -> None:
 # SLIDE 20 — Baselines + Cenários
 # ============================================================
 def slide_baselines_cenarios(prs: Presentation) -> None:
-    add_bullets(prs, 18, "Como validamos — cenários e norma", [
-        ("Cenário A — apenas raça:", "métricas por classe racial (7 classes do FairFace)."),
-        ("Cenário B — raça × gênero:", "análise interseccional (8 subgrupos, seguindo Gender Shades — Buolamwini & Gebru, 2018)."),
-        ("Norma seguida:", "ISO/IEC 19795-10:2024 — padrão internacional para reporte de desempenho biométrico entre grupos."),
-        ("Rigor experimental:", "3 sementes independentes por experimento (42, 1, 2), comparação pareada, intervalo de confiança 95 % via bootstrap."),
-        ("Datasets de transferência (Etapa 5):", "RFW (Wang et al., 2019) e BFW (Robinson et al., 2020) — pares oficiais 1:1."),
+    add_bullets(prs, 18, "Protocolo de validação: cenários e norma", [
+        ("Cenário A — apenas raça:", "reporte estratificado por classe racial (sete classes do FairFace)."),
+        ("Cenário B — raça × gênero:", "análise interseccional (oito subgrupos), conforme protocolo estabelecido por Gender Shades (Buolamwini & Gebru, 2018)."),
+        ("Norma seguida:", "ISO/IEC 19795-10:2024, padrão internacional para reporte de desempenho biométrico estratificado entre grupos demográficos."),
+        ("Rigor experimental:", "três sementes independentes por experimento (42, 1, 2), comparação pareada e intervalo de confiança de 95 % via bootstrap não paramétrico."),
+        ("Datasets de transferência (Etapa 5):", "RFW (Wang et al., 2019) e BFW (Robinson et al., 2020), com pares oficiais de verificação 1:1."),
     ])
 
 
@@ -1144,13 +1144,13 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
 # SLIDE 21 — Triangulação de métricas
 # ============================================================
 def slide_metricas(prs: Presentation) -> None:
-    add_bullets(prs, 19, "Triangulação de métricas — nenhuma métrica isolada basta", [
-        ("Por que triangular — Kleinberg et al. (2017):", "Teorema da Impossibilidade — não existe métrica única de equidade que satisfaça todos os critérios simultaneamente."),
-        ("Disparity Ratio:", "razão entre pior e melhor F1. Mede o quão desigual é o desempenho entre grupos."),
-        ("F1 da pior classe:", "protege o grupo mais fraco — garante que a melhoria não vem só no meio."),
-        ("Equal Opportunity — Hardt et al. (2016, NeurIPS):", "iguala a taxa de acerto entre grupos, condicionada ao rótulo verdadeiro."),
-        ("Equalized Odds — Hardt et al. (2016):", "vai além — iguala acerto e erro entre grupos."),
-        ("Visualização Pareto:", "para cada modelo, plotamos acurácia × disparidade — vemos quem está na fronteira."),
+    add_bullets(prs, 19, "Triangulação de métricas de equidade", [
+        ("Por que triangular — Kleinberg et al. (2017):", "Teorema da Impossibilidade — demonstra a impossibilidade formal de satisfação simultânea de múltiplas definições de equidade quando as prevalências diferem entre grupos."),
+        ("Disparity Ratio:", "razão entre F1 mínimo e máximo entre grupos; mensura a desigualdade de desempenho."),
+        ("F1 da pior classe:", "protege o grupo sub-representado; evita ganhos concentrados apenas na média agregada."),
+        ("Equal Opportunity — Hardt et al. (2016, NeurIPS):", "requer igualdade de taxa de verdadeiro positivo (TPR) condicionada ao rótulo verdadeiro."),
+        ("Equalized Odds — Hardt et al. (2016):", "requisito estrito: igualdade simultânea de TPR e FPR entre grupos."),
+        ("Visualização Pareto:", "identificação da fronteira Pareto no trade-off acurácia agregada × disparidade demográfica."),
     ])
 
 
@@ -1160,7 +1160,7 @@ def slide_metricas(prs: Presentation) -> None:
 def slide_contribuicoes(prs: Presentation) -> None:
     add_table_slide(
         prs, 20,
-        "Contribuições esperadas — 3 eixos, 7 contribuições",
+        "Contribuições esperadas",
         ["Eixo", "Contribuições", "Foco"],
         [
             ["Fenotípico-empírico", "1, 2", "Documentar como o fenótipo (MST) se distribui dentro de cada rótulo racial."],
@@ -1202,7 +1202,7 @@ def slide_cronograma(prs: Presentation) -> None:
 def slide_riscos(prs: Presentation) -> None:
     add_table_slide(
         prs, 22,
-        "Riscos identificados e mitigações",
+        "Riscos identificados e estratégias de mitigação",
         ["#", "Risco", "Mitigação"],
         [
             ["R1", "Alguma das 6 hipóteses pode ser refutada.", "Cada hipótese tem plano B; refutação é resultado científico válido."],
@@ -1221,7 +1221,7 @@ def slide_riscos(prs: Presentation) -> None:
 # ============================================================
 def slide_estado_atual(prs: Presentation) -> None:
     slide = prs.slides.add_slide(_blank(prs))
-    add_title(slide, "Estado atual — adiantados no cronograma")
+    add_title(slide, "Estado atual do trabalho")
 
     kpis = [
         ("+3", "meses adiantados", "sobre o cronograma proposto na qualificação"),
@@ -1271,7 +1271,7 @@ def slide_estado_atual(prs: Presentation) -> None:
 
     subtitle = slide.shapes.add_textbox(Inches(0.5), Inches(4.2), Inches(12.5), Inches(0.4))
     p = subtitle.text_frame.paragraphs[0]
-    p.text = "Entregas concretas até 28/09/2026"
+    p.text = "Estado das entregas em 28/09/2026"
     p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = NAVY
@@ -1280,10 +1280,10 @@ def slide_estado_atual(prs: Presentation) -> None:
     tf = tx.text_frame
     tf.word_wrap = True
     entregas = [
-        ("Etapas 1 e 2 (código completo):", "classificador MST próprio, camada auto-suficiente, matriz MST × raça, teste da H2."),
-        ("Etapa 3 (FiLM):", "camada FiLM + wrapper ConvNeXt-T + ensembler CLIP-text + pipeline de treino das 3 configs."),
-        ("Etapas 4, 5 e 6:", "métricas de fairness + 4 baselines + Pareto + verificação RFW/BFW + decomposição ANOVA/R²."),
-        ("Texto da dissertação:", "5 capítulos consolidados, 3 passadas de revisão de estilo, 104 fichas bibliográficas."),
+        ("Etapas 1 e 2 (código completo):", "classificador MST treinado internamente, camada de preprocessamento auto-suficiente, matriz MST × raça, teste formal de H2."),
+        ("Etapa 3 (FiLM):", "camada FiLM, wrapper ConvNeXt-T, ensembler CLIP-text e pipeline de treinamento das três configurações."),
+        ("Etapas 4, 5 e 6:", "métricas de equidade, quatro baselines, análise Pareto, verificação em RFW/BFW e decomposição ANOVA/R²."),
+        ("Texto da dissertação:", "cinco capítulos consolidados, três passadas de revisão de estilo e 104 fichas bibliográficas."),
     ]
     for i, (head, body) in enumerate(entregas):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
