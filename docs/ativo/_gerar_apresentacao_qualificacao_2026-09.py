@@ -63,7 +63,7 @@ AMBER = RGBColor(0xF5, 0xB7, 0x00)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 
 QUALIFICACAO = date(2026, 10, 5)
-TOTAL_SLIDES = 29
+TOTAL_SLIDES = 24
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IMG_DIR = REPO_ROOT / "docs" / "tese" / "images"
@@ -512,7 +512,7 @@ def slide_motivacao_contexto(prs: Presentation) -> None:
         p.space_after = Pt(7)
 
     add_footer(slide)
-    add_page_number(slide, 3)
+    add_page_number(slide, 2)
 
 
 # ============================================================
@@ -610,7 +610,7 @@ def slide_motivacao_regulacao(prs: Presentation) -> None:
     p.alignment = 2
 
     add_footer(slide)
-    add_page_number(slide, 4)
+    add_page_number(slide, 3)
 
 
 # ============================================================
@@ -618,7 +618,7 @@ def slide_motivacao_regulacao(prs: Presentation) -> None:
 # ============================================================
 def slide_problema_disparidade(prs: Presentation) -> None:
     add_image_slide(
-        prs, 5,
+        prs, 4,
         "Disparidade estável de ~30 pontos entre grupos raciais",
         IMG_DIR / "fig_disparidade_racial.png",
         caption="FaceScanPaliGemma (AlDahoul et al., 2024) sobre o dataset FairFace (Kärkkäinen & Joo, 2021). Diferença entre Black e Latinx = 30 pontos percentuais.",
@@ -689,7 +689,7 @@ def slide_problema_heterogeneidade(prs: Presentation) -> None:
         p.space_after = Pt(10)
 
     add_footer(slide)
-    add_page_number(slide, 7)
+    add_page_number(slide, 5)
 
 
 # ============================================================
@@ -810,7 +810,7 @@ def slide_problema_refutacao(prs: Presentation) -> None:
         p.space_after = Pt(6)
 
     add_footer(slide)
-    add_page_number(slide, 8)
+    add_page_number(slide, 6)
 
 
 # ============================================================
@@ -850,50 +850,118 @@ def slide_objetivo_geral(prs: Presentation) -> None:
     p.font.italic = True
     p.font.color.rgb = GRAY_DK
     add_footer(slide)
-    add_page_number(slide, 9)
+    add_page_number(slide, 7)
 
 
 # ============================================================
 # SLIDE 10 — Objetivos específicos
 # ============================================================
-def slide_objetivos_especificos(prs: Presentation) -> None:
-    add_table_slide(
-        prs, 10,
-        "Seis objetivos específicos",
-        ["#", "Objetivo"],
-        [
-            ["1", "Quantificar como o tom de pele Monk se distribui dentro de cada grupo racial do FairFace."],
-            ["2", "Treinar e avaliar classificador MST próprio, com sensitivity analysis contra alternativas."],
-            ["3", "Implementar o pipeline com FiLM sobre ConvNeXt-T e compará-lo contra seis baselines."],
-            ["4", "Demonstrar que o ganho em classificação transfere para reconhecimento (RFW/BFW)."],
-            ["5", "Formalizar a triangulação de métricas — Disparity Ratio, F1 da pior classe, Equal Opportunity."],
-            ["6", "Decompor quanto do erro Latinx vem do fenótipo (irredutível) e quanto do modelo (mitigável)."],
-        ],
-        col_widths=[0.5, 12.0],
-        highlight_rows=[2, 5],
-        font_size=15,
-    )
+def slide_objetivos_hipoteses(prs: Presentation) -> None:
+    """Slide consolidado (era 10 + 11): 6 objetivos à esquerda, 6 hipóteses à direita."""
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Objetivos específicos e hipóteses testáveis")
 
+    col_w = 6.0
+    gap = 0.3
+    start_x = (13.33 - 2 * col_w - gap) / 2
+    top_y = 1.55
+    header_h = 0.55
+    body_top = top_y + header_h + 0.15
 
-# ============================================================
-# SLIDE 11 — Hipóteses
-# ============================================================
-def slide_hipoteses(prs: Presentation) -> None:
-    add_table_slide(
-        prs, 11,
-        "Seis hipóteses testáveis",
-        ["#", "Hipótese", "Confirma se..."],
-        [
-            ["H1", "O classificador MST próprio atinge concordância humana suficiente.", "κ ≥ 0,7 com anotações internas"],
-            ["H2", "A classe Latinx cobre ≥ 5 dos 10 tons Monk no FairFace.", "cobertura observada ≥ 5"],
-            ["H3", "Condicionar por tom reduz disparidade sem perder acurácia agregada.", "DR menor + F1 macro ≥ baseline"],
-            ["H4", "≥ 50 % dos erros Latinx concentram-se em zonas de sobreposição de tom.", "concentração observada ≥ 50 %"],
-            ["H5", "O ganho em classificação transfere para reconhecimento.", "redução de gap também em RFW/BFW"],
-            ["H6", "Parte substancial do gap é explicada por pixel information (Pangelinan 2023).", "R² explicado ≥ 70 %"],
-        ],
-        col_widths=[0.7, 7.5, 4.3],
-        font_size=15,
+    # ---------- Coluna 1: Objetivos ----------
+    h1 = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(start_x), Inches(top_y), Inches(col_w), Inches(header_h),
     )
+    h1.fill.solid()
+    h1.fill.fore_color.rgb = NAVY
+    h1.line.fill.background()
+    tx = slide.shapes.add_textbox(Inches(start_x), Inches(top_y + 0.05), Inches(col_w), Inches(0.5))
+    p = tx.text_frame.paragraphs[0]
+    p.text = "6 OBJETIVOS ESPECÍFICOS"
+    p.font.size = Pt(15)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.alignment = 2
+
+    objetivos = [
+        "Quantificar distribuição MST × classe racial no FairFace.",
+        "Treinar e avaliar classificador MST próprio + sensitivity.",
+        "Implementar FiLM sobre ConvNeXt-T e comparar vs 6 baselines.",
+        "Demonstrar transferência do ganho para reconhecimento (RFW/BFW).",
+        "Formalizar triangulação de métricas (DR, F1 pior classe, EO).",
+        "Decompor erro Latinx: fenótipo (irredutível) vs modelo (mitigável).",
+    ]
+    tx = slide.shapes.add_textbox(
+        Inches(start_x + 0.15), Inches(body_top),
+        Inches(col_w - 0.3), Inches(5.0),
+    )
+    tf = tx.text_frame
+    tf.word_wrap = True
+    for i, obj in enumerate(objetivos):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        r1 = p.add_run()
+        r1.text = f"{i+1}.  "
+        r1.font.size = Pt(15)
+        r1.font.bold = True
+        r1.font.color.rgb = NAVY
+        r2 = p.add_run()
+        r2.text = obj
+        r2.font.size = Pt(15)
+        r2.font.color.rgb = GRAY_DK
+        p.space_after = Pt(8)
+
+    # ---------- Coluna 2: Hipóteses ----------
+    x2 = start_x + col_w + gap
+    h2 = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(x2), Inches(top_y), Inches(col_w), Inches(header_h),
+    )
+    h2.fill.solid()
+    h2.fill.fore_color.rgb = ACCENT
+    h2.line.fill.background()
+    tx = slide.shapes.add_textbox(Inches(x2), Inches(top_y + 0.05), Inches(col_w), Inches(0.5))
+    p = tx.text_frame.paragraphs[0]
+    p.text = "6 HIPÓTESES TESTÁVEIS"
+    p.font.size = Pt(15)
+    p.font.bold = True
+    p.font.color.rgb = WHITE
+    p.alignment = 2
+
+    hipoteses = [
+        ("H1", "Classificador MST atinge concordância humana", "κ ≥ 0,7"),
+        ("H2", "Latinx cobre ≥ 5 dos 10 tons Monk", "cobertura ≥ 5"),
+        ("H3", "Condicionamento reduz disparidade sem perder acurácia", "DR ↓  ·  F1 ≥ baseline"),
+        ("H4", "≥ 50 % dos erros Latinx em zonas de sobreposição", "concentração ≥ 50 %"),
+        ("H5", "Ganho transfere para reconhecimento (RFW/BFW)", "gap ↓ downstream"),
+        ("H6", "Pixel information explica variância do erro (Pangelinan)", "R² ≥ 70 %"),
+    ]
+    tx = slide.shapes.add_textbox(
+        Inches(x2 + 0.15), Inches(body_top),
+        Inches(col_w - 0.3), Inches(5.0),
+    )
+    tf = tx.text_frame
+    tf.word_wrap = True
+    for i, (hid, texto, criterio) in enumerate(hipoteses):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        r1 = p.add_run()
+        r1.text = f"{hid}.  "
+        r1.font.size = Pt(15)
+        r1.font.bold = True
+        r1.font.color.rgb = ACCENT
+        r2 = p.add_run()
+        r2.text = texto + "  "
+        r2.font.size = Pt(15)
+        r2.font.color.rgb = GRAY_DK
+        r3 = p.add_run()
+        r3.text = f"[{criterio}]"
+        r3.font.size = Pt(13)
+        r3.font.color.rgb = GRAY_MD
+        r3.font.italic = True
+        p.space_after = Pt(8)
+
+    add_footer(slide)
+    add_page_number(slide, 6)
 
 
 # ============================================================
@@ -901,7 +969,7 @@ def slide_hipoteses(prs: Presentation) -> None:
 # ============================================================
 def slide_revisao_timeline(prs: Presentation) -> None:
     add_image_slide(
-        prs, 12,
+        prs, 9,
         "Timeline das principais respostas ao problema (2018–2026)",
         IMG_DIR / "fig_timeline_mitigacoes.png",
         caption="Frentes cronológicas: dados balanceados → funções de perda → arquiteturas Pareto-eficientes → modelos vision-language → escalas MST → heterogeneidade fenotípica.",
@@ -914,7 +982,7 @@ def slide_revisao_timeline(prs: Presentation) -> None:
 # ============================================================
 def slide_revisao_mitigacao(prs: Presentation) -> None:
     add_table_slide(
-        prs, 13,
+        prs, 10,
         "Seis baselines de mitigação (comparação sistemática planejada)",
         ["Método", "Referência", "Ideia central"],
         [
@@ -948,7 +1016,7 @@ def slide_revisao_heterogeneidade(prs: Presentation) -> None:
 # ============================================================
 def slide_revisao_lacunas(prs: Presentation) -> None:
     add_table_slide(
-        prs, 15,
+        prs, 11,
         "Cinco lacunas científicas identificadas na literatura",
         ["#", "Lacuna", "Como endereçamos"],
         [
@@ -968,7 +1036,7 @@ def slide_revisao_lacunas(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_pipeline(prs: Presentation) -> None:
     add_image_slide(
-        prs, 16,
+        prs, 12,
         "Pipeline em 6 etapas",
         IMG_DIR / "fig_pipeline_6etapas.png",
         caption="Fluxo top-down organizado em 3 fases: diagnóstico (etapas 1-2), método proposto (etapa 3) e validação/síntese (etapas 4-6).",
@@ -980,7 +1048,7 @@ def slide_metodologia_pipeline(prs: Presentation) -> None:
 # SLIDE 17 — Metodologia: Etapa 1
 # ============================================================
 def slide_metodologia_etapa1(prs: Presentation) -> None:
-    add_bullets(prs, 17, "Etapa 1 — Classificador de tom de pele (próprio)", [
+    add_bullets(prs, 13, "Etapa 1 — Classificador de tom de pele (próprio)", [
         ("O que faz:", "recebe uma foto de rosto e devolve as 10 probabilidades da escala Monk."),
         ("Decisão pós-reunião Ago/2026:", "treinar nosso próprio classificador — não depender do SkinToneNet (Matias 2026), cujos pesos e dataset STW ainda não foram liberados."),
         ("Datasets de treino:", "MSTE — Monk Skin Tone Examples (Monk, 2019, Google) e Casual Conversations v2 (Porgali et al., 2023, Meta)."),
@@ -993,7 +1061,7 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
 # SLIDE 18 — Por que ConvNeXt-T (justificativa vs ResNet e vs ViT)
 # ============================================================
 def slide_por_que_convnext(prs: Presentation) -> None:
-    add_bullets(prs, 18, "Por que ConvNeXt-T (Liu et al., 2022)?", [
+    add_bullets(prs, 14, "Por que ConvNeXt-T (Liu et al., 2022)?", [
         ("Paridade com ViTs a custo convolucional:",
          "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos params."),
         ("Estável em fine-tuning:",
@@ -1011,7 +1079,7 @@ def slide_por_que_convnext(prs: Presentation) -> None:
 # SLIDE 19 — Por que FiLM (comparação com 7 alternativas de conditioning)
 # ============================================================
 def slide_por_que_film(prs: Presentation) -> None:
-    add_bullets(prs, 19, "Por que FiLM (Perez et al., 2018)?", [
+    add_bullets(prs, 15, "Por que FiLM (Perez et al., 2018)?", [
         ("Adequação dimensional ao sinal MST:",
          "sinal 10-dim casa naturalmente com γ, β — sem explosão paramétrica."),
         ("Eficiência:",
@@ -1032,7 +1100,7 @@ def slide_por_que_film(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_film(prs: Presentation) -> None:
     add_image_slide(
-        prs, 20,
+        prs, 16,
         "Mecanismo FiLM — como o tom entra como contexto",
         IMG_DIR / "film_pipeline.png",
         caption="FiLM (Perez et al., 2018) modula as features intermediárias do ConvNeXt-T canal a canal, condicionadas ao vetor MST. Overhead: ~1,3 % do backbone.",
@@ -1045,7 +1113,7 @@ def slide_metodologia_film(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_configs(prs: Presentation) -> None:
     add_table_slide(
-        prs, 21,
+        prs, 17,
         "Três configurações comparadas no estudo de ablation",
         ["ID", "Configuração", "O que testa"],
         [
@@ -1063,7 +1131,7 @@ def slide_metodologia_configs(prs: Presentation) -> None:
 # SLIDE 20 — Baselines + Cenários
 # ============================================================
 def slide_baselines_cenarios(prs: Presentation) -> None:
-    add_bullets(prs, 22, "Como validamos — cenários e norma", [
+    add_bullets(prs, 18, "Como validamos — cenários e norma", [
         ("Cenário A — apenas raça:", "métricas por classe racial (7 classes do FairFace)."),
         ("Cenário B — raça × gênero:", "análise interseccional (8 subgrupos, seguindo Gender Shades — Buolamwini & Gebru, 2018)."),
         ("Norma seguida:", "ISO/IEC 19795-10:2024 — padrão internacional para reporte de desempenho biométrico entre grupos."),
@@ -1076,7 +1144,7 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
 # SLIDE 21 — Triangulação de métricas
 # ============================================================
 def slide_metricas(prs: Presentation) -> None:
-    add_bullets(prs, 23, "Triangulação de métricas — nenhuma métrica isolada basta", [
+    add_bullets(prs, 19, "Triangulação de métricas — nenhuma métrica isolada basta", [
         ("Por que triangular — Kleinberg et al. (2017):", "Teorema da Impossibilidade — não existe métrica única de equidade que satisfaça todos os critérios simultaneamente."),
         ("Disparity Ratio:", "razão entre pior e melhor F1. Mede o quão desigual é o desempenho entre grupos."),
         ("F1 da pior classe:", "protege o grupo mais fraco — garante que a melhoria não vem só no meio."),
@@ -1091,7 +1159,7 @@ def slide_metricas(prs: Presentation) -> None:
 # ============================================================
 def slide_contribuicoes(prs: Presentation) -> None:
     add_table_slide(
-        prs, 24,
+        prs, 20,
         "Contribuições esperadas — 3 eixos, 7 contribuições",
         ["Eixo", "Contribuições", "Foco"],
         [
@@ -1109,7 +1177,7 @@ def slide_contribuicoes(prs: Presentation) -> None:
 # ============================================================
 def slide_cronograma(prs: Presentation) -> None:
     add_table_slide(
-        prs, 25,
+        prs, 21,
         "Cronograma",
         ["Período", "Etapa", "Entrega"],
         [
@@ -1133,7 +1201,7 @@ def slide_cronograma(prs: Presentation) -> None:
 # ============================================================
 def slide_riscos(prs: Presentation) -> None:
     add_table_slide(
-        prs, 26,
+        prs, 22,
         "Riscos identificados e mitigações",
         ["#", "Risco", "Mitigação"],
         [
@@ -1231,7 +1299,7 @@ def slide_estado_atual(prs: Presentation) -> None:
         p.space_after = Pt(6)
 
     add_footer(slide)
-    add_page_number(slide, 27)
+    add_page_number(slide, 23)
 
 
 # ============================================================
@@ -1291,35 +1359,33 @@ def build_presentation() -> Presentation:
     prs.slide_width = Inches(13.33)
     prs.slide_height = Inches(7.5)
 
-    slide_capa(prs)
-    slide_agenda(prs)
-    slide_motivacao_contexto(prs)
-    slide_motivacao_regulacao(prs)
-    slide_problema_disparidade(prs)
-    slide_problema_sota_comparativo(prs)
-    slide_problema_heterogeneidade(prs)
-    slide_problema_refutacao(prs)
-    slide_objetivo_geral(prs)
-    slide_objetivos_especificos(prs)
-    slide_hipoteses(prs)
-    slide_revisao_timeline(prs)
-    slide_revisao_mitigacao(prs)
-    slide_revisao_heterogeneidade(prs)
-    slide_revisao_lacunas(prs)
-    slide_metodologia_pipeline(prs)
-    slide_metodologia_etapa1(prs)
-    slide_por_que_convnext(prs)      # NOVO - slide 18
-    slide_por_que_film(prs)          # NOVO - slide 19
-    slide_metodologia_film(prs)
-    slide_metodologia_configs(prs)
-    slide_baselines_cenarios(prs)
-    slide_metricas(prs)
-    slide_contribuicoes(prs)
-    slide_cronograma(prs)
-    slide_riscos(prs)
-    slide_estado_atual(prs)
-    slide_consideracoes(prs)
-    slide_perguntas(prs)
+    # Opção A do enxugamento: 24 slides (era 29).
+    # Cortados: agenda, comparativo SOTA, 3 disciplinas, considerações finais.
+    # Consolidado: objetivos + hipóteses em um único slide.
+    slide_capa(prs)                          # 1
+    slide_motivacao_contexto(prs)            # 2
+    slide_motivacao_regulacao(prs)           # 3
+    slide_problema_disparidade(prs)          # 4
+    slide_problema_heterogeneidade(prs)      # 5
+    slide_problema_refutacao(prs)            # 6
+    slide_objetivo_geral(prs)                # 7
+    slide_objetivos_hipoteses(prs)           # 8   [CONSOLIDADO]
+    slide_revisao_timeline(prs)              # 9
+    slide_revisao_mitigacao(prs)             # 10
+    slide_revisao_lacunas(prs)               # 11
+    slide_metodologia_pipeline(prs)          # 12
+    slide_metodologia_etapa1(prs)            # 13
+    slide_por_que_convnext(prs)              # 14
+    slide_por_que_film(prs)                  # 15
+    slide_metodologia_film(prs)              # 16
+    slide_metodologia_configs(prs)           # 17
+    slide_baselines_cenarios(prs)            # 18
+    slide_metricas(prs)                      # 19
+    slide_contribuicoes(prs)                 # 20
+    slide_cronograma(prs)                    # 21
+    slide_riscos(prs)                        # 22
+    slide_estado_atual(prs)                  # 23
+    slide_perguntas(prs)                     # 24
 
     return prs
 
