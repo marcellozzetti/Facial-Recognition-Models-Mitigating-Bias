@@ -1,164 +1,245 @@
-"""Gera diagrama do mecanismo FiLM aplicado ao nosso pipeline.
+"""Gera diagrama SIMPLIFICADO do mecanismo FiLM aplicado ao nosso pipeline.
+
+Objetivo: comunicar sem ambiguidade à banca de qualificação, com
+tipografia legível e caixas dimensionadas para o conteúdo.
 
 Saída: docs/ativo/imagens/film_pipeline.png (alta resolução 300 DPI).
-
-Mostra:
-- SkinToneNet (frozen) extraindo vetor de contexto z da imagem
-- MLPs f_gamma, f_beta gerando parâmetros de modulação
-- Backbone ConvNeXt-T com 4 blocos FiLM inseridos por estágio
-- Modulação F' = gamma * F + beta por canal
-- Classificador final sobre 7 raças do FairFace
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
-from matplotlib.lines import Line2D
+import matplotlib.pyplot as plt
+from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
-# Paleta consistente com o PPTX
-NAVY = (31/255, 42/255, 78/255)
-GRAY_DK = (61/255, 66/255, 78/255)
-GRAY_MD = (112/255, 118/255, 130/255)
-GRAY_LT = (232/255, 234/255, 237/255)
-ACCENT = (192/255, 57/255, 43/255)
-GREEN = (46/255, 125/255, 50/255)
+# Paleta consistente com o restante do repo
+NAVY = (31 / 255, 42 / 255, 78 / 255)
+GRAY_DK = (61 / 255, 66 / 255, 78 / 255)
+GRAY_MD = (112 / 255, 118 / 255, 130 / 255)
+GRAY_LT = (232 / 255, 234 / 255, 237 / 255)
+ACCENT = (192 / 255, 57 / 255, 43 / 255)
+GREEN = (46 / 255, 125 / 255, 50 / 255)
 WHITE = (1.0, 1.0, 1.0)
 
 
-def _box(ax, x, y, w, h, text, fc=GRAY_LT, ec=NAVY, fs=11, fw="normal", tc=GRAY_DK, lw=1.5, rounding=0.05):
+def _box(ax, x, y, w, h, text, fc=GRAY_LT, ec=NAVY, fs=12, fw="normal",
+         tc=GRAY_DK, lw=1.5):
     box = FancyBboxPatch(
         (x, y), w, h,
-        boxstyle=f"round,pad=0.02,rounding_size={rounding}",
+        boxstyle="round,pad=0.02,rounding_size=0.5",
         fc=fc, ec=ec, lw=lw,
     )
     ax.add_patch(box)
-    ax.text(x + w/2, y + h/2, text, ha="center", va="center",
-            fontsize=fs, fontweight=fw, color=tc, wrap=True)
+    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center",
+            fontsize=fs, fontweight=fw, color=tc, wrap=True,
+            linespacing=1.15)
 
 
-def _arrow(ax, x0, y0, x1, y1, color=NAVY, lw=2.0, style="-|>", mutation_scale=18):
-    arrow = FancyArrowPatch(
+def _arrow(ax, x0, y0, x1, y1, color=NAVY, lw=2.0, style="-|>", ms=18):
+    ax.add_patch(FancyArrowPatch(
         (x0, y0), (x1, y1),
         arrowstyle=style, color=color, lw=lw,
-        mutation_scale=mutation_scale,
-        shrinkA=2, shrinkB=2,
-    )
-    ax.add_patch(arrow)
-
-
-def _label(ax, x, y, text, color=GRAY_MD, fs=9, italic=True, ha="center", va="center"):
-    style = "italic" if italic else "normal"
-    ax.text(x, y, text, ha=ha, va=va, fontsize=fs, color=color, style=style)
+        mutation_scale=ms, shrinkA=2, shrinkB=2,
+    ))
 
 
 def build_figure(out_path: Path) -> None:
-    fig, ax = plt.subplots(figsize=(15, 9), dpi=300)
+    # Figura mais larga para acomodar 4 pares (Estágio + FiLM) com folga
+    fig, ax = plt.subplots(figsize=(18, 10), dpi=300)
     ax.set_xlim(0, 100)
-    ax.set_ylim(0, 60)
+    ax.set_ylim(0, 62)
     ax.axis("off")
 
-    # ====== Título ======
-    ax.text(50, 57, "FiLM — Feature-wise Linear Modulation",
-            ha="center", va="center", fontsize=20, fontweight="bold", color=NAVY)
-    ax.text(50, 54, "Como o tom de pele é injetado como contexto na rede de classificação racial",
-            ha="center", va="center", fontsize=12, color=GRAY_MD, style="italic")
+    # ---------- Título ----------
+    ax.text(50, 58.5, "FiLM — Feature-wise Linear Modulation",
+            ha="center", va="center",
+            fontsize=24, fontweight="bold", color=NAVY)
+    ax.text(50, 55,
+            "Uma camada FiLM aplicada após cada um dos 4 estágios do ConvNeXt-T",
+            ha="center", va="center",
+            fontsize=14, color=GRAY_MD, style="italic")
 
-    # ====== Linha 1 — Pipeline da imagem (input) ======
-    # Foto / Imagem
-    _box(ax, 2, 35, 9, 8, "Imagem\n224x224x3", fc=GRAY_LT, ec=NAVY, fs=10, fw="bold")
+    # =========================================================
+    # LINHA SUPERIOR — geração do sinal condicionante z e MLPs
+    # =========================================================
+    y_top = 40
+    box_h = 8
 
-    # Branch 1 — saída para SkinToneNet (cima)
-    _arrow(ax, 11, 41, 16, 46, color=GREEN, lw=2.0)
-    # Branch 2 — saída para ConvNeXt-T (baixo)
-    _arrow(ax, 11, 37, 16, 32, color=NAVY, lw=2.0)
+    # Imagem
+    _box(ax, 2, y_top, 11, box_h,
+         "Imagem\n224 × 224 × 3",
+         fc=GRAY_LT, ec=NAVY, fs=13, fw="bold")
+    _arrow(ax, 13, y_top + box_h / 2, 18, y_top + box_h / 2, color=GREEN, lw=2.2)
 
-    # ====== Linha 2 (superior) — SkinToneNet + contexto z + MLPs ======
-    # SkinToneNet
-    _box(ax, 16, 44, 12, 6, "SkinToneNet\n(ViT-Small)\nCONGELADO", fc=GREEN, ec=GREEN, fs=10, fw="bold", tc=WHITE)
-    _label(ax, 22, 51.5, "Matias et al. 2026", fs=8)
+    # Classificador MST (verde — congelado)
+    _box(ax, 18, y_top, 18, box_h,
+         "Classificador MST\ncongelado",
+         fc=GREEN, ec=GREEN, fs=14, fw="bold", tc=WHITE)
+    ax.text(27, y_top + box_h + 1.2,
+            "treinado na Etapa 1  (MSTE + CCv2)",
+            ha="center", va="center",
+            fontsize=11, color=GRAY_MD, style="italic")
+    _arrow(ax, 36, y_top + box_h / 2, 41, y_top + box_h / 2, color=NAVY, lw=2.2)
 
-    _arrow(ax, 28, 47, 33, 47)
+    # Vetor z (10-dim)
+    _box(ax, 41, y_top, 18, box_h, "",
+         fc=WHITE, ec=NAVY, fs=14, fw="bold", lw=1.5)
+    ax.text(50, y_top + box_h / 2 + 1.4,
+            "Vetor  z  ∈  ℝ¹⁰",
+            ha="center", va="center",
+            fontsize=15, fontweight="bold", color=NAVY)
+    ax.text(50, y_top + box_h / 2 - 1.6,
+            "softmax sobre os 10 tons Monk",
+            ha="center", va="center",
+            fontsize=11, color=GRAY_MD, style="italic")
+    _arrow(ax, 59, y_top + box_h / 2, 64, y_top + box_h / 2, color=NAVY, lw=2.2)
 
-    # Vetor z (com bargraph mini)
-    _box(ax, 33, 44, 11, 6, "", fc=WHITE, ec=NAVY, fs=10)
-    ax.text(38.5, 49, "Vetor z (MST)", ha="center", va="center", fontsize=9, fontweight="bold", color=NAVY)
-    # Mini histograma representando o vetor MST 10-dim
-    bar_x = [34, 35, 36, 37, 38, 39, 40, 41, 42, 43]
-    bar_h = [0.4, 0.7, 1.2, 1.5, 1.0, 0.6, 0.3, 0.2, 0.15, 0.1]
-    for bx, bh in zip(bar_x, bar_h):
-        ax.add_patch(mpatches.Rectangle((bx + 0.05, 44.7), 0.55, bh, fc=NAVY, ec=None))
-    _label(ax, 38.5, 44.3, "MST 1...........10", fs=7, italic=False, color=GRAY_MD)
+    # MLPs f_γ, f_β
+    _box(ax, 64, y_top, 22, box_h,
+         "MLPs   f_γ  ,   f_β\num par por estágio",
+         fc=WHITE, ec=ACCENT, fs=14, fw="bold", tc=ACCENT, lw=2.0)
+    ax.text(75, y_top + box_h + 1.2,
+            "≈ 380 k parâmetros  (≈ 1,3 % do backbone)",
+            ha="center", va="center",
+            fontsize=11, color=GRAY_MD, style="italic")
 
-    _arrow(ax, 44, 47, 49, 47)
+    # =========================================================
+    # LINHA INFERIOR — backbone ConvNeXt-T com 4 estágios + FiLM
+    # =========================================================
+    y_bb = 15
+    stage_w = 9.5
+    film_w = 7.5
+    gap = 0.7
+    channels = [96, 192, 384, 768]
 
-    # MLPs f_gamma e f_beta
-    _box(ax, 49, 47, 14, 4.5, "MLP  f_γ  (gera γ)", fc=GRAY_LT, ec=NAVY, fs=10)
-    _box(ax, 49, 42, 14, 4.5, "MLP  f_β  (gera β)", fc=GRAY_LT, ec=NAVY, fs=10)
-    _label(ax, 56, 52.2, "treináveis (~380k params total)", fs=8)
+    # Geometria dos 4 pares
+    total_w = 4 * stage_w + 4 * film_w + 7 * gap + 13
+    x0 = (100 - total_w) / 2 + 2.5
 
-    # Setas das MLPs para baixo (apontando para os blocos FiLM)
-    _arrow(ax, 56, 42, 56, 36, color=ACCENT, lw=2.0)
-    ax.text(57, 38.5, "γ, β", ha="left", va="center", fontsize=11,
-            fontweight="bold", color=ACCENT)
+    # ---------- Container "ConvNeXt-T backbone" ----------
+    container_x = x0 - 1.2
+    container_w = 4 * stage_w + 4 * film_w + 7 * gap + 2.4
+    container_y = y_bb - 2.0
+    container_h = 10.5
+    container = FancyBboxPatch(
+        (container_x, container_y), container_w, container_h,
+        boxstyle="round,pad=0.02,rounding_size=0.6",
+        fc=(0.96, 0.97, 0.99), ec=NAVY, lw=1.2,
+        linestyle=(0, (4, 3)),  # tracejado
+    )
+    ax.add_patch(container)
+    ax.text(container_x + container_w / 2, container_y + container_h - 1.0,
+            "ConvNeXt-T backbone   (4 estágios hierárquicos)",
+            ha="center", va="center",
+            fontsize=13, fontweight="bold", color=NAVY, style="italic")
 
-    # ====== Linha 3 (inferior) — ConvNeXt-T blocks com FiLM inserido ======
-    # ConvNeXt stage 1
-    _box(ax, 16, 27, 11, 6, "ConvNeXt-T\nEstágio 1\n96 canais", fc=GRAY_LT, ec=NAVY, fs=9)
-    _arrow(ax, 27, 30, 31, 30)
+    # Seta da imagem para o primeiro estágio (entra no container)
+    _arrow(ax, 7.5, y_top, 7.5, y_bb + 6, color=NAVY, lw=2.2)
+    _arrow(ax, 7.5, y_bb + 6, x0 - 0.5, y_bb + 3, color=NAVY, lw=2.2)
 
-    # FiLM block 1
-    _box(ax, 31, 26.5, 9, 7, "FiLM\nF' = γ ⊙ F + β", fc=NAVY, ec=NAVY, fs=10, fw="bold", tc=WHITE)
-    _arrow(ax, 40, 30, 44, 30)
+    cur_x = x0
+    film_centers_x = []
 
-    # ConvNeXt stage 2
-    _box(ax, 44, 27, 11, 6, "ConvNeXt-T\nEstágio 2\n192 canais", fc=GRAY_LT, ec=NAVY, fs=9)
-    _arrow(ax, 55, 30, 59, 30)
+    for i in range(4):
+        _box(ax, cur_x, y_bb, stage_w, 6,
+             f"Estágio {i + 1}\n{channels[i]} canais",
+             fc=GRAY_LT, ec=NAVY, fs=12, fw="bold")
+        _arrow(ax, cur_x + stage_w, y_bb + 3,
+               cur_x + stage_w + gap, y_bb + 3)
+        cur_x += stage_w + gap
 
-    # FiLM block 2
-    _box(ax, 59, 26.5, 9, 7, "FiLM\nF' = γ ⊙ F + β", fc=NAVY, ec=NAVY, fs=10, fw="bold", tc=WHITE)
-    _arrow(ax, 68, 30, 72, 30)
+        # FiLM i — só o rótulo
+        _box(ax, cur_x, y_bb - 0.5, film_w, 7,
+             f"FiLM {i + 1}",
+             fc=NAVY, ec=NAVY, fs=15, fw="bold", tc=WHITE)
+        film_centers_x.append(cur_x + film_w / 2)
+        cur_x += film_w
 
-    # Reticências indicando blocos 3 e 4
-    _box(ax, 72, 27, 11, 6, "... Estágios\n3 e 4 com FiLM\n(384, 768 ch)", fc=GRAY_LT, ec=NAVY, fs=9)
-    _arrow(ax, 83, 30, 87, 30)
+        if i < 3:
+            _arrow(ax, cur_x, y_bb + 3, cur_x + gap, y_bb + 3)
+            cur_x += gap
 
-    # Classifier head
-    _box(ax, 87, 26, 11, 8, "Classificador\n(7 raças)", fc=ACCENT, ec=ACCENT, fs=10, fw="bold", tc=WHITE)
+    # Seta para o classificador final (sai do container)
+    _arrow(ax, cur_x, y_bb + 3, cur_x + gap + 1.2, y_bb + 3)
+    cur_x += gap + 1.2
 
-    # ====== Saída final ======
-    _arrow(ax, 92.5, 26, 92.5, 21, color=ACCENT)
-    ax.text(92.5, 19.5, "Predição de raça\n(W, B, Ind, EA, SEA, ME, Lat)",
-            ha="center", va="center", fontsize=9, color=GRAY_DK, fontweight="bold")
+    _box(ax, cur_x, y_bb - 0.5, 11, 7,
+         "Classificador\n7 raças",
+         fc=ACCENT, ec=ACCENT, fs=13, fw="bold", tc=WHITE)
+    class_center = cur_x + 5.5
 
-    # ====== Segunda seta para o segundo bloco FiLM ======
-    # γ, β também alimentam o FiLM 2 (linha curva implícita)
-    _arrow(ax, 56, 42, 63.5, 33.5, color=ACCENT, lw=1.2, style="-|>")
-    _arrow(ax, 56, 42, 77.5, 33.5, color=ACCENT, lw=1.2, style="-|>")
+    _arrow(ax, class_center, y_bb - 0.5, class_center, y_bb - 4, color=ACCENT)
+    ax.text(class_center, y_bb - 5.5,
+            "Predição de raça",
+            ha="center", va="center",
+            fontsize=12, fontweight="bold", color=GRAY_DK)
 
-    # ====== Legenda de cores no rodapé ======
-    legend_y = 8
+    # =========================================================
+    # BARRAMENTO de (γᵢ, βᵢ) — uma linha horizontal + 4 quedas curtas
+    # =========================================================
+    # Sai do bloco MLPs (bordo inferior) para o barramento
+    mlp_out_x = 75
+    mlp_out_y = y_top
+
+    bus_y = 30  # altura do barramento (linha horizontal comum)
+
+    # Descida da MLP até o barramento
+    _arrow(ax, mlp_out_x, mlp_out_y, mlp_out_x, bus_y + 0.4,
+           color=ACCENT, lw=2.0)
+
+    # Linha horizontal do barramento indo até o primeiro FiLM (esquerda)
+    # e até o último FiLM (direita)
+    bus_left = film_centers_x[0]
+    bus_right = film_centers_x[-1]
+    bus_start = min(bus_left, mlp_out_x)
+    bus_end = max(bus_right, mlp_out_x)
+    ax.add_patch(mpatches.Rectangle(
+        (bus_start, bus_y - 0.15), bus_end - bus_start, 0.3,
+        fc=ACCENT, ec=ACCENT))
+
+    # Quedas curtas do barramento até cada FiLM
+    for fx in film_centers_x:
+        _arrow(ax, fx, bus_y, fx, y_bb + 6.5,
+               color=ACCENT, lw=1.6, style="-|>", ms=14)
+
+    # Rótulo (γᵢ, βᵢ) acima do barramento, alinhado à esquerda
+    ax.text(bus_start - 0.5, bus_y + 1.4,
+            "(γᵢ , βᵢ)  ·  i = 1, 2, 3, 4",
+            ha="left", va="center",
+            fontsize=13, fontweight="bold",
+            color=ACCENT, style="italic")
+
+    # =========================================================
+    # RODAPÉ — equação canônica + legenda
+    # =========================================================
+    # Caixa da equação (esquerda)
+    _box(ax, 4, 4, 44, 6, "",
+         fc=WHITE, ec=NAVY, lw=1.8)
+    ax.text(26, 7.8,
+            "Equação canônica  (Perez et al., 2018)",
+            ha="center", va="center",
+            fontsize=12, fontweight="bold", color=NAVY)
+    ax.text(26, 5.3,
+            "F′  =  γ  ⊙  F  +  β",
+            ha="center", va="center",
+            fontsize=20, fontweight="bold", color=ACCENT, style="italic")
+
+    # Legenda de cores (direita)
     legend_items = [
-        (GREEN, "Pré-treinado, congelado (SkinToneNet)"),
-        (NAVY, "Treinável end-to-end (ConvNeXt-T)"),
-        (ACCENT, "Camadas novas (MLPs FiLM, ~1% dos params)"),
+        (GREEN, "Congelado  (Classificador MST)"),
+        (NAVY,  "Treinado end-to-end  (backbone + FiLM)"),
+        (ACCENT, "Camadas novas  (~1,3 % dos params)"),
     ]
+    legend_x = 55
     for i, (color, text) in enumerate(legend_items):
-        x_leg = 5 + i * 30
-        ax.add_patch(mpatches.Rectangle((x_leg, legend_y), 2, 1.5, fc=color, ec=color))
-        ax.text(x_leg + 3, legend_y + 0.75, text, ha="left", va="center", fontsize=9, color=GRAY_DK)
-
-    # ====== Caixa explicativa "Em palavras simples" ======
-    _box(ax, 3, 1.5, 94, 4.5, "", fc=GRAY_LT, ec=NAVY, lw=1.0)
-    ax.text(50, 4.5, "Em palavras simples",
-            ha="center", va="center", fontsize=10, fontweight="bold", color=NAVY)
-    ax.text(50, 2.7,
-            "A rede de raça 'consulta' o tom de pele antes de decidir. Cada bloco FiLM recebe (γ, β) gerados a partir do vetor MST "
-            "e ajusta as features intermediárias da rede — sem trocar o backbone.",
-            ha="center", va="center", fontsize=9, color=GRAY_DK, style="italic")
+        y_leg = 8.5 - i * 1.9
+        ax.add_patch(mpatches.Rectangle(
+            (legend_x, y_leg), 2.5, 1.2, fc=color, ec=color))
+        ax.text(legend_x + 3.5, y_leg + 0.6, text,
+                ha="left", va="center",
+                fontsize=11, color=GRAY_DK)
 
     plt.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -171,6 +252,12 @@ def build_figure(out_path: Path) -> None:
 def main() -> None:
     out = Path(__file__).resolve().parent / "imagens" / "film_pipeline.png"
     build_figure(out)
+    dest = (Path(__file__).resolve().parents[2]
+            / "docs" / "tese" / "images" / "film_pipeline.png")
+    if dest.parent.exists():
+        import shutil
+        shutil.copy2(out, dest)
+        print(f"Copiado para: {dest}")
 
 
 if __name__ == "__main__":

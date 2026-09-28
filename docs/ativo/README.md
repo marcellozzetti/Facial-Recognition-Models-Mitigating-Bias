@@ -1,7 +1,7 @@
 # docs/ativo/ — materiais em uso ativo
 
 > Diretório de trabalho corrente. Contém o essencial para (a) a defesa
-> da qualificação em **30/09/2026** e (b) a execução das Etapas 1–6 do
+> da qualificação em **05/10/2026** e (b) a execução das Etapas 1–6 do
 > pipeline. Materiais concluídos, reuniões passadas e emails já
 > enviados foram arquivados em `docs/historico/` ou removidos.
 >
@@ -53,7 +53,7 @@ Documentos consolidados de rodadas anteriores mantidos como âncora.
 | `mestrado_architecture.md` | Mapa de código × Etapas do Cap 4 |
 | `etapa1_report.md` | Relatório operacional da Etapa 1 |
 
-## 6. Material da qualificação — próxima entrega (30/09/2026)
+## 6. Material da qualificação — próxima entrega (05/10/2026)
 
 | Arquivo | Uso |
 |---|---|

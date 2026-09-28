@@ -1,4 +1,4 @@
-"""Gera apresentação PowerPoint da defesa da qualificação (30/09/2026).
+"""Gera apresentação PowerPoint da defesa da qualificação (05/10/2026).
 
 29 slides, formato 16:9, ~15-20 min de fala.
 Linguagem clara, sem jargão desnecessário, com referências acadêmicas
@@ -37,7 +37,7 @@ Estrutura:
 
 Uso:
     python docs/ativo/_gerar_apresentacao_qualificacao_2026-09.py
-    -> produz: docs/ativo/material_qualificacao_2026-09-30.pptx
+    -> produz: docs/ativo/material_qualificacao_2026-10-05.pptx
 """
 
 from __future__ import annotations
@@ -62,7 +62,7 @@ GREEN = RGBColor(0x2E, 0x7D, 0x32)
 AMBER = RGBColor(0xF5, 0xB7, 0x00)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 
-QUALIFICACAO = date(2026, 9, 30)
+QUALIFICACAO = date(2026, 10, 5)
 TOTAL_SLIDES = 29
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -219,7 +219,7 @@ def add_image_slide(
         cap = slide.shapes.add_textbox(Inches(0.5), Inches(6.55), Inches(12.5), Inches(0.4))
         p = cap.text_frame.paragraphs[0]
         p.text = caption
-        p.font.size = Pt(13)
+        p.font.size = Pt(14)
         p.font.italic = True
         p.font.color.rgb = GRAY_MD
         p.alignment = 2
@@ -448,7 +448,7 @@ def slide_motivacao_contexto(prs: Presentation) -> None:
         tx = slide.shapes.add_textbox(Inches(x), Inches(top_y + 0.25), Inches(box_w), Inches(0.4))
         p = tx.text_frame.paragraphs[0]
         p.text = kicker.upper()
-        p.font.size = Pt(11)
+        p.font.size = Pt(13)
         p.font.bold = True
         p.font.color.rgb = ACCENT
         p.alignment = 2
@@ -502,12 +502,12 @@ def slide_motivacao_contexto(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = head + " "
-        r1.font.size = Pt(15)
+        r1.font.size = Pt(16)
         r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(15)
+        r2.font.size = Pt(16)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(7)
 
@@ -563,10 +563,10 @@ def slide_motivacao_regulacao(prs: Presentation) -> None:
         node.line.color.rgb = WHITE
 
         # ano acima do nó
-        tx = slide.shapes.add_textbox(Inches(cx - 0.75), Inches(line_y - 1.0), Inches(1.5), Inches(0.5))
+        tx = slide.shapes.add_textbox(Inches(cx - 0.75), Inches(line_y - 1.1), Inches(1.5), Inches(0.5))
         p = tx.text_frame.paragraphs[0]
         p.text = year
-        p.font.size = Pt(20)
+        p.font.size = Pt(22)
         p.font.bold = True
         p.font.color.rgb = ACCENT if highlight else NAVY
         p.alignment = 2
@@ -575,18 +575,18 @@ def slide_motivacao_regulacao(prs: Presentation) -> None:
         tx = slide.shapes.add_textbox(Inches(cx - 1.35), Inches(line_y + 0.5), Inches(2.7), Inches(0.5))
         p = tx.text_frame.paragraphs[0]
         p.text = title
-        p.font.size = Pt(14)
+        p.font.size = Pt(16)
         p.font.bold = True
         p.font.color.rgb = NAVY
         p.alignment = 2
 
         # corpo abaixo
-        tx = slide.shapes.add_textbox(Inches(cx - 1.4), Inches(line_y + 1.05), Inches(2.8), Inches(2.0))
+        tx = slide.shapes.add_textbox(Inches(cx - 1.5), Inches(line_y + 1.15), Inches(3.0), Inches(2.4))
         tf = tx.text_frame
         tf.word_wrap = True
         p = tf.paragraphs[0]
         p.text = body
-        p.font.size = Pt(11)
+        p.font.size = Pt(13)
         p.font.color.rgb = GRAY_DK
         p.alignment = 2
 
@@ -656,7 +656,7 @@ def slide_problema_heterogeneidade(prs: Presentation) -> None:
     cap = slide.shapes.add_textbox(Inches(0.5), Inches(6.4), Inches(6.2), Inches(0.4))
     p = cap.text_frame.paragraphs[0]
     p.text = "Fitzpatrick (esq., 6 tons) × Monk (dir., 10 tons)."
-    p.font.size = Pt(10)
+    p.font.size = Pt(12)
     p.font.italic = True
     p.font.color.rgb = GRAY_MD
     p.alignment = 2
@@ -717,7 +717,7 @@ def slide_problema_refutacao(prs: Presentation) -> None:
     tx = slide.shapes.add_textbox(Inches(start_x), Inches(top_y + 0.06), Inches(col_w), Inches(0.5))
     p = tx.text_frame.paragraphs[0]
     p.text = "A CRÍTICA DA LITERATURA"
-    p.font.size = Pt(13)
+    p.font.size = Pt(15)
     p.font.bold = True
     p.font.color.rgb = WHITE
     p.alignment = 2
@@ -748,12 +748,12 @@ def slide_problema_refutacao(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = head + "  "
-        r1.font.size = Pt(14)
+        r1.font.size = Pt(16)
         r1.font.bold = True
         r1.font.color.rgb = ACCENT
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(14)
+        r2.font.size = Pt(16)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(8)
 
@@ -769,7 +769,7 @@ def slide_problema_refutacao(prs: Presentation) -> None:
     tx = slide.shapes.add_textbox(Inches(x2), Inches(top_y + 0.06), Inches(col_w), Inches(0.5))
     p = tx.text_frame.paragraphs[0]
     p.text = "NOSSA POSIÇÃO"
-    p.font.size = Pt(13)
+    p.font.size = Pt(15)
     p.font.bold = True
     p.font.color.rgb = WHITE
     p.alignment = 2
@@ -789,25 +789,23 @@ def slide_problema_refutacao(prs: Presentation) -> None:
     tf = tx.text_frame
     tf.word_wrap = True
     respostas = [
-        ("Tom de pele COMPLEMENTA, não substitui a raça:",
-         "usamos MST como sinal de contexto que ajuda a rede — o rótulo racial continua sendo o alvo de predição."),
+        ("Tom de pele COMPLEMENTA a raça:",
+         "usamos MST como contexto — o rótulo racial continua sendo o alvo de predição."),
         ("Incorporamos a crítica formalmente:",
-         "H6 testa diretamente a tese de Pangelinan (≥ 70 % da variância do erro explicada por pixel information)."),
-        ("Controle explícito de pixel information (Etapa 5):",
-         "avaliamos com e sem esse confounder — se a crítica vencer, a refutação vira contribuição quantitativa."),
-        ("Ganho esperado se a nossa tese estiver certa:",
-         "redução de disparidade + explicação estrutural de quanto do erro é irredutível vs mitigável."),
+         "H6 testa diretamente a tese de Pangelinan (R² ≥ 70 % explicado por pixel information)."),
+        ("Refutação vira contribuição:",
+         "se a crítica vencer, entregamos decomposição quantitativa do erro — resultado científico válido."),
     ]
     for i, (head, body) in enumerate(respostas):
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = head + "  "
-        r1.font.size = Pt(14)
+        r1.font.size = Pt(16)
         r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(14)
+        r2.font.size = Pt(16)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(6)
 
@@ -894,7 +892,7 @@ def slide_hipoteses(prs: Presentation) -> None:
             ["H6", "Parte substancial do gap é explicada por pixel information (Pangelinan 2023).", "R² explicado ≥ 70 %"],
         ],
         col_widths=[0.7, 7.5, 4.3],
-        font_size=13,
+        font_size=15,
     )
 
 
@@ -928,7 +926,7 @@ def slide_revisao_mitigacao(prs: Presentation) -> None:
             ["ConvNeXt-T puro", "Liu et al. (2022)", "Controle arquitetural moderno — efeito da rede base sem condicionamento."],
         ],
         col_widths=[3.0, 3.0, 6.5],
-        font_size=13,
+        font_size=15,
     )
 
 
@@ -961,7 +959,7 @@ def slide_revisao_lacunas(prs: Presentation) -> None:
             ["L5", "Não há decomposição quantitativa do gap Latinx (fenótipo × algoritmo).", "Etapa 6 — Contribuição 6."],
         ],
         col_widths=[0.6, 6.5, 5.4],
-        font_size=13,
+        font_size=15,
     )
 
 
@@ -995,70 +993,38 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
 # SLIDE 18 — Por que ConvNeXt-T (justificativa vs ResNet e vs ViT)
 # ============================================================
 def slide_por_que_convnext(prs: Presentation) -> None:
-    add_table_slide(
-        prs, 18,
-        "Por que ConvNeXt-T (Liu et al., 2022) e não ResNet ou ViT?",
-        ["Critério", "ResNet-34 (Kärkkäinen 2021)", "ViT-B (Swin, DeiT)", "ConvNeXt-T (adotado)"],
-        [
-            [
-                "Desempenho ImageNet",
-                "76 % top-1 — 5 anos atrás",
-                "81–83 % top-1 — SOTA moderno",
-                "82 % top-1 — paridade com ViT a custo convolucional",
-            ],
-            [
-                "Estabilidade em fine-tuning",
-                "BatchNorm — sensível a batch pequeno",
-                "Boa, mas exige mais dados",
-                "LayerNorm — robusto a variação de batch (importante p/ 3 sementes)",
-            ],
-            [
-                "Compatibilidade com FiLM",
-                "4 estágios naturais",
-                "Estrutura por tokens — inserção não trivial",
-                "4 estágios hierárquicos — inserção direta após bloco principal",
-            ],
-            [
-                "Comparabilidade científica",
-                "É o baseline canônico de fairness facial (FairFace)",
-                "Sem baseline consolidado em fairness facial",
-                "Controle arquitetural moderno vs ResNet — isola efeito do FiLM",
-            ],
-            [
-                "Custo computacional",
-                "22 M params",
-                "86 M params (ViT-B)",
-                "28 M params — leve, viabiliza 3 sementes × 3 configs em GPU comum",
-            ],
-        ],
-        col_widths=[2.2, 3.0, 3.0, 4.3],
-        highlight_rows=[],
-        font_size=12,
-    )
+    add_bullets(prs, 18, "Por que ConvNeXt-T (Liu et al., 2022)?", [
+        ("Paridade com ViTs a custo convolucional:",
+         "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos params."),
+        ("Estável em fine-tuning:",
+         "LayerNorm (não BatchNorm) — robusto a batch pequeno, essencial para 3 sementes."),
+        ("Inserção natural de FiLM:",
+         "4 estágios hierárquicos oferecem 4 pontos de inserção sem modificar blocos internos."),
+        ("Comparável ao baseline canônico:",
+         "ResNet-34 do FairFace serve como âncora — ConvNeXt-T isola o efeito do condicionamento."),
+        ("Viável computacionalmente:",
+         "28 M params permitem 3 sementes × 3 configs em GPU comum (~300 h total)."),
+    ])
 
 
 # ============================================================
 # SLIDE 19 — Por que FiLM (comparação com 7 alternativas de conditioning)
 # ============================================================
 def slide_por_que_film(prs: Presentation) -> None:
-    add_table_slide(
-        prs, 19,
-        "Por que FiLM (Perez et al., 2018) e não outras técnicas de condicionamento?",
-        ["Alternativa avaliada", "Referência / origem", "Por que descartada"],
-        [
-            ["Concatenação direta MST → features", "Prática comum", "Explosão paramétrica e diluição do sinal — sem modulação explícita."],
-            ["Conditional Batch Normalization", "Anterior a FiLM", "Caso particular do FiLM — generalizado por Perez et al. (2018)."],
-            ["Cross-attention", "Transformer decoders", "Superdimensionado para sinal 10-dim — ~3× o custo de FiLM sem ganho."],
-            ["AdaIN", "Style transfer", "Projetado p/ transferência de estilo — incompatível com sinal demográfico."],
-            ["SPADE", "Síntese de imagens", "Requer mapa espacial denso — incompatível com vetor MST global."],
-            ["HyperNetworks", "Meta-aprendizagem", "Instabilidade documentada — sobredimensionado para nosso porte."],
-            ["LoRA / Adaptadores", "Parameter-efficient fine-tuning", "Modifica pesos, não condiciona features — categoria distinta (trab. futuro)."],
-            ["FiLM (adotado)", "Perez et al. (2018)", "★ 10-dim ideal + ~1 % overhead + interpretabilidade γ,β + compatível com LayerNorm."],
-        ],
-        col_widths=[3.5, 3.0, 6.0],
-        highlight_rows=[7],
-        font_size=12,
-    )
+    add_bullets(prs, 19, "Por que FiLM (Perez et al., 2018)?", [
+        ("Adequação dimensional ao sinal MST:",
+         "sinal 10-dim casa naturalmente com γ, β — sem explosão paramétrica."),
+        ("Eficiência:",
+         "~380 k parâmetros (~1,3 % do backbone) — muito abaixo de cross-attention (~3×)."),
+        ("Interpretabilidade direta:",
+         "γ e β por canal permitem inspecionar como cada tom modula as features."),
+        ("Compatibilidade nativa:",
+         "opera bem com LayerNorm do ConvNeXt-T; init identidade preserva backbone."),
+        ("Lacuna documentada:",
+         "sem aplicação prévia em fairness facial multi-classe — Contribuição 3 desta pesquisa."),
+        ("Descartadas com justificativa formal (Cap 2):",
+         "Concatenação, CBN, Cross-attention, AdaIN, SPADE, HyperNetworks, LoRA/Adaptadores."),
+    ])
 
 
 # ============================================================
@@ -1147,20 +1113,18 @@ def slide_cronograma(prs: Presentation) -> None:
         "Cronograma",
         ["Período", "Etapa", "Entrega"],
         [
-            ["Ago/2026 (hoje)", "Preparação adiantada", "Código das Etapas 1 e 2 pronto e testado."],
-            ["Set/2026", "QUALIFICAÇÃO", "Marco atual."],
+            ["Ago–Set/2026", "Preparação adiantada", "Código das 6 etapas pronto (120 testes passando)."],
+            ["05/10/2026", "QUALIFICAÇÃO", "Marco atual."],
             ["Out/2026", "Aplicar sugestões da banca", "Ajustes de texto e escopo."],
-            ["Nov/2026", "Etapa 1 formal", "Treinar classificador MST + validação humana."],
-            ["Dez/2026", "Etapa 2", "Matriz pública MST × raça."],
-            ["Jan–Mar/2027", "Etapa 3", "Ablation 3 configurações FiLM."],
-            ["Abr/2027", "Etapa 4", "Comparação vs 6 baselines."],
-            ["Mai/2027", "Etapa 5", "Transferência RFW/BFW."],
+            ["Nov–Dez/2026", "Etapas 1 e 2 formais", "Treino MST + matriz pública MST × raça."],
+            ["Jan–Mar/2027", "Etapa 3 (ablation)", "3 configurações A/B/C do FiLM."],
+            ["Abr–Mai/2027", "Etapas 4 e 5", "6 baselines + transferência RFW/BFW."],
             ["Jun/2027", "Etapa 6", "Síntese decompositiva."],
             ["2º sem 2027", "Redação final + DEFESA", "Encerramento."],
         ],
-        col_widths=[2.5, 3.0, 7.0],
-        highlight_rows=[0, 1, 9],
-        font_size=13,
+        col_widths=[2.5, 3.5, 6.5],
+        highlight_rows=[0, 1, 7],
+        font_size=16,
     )
 
 
@@ -1232,15 +1196,15 @@ def slide_estado_atual(prs: Presentation) -> None:
         tf.word_wrap = True
         p = tf.paragraphs[0]
         p.text = small
-        p.font.size = Pt(10)
+        p.font.size = Pt(12)
         p.font.italic = True
         p.font.color.rgb = BLUE_LIGHT if i == 0 else GRAY_MD
         p.alignment = 2
 
     subtitle = slide.shapes.add_textbox(Inches(0.5), Inches(4.2), Inches(12.5), Inches(0.4))
     p = subtitle.text_frame.paragraphs[0]
-    p.text = "Entregas concretas até 30/08/2026"
-    p.font.size = Pt(14)
+    p.text = "Entregas concretas até 28/09/2026"
+    p.font.size = Pt(16)
     p.font.bold = True
     p.font.color.rgb = NAVY
 
@@ -1257,12 +1221,12 @@ def slide_estado_atual(prs: Presentation) -> None:
         p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = "•  " + head + "  "
-        r1.font.size = Pt(15)
+        r1.font.size = Pt(16)
         r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = body
-        r2.font.size = Pt(15)
+        r2.font.size = Pt(16)
         r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(6)
 
@@ -1363,7 +1327,7 @@ def build_presentation() -> Presentation:
 def main() -> None:
     prs = build_presentation()
     out_dir = Path(__file__).parent
-    out = out_dir / "material_qualificacao_2026-09-30.pptx"
+    out = out_dir / "material_qualificacao_2026-10-05.pptx"
     prs.save(out)
     print(f"OK: {out}")
     print(f"Total slides: {len(prs.slides)}")

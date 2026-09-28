@@ -249,57 +249,102 @@ def gerar_fig_pipeline():
 
 
 # ============================================================
-# FIGURA 4 - 4 configuracoes A/B/C/D (Cap 4)
+# FIGURA 4 - 3 configuracoes A/B/C do estudo de ablation (Cap 4)
 # ============================================================
 def gerar_fig_configs():
-    """4 blocos comparativos com destaque da Config B."""
-    fig, ax = plt.subplots(figsize=(12, 4), dpi=DPI)
+    """3 blocos comparativos do ablation arquitetural, com destaque da Config B.
+
+    Após a reunião com o orientador (Ago/2026), a antiga Config C
+    (Gated FiLM) foi consolidada como variante interna da Config B
+    e a antiga Config D (FiLM CLIP-text) passou a ser a Config C.
+    Nome do arquivo mantido (fig_configs_abcd.png) para não quebrar
+    a referência no LaTeX (metodologia.tex).
+    """
+    fig, ax = plt.subplots(figsize=(12, 4.8), dpi=DPI)
     ax.set_xlim(0, 13)
-    ax.set_ylim(0, 5)
+    ax.set_ylim(0, 6.0)
     ax.axis("off")
 
     configs = [
-        {"x": 0.3, "id": "A", "titulo": "Baseline", "corpo": "ConvNeXt-T",
-         "sinal": "sem conditioning", "destaque": False},
-        {"x": 3.5, "id": "B", "titulo": "FiLM linear", "corpo": "ConvNeXt-T + FiLM",
-         "sinal": "MST 10-dim", "destaque": True},
-        {"x": 6.7, "id": "C", "titulo": "Gated FiLM", "corpo": "ConvNeXt-T + Gated FiLM",
-         "sinal": "MST 10-dim", "destaque": False},
-        {"x": 9.9, "id": "D", "titulo": "FiLM CLIP", "corpo": "ConvNeXt-T + FiLM",
-         "sinal": "CLIP-text 512-dim", "destaque": False},
+        {
+            "x": 0.7,
+            "id": "A",
+            "titulo": "Baseline",
+            "corpo": "ConvNeXt-T",
+            "sinal": "sem condicionamento",
+            "destaque": False,
+        },
+        {
+            "x": 4.7,
+            "id": "B",
+            "titulo": "FiLM  (MST direto)",
+            "corpo": "ConvNeXt-T + FiLM",
+            "sinal": "vetor MST 10-dim",
+            "destaque": True,
+        },
+        {
+            "x": 8.7,
+            "id": "C",
+            "titulo": "FiLM  (CLIP-text)",
+            "corpo": "ConvNeXt-T + FiLM",
+            "sinal": "embedding CLIP-text 512-dim",
+            "destaque": False,
+        },
     ]
 
-    dx, dy = 2.9, 2.5
+    dx, dy = 3.6, 2.6
+
+    box_bottom = 1.6
+    box_top = box_bottom + dy
 
     for c in configs:
         face = BLUE_MID if c["destaque"] else BLUE_LIGHT
-        text_color = "white" if c["destaque"] else NAVY
-        sub_color = "white" if c["destaque"] else GRAY_DK
-        lw = 2.0 if c["destaque"] else 1.2
+        body_color = "white" if c["destaque"] else NAVY
+        lw = 2.2 if c["destaque"] else 1.2
 
-        # Cabecalho (ID + titulo)
-        ax.text(c["x"] + dx / 2, dy + 0.4,
-                f"{c['id']} — {c['titulo']}",
-                ha="center", va="center", fontsize=11, fontweight="bold", color=NAVY)
+        # Cabeçalho — sempre acima da caixa, em fundo branco
+        ax.text(
+            c["x"] + dx / 2, box_top + 0.95,
+            f"Configuração {c['id']}",
+            ha="center", va="center",
+            fontsize=14, fontweight="bold", color=NAVY,
+        )
+        ax.text(
+            c["x"] + dx / 2, box_top + 0.4,
+            c["titulo"],
+            ha="center", va="center",
+            fontsize=11, color=GRAY_DK, style="italic",
+        )
 
         # Caixa principal
         box = FancyBboxPatch(
-            (c["x"], 1.2), dx, dy,
+            (c["x"], box_bottom), dx, dy,
             boxstyle="round,pad=0.05",
-            linewidth=lw, edgecolor=NAVY if c["destaque"] else GRAY_DK, facecolor=face,
+            linewidth=lw,
+            edgecolor=NAVY if c["destaque"] else GRAY_DK,
+            facecolor=face,
         )
         ax.add_patch(box)
-        ax.text(c["x"] + dx / 2, 1.2 + dy / 2, c["corpo"],
-                ha="center", va="center", fontsize=10, fontweight="bold", color=text_color)
+        ax.text(
+            c["x"] + dx / 2, box_bottom + dy / 2, c["corpo"],
+            ha="center", va="center",
+            fontsize=13, fontweight="bold", color=body_color,
+        )
 
-        # Sinal condicionante (label italico)
-        ax.text(c["x"] + dx / 2, 0.85, c["sinal"],
-                ha="center", va="center", fontsize=9, style="italic", color=sub_color)
+        # Sinal condicionante — sempre fora da caixa (abaixo), fundo branco
+        ax.text(
+            c["x"] + dx / 2, box_bottom - 0.5, c["sinal"],
+            ha="center", va="center",
+            fontsize=11, style="italic", color=GRAY_DK,
+        )
 
-    # Rodape com constantes do experimento
-    ax.text(6.5, 0.25,
-            "Dataset: FairFace  |  Protocolo: 3 sementes  |  Métricas: DR + F1 macro + worst-class F1 + EO",
-            ha="center", va="center", fontsize=8, style="italic", color=GRAY_MD)
+    # Marca "» proposta principal" sob a Config B
+    ax.text(
+        configs[1]["x"] + dx / 2, box_bottom - 1.2,
+        "» proposta principal",
+        ha="center", va="center",
+        fontsize=11, fontweight="bold", color=NAVY,
+    )
 
     plt.tight_layout()
     out = OUT_DIR / "fig_configs_abcd.png"
