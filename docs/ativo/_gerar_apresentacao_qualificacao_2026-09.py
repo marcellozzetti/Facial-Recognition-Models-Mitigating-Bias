@@ -1,38 +1,39 @@
 """Gera apresentação PowerPoint da defesa da qualificação (05/10/2026).
 
-28 slides, formato 16:9, ~20 min de fala.
+29 slides, formato 16:9, ~20 min de fala.
 Linguagem acadêmica formal, referências inline (Autor, ANO) e figuras
 integradas para tangibilizar o estado do trabalho.
 
 Estrutura:
     1  Capa (com logo UNIFESP)
-    2  Motivação — contexto sociotécnico
-    3  Motivação — regulação (European AI Act)
-    4  Problema — disparidade racial (figura)
-    5  Problema — heterogeneidade fenotípica (Latinx)
-    6  Problema — refutação Pangelinan
-    7  Objetivo geral
-    8  Objetivos específicos + hipóteses testáveis (consolidado)
-    9  Revisão — linha do tempo das mitigações
-    10 Revisão — baselines de mitigação
-    11 Revisão — lacunas identificadas
-    12 Pipeline experimental em 6 etapas (figura)
-    13 Evolução do pipeline — estado em 04/10/2026 (NOVO)
-    14 Etapa 1 — classificador MST (contexto + datasets)
-    15 Classificador MST — detalhe técnico do backend (NOVO)
-    16 Classificador MST — validação qualitativa (NOVO)
-    17 Classificador MST — distribuição MST × raça (NOVO)
-    18 Racional do backbone ConvNeXt-T
-    19 Racional do mecanismo FiLM
-    20 Mecanismo FiLM (figura)
-    21 Configurações do ablation (A, B, C)
-    22 Protocolo de validação — cenários e norma
-    23 Triangulação de métricas de equidade
-    24 Contribuições esperadas
-    25 Cronograma
-    26 Riscos e mitigações
-    27 Estado atual do trabalho
-    28 Obrigado / perguntas
+    2  Motivação acadêmica — origem Buolamwini (2016/2018/2023)
+    3  Motivação — contexto sociotécnico
+    4  Motivação — regulação (European AI Act)
+    5  Problema — disparidade racial (figura)
+    6  Problema — heterogeneidade fenotípica (Latinx)
+    7  Problema — refutação Pangelinan
+    8  Objetivo geral
+    9  Objetivos específicos + hipóteses testáveis (consolidado)
+    10 Revisão — linha do tempo das mitigações
+    11 Revisão — baselines de mitigação
+    12 Revisão — lacunas identificadas
+    13 Pipeline experimental em 6 etapas (figura)
+    14 Evolução do pipeline — estado em 04/10/2026
+    15 Etapa 1 — classificador MST (contexto + datasets)
+    16 Classificador MST — detalhe técnico do backend
+    17 Classificador MST — validação qualitativa (grade)
+    18 Classificador MST — distribuição MST × raça (heatmap)
+    19 Racional do backbone ConvNeXt-T
+    20 Racional do mecanismo FiLM
+    21 Mecanismo FiLM (figura)
+    22 Configurações do ablation (A, B, C)
+    23 Protocolo de validação — cenários e norma
+    24 Triangulação de métricas de equidade
+    25 Contribuições esperadas
+    26 Cronograma
+    27 Riscos e mitigações
+    28 Estado atual do trabalho
+    29 Obrigado / perguntas
 
 Uso:
     python docs/ativo/_gerar_apresentacao_qualificacao_2026-09.py
@@ -62,7 +63,7 @@ AMBER = RGBColor(0xF5, 0xB7, 0x00)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 
 QUALIFICACAO = date(2026, 10, 5)
-TOTAL_SLIDES = 28
+TOTAL_SLIDES = 29
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IMG_DIR = REPO_ROOT / "docs" / "tese" / "images"
@@ -416,6 +417,99 @@ def slide_agenda(prs: Presentation) -> None:
 
 
 # ============================================================
+# SLIDE 2 — Motivação acadêmica: origem do problema (Buolamwini, 2016/2018/2023)
+# ============================================================
+def slide_motivacao_academica(prs: Presentation) -> None:
+    """Slide de motivação acadêmica — âncora histórica da agenda de pesquisa.
+
+    Reescritura em registro acadêmico-formal do episódio relatado por
+    Buolamwini (2023, Unmasking AI), com encaminhamento à consolidação
+    científica em Gender Shades (Buolamwini & Gebru, 2018, PMLR).
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Motivação acadêmica: origem do problema de pesquisa")
+
+    # Barra lateral de citação (acento visual)
+    bar = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE,
+        Inches(0.5), Inches(1.55),
+        Inches(0.15), Inches(3.1),
+    )
+    bar.fill.solid()
+    bar.fill.fore_color.rgb = NAVY
+    bar.line.fill.background()
+
+    # Bloco da citação acadêmica (reescritura)
+    quote = slide.shapes.add_textbox(
+        Inches(0.95), Inches(1.60), Inches(11.9), Inches(2.6)
+    )
+    tf = quote.text_frame
+    tf.word_wrap = True
+    p = tf.paragraphs[0]
+    p.text = (
+        "Em 2016, durante projeto acadêmico no MIT Media Lab, a então mestranda "
+        "Joy Buolamwini constatou que sistemas comerciais de análise facial "
+        "falhavam em detectar seu próprio rosto, enquanto detectavam, sem falha, "
+        "interlocutores fenotipicamente mais claros. A conclusão do projeto "
+        "exigiu o uso de uma máscara branca para que a face fosse reconhecida — "
+        "episódio que converteu uma observação pessoal em programa de pesquisa."
+    )
+    p.font.size = Pt(17)
+    p.font.italic = True
+    p.font.color.rgb = NAVY
+
+    attr = slide.shapes.add_textbox(
+        Inches(0.95), Inches(4.25), Inches(11.9), Inches(0.4)
+    )
+    pa = attr.text_frame.paragraphs[0]
+    pa.text = (
+        "Reescritura acadêmica da narrativa relatada em "
+        "Unmasking AI: My Mission to Protect What Is Human in a World of Machines "
+        "(Buolamwini, 2023, W. W. Norton)."
+    )
+    pa.font.size = Pt(10)
+    pa.font.italic = True
+    pa.font.color.rgb = GRAY_MD
+    pa.alignment = 2
+
+    # Consequências acadêmicas (bullets)
+    cons = slide.shapes.add_textbox(
+        Inches(0.5), Inches(5.0), Inches(12.3), Inches(2.0)
+    )
+    tf = cons.text_frame
+    tf.word_wrap = True
+    bullets = [
+        (
+            "Consolidação científica:",
+            "a observação foi formalizada em Gender Shades (Buolamwini & Gebru, 2018, PMLR), "
+            "estudo seminal que quantificou disparidade de até 34,4 pontos percentuais em acurácia "
+            "entre homens de pele clara e mulheres de pele escura em três APIs comerciais de análise facial.",
+        ),
+        (
+            "Herança científica desta pesquisa:",
+            "inscreve-se formalmente na mesma agenda — dissociar o desempenho de classificadores "
+            "faciais do tom de pele —, deslocando a pergunta de \"existe viés?\" para "
+            "\"como mitigá-lo de forma defensável e auditável?\".",
+        ),
+    ]
+    for i, (head, body) in enumerate(bullets):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        r1 = p.add_run()
+        r1.text = head + "  "
+        r1.font.size = Pt(15)
+        r1.font.bold = True
+        r1.font.color.rgb = NAVY
+        r2 = p.add_run()
+        r2.text = body
+        r2.font.size = Pt(15)
+        r2.font.color.rgb = GRAY_DK
+        p.space_after = Pt(8)
+
+    add_footer(slide)
+    add_page_number(slide, 2)
+
+
+# ============================================================
 # SLIDE 3 — Motivação: contexto
 # ============================================================
 def slide_motivacao_contexto(prs: Presentation) -> None:
@@ -511,7 +605,7 @@ def slide_motivacao_contexto(prs: Presentation) -> None:
         p.space_after = Pt(7)
 
     add_footer(slide)
-    add_page_number(slide, 2)
+    add_page_number(slide, 3)
 
 
 # ============================================================
@@ -609,7 +703,7 @@ def slide_motivacao_regulacao(prs: Presentation) -> None:
     p.alignment = 2
 
     add_footer(slide)
-    add_page_number(slide, 3)
+    add_page_number(slide, 4)
 
 
 # ============================================================
@@ -617,7 +711,7 @@ def slide_motivacao_regulacao(prs: Presentation) -> None:
 # ============================================================
 def slide_problema_disparidade(prs: Presentation) -> None:
     add_image_slide(
-        prs, 4,
+        prs, 5,
         "Disparidade sistemática de aproximadamente 30 pontos percentuais entre grupos raciais",
         IMG_DIR / "fig_disparidade_racial.png",
         caption="FaceScanPaliGemma (AlDahoul et al., 2024) avaliado sobre o dataset FairFace (Kärkkäinen & Joo, 2021). Diferencial entre Black e Latinx: 30 pontos percentuais em F1.",
@@ -688,7 +782,7 @@ def slide_problema_heterogeneidade(prs: Presentation) -> None:
         p.space_after = Pt(10)
 
     add_footer(slide)
-    add_page_number(slide, 5)
+    add_page_number(slide, 6)
 
 
 # ============================================================
@@ -809,7 +903,7 @@ def slide_problema_refutacao(prs: Presentation) -> None:
         p.space_after = Pt(6)
 
     add_footer(slide)
-    add_page_number(slide, 6)
+    add_page_number(slide, 7)
 
 
 # ============================================================
@@ -849,7 +943,7 @@ def slide_objetivo_geral(prs: Presentation) -> None:
     p.font.italic = True
     p.font.color.rgb = GRAY_DK
     add_footer(slide)
-    add_page_number(slide, 7)
+    add_page_number(slide, 8)
 
 
 # ============================================================
@@ -960,7 +1054,7 @@ def slide_objetivos_hipoteses(prs: Presentation) -> None:
         p.space_after = Pt(8)
 
     add_footer(slide)
-    add_page_number(slide, 8)
+    add_page_number(slide, 9)
 
 
 # ============================================================
@@ -968,7 +1062,7 @@ def slide_objetivos_hipoteses(prs: Presentation) -> None:
 # ============================================================
 def slide_revisao_timeline(prs: Presentation) -> None:
     add_image_slide(
-        prs, 9,
+        prs, 10,
         "Linha do tempo das principais respostas ao problema (2018–2026)",
         IMG_DIR / "fig_timeline_mitigacoes.png",
         caption="Frentes cronológicas: dados balanceados → funções de perda → arquiteturas Pareto-eficientes → modelos vision-language → escalas MST → heterogeneidade fenotípica.",
@@ -981,7 +1075,7 @@ def slide_revisao_timeline(prs: Presentation) -> None:
 # ============================================================
 def slide_revisao_mitigacao(prs: Presentation) -> None:
     add_table_slide(
-        prs, 10,
+        prs, 11,
         "Baselines de mitigação para comparação sistemática",
         ["Método", "Referência", "Ideia central"],
         [
@@ -1015,7 +1109,7 @@ def slide_revisao_heterogeneidade(prs: Presentation) -> None:
 # ============================================================
 def slide_revisao_lacunas(prs: Presentation) -> None:
     add_table_slide(
-        prs, 11,
+        prs, 12,
         "Lacunas científicas identificadas na literatura",
         ["#", "Lacuna", "Como endereçamos"],
         [
@@ -1035,7 +1129,7 @@ def slide_revisao_lacunas(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_pipeline(prs: Presentation) -> None:
     add_image_slide(
-        prs, 12,
+        prs, 13,
         "Pipeline experimental em seis etapas",
         IMG_DIR / "fig_pipeline_6etapas.png",
         caption="Fluxo top-down organizado em três fases: diagnóstico (etapas 1 e 2), método proposto (etapa 3) e validação e síntese (etapas 4 a 6).",
@@ -1048,7 +1142,7 @@ def slide_metodologia_pipeline(prs: Presentation) -> None:
 # ============================================================
 def slide_evolucao_pipeline(prs: Presentation) -> None:
     add_image_slide(
-        prs, 13,
+        prs, 14,
         "Evolução do pipeline experimental — estado em 04/10/2026",
         IMG_DIR / "fig_pipeline_evolucao.png",
         caption=(
@@ -1063,7 +1157,7 @@ def slide_evolucao_pipeline(prs: Presentation) -> None:
 # SLIDE 14 — Metodologia: Etapa 1
 # ============================================================
 def slide_metodologia_etapa1(prs: Presentation) -> None:
-    add_bullets(prs, 14, "Etapa 1: classificador MST treinado internamente", [
+    add_bullets(prs, 15, "Etapa 1: classificador MST treinado internamente", [
         ("O que faz:", "produz, para cada imagem facial, o vetor softmax sobre os dez tons da escala Monk."),
         ("Decisão pós-reunião Ago/2026:", "adotar treinamento interno do classificador, reduzindo dependência do release do SkinToneNet (Matias, 2026), cujos pesos e dataset STW ainda não foram divulgados publicamente."),
         ("Datasets de treino:", "Monk Skin Tone Examples (Monk, 2019) e Casual Conversations v2 (Porgali et al., 2023)."),
@@ -1077,7 +1171,7 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
 # ============================================================
 def slide_mst_detalhe_tecnico(prs: Presentation) -> None:
     add_image_slide(
-        prs, 15,
+        prs, 16,
         "Classificador MST em validação: detalhe técnico do backend",
         IMG_DIR / "fig_mst_detalhe_tecnico.png",
         caption=(
@@ -1094,7 +1188,7 @@ def slide_mst_detalhe_tecnico(prs: Presentation) -> None:
 # ============================================================
 def slide_mst_validacao_faces(prs: Presentation) -> None:
     add_image_slide(
-        prs, 16,
+        prs, 17,
         "Classificador MST em validação: amostras FairFace val (qualitativo)",
         IMG_DIR / "fig_mst_demo_faces.png",
         caption=(
@@ -1111,7 +1205,7 @@ def slide_mst_validacao_faces(prs: Presentation) -> None:
 # ============================================================
 def slide_mst_validacao_distribuicao(prs: Presentation) -> None:
     add_image_slide(
-        prs, 17,
+        prs, 18,
         "Classificador MST em validação: distribuição MST × raça (quantitativo)",
         IMG_DIR / "fig_mst_demo_distribuicao.png",
         caption=(
@@ -1127,7 +1221,7 @@ def slide_mst_validacao_distribuicao(prs: Presentation) -> None:
 # SLIDE 18 — Por que ConvNeXt-T (justificativa vs ResNet e vs ViT)
 # ============================================================
 def slide_por_que_convnext(prs: Presentation) -> None:
-    add_bullets(prs, 18, "Racional da escolha do backbone: ConvNeXt-T (Liu et al., 2022)", [
+    add_bullets(prs, 19, "Racional da escolha do backbone: ConvNeXt-T (Liu et al., 2022)", [
         ("Paridade com ViTs a custo convolucional:",
          "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos params."),
         ("Estável em fine-tuning:",
@@ -1145,7 +1239,7 @@ def slide_por_que_convnext(prs: Presentation) -> None:
 # SLIDE 19 — Por que FiLM (comparação com 7 alternativas de conditioning)
 # ============================================================
 def slide_por_que_film(prs: Presentation) -> None:
-    add_bullets(prs, 19, "Racional do mecanismo de condicionamento: FiLM (Perez et al., 2018)", [
+    add_bullets(prs, 20, "Racional do mecanismo de condicionamento: FiLM (Perez et al., 2018)", [
         ("Adequação dimensional ao sinal MST:",
          "sinal 10-dim casa naturalmente com γ, β — sem explosão paramétrica."),
         ("Eficiência:",
@@ -1166,7 +1260,7 @@ def slide_por_que_film(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_film(prs: Presentation) -> None:
     add_image_slide(
-        prs, 20,
+        prs, 21,
         "Mecanismo FiLM: modulação de features condicionada ao tom de pele",
         IMG_DIR / "film_pipeline.png",
         caption="FiLM (Perez et al., 2018) modula as features intermediárias do ConvNeXt-T canal a canal, condicionadas ao vetor MST. Overhead paramétrico: aproximadamente 1,3 % do backbone.",
@@ -1179,7 +1273,7 @@ def slide_metodologia_film(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_configs(prs: Presentation) -> None:
     add_table_slide(
-        prs, 21,
+        prs, 22,
         "Configurações do estudo de ablation arquitetural",
         ["ID", "Configuração", "O que testa"],
         [
@@ -1197,7 +1291,7 @@ def slide_metodologia_configs(prs: Presentation) -> None:
 # SLIDE 20 — Baselines + Cenários
 # ============================================================
 def slide_baselines_cenarios(prs: Presentation) -> None:
-    add_bullets(prs, 22, "Protocolo de validação: cenários e norma", [
+    add_bullets(prs, 23, "Protocolo de validação: cenários e norma", [
         ("Cenário A — apenas raça:", "reporte estratificado por classe racial (sete classes do FairFace)."),
         ("Cenário B — raça × gênero:", "análise interseccional (oito subgrupos), conforme protocolo estabelecido por Gender Shades (Buolamwini & Gebru, 2018)."),
         ("Norma seguida:", "ISO/IEC 19795-10:2024, padrão internacional para reporte de desempenho biométrico estratificado entre grupos demográficos."),
@@ -1210,7 +1304,7 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
 # SLIDE 21 — Triangulação de métricas
 # ============================================================
 def slide_metricas(prs: Presentation) -> None:
-    add_bullets(prs, 23, "Triangulação de métricas de equidade", [
+    add_bullets(prs, 24, "Triangulação de métricas de equidade", [
         ("Por que triangular — Kleinberg et al. (2017):", "Teorema da Impossibilidade — demonstra a impossibilidade formal de satisfação simultânea de múltiplas definições de equidade quando as prevalências diferem entre grupos."),
         ("Disparity Ratio:", "razão entre F1 mínimo e máximo entre grupos; mensura a desigualdade de desempenho."),
         ("F1 da pior classe:", "protege o grupo sub-representado; evita ganhos concentrados apenas na média agregada."),
@@ -1225,7 +1319,7 @@ def slide_metricas(prs: Presentation) -> None:
 # ============================================================
 def slide_contribuicoes(prs: Presentation) -> None:
     add_table_slide(
-        prs, 24,
+        prs, 25,
         "Contribuições esperadas",
         ["Eixo", "Contribuições", "Foco"],
         [
@@ -1243,7 +1337,7 @@ def slide_contribuicoes(prs: Presentation) -> None:
 # ============================================================
 def slide_cronograma(prs: Presentation) -> None:
     add_table_slide(
-        prs, 25,
+        prs, 26,
         "Cronograma",
         ["Período", "Etapa", "Entrega"],
         [
@@ -1267,7 +1361,7 @@ def slide_cronograma(prs: Presentation) -> None:
 # ============================================================
 def slide_riscos(prs: Presentation) -> None:
     add_table_slide(
-        prs, 26,
+        prs, 27,
         "Riscos identificados e estratégias de mitigação",
         ["#", "Risco", "Mitigação"],
         [
@@ -1365,7 +1459,7 @@ def slide_estado_atual(prs: Presentation) -> None:
         p.space_after = Pt(6)
 
     add_footer(slide)
-    add_page_number(slide, 27)
+    add_page_number(slide, 28)
 
 
 # ============================================================
@@ -1425,37 +1519,38 @@ def build_presentation() -> Presentation:
     prs.slide_width = Inches(13.33)
     prs.slide_height = Inches(7.5)
 
-    # 28 slides (era 24): adicionados 4 slides em torno da Etapa 1 com
-    # evidencia empirica — estado do pipeline, detalhe tecnico do classificador
-    # MST em validacao, e dois slides de validacao preliminar sobre FairFace.
+    # 29 slides (era 28): adicionada ancora academica de motivacao em slide 2
+    # — reescritura formal do episodio Buolamwini (MIT Media Lab, 2016),
+    # consolidado em Gender Shades (2018) e Unmasking AI (2023).
     slide_capa(prs)                           # 1
-    slide_motivacao_contexto(prs)             # 2
-    slide_motivacao_regulacao(prs)            # 3
-    slide_problema_disparidade(prs)           # 4
-    slide_problema_heterogeneidade(prs)       # 5
-    slide_problema_refutacao(prs)             # 6
-    slide_objetivo_geral(prs)                 # 7
-    slide_objetivos_hipoteses(prs)            # 8   [CONSOLIDADO]
-    slide_revisao_timeline(prs)               # 9
-    slide_revisao_mitigacao(prs)              # 10
-    slide_revisao_lacunas(prs)                # 11
-    slide_metodologia_pipeline(prs)           # 12
-    slide_evolucao_pipeline(prs)              # 13  [NOVO — status das 6 etapas]
-    slide_metodologia_etapa1(prs)             # 14
-    slide_mst_detalhe_tecnico(prs)            # 15  [NOVO — pipeline interno MST]
-    slide_mst_validacao_faces(prs)            # 16  [NOVO — evidencia visual]
-    slide_mst_validacao_distribuicao(prs)     # 17  [NOVO — heatmap MST x raca]
-    slide_por_que_convnext(prs)               # 18
-    slide_por_que_film(prs)                   # 19
-    slide_metodologia_film(prs)               # 20
-    slide_metodologia_configs(prs)            # 21
-    slide_baselines_cenarios(prs)             # 22
-    slide_metricas(prs)                       # 23
-    slide_contribuicoes(prs)                  # 24
-    slide_cronograma(prs)                     # 25
-    slide_riscos(prs)                         # 26
-    slide_estado_atual(prs)                   # 27
-    slide_perguntas(prs)                      # 28
+    slide_motivacao_academica(prs)            # 2   [NOVO — origem academica Buolamwini]
+    slide_motivacao_contexto(prs)             # 3
+    slide_motivacao_regulacao(prs)            # 4
+    slide_problema_disparidade(prs)           # 5
+    slide_problema_heterogeneidade(prs)       # 6
+    slide_problema_refutacao(prs)             # 7
+    slide_objetivo_geral(prs)                 # 8
+    slide_objetivos_hipoteses(prs)            # 9   [CONSOLIDADO]
+    slide_revisao_timeline(prs)               # 10
+    slide_revisao_mitigacao(prs)              # 11
+    slide_revisao_lacunas(prs)                # 12
+    slide_metodologia_pipeline(prs)           # 13
+    slide_evolucao_pipeline(prs)              # 14
+    slide_metodologia_etapa1(prs)             # 15
+    slide_mst_detalhe_tecnico(prs)            # 16
+    slide_mst_validacao_faces(prs)            # 17
+    slide_mst_validacao_distribuicao(prs)     # 18
+    slide_por_que_convnext(prs)               # 19
+    slide_por_que_film(prs)                   # 20
+    slide_metodologia_film(prs)               # 21
+    slide_metodologia_configs(prs)            # 22
+    slide_baselines_cenarios(prs)             # 23
+    slide_metricas(prs)                       # 24
+    slide_contribuicoes(prs)                  # 25
+    slide_cronograma(prs)                     # 26
+    slide_riscos(prs)                         # 27
+    slide_estado_atual(prs)                   # 28
+    slide_perguntas(prs)                      # 29
 
     return prs
 
