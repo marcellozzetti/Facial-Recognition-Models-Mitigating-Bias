@@ -368,74 +368,75 @@ FITZ_HEX = ["#F6E4D8", "#EDD3B6", "#D8B48A", "#B98E63", "#855832", "#322422"]
 
 
 def gerar_fig_fitzpatrick_vs_mst():
-    """Compara escalas Fitzpatrick (6, assimetrica) e MST (10, simetrica)."""
+    """Compara escalas Fitzpatrick (6, assimetrica) e MST (10, simetrica).
+
+    Texto simplificado, com acentuacao PT-BR; dimensionamento ampliado
+    para leitura confortavel em projecao de defesa.
+    """
     from matplotlib.patches import Rectangle
 
-    fig, ax = plt.subplots(figsize=(11, 4.5), dpi=DPI)
+    fig, ax = plt.subplots(figsize=(13, 5.2), dpi=DPI)
     ax.set_xlim(0, 22)
-    ax.set_ylim(0, 6)
+    ax.set_ylim(-0.4, 6.2)
     ax.axis("off")
 
     # ---- Fitzpatrick (linha superior) ----
-    ax.text(0.3, 5.2, "Escala Fitzpatrick (1988)",
-            fontsize=11, fontweight="bold", color=NAVY, ha="left")
-    ax.text(0.3, 4.75, "6 fototipos - dermatologia (fototerapia UV)",
-            fontsize=9, style="italic", color=GRAY_MD, ha="left")
+    ax.text(0.3, 5.4, "Fitzpatrick (1988)",
+            fontsize=18, fontweight="bold", color=NAVY, ha="left")
+    ax.text(0.3, 4.90, "6 fototipos — dermatologia",
+            fontsize=14, style="italic", color=GRAY_MD, ha="left")
 
     fitz_w = 2.5
     fitz_x0 = 4.0
     fitz_y = 3.5
-    fitz_h = 1.0
+    fitz_h = 1.1
     for i, hexcolor in enumerate(FITZ_HEX):
         x = fitz_x0 + i * fitz_w
         rect = Rectangle((x, fitz_y), fitz_w, fitz_h,
-                         facecolor=hexcolor, edgecolor=GRAY_DK, linewidth=0.6)
+                         facecolor=hexcolor, edgecolor=GRAY_DK, linewidth=0.8)
         ax.add_patch(rect)
-        # Rotulo I-VI
         roman = ["I", "II", "III", "IV", "V", "VI"][i]
         text_color = "white" if i >= 4 else GRAY_DK
         ax.text(x + fitz_w / 2, fitz_y + fitz_h / 2, roman,
-                ha="center", va="center", fontsize=11, fontweight="bold",
+                ha="center", va="center", fontsize=20, fontweight="bold",
                 color=text_color)
 
-    # Colchetes de assimetria
-    # 4 claros (I-IV)
-    ax.annotate("", xy=(fitz_x0, 3.2), xytext=(fitz_x0 + 4 * fitz_w, 3.2),
-                arrowprops=dict(arrowstyle="-", color=BLUE_MID, lw=1.5))
-    ax.text(fitz_x0 + 2 * fitz_w, 2.85, "4 fototipos claros",
-            ha="center", va="center", fontsize=9, fontweight="bold", color=BLUE_MID)
-    # 2 escuros (V-VI)
-    ax.annotate("", xy=(fitz_x0 + 4 * fitz_w, 3.2),
-                xytext=(fitz_x0 + 6 * fitz_w, 3.2),
-                arrowprops=dict(arrowstyle="-", color=RED, lw=1.5))
-    ax.text(fitz_x0 + 5 * fitz_w, 2.85, "apenas 2 escuros",
-            ha="center", va="center", fontsize=9, fontweight="bold", color=RED)
+    # Colchetes de assimetria (4 claros vs apenas 2 escuros)
+    ax.annotate("", xy=(fitz_x0, 3.25), xytext=(fitz_x0 + 4 * fitz_w, 3.25),
+                arrowprops=dict(arrowstyle="-", color=BLUE_MID, lw=2.4))
+    ax.text(fitz_x0 + 2 * fitz_w, 2.85, "4 tons claros",
+            ha="center", va="center", fontsize=15, fontweight="bold", color=BLUE_MID)
+    ax.annotate("", xy=(fitz_x0 + 4 * fitz_w, 3.25),
+                xytext=(fitz_x0 + 6 * fitz_w, 3.25),
+                arrowprops=dict(arrowstyle="-", color=RED, lw=2.4))
+    ax.text(fitz_x0 + 5 * fitz_w, 2.85, "só 2 escuros",
+            ha="center", va="center", fontsize=15, fontweight="bold", color=RED)
 
     # ---- MST (linha inferior) ----
-    ax.text(0.3, 2.15, "Monk Skin Tone Scale (2023)",
-            fontsize=11, fontweight="bold", color=NAVY, ha="left")
-    ax.text(0.3, 1.7, "10 tons - auditoria de fairness em IA",
-            fontsize=9, style="italic", color=GRAY_MD, ha="left")
+    ax.text(0.3, 2.20, "Monk Skin Tone (2023)",
+            fontsize=18, fontweight="bold", color=NAVY, ha="left")
+    ax.text(0.3, 1.70, "10 tons — auditoria de IA",
+            fontsize=14, style="italic", color=GRAY_MD, ha="left")
 
     mst_w = 1.5
     mst_x0 = 4.0
-    mst_y = 0.5
-    mst_h = 1.0
+    mst_y = 0.45
+    mst_h = 1.1
     for i, hexcolor in enumerate(MST_HEX):
         x = mst_x0 + i * mst_w
         rect = Rectangle((x, mst_y), mst_w, mst_h,
-                         facecolor=hexcolor, edgecolor=GRAY_DK, linewidth=0.6)
+                         facecolor=hexcolor, edgecolor=GRAY_DK, linewidth=0.8)
         ax.add_patch(rect)
         text_color = "white" if i >= 6 else GRAY_DK
         ax.text(x + mst_w / 2, mst_y + mst_h / 2, str(i + 1),
-                ha="center", va="center", fontsize=10, fontweight="bold",
+                ha="center", va="center", fontsize=18, fontweight="bold",
                 color=text_color)
 
     # Barra de distribuicao simetrica
-    ax.annotate("", xy=(mst_x0, 0.2), xytext=(mst_x0 + 10 * mst_w, 0.2),
-                arrowprops=dict(arrowstyle="-", color=GREEN, lw=1.5))
-    ax.text(mst_x0 + 5 * mst_w, -0.05, "distribuicao perceptualmente simetrica",
-            ha="center", va="center", fontsize=9, fontweight="bold", color=GREEN)
+    ax.annotate("", xy=(mst_x0, 0.15), xytext=(mst_x0 + 10 * mst_w, 0.15),
+                arrowprops=dict(arrowstyle="-", color=GREEN, lw=2.4))
+    ax.text(mst_x0 + 5 * mst_w, -0.25, "cobertura simétrica da escala",
+            ha="center", va="center", fontsize=15, fontweight="bold", color=GREEN)
 
     plt.tight_layout()
     out = OUT_DIR / "fig_fitzpatrick_vs_mst.png"
