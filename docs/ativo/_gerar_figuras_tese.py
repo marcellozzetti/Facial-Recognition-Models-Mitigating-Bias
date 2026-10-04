@@ -449,67 +449,133 @@ def gerar_fig_fitzpatrick_vs_mst():
 # FIGURA 6 - Timeline evolutiva das mitigacoes (Cap 2, sec 2.2)
 # ============================================================
 def gerar_fig_timeline_mitigacoes():
-    """Linha do tempo 2018-2025 das 6 tecnicas de mitigacao algoritmica."""
-    fig, ax = plt.subplots(figsize=(12, 5), dpi=DPI)
-    ax.set_xlim(2017.5, 2025.5)
-    ax.set_ylim(-3, 3)
+    """Linha do tempo 2018-2026 das principais tecnicas de mitigacao de vies
+    em classificacao facial, com cartoes grandes e linguagem simples.
+
+    Fecha com o marco de 2026 (esta pesquisa) para situar a lacuna que o
+    condicionamento por tom de pele (MST via FiLM) pretende preencher.
+    """
+    from matplotlib.patches import FancyBboxPatch, Patch
+
+    fig, ax = plt.subplots(figsize=(15, 7.0), dpi=DPI)
+    ax.set_xlim(2017.3, 2026.7)
+    ax.set_ylim(-3.0, 3.4)
     ax.axis("off")
 
-    # Linha do tempo
-    ax.axhline(0, color=GRAY_DK, linewidth=1.5, zorder=1)
+    # Linha do tempo (mais espessa)
+    ax.axhline(0, color=GRAY_DK, linewidth=2.4, zorder=1)
 
-    # Marcadores de ano (grid)
-    for ano in range(2018, 2026):
-        ax.plot(ano, 0, "|", color=GRAY_DK, markersize=12, mew=1.5, zorder=2)
-        ax.text(ano, -0.5, str(ano), ha="center", va="top",
-                fontsize=9, color=GRAY_DK, fontweight="bold")
+    # Marcadores de ano + labels grandes
+    for ano in range(2018, 2027):
+        ax.plot(ano, 0, "|", color=GRAY_DK, markersize=16, mew=2.4, zorder=2)
+        ax.text(ano, -0.55, str(ano), ha="center", va="top",
+                fontsize=15, color=NAVY, fontweight="bold")
 
-    # Categorias de tecnica (por cor)
-    CAT_ADVERSARIAL = RED
-    CAT_OPTIMIZATION = BLUE_MID
-    CAT_CONTRASTIVE = GREEN
-    CAT_PRUNING = "#E67E22"
-    CAT_ARCHITECTURE = "#8E44AD"
+    # Paleta por familia de metodo
+    FAM_ADV   = RED           # Adversarial — remover o sinal
+    FAM_OTIM  = BLUE_MID      # Otimizacao — reponderar / meta
+    FAM_REPR  = GREEN         # Representacao — contrastivo
+    FAM_SPARS = "#E67E22"     # Esparsidade — pruning
+    FAM_ARQ   = "#8E44AD"     # Arquitetura — modulos / blocos
+    FAM_OURS  = NAVY          # Esta pesquisa
 
-    # Publicacoes (ano, autor, tecnica, cor, y_offset)
+    # (ano, metodo, autor, acao em uma linha, cor, y_card, familia_label)
     pubs = [
-        (2018, "Zhang et al.", "Adversarial\ndebiasing", CAT_ADVERSARIAL, 1.5),
-        (2020, "Sagawa et al.", "DRO\n(worst-case group)", CAT_OPTIMIZATION, 1.5),
-        (2022, "Park et al.", "FSCL+\n(contrastivo)", CAT_CONTRASTIVE, 2.0),
-        (2022, "Lin et al.", "FairGRAPE\n(pruning)", CAT_PRUNING, -2.0),
-        (2024, "Manzoor et al.", "FineFACE\n(arquitetura)", CAT_ARCHITECTURE, 1.5),
-        (2025, "Liu et al.", "Bayesian Meta\nReweighting", CAT_OPTIMIZATION, 1.5),
+        (2018, "Adversarial Debiasing", "Zhang et al.",
+         "Discriminador remove\nsinal demográfico",
+         FAM_ADV, 1.65),
+        (2020, "Group DRO", "Sagawa et al.",
+         "Minimax protege\no pior grupo",
+         FAM_OTIM, 1.65),
+        (2022, "FSCL+", "Park et al.",
+         "Perda contrastiva\nalinha embeddings",
+         FAM_REPR, 2.45),
+        (2022, "FairGRAPE", "Lin et al.",
+         "Poda unidades\nenviesadas",
+         FAM_SPARS, -1.80),
+        (2024, "FineFACE", "Manzoor et al.",
+         "Módulos de fairness\nna arquitetura",
+         FAM_ARQ, 1.65),
+        (2025, "Bayesian Meta", "Liu et al.",
+         "Meta-reponderação\npor incerteza",
+         FAM_OTIM, 1.65),
     ]
 
-    for ano, autor, tecnica, cor, y in pubs:
-        # Bolinha do marcador
-        ax.plot(ano, 0, "o", color=cor, markersize=16, zorder=3,
-                markeredgecolor="white", markeredgewidth=2)
+    def _draw_card(x, y_center, titulo, corpo, autor, cor,
+                   face="white", title_color=NAVY, body_color=NAVY,
+                   author_color=GRAY_MD):
+        """Desenha um cartao de milestone centrado em (x, y_center).
 
-        # Linha conectando marcador a caixa de texto
-        y_box = y
-        y_line_end = y_box - 0.35 if y > 0 else y_box + 0.35
-        ax.plot([ano, ano], [0, y_line_end], color=cor, lw=1.2,
-                linestyle="--", alpha=0.6, zorder=2)
+        Hierarquia visual: titulo em negrito; corpo em peso regular (ate 2
+        linhas); autor em italico/menor no rodape. Caixa com borda da cor
+        da familia.
+        """
+        cw = 0.46            # meia-largura do card (unidades-x)
+        half_h = 0.60
+        patch = FancyBboxPatch(
+            (x - cw, y_center - half_h),
+            2 * cw, 2 * half_h,
+            boxstyle="round,pad=0.04,rounding_size=0.12",
+            facecolor=face, edgecolor=cor, linewidth=1.9, zorder=3,
+        )
+        ax.add_patch(patch)
+        # titulo
+        ax.text(x, y_center + half_h - 0.17, titulo,
+                ha="center", va="center",
+                fontsize=12, fontweight="bold", color=title_color, zorder=4)
+        # corpo (ate 2 linhas)
+        ax.text(x, y_center + 0.02, corpo,
+                ha="center", va="center",
+                fontsize=10.0, color=body_color, linespacing=1.25, zorder=4)
+        # autor
+        ax.text(x, y_center - half_h + 0.17, autor,
+                ha="center", va="center",
+                fontsize=9.5, color=author_color, style="italic", zorder=4)
 
-        # Caixa de texto
-        va = "bottom" if y > 0 else "top"
-        ax.text(ano, y_box, f"{autor}\n{tecnica}", ha="center", va=va,
-                fontsize=9, color=NAVY,
-                bbox=dict(boxstyle="round,pad=0.3", facecolor="white",
-                          edgecolor=cor, linewidth=1.2))
+    for ano, metodo, autor, acao, cor, y in pubs:
+        # Marcador no eixo
+        ax.plot(ano, 0, "o", color=cor, markersize=22, zorder=3,
+                markeredgecolor="white", markeredgewidth=2.8)
 
-    # Legenda de categorias
-    from matplotlib.patches import Patch
+        # Linha pontilhada ligando o eixo ao card
+        y_tip = (y - 0.60) if y > 0 else (y + 0.60)
+        ax.plot([ano, ano], [0, y_tip], color=cor, lw=1.8,
+                linestyle="--", alpha=0.75, zorder=2)
+
+        _draw_card(ano, y, metodo, acao, autor, cor)
+
+    # ---- 2026: Esta pesquisa (destaque de fechamento) ----
+    ax.plot(2026, 0, "*", color=FAM_OURS, markersize=32, zorder=4,
+            markeredgecolor="white", markeredgewidth=1.8)
+    y_ours = 1.65
+    ax.plot([2026, 2026], [0, y_ours - 0.60], color=FAM_OURS, lw=2.4,
+            linestyle="-", alpha=0.95, zorder=2)
+    _draw_card(2026, y_ours,
+               "Esta pesquisa",
+               "FiLM condiciona\nfeatures ao MST",
+               "tom de pele contínuo",
+               FAM_OURS, face=FAM_OURS,
+               title_color="white", body_color="white",
+               author_color=(0.80, 0.85, 0.95))
+
+    # Legenda — 5 familias (sem 'Esta pesquisa', separada visualmente)
     legenda = [
-        Patch(facecolor=CAT_ADVERSARIAL, label="Adversarial"),
-        Patch(facecolor=CAT_OPTIMIZATION, label="Otimizacao (DRO / meta)"),
-        Patch(facecolor=CAT_CONTRASTIVE, label="Contrastivo"),
-        Patch(facecolor=CAT_PRUNING, label="Pruning"),
-        Patch(facecolor=CAT_ARCHITECTURE, label="Arquitetura"),
+        Patch(facecolor=FAM_ADV,   label="Adversarial"),
+        Patch(facecolor=FAM_OTIM,  label="Otimização / meta-learning"),
+        Patch(facecolor=FAM_REPR,  label="Representação (contrastivo)"),
+        Patch(facecolor=FAM_SPARS, label="Esparsidade (pruning)"),
+        Patch(facecolor=FAM_ARQ,   label="Arquitetura"),
     ]
     ax.legend(handles=legenda, loc="lower center",
-              bbox_to_anchor=(0.5, -0.15), ncol=5, frameon=False, fontsize=9)
+              bbox_to_anchor=(0.5, -0.17), ncol=5, frameon=False,
+              fontsize=12, handlelength=1.5, columnspacing=1.6)
+
+    # Nota de rodape explicativa
+    ax.text(0.5, -0.26,
+            "Nenhum dos trabalhos acima condiciona explicitamente a arquitetura "
+            "ao tom de pele contínuo (MST) — lacuna que esta pesquisa endereça.",
+            transform=ax.transAxes, ha="center", va="top",
+            fontsize=10.5, color=GRAY_MD, style="italic")
 
     plt.tight_layout()
     out = OUT_DIR / "fig_timeline_mitigacoes.png"
