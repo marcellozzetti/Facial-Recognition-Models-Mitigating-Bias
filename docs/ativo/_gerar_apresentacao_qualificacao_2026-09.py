@@ -1490,13 +1490,256 @@ def slide_evolucao_pipeline(prs: Presentation) -> None:
 # SLIDE 14 — Metodologia: Etapa 1
 # ============================================================
 def slide_metodologia_etapa1(prs: Presentation) -> None:
-    add_bullets(prs, 15, "Etapa 1: classificador MST treinado internamente", [
-        ("O que faz:", "produz, para cada imagem facial, o vetor softmax sobre os dez tons da escala Monk."),
-        ("Decisão pós-reunião Ago/2026:", "adotar treinamento interno do classificador, reduzindo dependência do release do SkinToneNet (Matias, 2026), cujos pesos e dataset STW ainda não foram divulgados publicamente."),
-        ("Datasets de treino:", "Monk Skin Tone Examples (Monk, 2019) e Casual Conversations v2 (Porgali et al., 2023)."),
-        ("Camada auto-suficiente:", "detecção facial (MTCNN, Zhang et al., 2016), alinhamento, recorte e classificação — viabiliza inferência em datasets sem anotação MST."),
-        ("Validação:", "protocolo humano interno (aproximadamente 250 imagens do FairFace) e sensitivity analysis com dois a três classificadores alternativos."),
-    ])
+    """Etapa 1: pipeline neural horizontal + 2 colunas de contexto.
+
+    Pipeline: Rosto -> MTCNN+Alinhamento -> ViT-S/ResNet-34 fine-tuned
+    -> Softmax 10-dim (paleta Monk destacada).
+
+    Duas colunas abaixo:
+      - Decisao de Autonomia Metodologica (NAVY)
+      - Arquitetura e Saida Esperada     (ACCENT)
+    """
+    MST_PAL = [
+        RGBColor(0xF6, 0xED, 0xE4), RGBColor(0xF3, 0xE7, 0xDB),
+        RGBColor(0xF7, 0xEA, 0xD0), RGBColor(0xEA, 0xDA, 0xBA),
+        RGBColor(0xD7, 0xBD, 0x96), RGBColor(0xA0, 0x7E, 0x56),
+        RGBColor(0x82, 0x5C, 0x43), RGBColor(0x60, 0x41, 0x34),
+        RGBColor(0x3A, 0x31, 0x2A), RGBColor(0x29, 0x24, 0x20),
+    ]
+
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Etapa 1 — Classificador MST interno")
+
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
+    )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Para cada rosto, produz vetor softmax 10-dim sobre a escala "
+        "Monk — sinal condicionante estático para a Etapa 3 (FiLM)."
+    )
+    ps.font.size = Pt(13)
+    ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    # ============================================================
+    # PIPELINE neural horizontal (hero)
+    # ============================================================
+    SLIDE_W = 13.33
+    PIPE_Y = 1.80
+    PIPE_H = 1.25
+
+    passos = [
+        ("Rosto\n224 × 224",            "entrada bruta",         GRAY_LT, GRAY_DK),
+        ("MTCNN\ndetecção + alinhamento", "Zhang 2016",          WHITE,   NAVY),
+        ("Crop à face\n(normalizada)",   "pose canônica",        WHITE,   NAVY),
+        ("ViT-S  /  ResNet-34\nfine-tuned para MST", "backbone neural", BLUE_MID, WHITE),
+    ]
+    n = len(passos)
+    PAL_SLOT_W = 3.80   # espaco reservado para paleta a direita
+    MARGIN = 0.50
+    ARROW_SPACE = 0.22
+    total_arrows = n * ARROW_SPACE  # inclui seta final para paleta
+    usable = SLIDE_W - 2 * MARGIN - total_arrows - PAL_SLOT_W
+    pw = usable / n
+
+    for i, (titulo, nota, fc, fg) in enumerate(passos):
+        px = MARGIN + i * (pw + ARROW_SPACE)
+        box = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(px), Inches(PIPE_Y),
+            Inches(pw), Inches(PIPE_H),
+        )
+        box.fill.solid(); box.fill.fore_color.rgb = fc
+        box.line.color.rgb = NAVY; box.line.width = Pt(1.6)
+        tf = box.text_frame
+        tf.margin_top = Inches(0.12); tf.margin_bottom = Inches(0.06)
+        p = tf.paragraphs[0]; p.alignment = 2
+        r = p.add_run()
+        r.text = titulo
+        r.font.size = Pt(12)
+        r.font.bold = True
+        r.font.color.rgb = fg
+        p2 = tf.add_paragraph(); p2.alignment = 2
+        r2 = p2.add_run()
+        r2.text = nota
+        r2.font.size = Pt(9.5)
+        r2.font.italic = True
+        r2.font.color.rgb = GRAY_LT if fc in (NAVY, BLUE_MID) else GRAY_MD
+
+        # Seta
+        cx0 = px + pw
+        cy = PIPE_Y + PIPE_H / 2
+        conn = slide.shapes.add_connector(
+            2,
+            Inches(cx0), Inches(cy),
+            Inches(cx0 + ARROW_SPACE), Inches(cy),
+        )
+        conn.line.color.rgb = NAVY; conn.line.width = Pt(2.2)
+        _add_arrowhead(conn)
+
+    # ============================================================
+    # Paleta Monk (saida) a direita do pipeline
+    # ============================================================
+    PAL_X = MARGIN + n * (pw + ARROW_SPACE)
+    PAL_Y = PIPE_Y + 0.08
+    PAL_W = PAL_SLOT_W - 0.10
+    PAL_H = 0.70
+    cell_w = PAL_W / 10
+    highlight_idx = 6
+
+    # Mini rotulo acima
+    hdr = slide.shapes.add_textbox(
+        Inches(PAL_X), Inches(PAL_Y - 0.32),
+        Inches(PAL_W), Inches(0.28),
+    )
+    ph = hdr.text_frame.paragraphs[0]; ph.alignment = 2
+    rh = ph.add_run()
+    rh.text = "Softmax 10-dim · paleta Monk"
+    rh.font.size = Pt(10)
+    rh.font.bold = True
+    rh.font.italic = True
+    rh.font.color.rgb = ACCENT
+
+    for i in range(10):
+        cx = PAL_X + i * cell_w
+        cell = slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE,
+            Inches(cx), Inches(PAL_Y),
+            Inches(cell_w - 0.02), Inches(PAL_H),
+        )
+        cell.fill.solid(); cell.fill.fore_color.rgb = MST_PAL[i]
+        if i == highlight_idx:
+            cell.line.color.rgb = ACCENT; cell.line.width = Pt(2.8)
+        else:
+            cell.line.color.rgb = GRAY_DK; cell.line.width = Pt(0.5)
+        tn = slide.shapes.add_textbox(
+            Inches(cx), Inches(PAL_Y + PAL_H + 0.02),
+            Inches(cell_w - 0.02), Inches(0.22),
+        )
+        pn = tn.text_frame.paragraphs[0]; pn.alignment = 2
+        rn = pn.add_run()
+        rn.text = str(i + 1)
+        rn.font.size = Pt(9)
+        rn.font.bold = (i == highlight_idx)
+        rn.font.color.rgb = ACCENT if i == highlight_idx else GRAY_DK
+
+    # Nota: 1 vetor por imagem
+    nota = slide.shapes.add_textbox(
+        Inches(PAL_X), Inches(PAL_Y + PAL_H + 0.28),
+        Inches(PAL_W), Inches(0.3),
+    )
+    pn2 = nota.text_frame.paragraphs[0]; pn2.alignment = 2
+    rn2 = pn2.add_run()
+    rn2.text = "1 vetor por imagem"
+    rn2.font.size = Pt(9)
+    rn2.font.italic = True
+    rn2.font.color.rgb = GRAY_MD
+
+    # ============================================================
+    # Duas colunas de contexto (abaixo do pipeline)
+    # ============================================================
+    COL_Y = 3.55
+    COL_H = 2.95
+    COL_W = 6.00
+    COL_GAP = 0.33
+    col1_x = (SLIDE_W - 2 * COL_W - COL_GAP) / 2
+    col2_x = col1_x + COL_W + COL_GAP
+
+    colunas = [
+        {
+            "titulo": "Decisão de Autonomia Metodológica",
+            "cor_titulo": NAVY,
+            "itens": [
+                ("Decisão:",   "treinar classificador próprio — sem dependência de modelos de terceiros (ex. SkinToneNet, cujo release ainda não é público)."),
+                ("Datasets:",  "Monk Skin Tone Examples (MSTE) + Casual Conversations v2 (Meta AI)."),
+                ("Validação:", "subset FairFace anotado por especialistas humanos — concordância κ ≥ 0,70 com o modelo (H1)."),
+            ],
+        },
+        {
+            "titulo": "Arquitetura e Saída Esperada",
+            "cor_titulo": ACCENT,
+            "itens": [
+                ("Backbone:",   "ViT-Small ou ResNet-34 fine-tuned para classificação na escala MST de 10 tons."),
+                ("Saída:",      "vetor de probabilidade softmax 10-dim (um por imagem)."),
+                ("Função no pipeline:", "sinal condicionante estático para as camadas FiLM da Etapa 3 — também alimenta a matriz da Etapa 2."),
+            ],
+        },
+    ]
+
+    for col_i, col in enumerate(colunas):
+        x = col1_x if col_i == 0 else col2_x
+        # Header
+        hdr = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(COL_Y),
+            Inches(COL_W), Inches(0.50),
+        )
+        hdr.fill.solid(); hdr.fill.fore_color.rgb = col["cor_titulo"]
+        hdr.line.fill.background()
+        tf = hdr.text_frame
+        tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.04)
+        p = tf.paragraphs[0]; p.alignment = 2
+        r = p.add_run()
+        r.text = col["titulo"]
+        r.font.size = Pt(14)
+        r.font.bold = True
+        r.font.color.rgb = WHITE
+
+        # Corpo
+        body = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(COL_Y + 0.53),
+            Inches(COL_W), Inches(COL_H - 0.53),
+        )
+        body.fill.solid(); body.fill.fore_color.rgb = WHITE
+        body.line.color.rgb = col["cor_titulo"]
+        body.line.width = Pt(1.2)
+
+        # Bullets
+        tb = slide.shapes.add_textbox(
+            Inches(x + 0.20), Inches(COL_Y + 0.65),
+            Inches(COL_W - 0.40), Inches(COL_H - 0.70),
+        )
+        tf = tb.text_frame; tf.word_wrap = True
+        for j, (head, body_txt) in enumerate(col["itens"]):
+            p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
+            r1 = p.add_run()
+            r1.text = "•  " + head + "  "
+            r1.font.size = Pt(12)
+            r1.font.bold = True
+            r1.font.color.rgb = col["cor_titulo"]
+            r2 = p.add_run()
+            r2.text = body_txt
+            r2.font.size = Pt(12)
+            r2.font.color.rgb = GRAY_DK
+            p.space_after = Pt(5)
+
+    # ============================================================
+    # Banner inferior
+    # ============================================================
+    bot_y = 6.75; bot_h = 0.55
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(SLIDE_W - 1.0), Inches(bot_h),
+    )
+    bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_top = Inches(0.06); tf.margin_bottom = Inches(0.03)
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    p1 = tf.paragraphs[0]; p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = (
+        "Fundação do pipeline — alimenta diretamente a Etapa 2 (matriz MST × raça) "
+        "e a Etapa 3 (FiLM)."
+    )
+    r1.font.size = Pt(12); r1.font.bold = True
+    r1.font.color.rgb = WHITE
+
+    add_footer(slide)
+    add_page_number(slide, 15)
 
 
 # ============================================================
@@ -2660,338 +2903,986 @@ def _slide_etapa_detalhe(
 # SLIDE 19 — Etapa 2: Matriz MST × raca (detalhamento)
 # ============================================================
 def slide_etapa2_matriz_mst_raca(prs: Presentation) -> None:
-    def viz(slide, x, y, w, h):
-        # Mini-heatmap esquematico 7x10 com cores MST
-        from pptx.util import Emu
-        mst_colors = [
-            RGBColor(0xF6, 0xED, 0xE4), RGBColor(0xF3, 0xE7, 0xDB),
-            RGBColor(0xF7, 0xEA, 0xD0), RGBColor(0xEA, 0xDA, 0xBA),
-            RGBColor(0xD7, 0xBD, 0x96), RGBColor(0xA0, 0x7E, 0x56),
-            RGBColor(0x82, 0x5C, 0x43), RGBColor(0x60, 0x41, 0x34),
-            RGBColor(0x3A, 0x31, 0x2A), RGBColor(0x29, 0x24, 0x20),
-        ]
-        cell_w = w * 0.055
-        cell_h = h * 0.80
-        start_cx = x + (w - 10 * cell_w) / 2
-        start_cy = y + 0.10
-        # Rotulo
-        lbl = slide.shapes.add_textbox(
-            Inches(x), Inches(y),
-            Inches(w / 2), Inches(0.30),
+    """Etapa 2: layout com MATRIZ 7x10 como heroi visual central.
+
+    Metafora: a propria matriz publicada e o artefato — mostra-se o
+    artefato em primeiro plano. Latinx (linha 5) destacada em vermelho
+    para evidenciar o spread.
+    """
+    MST_PAL = [
+        RGBColor(0xF6, 0xED, 0xE4), RGBColor(0xF3, 0xE7, 0xDB),
+        RGBColor(0xF7, 0xEA, 0xD0), RGBColor(0xEA, 0xDA, 0xBA),
+        RGBColor(0xD7, 0xBD, 0x96), RGBColor(0xA0, 0x7E, 0x56),
+        RGBColor(0x82, 0x5C, 0x43), RGBColor(0x60, 0x41, 0x34),
+        RGBColor(0x3A, 0x31, 0x2A), RGBColor(0x29, 0x24, 0x20),
+    ]
+    # Distribuicao ilustrativa (% dentro de cada raca)
+    # intensidades 0-5 para representar frequencia
+    #  linhas = raca (ordem FairFace); colunas = MST 1..10
+    #  Latinx (idx 4) distribuida; outras com picos mais concentrados
+    freq = [
+        [4, 5, 5, 4, 3, 1, 0, 0, 0, 0],  # White
+        [0, 0, 0, 0, 1, 3, 5, 5, 4, 2],  # Black
+        [0, 0, 1, 3, 4, 5, 4, 2, 1, 0],  # Indian
+        [3, 5, 5, 4, 2, 1, 0, 0, 0, 0],  # East Asian
+        [1, 2, 3, 4, 4, 3, 2, 1, 0, 0],  # Latinx  <-- distribuido
+        [1, 3, 4, 4, 3, 2, 1, 0, 0, 0],  # SE Asian
+        [1, 3, 5, 4, 3, 2, 1, 0, 0, 0],  # Mid Eastern
+    ]
+    racas = [
+        "White", "Black", "Indian", "East Asian",
+        "Latinx", "SE Asian", "Mid East.",
+    ]
+    LATINX_IDX = 4
+
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Etapa 2 — Matriz MST × raça")
+
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
+    )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Primeira matriz de distribuição cruzada MST × FairFace — "
+        "dataset auditado completo (~108 000 imagens, 7 grupos raciais)."
+    )
+    ps.font.size = Pt(13)
+    ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    # ============================================================
+    # HEROI VISUAL: matriz 7 x 10 ao centro
+    # ============================================================
+    MTX_X = 2.80
+    MTX_Y = 1.95
+    CELL_W = 0.56
+    CELL_H = 0.42
+
+    # Rotulos de coluna (MST 1..10) acima
+    for c in range(10):
+        tx = slide.shapes.add_textbox(
+            Inches(MTX_X + c * CELL_W), Inches(MTX_Y - 0.30),
+            Inches(CELL_W), Inches(0.25),
         )
-        pl = lbl.text_frame.paragraphs[0]
-        pl.text = "Paleta Monk 10 tons (eixo horizontal da matriz 7 × 10):"
-        pl.font.size = Pt(10)
-        pl.font.italic = True
-        pl.font.color.rgb = GRAY_MD
-        for i, col in enumerate(mst_colors):
+        p = tx.text_frame.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = str(c + 1)
+        r.font.size = Pt(10)
+        r.font.bold = True
+        r.font.color.rgb = GRAY_DK
+    # Header "MST →"
+    hdr = slide.shapes.add_textbox(
+        Inches(MTX_X - 1.6), Inches(MTX_Y - 0.30),
+        Inches(1.5), Inches(0.25),
+    )
+    ph = hdr.text_frame.paragraphs[0]
+    ph.alignment = 2
+    rh = ph.add_run()
+    rh.text = "Monk tone →"
+    rh.font.size = Pt(10)
+    rh.font.bold = True
+    rh.font.italic = True
+    rh.font.color.rgb = GRAY_MD
+
+    # Celulas da matriz
+    for r_idx in range(7):
+        # Rotulo da raca na coluna esquerda
+        tr = slide.shapes.add_textbox(
+            Inches(MTX_X - 1.6), Inches(MTX_Y + r_idx * CELL_H + 0.05),
+            Inches(1.5), Inches(CELL_H - 0.05),
+        )
+        pr = tr.text_frame.paragraphs[0]
+        pr.alignment = 2
+        rr = pr.add_run()
+        rr.text = racas[r_idx]
+        rr.font.size = Pt(11)
+        rr.font.bold = (r_idx == LATINX_IDX)
+        rr.font.color.rgb = ACCENT if r_idx == LATINX_IDX else NAVY
+
+        for c in range(10):
+            intensity = freq[r_idx][c]
+            # fundo claro quando intensidade=0; MST palette quando >0
+            if intensity == 0:
+                fc = RGBColor(0xF5, 0xF5, 0xF5)
+            else:
+                fc = MST_PAL[c]
             cell = slide.shapes.add_shape(
                 MSO_SHAPE.RECTANGLE,
-                Inches(start_cx + i * cell_w), Inches(start_cy + 0.35),
-                Inches(cell_w - 0.02), Inches(cell_h - 0.35),
+                Inches(MTX_X + c * CELL_W + 0.02),
+                Inches(MTX_Y + r_idx * CELL_H + 0.02),
+                Inches(CELL_W - 0.04), Inches(CELL_H - 0.04),
             )
             cell.fill.solid()
-            cell.fill.fore_color.rgb = col
-            cell.line.color.rgb = GRAY_DK
-            cell.line.width = Pt(0.5)
-            # numero MST
-            tn = slide.shapes.add_textbox(
-                Inches(start_cx + i * cell_w), Inches(start_cy + cell_h + 0.03),
-                Inches(cell_w), Inches(0.22),
-            )
-            pt = tn.text_frame.paragraphs[0]
-            pt.alignment = 2
-            r = pt.add_run()
-            r.text = str(i + 1)
-            r.font.size = Pt(9)
-            r.font.color.rgb = GRAY_DK
+            cell.fill.fore_color.rgb = fc
+            if r_idx == LATINX_IDX:
+                cell.line.color.rgb = ACCENT
+                cell.line.width = Pt(1.4)
+            else:
+                cell.line.color.rgb = GRAY_DK
+                cell.line.width = Pt(0.4)
+            # Dot de frequencia (circulo preto escalado por intensidade)
+            if intensity > 0:
+                dot_size = 0.06 + intensity * 0.04  # 0.10..0.26
+                dot_cx = MTX_X + c * CELL_W + (CELL_W - dot_size) / 2
+                dot_cy = MTX_Y + r_idx * CELL_H + (CELL_H - dot_size) / 2
+                dot = slide.shapes.add_shape(
+                    MSO_SHAPE.OVAL,
+                    Inches(dot_cx), Inches(dot_cy),
+                    Inches(dot_size), Inches(dot_size),
+                )
+                dot.fill.solid()
+                dot.fill.fore_color.rgb = NAVY
+                dot.line.fill.background()
 
-    _slide_etapa_detalhe(
-        prs, 19,
-        "Etapa 2 — Matriz MST × raça",
-        "Diagnóstico fenotípico: distribuição de tons Monk predita por raça do FairFace.",
-        entrada=[
-            "FairFace val (≈ 10 954 imagens)",
-            "Classificador MST da Etapa 1 (congelado)",
-            "Rótulos raciais FairFace (7 classes)",
-        ],
-        processo=[
-            "Inferência MST sobre todas as imagens",
-            "Agregação por raça: contagem de cada tom",
-            "Normalização para % dentro de cada raça",
-            "Teste χ² de homogeneidade de distribuição",
-        ],
-        saida=[
-            "Matriz pública 7 × 10 (CSV) — contribuição 2",
-            "Spread por raça (nº de tons distintos)",
-            "Rank de heterogeneidade intra-categorial",
-        ],
-        regra_titulo="Regra de aprovação — hipótese H3",
-        regra_texto=(
-            "Latinx cobre pelo menos 5 dos 10 tons MST com pico "
-            "distribuído (não concentrado em um único tom). "
-            "Confirma heterogeneidade fenotípica intra-categorial."
-        ),
-        extra_visual=viz,
+    # Legenda da intensidade (direita)
+    LEG_X = MTX_X + 10 * CELL_W + 0.40
+    tl = slide.shapes.add_textbox(
+        Inches(LEG_X), Inches(MTX_Y - 0.30),
+        Inches(1.8), Inches(0.25),
     )
+    pl = tl.text_frame.paragraphs[0]
+    rl = pl.add_run()
+    rl.text = "frequência"
+    rl.font.size = Pt(10)
+    rl.font.bold = True
+    rl.font.italic = True
+    rl.font.color.rgb = GRAY_MD
+    for i, sz in enumerate([0.10, 0.14, 0.20, 0.26]):
+        row_y = MTX_Y + 0.05 + i * 0.45
+        d = slide.shapes.add_shape(
+            MSO_SHAPE.OVAL,
+            Inches(LEG_X + 0.10), Inches(row_y),
+            Inches(sz), Inches(sz),
+        )
+        d.fill.solid(); d.fill.fore_color.rgb = NAVY
+        d.line.fill.background()
+        txt = slide.shapes.add_textbox(
+            Inches(LEG_X + 0.50), Inches(row_y - 0.03),
+            Inches(1.3), Inches(0.30),
+        )
+        pt_ = txt.text_frame.paragraphs[0]
+        rt_ = pt_.add_run()
+        rt_.text = ["baixa", "média", "alta", "muito alta"][i]
+        rt_.font.size = Pt(9)
+        rt_.font.color.rgb = GRAY_DK
+
+    # ============================================================
+    # Callout destacando a linha Latinx
+    # ============================================================
+    CALL_X = 0.60
+    CALL_Y = MTX_Y + 7 * CELL_H + 0.30
+    callout = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(CALL_X), Inches(CALL_Y),
+        Inches(12.1), Inches(0.95),
+    )
+    callout.fill.solid()
+    callout.fill.fore_color.rgb = WHITE
+    callout.line.color.rgb = ACCENT
+    callout.line.width = Pt(1.8)
+    tf = callout.text_frame
+    tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.06)
+    tf.margin_left = Inches(0.20); tf.margin_right = Inches(0.20)
+    p1 = tf.paragraphs[0]
+    r1 = p1.add_run()
+    r1.text = "Latinx:  "
+    r1.font.size = Pt(13); r1.font.bold = True
+    r1.font.color.rgb = ACCENT
+    r1b = p1.add_run()
+    r1b.text = "variância fenotípica interna cobre MST 1 a MST 8 — "
+    r1b.font.size = Pt(13); r1b.font.color.rgb = NAVY
+    r1c = p1.add_run()
+    r1c.text = "contraste com White (1–5) e Black (5–10)."
+    r1c.font.size = Pt(13); r1c.font.italic = True
+    r1c.font.color.rgb = GRAY_DK
+    p2 = tf.add_paragraph()
+    r2 = p2.add_run()
+    r2.text = (
+        "Prova empírica da inadequação dos rótulos raciais discretos "
+        "— justifica o condicionamento por tom de pele (Etapa 3)."
+    )
+    r2.font.size = Pt(11)
+    r2.font.italic = True
+    r2.font.color.rgb = GRAY_MD
+
+    # ============================================================
+    # Banner inferior: regra H3
+    # ============================================================
+    bot_y = 6.60; bot_h = 0.80
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(12.33), Inches(bot_h),
+    )
+    bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.05)
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    p1 = tf.paragraphs[0]; p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "Regra de aprovação — hipótese H3"
+    r1.font.size = Pt(13); r1.font.bold = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = (
+        "Latinx cobre ao menos 6 dos 10 tons MST (observado: 1–8) — "
+        "quantifica a inadequação do rótulo racial discreto."
+    )
+    r2.font.size = Pt(11); r2.font.color.rgb = BLUE_LIGHT
+
+    add_footer(slide)
+    add_page_number(slide, 19)
 
 
 # ============================================================
 # SLIDE 24 — Etapa 4: Comparacao com baselines (detalhamento)
 # ============================================================
 def slide_etapa4_baselines(prs: Presentation) -> None:
-    def viz(slide, x, y, w, h):
-        # Lista horizontal de 6 badges de baselines + nossa proposta
-        badges = [
-            ("ResNet-34", "FairFace\nbaseline"),
-            ("ConvNeXt-T", "backbone\npuro"),
-            ("Adv. Debiasing", "Zhang\n2018"),
-            ("Group DRO", "Sagawa\n2020"),
-            ("FSCL+", "Park\n2022"),
-            ("FineFACE", "Manzoor\n2024"),
-            ("FiLM + MST", "nossa\nproposta"),
-        ]
-        n = len(badges)
-        gap = 0.08
-        bw = (w - (n - 1) * gap) / n
-        bh = 0.90
-        for i, (nome, sub) in enumerate(badges):
-            bx = x + i * (bw + gap)
-            hl = (i == n - 1)
-            box = slide.shapes.add_shape(
-                MSO_SHAPE.ROUNDED_RECTANGLE,
-                Inches(bx), Inches(y),
-                Inches(bw), Inches(bh),
-            )
-            box.fill.solid()
-            box.fill.fore_color.rgb = NAVY if hl else WHITE
-            box.line.color.rgb = NAVY
-            box.line.width = Pt(1.8 if hl else 1.0)
-            tf = box.text_frame
-            tf.margin_top = Inches(0.03); tf.margin_bottom = Inches(0.02)
-            p = tf.paragraphs[0]
-            p.alignment = 2
-            r = p.add_run()
-            r.text = nome
-            r.font.size = Pt(10.5)
-            r.font.bold = True
-            r.font.color.rgb = WHITE if hl else NAVY
-            p2 = tf.add_paragraph()
-            p2.alignment = 2
-            r2 = p2.add_run()
-            r2.text = sub
-            r2.font.size = Pt(8.5)
-            r2.font.italic = True
-            r2.font.color.rgb = BLUE_LIGHT if hl else GRAY_MD
+    """Etapa 4: layout VS — 6 baselines publicados vs. nossa proposta.
 
-    _slide_etapa_detalhe(
-        prs, 24,
-        "Etapa 4 — Comparação sistemática com baselines",
-        "Confronta a proposta FiLM + MST contra seis famílias publicadas sob o mesmo protocolo.",
-        entrada=[
-            "FairFace train split (padrão)",
-            "6 famílias de mitigação (6 implementações oficiais)",
-            "Nossa configuração B (FiLM + MST, Etapa 3)",
-            "Mesmo backbone, dataset e receita de treino",
-        ],
-        processo=[
-            "Treino de cada método: 3 sementes (42, 1, 2)",
-            "Avaliação pareada por classe racial",
-            "Cálculo das 3 métricas triangulares por grupo",
-            "Teste pareado (bootstrap IC 95 %) entre configs",
-        ],
-        saida=[
-            "Tabela comparativa 7 métodos × 3 métricas",
-            "Fronteira Pareto (acurácia × disparidade)",
-            "Ranking de métodos no espaço F1 vs DR",
-        ],
-        regra_titulo="Regra de aprovação — hipótese H1 (central)",
-        regra_texto=(
-            "Nossa proposta supera o melhor baseline em F1 macro ≥ +2 "
-            "pontos percentuais E reduz Disparity Ratio em ≥ 20 % — "
-            "ambos critérios satisfeitos simultaneamente."
-        ),
-        extra_visual=viz,
+    Metafora: duas panels, direita vs. esquerda, com simbolo "x" no meio.
+    Deixa claro visualmente a estrutura de comparacao direta.
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Etapa 4 — Comparação sistemática com baselines")
+
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
     )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Confronta a proposta FiLM + MST contra seis famílias publicadas "
+        "sob o mesmo protocolo pareado."
+    )
+    ps.font.size = Pt(13); ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    SLIDE_W = 13.33
+    PANEL_Y = 1.80
+    PANEL_H = 3.60
+
+    # ============================================================
+    # PAINEL ESQUERDO — 6 baselines publicados (3 x 2)
+    # ============================================================
+    LEFT_X = 0.50
+    LEFT_W = 7.70
+    left_bg = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(LEFT_X), Inches(PANEL_Y),
+        Inches(LEFT_W), Inches(PANEL_H),
+    )
+    left_bg.fill.solid(); left_bg.fill.fore_color.rgb = GRAY_LT
+    left_bg.line.color.rgb = GRAY_DK; left_bg.line.width = Pt(0.8)
+
+    # Header
+    lhdr = slide.shapes.add_textbox(
+        Inches(LEFT_X), Inches(PANEL_Y + 0.08),
+        Inches(LEFT_W), Inches(0.35),
+    )
+    plh = lhdr.text_frame.paragraphs[0]; plh.alignment = 2
+    rh = plh.add_run()
+    rh.text = "6 famílias de mitigação já publicadas"
+    rh.font.size = Pt(13); rh.font.bold = True
+    rh.font.color.rgb = NAVY
+
+    # 6 mini-cards: 3 cols x 2 rows
+    baselines = [
+        ("Adv. Debiasing",   "Zhang 2018",       "loss adversarial"),
+        ("Group DRO",         "Sagawa 2020",      "worst-case group"),
+        ("FSCL+",             "Park 2022",        "contrastive fair"),
+        ("FineFACE",          "Manzoor 2024",     "Pareto-eficiente"),
+        ("Bayes. Meta",       "Liu 2025",         "component fairness"),
+        ("FaceScanPaliGemma", "AlDahoul 2024",    "VLM / VQA"),
+    ]
+    COLS = 3; ROWS = 2
+    inner_margin = 0.18
+    inner_gap = 0.12
+    card_w = (LEFT_W - 2 * inner_margin - (COLS - 1) * inner_gap) / COLS
+    card_h = (PANEL_H - 0.55 - inner_margin - (ROWS - 1) * inner_gap) / ROWS
+    grid_y0 = PANEL_Y + 0.50
+
+    for i, (nome, ref, nota) in enumerate(baselines):
+        row = i // COLS
+        col = i % COLS
+        cx = LEFT_X + inner_margin + col * (card_w + inner_gap)
+        cy = grid_y0 + row * (card_h + inner_gap)
+        card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(cx), Inches(cy),
+            Inches(card_w), Inches(card_h),
+        )
+        card.fill.solid(); card.fill.fore_color.rgb = WHITE
+        card.line.color.rgb = NAVY; card.line.width = Pt(1.0)
+        tf = card.text_frame
+        tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.05)
+        p = tf.paragraphs[0]; p.alignment = 2
+        r = p.add_run()
+        r.text = nome
+        r.font.size = Pt(11); r.font.bold = True
+        r.font.color.rgb = NAVY
+        p2 = tf.add_paragraph(); p2.alignment = 2
+        r2 = p2.add_run()
+        r2.text = ref
+        r2.font.size = Pt(9); r2.font.italic = True
+        r2.font.color.rgb = GRAY_MD
+        p3 = tf.add_paragraph(); p3.alignment = 2
+        r3 = p3.add_run()
+        r3.text = nota
+        r3.font.size = Pt(9)
+        r3.font.color.rgb = GRAY_DK
+
+    # ============================================================
+    # DIVISOR "VS" central
+    # ============================================================
+    VS_X = LEFT_X + LEFT_W + 0.10
+    VS_W = 0.90
+    vs = slide.shapes.add_shape(
+        MSO_SHAPE.OVAL,
+        Inches(VS_X), Inches(PANEL_Y + PANEL_H / 2 - 0.45),
+        Inches(VS_W), Inches(VS_W),
+    )
+    vs.fill.solid(); vs.fill.fore_color.rgb = ACCENT
+    vs.line.color.rgb = NAVY; vs.line.width = Pt(2.2)
+    tf = vs.text_frame
+    tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.05)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "VS"
+    r.font.size = Pt(20); r.font.bold = True
+    r.font.color.rgb = WHITE
+
+    # ============================================================
+    # PAINEL DIREITO — nossa proposta
+    # ============================================================
+    RIGHT_X = VS_X + VS_W + 0.15
+    RIGHT_W = SLIDE_W - 0.50 - RIGHT_X
+    right_bg = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(RIGHT_X), Inches(PANEL_Y),
+        Inches(RIGHT_W), Inches(PANEL_H),
+    )
+    right_bg.fill.solid(); right_bg.fill.fore_color.rgb = NAVY
+    right_bg.line.color.rgb = NAVY; right_bg.line.width = Pt(1.0)
+
+    # Header "Nossa proposta"
+    rhdr = slide.shapes.add_textbox(
+        Inches(RIGHT_X), Inches(PANEL_Y + 0.08),
+        Inches(RIGHT_W), Inches(0.35),
+    )
+    prh = rhdr.text_frame.paragraphs[0]; prh.alignment = 2
+    rr = prh.add_run()
+    rr.text = "Nossa proposta"
+    rr.font.size = Pt(13); rr.font.bold = True
+    rr.font.color.rgb = BLUE_LIGHT
+
+    # Card grande da proposta
+    OUR_X = RIGHT_X + 0.20
+    OUR_Y = PANEL_Y + 0.55
+    OUR_W = RIGHT_W - 0.40
+    OUR_H = PANEL_H - 0.75
+    our = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(OUR_X), Inches(OUR_Y),
+        Inches(OUR_W), Inches(OUR_H),
+    )
+    our.fill.solid(); our.fill.fore_color.rgb = WHITE
+    our.line.color.rgb = ACCENT; our.line.width = Pt(2.5)
+    tf = our.text_frame
+    tf.margin_top = Inches(0.20); tf.margin_bottom = Inches(0.10)
+    tf.margin_left = Inches(0.15); tf.margin_right = Inches(0.15)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "FiLM + MST"
+    r.font.size = Pt(20); r.font.bold = True
+    r.font.color.rgb = NAVY
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = "Config B (Etapa 3)"
+    r2.font.size = Pt(12); r2.font.italic = True
+    r2.font.color.rgb = ACCENT
+    p3 = tf.add_paragraph(); p3.alignment = 2
+    p3.space_before = Pt(10)
+    r3 = p3.add_run()
+    r3.text = "condicionamento\narquitetural\n(FiLM) com sinal\nde tom de pele\ncontínuo (MST)"
+    r3.font.size = Pt(11)
+    r3.font.color.rgb = GRAY_DK
+
+    # ============================================================
+    # Faixa inferior: protocolo pareado (3 atributos)
+    # ============================================================
+    PROTO_Y = PANEL_Y + PANEL_H + 0.20
+    proto_items = [
+        ("mesmo backbone",    "ConvNeXt-T"),
+        ("mesmos dados",      "FairFace train split"),
+        ("mesma receita",     "3 sementes · bootstrap IC 95 %"),
+    ]
+    nprot = len(proto_items)
+    gap = 0.20
+    pw = (SLIDE_W - 1.0 - (nprot - 1) * gap) / nprot
+
+    # Header da faixa
+    phd = slide.shapes.add_textbox(
+        Inches(0.5), Inches(PROTO_Y - 0.03),
+        Inches(SLIDE_W - 1.0), Inches(0.28),
+    )
+    pph = phd.text_frame.paragraphs[0]; pph.alignment = 2
+    rh = pph.add_run()
+    rh.text = "Protocolo pareado  —  o que mantemos constante entre os 7 métodos"
+    rh.font.size = Pt(11); rh.font.italic = True
+    rh.font.bold = True
+    rh.font.color.rgb = GRAY_MD
+
+    for i, (k, v) in enumerate(proto_items):
+        bx = 0.5 + i * (pw + gap)
+        by = PROTO_Y + 0.30
+        card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(bx), Inches(by),
+            Inches(pw), Inches(0.55),
+        )
+        card.fill.solid(); card.fill.fore_color.rgb = WHITE
+        card.line.color.rgb = BLUE_MID; card.line.width = Pt(1.2)
+        tf = card.text_frame
+        tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.03)
+        p = tf.paragraphs[0]; p.alignment = 2
+        r1 = p.add_run()
+        r1.text = k + "  "
+        r1.font.size = Pt(11); r1.font.bold = True
+        r1.font.color.rgb = NAVY
+        r2 = p.add_run()
+        r2.text = v
+        r2.font.size = Pt(11); r2.font.italic = True
+        r2.font.color.rgb = GRAY_DK
+
+    # ============================================================
+    # Banner inferior: regra H1
+    # ============================================================
+    bot_y = 6.60; bot_h = 0.80
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(SLIDE_W - 1.0), Inches(bot_h),
+    )
+    bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.05)
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    p1 = tf.paragraphs[0]; p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "Regra de aprovação — hipótese H1 (central)"
+    r1.font.size = Pt(13); r1.font.bold = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = (
+        "Supera o melhor baseline em F1 macro ≥ +2 pp E "
+        "reduz Disparity Ratio em ≥ 20 % — ambos critérios juntos."
+    )
+    r2.font.size = Pt(11); r2.font.color.rgb = BLUE_LIGHT
+
+    add_footer(slide)
+    add_page_number(slide, 24)
 
 
 # ============================================================
 # SLIDE 25 — Etapa 5: Transferencia RFW/BFW (detalhamento)
 # ============================================================
 def slide_etapa5_transferencia(prs: Presentation) -> None:
-    def viz(slide, x, y, w, h):
-        # Mini-fluxo: Classificador 7 racas CONGELADO -> cabeca de verificacao -> RFW/BFW
-        parts = [
-            ("ConvNeXt-T\n+ FiLM (MST)",      "congelado",    True),
-            ("Cabeça de\nverificação",         "treinada",     False),
-            ("RFW · BFW\npairs 1 : 1",          "avaliação",    False),
-        ]
-        n = len(parts)
-        gap = 0.12
-        pw = (w - (n - 1) * gap - 0.6) / n   # 0.6 reserva para setas
-        ph = 0.90
-        for i, (titulo, nota, congelado) in enumerate(parts):
-            px = x + i * (pw + gap + 0.20)
+    """Etapa 5: layout ANTES vs DEPOIS com feature-freeze visualizado.
+
+    LADO ESQUERDO: Modelo da Etapa 3 (classificacao racial).
+    SETA CENTRAL: "transferencia via feature-freeze (Madras, LAFTR 2018)".
+    LADO DIREITO: Modelo da Etapa 5 (verificacao RFW/BFW) com
+                  encoder congelado + nova cabeca.
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Etapa 5 — Transferência arquitetural para verificação")
+
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
+    )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Testa se o condicionamento FiLM + MST herda-se para "
+        "verificação sem re-treino do encoder (LAFTR, Madras 2018)."
+    )
+    ps.font.size = Pt(13); ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    SLIDE_W = 13.33
+    PANEL_Y = 1.80
+    PANEL_H = 4.00
+
+    # Dimensoes dos paineis esquerdo e direito
+    SIDE_W = 5.20
+    LEFT_X = 0.50
+    RIGHT_X = SLIDE_W - 0.50 - SIDE_W
+    MID_X = LEFT_X + SIDE_W
+    MID_W = RIGHT_X - MID_X
+
+    # ============================================================
+    # HELPER para desenhar um "stack" de camadas
+    # ============================================================
+    def _draw_stack(x, y, w, titulo, header_cor, camadas):
+        # Header do painel
+        hdr = slide.shapes.add_textbox(
+            Inches(x), Inches(y),
+            Inches(w), Inches(0.35),
+        )
+        ph = hdr.text_frame.paragraphs[0]; ph.alignment = 2
+        r = ph.add_run()
+        r.text = titulo
+        r.font.size = Pt(13); r.font.bold = True
+        r.font.color.rgb = header_cor
+
+        # Pilha vertical de camadas
+        STACK_Y = y + 0.40
+        STACK_H = PANEL_H - 0.50
+        n = len(camadas)
+        gap_internal = 0.12
+        layer_h = (STACK_H - (n - 1) * gap_internal) / n
+        for i, (nome, nota, estado) in enumerate(camadas):
+            # estado: "frozen" | "trained" | "discarded"
+            ly = STACK_Y + i * (layer_h + gap_internal)
             box = slide.shapes.add_shape(
                 MSO_SHAPE.ROUNDED_RECTANGLE,
-                Inches(px), Inches(y),
-                Inches(pw), Inches(ph),
+                Inches(x + 0.20), Inches(ly),
+                Inches(w - 0.40), Inches(layer_h),
             )
-            box.fill.solid()
-            if congelado:
-                box.fill.fore_color.rgb = GREEN
-            else:
-                box.fill.fore_color.rgb = WHITE
-            box.line.color.rgb = NAVY
-            box.line.width = Pt(1.5)
+            if estado == "frozen":
+                box.fill.solid(); box.fill.fore_color.rgb = BLUE_LIGHT
+                box.line.color.rgb = NAVY; box.line.width = Pt(2.0)
+                border_cor = NAVY
+            elif estado == "trained":
+                box.fill.solid(); box.fill.fore_color.rgb = ACCENT
+                box.line.color.rgb = ACCENT; box.line.width = Pt(2.0)
+                border_cor = WHITE
+            elif estado == "discarded":
+                box.fill.solid(); box.fill.fore_color.rgb = GRAY_LT
+                box.line.color.rgb = GRAY_DK; box.line.width = Pt(1.0)
+                border_cor = GRAY_MD
+            else:  # "neutral"
+                box.fill.solid(); box.fill.fore_color.rgb = WHITE
+                box.line.color.rgb = NAVY; box.line.width = Pt(1.0)
+                border_cor = NAVY
             tf = box.text_frame
-            tf.margin_top = Inches(0.03); tf.margin_bottom = Inches(0.02)
-            p = tf.paragraphs[0]
-            p.alignment = 2
+            tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.04)
+            p = tf.paragraphs[0]; p.alignment = 2
             r = p.add_run()
-            r.text = titulo
-            r.font.size = Pt(11)
-            r.font.bold = True
-            r.font.color.rgb = WHITE if congelado else NAVY
-            p2 = tf.add_paragraph()
-            p2.alignment = 2
+            r.text = nome
+            r.font.size = Pt(12); r.font.bold = True
+            if estado == "trained":
+                r.font.color.rgb = WHITE
+            elif estado == "discarded":
+                r.font.color.rgb = GRAY_MD
+            else:
+                r.font.color.rgb = NAVY
+            p2 = tf.add_paragraph(); p2.alignment = 2
             r2 = p2.add_run()
             r2.text = nota
-            r2.font.size = Pt(9)
-            r2.font.italic = True
-            r2.font.color.rgb = GRAY_LT if congelado else GRAY_MD
-            # Seta para o proximo
-            if i < n - 1:
-                conn = slide.shapes.add_connector(
-                    2,
-                    Inches(px + pw), Inches(y + ph / 2),
-                    Inches(px + pw + 0.20), Inches(y + ph / 2),
+            r2.font.size = Pt(10); r2.font.italic = True
+            if estado == "trained":
+                r2.font.color.rgb = BLUE_LIGHT
+            elif estado == "discarded":
+                r2.font.color.rgb = GRAY_MD
+            else:
+                r2.font.color.rgb = GRAY_DK
+            # Badge estado (bolinha pequena no canto superior esquerdo)
+            if estado in ("frozen", "trained"):
+                badge_size = 0.32
+                bx = x + 0.26
+                by = ly + 0.08
+                badge = slide.shapes.add_shape(
+                    MSO_SHAPE.OVAL,
+                    Inches(bx), Inches(by),
+                    Inches(badge_size), Inches(badge_size),
                 )
-                conn.line.color.rgb = NAVY
-                conn.line.width = Pt(2.0)
-                _add_arrowhead(conn)
+                badge.fill.solid()
+                badge.fill.fore_color.rgb = NAVY if estado == "frozen" else WHITE
+                badge.line.color.rgb = WHITE if estado == "frozen" else ACCENT
+                badge.line.width = Pt(1.5)
+                tfb = badge.text_frame
+                tfb.margin_top = Inches(0.0); tfb.margin_bottom = Inches(0.0)
+                pb = tfb.paragraphs[0]; pb.alignment = 2
+                rb = pb.add_run()
+                rb.text = "F" if estado == "frozen" else "T"
+                rb.font.size = Pt(10); rb.font.bold = True
+                rb.font.color.rgb = WHITE if estado == "frozen" else ACCENT
 
-    _slide_etapa_detalhe(
-        prs, 25,
-        "Etapa 5 — Transferência arquitetural para verificação",
-        "Testa se o condicionamento FiLM + MST herda-se de classificação para verificação, sem re-treino.",
-        entrada=[
-            "FiLM + ConvNeXt-T pré-treinado (Cap. 2)",
-            "RFW: 4 raças, pares oficiais 1 : 1 (Wang 2019)",
-            "BFW: 4 raças × 2 gêneros (Robinson 2020)",
-        ],
-        processo=[
-            "Encoder + FiLM CONGELADOS (feature-freeze)",
-            "Treina apenas cabeça de verificação (par-a-par)",
-            "Avaliação TAR @ FAR = 1 × 10⁻⁴ por raça",
-            "Comparação: backbone igual sem condicionamento",
-        ],
-        saida=[
-            "Métricas de verificação estratificadas por raça",
-            "Delta TAR por grupo demográfico",
-            "Teste empírico do Teorema 1 de LAFTR",
-        ],
-        regra_titulo="Regra de aprovação — hipótese H5 (central)",
-        regra_texto=(
-            "ΔTAR @ FAR = 1 × 10⁻⁴ ≥ +3 pontos percentuais no grupo "
-            "African, sobre backbone equivalente sem condicionamento — "
-            "demonstra transferência via feature-freeze (Madras et al., 2018)."
-        ),
-        extra_visual=viz,
+    # ============================================================
+    # PAINEL ESQUERDO — Modelo Etapa 3 (classificacao racial)
+    # ============================================================
+    camadas_antes = [
+        ("Cabeça classificador\n7 raças",  "treinada em Etapa 3",  "trained"),
+        ("FiLM · condicionamento",           "treinado",             "trained"),
+        ("ConvNeXt-T",                       "treinado end-to-end",  "trained"),
+    ]
+    _draw_stack(LEFT_X, PANEL_Y, SIDE_W,
+                "Modelo da Etapa 3  (classificação de 7 raças)",
+                NAVY, camadas_antes)
+
+    # ============================================================
+    # SETA central grande — transferencia arquitetural
+    # ============================================================
+    # Pentagona ou flecha larga
+    arrow = slide.shapes.add_shape(
+        MSO_SHAPE.RIGHT_ARROW,
+        Inches(MID_X + 0.15), Inches(PANEL_Y + 1.20),
+        Inches(MID_W - 0.30), Inches(1.60),
     )
+    arrow.fill.solid(); arrow.fill.fore_color.rgb = BLUE_MID
+    arrow.line.color.rgb = NAVY; arrow.line.width = Pt(1.8)
+    tf = arrow.text_frame
+    tf.margin_top = Inches(0.20); tf.margin_bottom = Inches(0.10)
+    tf.margin_left = Inches(0.10); tf.margin_right = Inches(0.35)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "TRANSFERÊNCIA"
+    r.font.size = Pt(13); r.font.bold = True
+    r.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = "feature-freeze"
+    r2.font.size = Pt(11); r2.font.italic = True
+    r2.font.color.rgb = WHITE
+    p3 = tf.add_paragraph(); p3.alignment = 2
+    r3 = p3.add_run()
+    r3.text = "Madras 2018 · LAFTR"
+    r3.font.size = Pt(9); r3.font.italic = True
+    r3.font.color.rgb = BLUE_LIGHT
+
+    # Rotulo abaixo da seta
+    sublbl = slide.shapes.add_textbox(
+        Inches(MID_X), Inches(PANEL_Y + 3.00),
+        Inches(MID_W), Inches(0.45),
+    )
+    psb = sublbl.text_frame.paragraphs[0]; psb.alignment = 2
+    rsb = psb.add_run()
+    rsb.text = "sem re-treino do\nencoder MST"
+    rsb.font.size = Pt(10); rsb.font.italic = True
+    rsb.font.bold = True
+    rsb.font.color.rgb = NAVY
+
+    # ============================================================
+    # PAINEL DIREITO — Modelo Etapa 5 (verificacao RFW/BFW)
+    # ============================================================
+    camadas_depois = [
+        ("Nova cabeça\nde verificação",     "ÚNICA treinada aqui",    "trained"),
+        ("FiLM · condicionamento",           "congelado",              "frozen"),
+        ("ConvNeXt-T",                       "congelado",              "frozen"),
+    ]
+    _draw_stack(RIGHT_X, PANEL_Y, SIDE_W,
+                "Modelo da Etapa 5  (verificação RFW · BFW)",
+                ACCENT, camadas_depois)
+
+    # ============================================================
+    # Rodape auxiliar: datasets + metrica
+    # ============================================================
+    FOOT_Y = PANEL_Y + PANEL_H + 0.10
+    foot_items = [
+        ("Datasets",   "RFW (Wang 2019, 4 raças) · BFW (Robinson 2020, 4 raças × 2 gêneros)"),
+        ("Métrica",    "TAR @ FAR = 1 × 10⁻⁴  estratificada por raça"),
+    ]
+    n = len(foot_items)
+    gap = 0.20
+    pw = (SLIDE_W - 1.0 - (n - 1) * gap) / n
+    for i, (k, v) in enumerate(foot_items):
+        bx = 0.5 + i * (pw + gap)
+        card = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(bx), Inches(FOOT_Y),
+            Inches(pw), Inches(0.52),
+        )
+        card.fill.solid(); card.fill.fore_color.rgb = WHITE
+        card.line.color.rgb = BLUE_MID; card.line.width = Pt(1.2)
+        tf = card.text_frame
+        tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.03)
+        tf.margin_left = Inches(0.12); tf.margin_right = Inches(0.12)
+        p = tf.paragraphs[0]
+        r1 = p.add_run()
+        r1.text = k + ":  "
+        r1.font.size = Pt(11); r1.font.bold = True
+        r1.font.color.rgb = NAVY
+        r2 = p.add_run()
+        r2.text = v
+        r2.font.size = Pt(11)
+        r2.font.color.rgb = GRAY_DK
+
+    # ============================================================
+    # Banner inferior: regra H5
+    # ============================================================
+    bot_y = 6.60; bot_h = 0.80
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(SLIDE_W - 1.0), Inches(bot_h),
+    )
+    bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.05)
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    p1 = tf.paragraphs[0]; p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "Regra de aprovação — hipótese H5 (central)"
+    r1.font.size = Pt(13); r1.font.bold = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = (
+        "ΔTAR @ FAR = 1 × 10⁻⁴ ≥ +3 pp no grupo African, "
+        "sobre backbone equivalente sem condicionamento."
+    )
+    r2.font.size = Pt(11); r2.font.color.rgb = BLUE_LIGHT
+
+    add_footer(slide)
+    add_page_number(slide, 25)
 
 
 # ============================================================
 # SLIDE 26 — Etapa 6: Decomposicao do erro (detalhamento)
 # ============================================================
 def slide_etapa6_decomposicao(prs: Presentation) -> None:
-    def viz(slide, x, y, w, h):
-        # Barra horizontal: fenotipico (irredutivel) + algoritmico (mitigavel)
-        bar_x = x + 0.3
-        bar_w = w - 0.6
-        bar_h = 0.55
-        bar_y = y + 0.20
+    """Etapa 6: layout com barra de decomposicao gigante como heroi.
 
-        # Segmento fenotipico (hipotetico 70%)
-        fen = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE,
-            Inches(bar_x), Inches(bar_y),
-            Inches(bar_w * 0.70), Inches(bar_h),
-        )
-        fen.fill.solid()
-        fen.fill.fore_color.rgb = BLUE_MID
-        fen.line.color.rgb = NAVY
-        fen.line.width = Pt(1.0)
-        tf = fen.text_frame
-        tf.margin_top = Inches(0.02); tf.margin_bottom = Inches(0.02)
-        p = tf.paragraphs[0]
-        p.alignment = 2
-        r = p.add_run()
-        r.text = "Fenotípico (irredutível) — ~70 %"
-        r.font.size = Pt(11)
-        r.font.bold = True
-        r.font.color.rgb = WHITE
+    Mostra visualmente a particao da variancia do erro Latinx em
+    FENOTIPICO (irredutivel) vs ALGORITMICO (mitigavel). Side-cards
+    explicam COMO se mede e O QUE se responde (tese de Pangelinan).
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Etapa 6 — Decomposição do erro Latinx")
 
-        alg = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE,
-            Inches(bar_x + bar_w * 0.70), Inches(bar_y),
-            Inches(bar_w * 0.30), Inches(bar_h),
-        )
-        alg.fill.solid()
-        alg.fill.fore_color.rgb = ACCENT
-        alg.line.color.rgb = NAVY
-        alg.line.width = Pt(1.0)
-        tf = alg.text_frame
-        tf.margin_top = Inches(0.02); tf.margin_bottom = Inches(0.02)
-        p = tf.paragraphs[0]
-        p.alignment = 2
-        r = p.add_run()
-        r.text = "Algorítmico (mitigável) — ~30 %"
-        r.font.size = Pt(11)
-        r.font.bold = True
-        r.font.color.rgb = WHITE
-
-        # legenda
-        cap = slide.shapes.add_textbox(
-            Inches(bar_x), Inches(bar_y + bar_h + 0.05),
-            Inches(bar_w), Inches(0.30),
-        )
-        pc = cap.text_frame.paragraphs[0]
-        pc.alignment = 2
-        pc.text = "Partição ilustrativa do R² — a proporção real é o resultado do experimento."
-        pc.font.size = Pt(10)
-        pc.font.italic = True
-        pc.font.color.rgb = GRAY_MD
-
-    _slide_etapa_detalhe(
-        prs, 26,
-        "Etapa 6 — Decomposição do erro Latinx",
-        "Separa quanto do erro vem de heterogeneidade fenotípica vs limitação do algoritmo.",
-        entrada=[
-            "Predições do melhor modelo (Config B, Etapa 3)",
-            "Rótulos raciais verdadeiros (FairFace val)",
-            "Vetor MST por imagem (Etapa 1)",
-            "Fração de pixels faciais (BiSeNet; Pangelinan)",
-        ],
-        processo=[
-            "Regressão linear: erro ~ MST_spread + pixel_info",
-            "Decomposição ANOVA: fenotípico × algorítmico",
-            "Cálculo R² por componente (variância explicada)",
-            "Repetição por raça (foco em Latinx)",
-        ],
-        saida=[
-            "R² componente fenotípico (irredutível)",
-            "R² componente algorítmico (mitigável)",
-            "Resposta quantitativa à tese de Pangelinan",
-        ],
-        regra_titulo="Regra de aprovação — hipótese H6 (teste da tese Pangelinan)",
-        regra_texto=(
-            "Se R² componente de pixel-info ≥ 70 %, confirma a refutação "
-            "de Pangelinan e vira contribuição quantitativa. Se < 70 %, "
-            "evidência contrária. Ambos os desfechos são resultado científico válido."
-        ),
-        extra_visual=viz,
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
     )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Separa quanto do erro vem de heterogeneidade fenotípica "
+        "intrínseca vs limitação do algoritmo — resposta à tese de Pangelinan."
+    )
+    ps.font.size = Pt(13); ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    SLIDE_W = 13.33
+
+    # ============================================================
+    # HEROI VISUAL — Barra gigante de decomposicao
+    # ============================================================
+    BAR_X = 1.00
+    BAR_Y = 2.00
+    BAR_W = SLIDE_W - 2 * BAR_X
+    BAR_H = 1.30
+    FEN_FRAC = 0.70   # ilustrativo
+    ALG_FRAC = 0.30
+
+    # Legenda acima da barra
+    hdr = slide.shapes.add_textbox(
+        Inches(BAR_X), Inches(BAR_Y - 0.35),
+        Inches(BAR_W), Inches(0.30),
+    )
+    ph = hdr.text_frame.paragraphs[0]; ph.alignment = 2
+    r = ph.add_run()
+    r.text = "100 % da variância do erro Latinx"
+    r.font.size = Pt(13); r.font.bold = True
+    r.font.italic = True
+    r.font.color.rgb = GRAY_MD
+
+    # Segmento FENOTIPICO (grande)
+    fen = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE,
+        Inches(BAR_X), Inches(BAR_Y),
+        Inches(BAR_W * FEN_FRAC), Inches(BAR_H),
+    )
+    fen.fill.solid(); fen.fill.fore_color.rgb = BLUE_MID
+    fen.line.color.rgb = NAVY; fen.line.width = Pt(1.5)
+    tf = fen.text_frame
+    tf.margin_top = Inches(0.15); tf.margin_bottom = Inches(0.10)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "FENOTÍPICO"
+    r.font.size = Pt(22); r.font.bold = True
+    r.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = "irredutível — intrínseco ao problema"
+    r2.font.size = Pt(13); r2.font.italic = True
+    r2.font.color.rgb = BLUE_LIGHT
+    p3 = tf.add_paragraph(); p3.alignment = 2
+    r3 = p3.add_run()
+    r3.text = "variância explicada por MST_spread  +  pixel_info"
+    r3.font.size = Pt(10)
+    r3.font.color.rgb = BLUE_LIGHT
+
+    # Segmento ALGORITMICO
+    alg = slide.shapes.add_shape(
+        MSO_SHAPE.RECTANGLE,
+        Inches(BAR_X + BAR_W * FEN_FRAC), Inches(BAR_Y),
+        Inches(BAR_W * ALG_FRAC), Inches(BAR_H),
+    )
+    alg.fill.solid(); alg.fill.fore_color.rgb = ACCENT
+    alg.line.color.rgb = NAVY; alg.line.width = Pt(1.5)
+    tf = alg.text_frame
+    tf.margin_top = Inches(0.15); tf.margin_bottom = Inches(0.10)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "ALGORÍTMICO"
+    r.font.size = Pt(18); r.font.bold = True
+    r.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = "mitigável"
+    r2.font.size = Pt(12); r2.font.italic = True
+    r2.font.color.rgb = WHITE
+    p3 = tf.add_paragraph(); p3.alignment = 2
+    r3 = p3.add_run()
+    r3.text = "o espaço onde a proposta pode agir"
+    r3.font.size = Pt(10)
+    r3.font.color.rgb = WHITE
+
+    # Escala debaixo da barra
+    scale_y = BAR_Y + BAR_H + 0.05
+    # 0 %, 70 %, 100 %
+    for frac, label in [(0.0, "0 %"), (FEN_FRAC, "70 %"), (1.0, "100 %")]:
+        tick_x = BAR_X + BAR_W * frac
+        # Tick vertical
+        tick = slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE,
+            Inches(tick_x - 0.01), Inches(scale_y),
+            Inches(0.02), Inches(0.14),
+        )
+        tick.fill.solid(); tick.fill.fore_color.rgb = GRAY_DK
+        tick.line.fill.background()
+        # Rotulo
+        tx = slide.shapes.add_textbox(
+            Inches(tick_x - 0.40), Inches(scale_y + 0.18),
+            Inches(0.80), Inches(0.25),
+        )
+        pt = tx.text_frame.paragraphs[0]; pt.alignment = 2
+        rt = pt.add_run()
+        rt.text = label
+        rt.font.size = Pt(10); rt.font.bold = True
+        rt.font.color.rgb = GRAY_DK
+
+    # Nota ilustrativa
+    note_y = scale_y + 0.55
+    note = slide.shapes.add_textbox(
+        Inches(BAR_X), Inches(note_y),
+        Inches(BAR_W), Inches(0.30),
+    )
+    pn = note.text_frame.paragraphs[0]; pn.alignment = 2
+    rn = pn.add_run()
+    rn.text = (
+        "Partição ilustrativa — a proporção real é o resultado experimental da Etapa 6."
+    )
+    rn.font.size = Pt(10); rn.font.italic = True
+    rn.font.color.rgb = GRAY_MD
+
+    # ============================================================
+    # Duas colunas abaixo
+    # ============================================================
+    COL_Y = 4.20
+    COL_H = 2.20
+    COL_W = 6.00
+    COL_GAP = 0.33
+    col1_x = (SLIDE_W - 2 * COL_W - COL_GAP) / 2
+    col2_x = col1_x + COL_W + COL_GAP
+
+    colunas = [
+        {
+            "titulo": "Como se mede",
+            "cor_titulo": BLUE_MID,
+            "itens": [
+                ("Variáveis:", "spread MST por imagem (Etapa 1) · fração de pixels faciais (BiSeNet, método Pangelinan)."),
+                ("Modelo:",     "regressão linear  erro ~ MST_spread + pixel_info  + ANOVA decomposicional."),
+                ("Métrica:",    "R² por componente (variância explicada)."),
+            ],
+        },
+        {
+            "titulo": "O que se responde",
+            "cor_titulo": ACCENT,
+            "itens": [
+                ("Para a tese:", "quanto do erro Latinx é inerente ao problema e quanto é atribuível ao algoritmo?"),
+                ("Para Pangelinan (2023):", "confirmação ou refutação quantitativa da hipótese de \"erro fenotípico dominante\"."),
+                ("Para a proposta:", "define o teto empírico de mitigação possível com condicionamento FiLM + MST."),
+            ],
+        },
+    ]
+    for col_i, col in enumerate(colunas):
+        x = col1_x if col_i == 0 else col2_x
+        # Header
+        hdr = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(COL_Y),
+            Inches(COL_W), Inches(0.45),
+        )
+        hdr.fill.solid(); hdr.fill.fore_color.rgb = col["cor_titulo"]
+        hdr.line.fill.background()
+        tf = hdr.text_frame
+        tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.03)
+        p = tf.paragraphs[0]; p.alignment = 2
+        r = p.add_run()
+        r.text = col["titulo"]
+        r.font.size = Pt(13); r.font.bold = True
+        r.font.color.rgb = WHITE
+
+        body = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(COL_Y + 0.48),
+            Inches(COL_W), Inches(COL_H - 0.48),
+        )
+        body.fill.solid(); body.fill.fore_color.rgb = WHITE
+        body.line.color.rgb = col["cor_titulo"]; body.line.width = Pt(1.2)
+
+        tb = slide.shapes.add_textbox(
+            Inches(x + 0.18), Inches(COL_Y + 0.56),
+            Inches(COL_W - 0.36), Inches(COL_H - 0.62),
+        )
+        tf = tb.text_frame; tf.word_wrap = True
+        for j, (head, body_txt) in enumerate(col["itens"]):
+            p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
+            r1 = p.add_run()
+            r1.text = "•  " + head + "  "
+            r1.font.size = Pt(11); r1.font.bold = True
+            r1.font.color.rgb = col["cor_titulo"]
+            r2 = p.add_run()
+            r2.text = body_txt
+            r2.font.size = Pt(11)
+            r2.font.color.rgb = GRAY_DK
+            p.space_after = Pt(4)
+
+    # ============================================================
+    # Banner inferior: regra H6
+    # ============================================================
+    bot_y = 6.60; bot_h = 0.80
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(SLIDE_W - 1.0), Inches(bot_h),
+    )
+    bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.05)
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    p1 = tf.paragraphs[0]; p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "Regra de aprovação — hipótese H6 (desfecho bidirecional, cada caso é resultado válido)"
+    r1.font.size = Pt(12); r1.font.bold = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = (
+        "Se R² fenotípico ≥ 70 %  →  confirma Pangelinan.    "
+        "Se < 70 %  →  evidência contrária, nova contribuição teórica."
+    )
+    r2.font.size = Pt(11); r2.font.color.rgb = BLUE_LIGHT
+
+    add_footer(slide)
+    add_page_number(slide, 26)
 
 
 # ============================================================
