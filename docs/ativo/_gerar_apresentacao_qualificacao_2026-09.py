@@ -1533,7 +1533,7 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
         ("Rosto\n224 × 224",            "entrada bruta",         GRAY_LT, GRAY_DK),
         ("MTCNN\ndetecção + alinhamento", "Zhang 2016",          WHITE,   NAVY),
         ("Crop à face\n(normalizada)",   "pose canônica",        WHITE,   NAVY),
-        ("ViT-S  /  ResNet-34\nfine-tuned para MST", "backbone neural", BLUE_MID, WHITE),
+        ("ViT-B/16\nfine-tuned para MST", "torchvision",          BLUE_MID, WHITE),
     ]
     n = len(passos)
     PAL_SLOT_W = 3.80   # espaco reservado para paleta a direita
@@ -1660,7 +1660,7 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
             "titulo": "Arquitetura e Saída Esperada",
             "cor_titulo": ACCENT,
             "itens": [
-                ("Backbone:",   "ViT-Small ou ResNet-34 fine-tuned para classificação na escala MST de 10 tons."),
+                ("Backbone:",   "ViT-B/16 (torchvision) fine-tuned para classificação na escala MST de 10 tons; ViT-Small como alternativa opcional para reprodução do SkinToneNet."),
                 ("Saída:",      "vetor de probabilidade softmax 10-dim (um por imagem)."),
                 ("Função no pipeline:", "sinal condicionante estático para as camadas FiLM da Etapa 3 — também alimenta a matriz da Etapa 2."),
             ],
