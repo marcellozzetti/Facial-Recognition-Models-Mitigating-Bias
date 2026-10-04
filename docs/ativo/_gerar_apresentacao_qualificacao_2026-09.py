@@ -1815,12 +1815,12 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     ps.font.color.rgb = GRAY_MD
 
     # ============================================================
-    # LADO ESQUERDO — figura anatomica (aspect ~1.787:1)
+    # LADO ESQUERDO — figura anatomica (aspect ~2.013:1)
     # ============================================================
     fig_x = 0.30
     fig_y = 1.75
-    fig_w = 8.00
-    fig_h = fig_w / 1.787  # ~4.48
+    fig_w = 8.20
+    fig_h = fig_w / 2.013  # ~4.07
     slide.shapes.add_picture(
         str(IMG_DIR / "convnext_backbone.png"),
         Inches(fig_x), Inches(fig_y),
@@ -1859,16 +1859,18 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     body.line.color.rgb = NAVY; body.line.width = Pt(1.2)
 
     bullets = [
-        ("Stem (entrada):",
-         "patchify conv 4×4 stride 4 — downsample inicial 4× sobre a imagem bruta (224×224×3 → 56×56×96)."),
-        ("Blocos (dentro de cada estágio):",
-         "DW 7×7 (grande kernel, canal-a-canal) → LN → PW 1×1 ↑4× → GELU → PW 1×1 ↓1× → LayerScale → residual."),
-        ("Downsample entre estágios:",
-         "LN + conv 2×2 stride 2 — dobra canais e corta a resolução pela metade."),
-        ("Head (saída):",
-         "Global Average Pooling + LayerNorm + Linear 768 → 7 classes."),
-        ("Modernizações-chave vs ResNet-34:",
-         "LayerNorm (não BN) · GELU (não ReLU) · kernel 7×7 depthwise · inverted bottleneck 4×."),
+        ("Stem — \"quebra a imagem em ladrilhos\":",
+         "conv 4×4 stride 4 — reduz o tamanho em 4× e cria 96 canais (224×224×3 → 56×56×96)."),
+        ("DW 7×7 — \"janela grande, um canal por vez\":",
+         "cada canal aprende seu próprio padrão espacial amplo, sem misturar com os outros."),
+        ("MLP interna 1×1 (↑4× → GELU → ↓1×) — \"FFN estilo Transformer\":",
+         "expande os canais em 4×, aplica ativação suave, comprime de volta."),
+        ("Atalho residual + LayerScale — \"soma a entrada, pesada\":",
+         "o bloco contribui como uma correção pequena; LayerScale decide o quanto pesa."),
+        ("Downsample entre estágios — \"metade do espaço, dobro dos canais\":",
+         "LN + conv 2×2 stride 2 → 56→28→14→7 pixels e 96→192→384→768 canais."),
+        ("Head — \"achata e classifica\":",
+         "GAP sobre o mapa 7×7 → vetor 768-dim → LN → Linear → 7 classes."),
     ]
     tb = slide.shapes.add_textbox(
         Inches(txt_x + 0.14), Inches(txt_y + 0.56),

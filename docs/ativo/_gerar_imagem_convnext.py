@@ -1,16 +1,13 @@
 """Gera diagrama do backbone ConvNeXt-T detalhado — foco exclusivo
-na ARQUITETURA, sem mencao a FiLM.
+na ARQUITETURA. Sem mencao a FiLM nem comparacoes com ResNet.
 
-Mostra:
+Mostra em 2 niveis:
   (a) Fluxo top-level: imagem -> Stem -> 4 estagios -> Head
       Com resolucoes espaciais e canais em cada etapa
       (56x56x96 -> 28x28x192 -> 14x14x384 -> 7x7x768).
   (b) Zoom detalhando o INTERIOR de um bloco ConvNeXt:
       DW 7x7 -> LN -> PW 1x1 (expand 4x) -> GELU -> PW 1x1 (reduce)
       -> LayerScale -> residual add.
-  (c) Painel lateral comparando com ResNet-34
-      (modernizacoes-chave: kernel 7x7 depthwise, LN em vez de BN,
-      GELU em vez de ReLU, inverted bottleneck).
 
 Saida: docs/ativo/imagens/convnext_backbone.png + copia em
 docs/tese/images/convnext_backbone.png (300 DPI).
@@ -62,7 +59,8 @@ def _arrow(ax, x0, y0, x1, y1, color=NAVY, lw=2.0, ms=18, style="-|>"):
 
 
 def build_figure(out_path: Path) -> None:
-    fig, ax = plt.subplots(figsize=(16, 9), dpi=300)
+    # figura mais curta agora que a faixa inferior foi removida
+    fig, ax = plt.subplots(figsize=(16, 8), dpi=300)
     ax.set_xlim(0, 100)
     ax.set_ylim(0, 56)
     ax.axis("off")
@@ -73,7 +71,7 @@ def build_figure(out_path: Path) -> None:
             fontsize=22, fontweight="bold", color=NAVY)
     ax.text(50, 49.8,
             "4 estágios hierárquicos  ·  28 M parâmetros  ·  "
-            "LayerNorm · GELU  ·  Liu et al. (2022, CVPR)",
+            "Liu et al. (2022, CVPR)",
             ha="center", va="center",
             fontsize=12, color=GRAY_MD, style="italic")
 
@@ -177,10 +175,10 @@ def build_figure(out_path: Path) -> None:
     ops = [
         ("Input",         "", GRAY_LT, NAVY, False),
         ("DW 7×7",        "depthwise\ngrande kernel", WHITE, NAVY, False),
-        ("LayerNorm",     "não BatchNorm", WHITE, NAVY, False),
-        ("PW 1×1  ↑ 4×",  "expande canais",  BLUE_LIGHT, NAVY, False),
-        ("GELU",          "não ReLU",  WHITE, NAVY, False),
-        ("PW 1×1  ↓ 1×",  "reduz canais",  BLUE_LIGHT, NAVY, False),
+        ("LayerNorm",     "normaliza\npor amostra", WHITE, NAVY, False),
+        ("PW 1×1  ↑ 4×",  "expande\ncanais",  BLUE_LIGHT, NAVY, False),
+        ("GELU",          "ativação\nsuave",  WHITE, NAVY, False),
+        ("PW 1×1  ↓ 1×",  "reduz\ncanais",  BLUE_LIGHT, NAVY, False),
         ("LayerScale",    "escala\naprendida", WHITE, NAVY, False),
         ("+",             "residual",      ACCENT, WHITE, True),
         ("Output",        "", GRAY_LT, NAVY, False),
@@ -242,31 +240,6 @@ def build_figure(out_path: Path) -> None:
     _text(ax, (input_cx + add_cx) / 2, arc_top_y + 0.9,
           "conexão residual (atalho)",
           size=9, italic=True, bold=True, color=ACCENT)
-
-    # =========================================================
-    # LINHA 3 — Modernizacoes vs ResNet (comparacao rapida)
-    # =========================================================
-    y_cmp = 3.5
-    pw = 20
-    gap = 2
-    moderniz = [
-        ("conv 7×7 depthwise",  "vs. 3×3 em ResNet"),
-        ("LayerNorm",            "vs. BatchNorm"),
-        ("GELU",                 "vs. ReLU"),
-        ("inverted bottleneck",  "4× expansão interna"),
-    ]
-    total_w = len(moderniz) * pw + (len(moderniz) - 1) * gap
-    px0 = (100 - total_w) / 2
-    _text(ax, 50, y_cmp + 4.0,
-          "Modernizações-chave vs ResNet-34  (justificam a escolha arquitetural)",
-          size=10.5, bold=True, italic=True, color=NAVY)
-    for i, (titulo, sub) in enumerate(moderniz):
-        x = px0 + i * (pw + gap)
-        _rbox(ax, x, y_cmp - 1.5, pw, 3.2, WHITE, ec=NAVY, lw=1.0)
-        _text(ax, x + pw / 2, y_cmp + 0.7, titulo,
-              size=10, bold=True, color=NAVY)
-        _text(ax, x + pw / 2, y_cmp - 0.9, sub,
-              size=8.5, italic=True, color=GRAY_MD)
 
     plt.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
