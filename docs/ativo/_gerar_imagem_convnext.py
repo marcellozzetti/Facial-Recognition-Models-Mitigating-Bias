@@ -1,13 +1,16 @@
-"""Gera diagrama do backbone ConvNeXt-T mostrando os 4 estagios hierarquicos.
+"""Gera diagrama do backbone ConvNeXt-T detalhado — foco exclusivo
+na ARQUITETURA, sem mencao a FiLM.
 
-Objetivo: comunicar visualmente a arquitetura do backbone escolhido
-na metodologia (Etapa 3). Destaca:
-  - entrada (imagem 224x224x3)
-  - stem conv 4x4 stride 4
-  - 4 estagios hierarquicos (3, 3, 9, 3 blocos) com canais crescentes
-    (96 -> 192 -> 384 -> 768) e resolucao decrescente (56 -> 28 -> 14 -> 7)
-  - GAP + LayerNorm + classificador final
-  - pontos naturais de insercao de FiLM (apos cada estagio)
+Mostra:
+  (a) Fluxo top-level: imagem -> Stem -> 4 estagios -> Head
+      Com resolucoes espaciais e canais em cada etapa
+      (56x56x96 -> 28x28x192 -> 14x14x384 -> 7x7x768).
+  (b) Zoom detalhando o INTERIOR de um bloco ConvNeXt:
+      DW 7x7 -> LN -> PW 1x1 (expand 4x) -> GELU -> PW 1x1 (reduce)
+      -> LayerScale -> residual add.
+  (c) Painel lateral comparando com ResNet-34
+      (modernizacoes-chave: kernel 7x7 depthwise, LN em vez de BN,
+      GELU em vez de ReLU, inverted bottleneck).
 
 Saida: docs/ativo/imagens/convnext_backbone.png + copia em
 docs/tese/images/convnext_backbone.png (300 DPI).
@@ -17,7 +20,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
@@ -31,11 +33,12 @@ ACCENT = (192 / 255, 57 / 255, 43 / 255)
 WHITE = (1.0, 1.0, 1.0)
 
 
-def _rbox(ax, x, y, w, h, fc, ec=NAVY, lw=1.5):
+def _rbox(ax, x, y, w, h, fc, ec=NAVY, lw=1.5, dashed=False):
+    style = (0, (4, 3)) if dashed else "solid"
     box = FancyBboxPatch(
         (x, y), w, h,
         boxstyle="round,pad=0.02,rounding_size=0.5",
-        fc=fc, ec=ec, lw=lw,
+        fc=fc, ec=ec, lw=lw, linestyle=style,
     )
     ax.add_patch(box)
     return box
@@ -50,157 +53,220 @@ def _text(ax, x, y, s, size=12, bold=False, italic=False,
             color=color)
 
 
-def _arrow(ax, x0, y0, x1, y1, color=NAVY, lw=2.0, ms=18):
+def _arrow(ax, x0, y0, x1, y1, color=NAVY, lw=2.0, ms=18, style="-|>"):
     ax.add_patch(FancyArrowPatch(
         (x0, y0), (x1, y1),
-        arrowstyle="-|>", color=color, lw=lw,
+        arrowstyle=style, color=color, lw=lw,
         mutation_scale=ms, shrinkA=2, shrinkB=2,
     ))
 
 
 def build_figure(out_path: Path) -> None:
-    fig, ax = plt.subplots(figsize=(16, 8), dpi=300)
+    fig, ax = plt.subplots(figsize=(16, 9), dpi=300)
     ax.set_xlim(0, 100)
     ax.set_ylim(0, 56)
     ax.axis("off")
 
     # ---------- Titulo ----------
-    ax.text(50, 52, "ConvNeXt-T — backbone convolucional moderno",
+    ax.text(50, 53, "ConvNeXt-T — anatomia do backbone",
             ha="center", va="center",
             fontsize=22, fontweight="bold", color=NAVY)
-    ax.text(50, 48.3,
+    ax.text(50, 49.8,
             "4 estágios hierárquicos  ·  28 M parâmetros  ·  "
-            "LayerNorm  ·  Liu et al. (2022, CVPR)",
+            "LayerNorm · GELU  ·  Liu et al. (2022, CVPR)",
             ha="center", va="center",
-            fontsize=13, color=GRAY_MD, style="italic")
+            fontsize=12, color=GRAY_MD, style="italic")
 
     # =========================================================
-    # LINHA PRINCIPAL — fluxo horizontal
+    # LINHA PRINCIPAL — Fluxo top-level da arquitetura
     # =========================================================
-    y_main = 24
-    stage_h = 10
+    y_main = 36
+    stage_h = 9
 
     # Imagem de entrada
-    _rbox(ax, 2, y_main, 10, stage_h, GRAY_LT, ec=NAVY)
-    _text(ax, 7, y_main + stage_h / 2 + 0.6, "Imagem", size=13, bold=True)
-    _text(ax, 7, y_main + stage_h / 2 - 1.0, "224 × 224 × 3",
-          size=11, color=GRAY_DK)
-    _arrow(ax, 12, y_main + stage_h / 2, 16, y_main + stage_h / 2)
+    _rbox(ax, 1.5, y_main, 8, stage_h, GRAY_LT, ec=NAVY)
+    _text(ax, 5.5, y_main + stage_h / 2 + 0.6, "Imagem", size=12, bold=True)
+    _text(ax, 5.5, y_main + stage_h / 2 - 1.0, "224×224×3",
+          size=10, color=GRAY_DK)
+    _arrow(ax, 9.5, y_main + stage_h / 2, 11.5, y_main + stage_h / 2)
 
     # Stem (patchify conv 4x4 stride 4)
-    _rbox(ax, 16, y_main + 1, 10, stage_h - 2, WHITE, ec=NAVY)
-    _text(ax, 21, y_main + stage_h / 2 + 0.7, "Stem", size=12, bold=True,
-          color=NAVY)
-    _text(ax, 21, y_main + stage_h / 2 - 0.9, "conv 4×4", size=10,
-          color=GRAY_DK)
-    _text(ax, 21, y_main + stage_h / 2 - 2.1, "stride 4", size=10,
-          color=GRAY_DK, italic=True)
-    _arrow(ax, 26, y_main + stage_h / 2, 29, y_main + stage_h / 2)
+    _rbox(ax, 11.5, y_main + 0.8, 9.5, stage_h - 1.6, WHITE, ec=NAVY)
+    _text(ax, 16.25, y_main + stage_h / 2 + 1.4, "Stem",
+          size=11, bold=True, color=NAVY)
+    _text(ax, 16.25, y_main + stage_h / 2 - 0.1, "conv 4×4",
+          size=10, color=GRAY_DK)
+    _text(ax, 16.25, y_main + stage_h / 2 - 1.5, "stride 4",
+          size=9, italic=True, color=GRAY_MD)
+    _text(ax, 16.25, y_main - 1.3, "56×56×96",
+          size=9, italic=True, color=NAVY)
+    _arrow(ax, 21, y_main + stage_h / 2, 23, y_main + stage_h / 2)
 
     # Os 4 estagios
     stage_data = [
-        ("Estágio 1", "3 blocos",  "56 × 56 × 96",   BLUE_LIGHT),
-        ("Estágio 2", "3 blocos",  "28 × 28 × 192",  (155 / 255, 180 / 255, 220 / 255)),
-        ("Estágio 3", "9 blocos",  "14 × 14 × 384",  BLUE_MID),
-        ("Estágio 4", "3 blocos",  "7 × 7 × 768",    (46 / 255, 79 / 255, 138 / 255)),
+        ("Estágio 1", "3 blocos",  "56×56×96",   BLUE_LIGHT, NAVY),
+        ("Estágio 2", "3 blocos",  "28×28×192",  (155 / 255, 180 / 255, 220 / 255), NAVY),
+        ("Estágio 3", "9 blocos",  "14×14×384",  BLUE_MID, WHITE),
+        ("Estágio 4", "3 blocos",  "7×7×768",    (46 / 255, 79 / 255, 138 / 255), WHITE),
     ]
-    stage_w = 11
-    gap = 1.0
-    cur_x = 29.5
+    stage_w = 11.5
+    gap = 1.2
+    cur_x = 23
     stage_centers = []
-    for i, (nome, blocos, dims, fc) in enumerate(stage_data):
+    for i, (nome, blocos, dims, fc, tc) in enumerate(stage_data):
         _rbox(ax, cur_x, y_main, stage_w, stage_h, fc, ec=NAVY, lw=1.8)
-        # cor do texto (branco se fundo escuro)
-        tc = WHITE if i >= 2 else NAVY
-        _text(ax, cur_x + stage_w / 2, y_main + stage_h - 1.5,
-              nome, size=13, bold=True, color=tc)
-        _text(ax, cur_x + stage_w / 2, y_main + stage_h / 2 - 0.3,
-              blocos, size=11, color=tc)
-        _text(ax, cur_x + stage_w / 2, y_main + 1.5,
-              dims, size=10, italic=True,
-              color=tc if i >= 2 else GRAY_DK)
+        _text(ax, cur_x + stage_w / 2, y_main + stage_h - 1.4,
+              nome, size=12, bold=True, color=tc)
+        _text(ax, cur_x + stage_w / 2, y_main + stage_h / 2 + 0.1,
+              blocos, size=10.5, color=tc)
+        _text(ax, cur_x + stage_w / 2, y_main - 1.3,
+              dims, size=9, italic=True,
+              color=NAVY if i < 2 else NAVY)
         stage_centers.append(cur_x + stage_w / 2)
         if i < 3:
-            # Downsample seta + rotulo
+            # Downsample seta com rotulo "↓2"
             dx = cur_x + stage_w
             _arrow(ax, dx, y_main + stage_h / 2,
                    dx + gap - 0.1, y_main + stage_h / 2)
+            _text(ax, dx + gap / 2, y_main + stage_h + 1.4,
+                  "↓ 2", size=10, bold=True, color=ACCENT)
+            _text(ax, dx + gap / 2, y_main - 2.6,
+                  "downsample\nLN + conv 2×2 s=2",
+                  size=8, italic=True, color=ACCENT)
         cur_x += stage_w + gap
 
     # Seta para GAP + LN
     _arrow(ax, cur_x - gap + 0.1, y_main + stage_h / 2,
            cur_x + 1, y_main + stage_h / 2)
 
-    # GAP + LayerNorm (pos-ultimo estagio)
-    _rbox(ax, cur_x + 1, y_main + 1.5, 7, stage_h - 3, WHITE, ec=NAVY)
-    _text(ax, cur_x + 4.5, y_main + stage_h / 2 + 0.6, "GAP", size=11, bold=True,
-          color=NAVY)
-    _text(ax, cur_x + 4.5, y_main + stage_h / 2 - 1.3, "+ LayerNorm", size=10,
-          color=GRAY_DK, italic=True)
-    _arrow(ax, cur_x + 8, y_main + stage_h / 2, cur_x + 10, y_main + stage_h / 2)
-
-    # Classificador 7 racas
-    cls_x = cur_x + 10
-    _rbox(ax, cls_x, y_main + 1, 8, stage_h - 2, ACCENT, ec=ACCENT, lw=2.0)
-    _text(ax, cls_x + 4, y_main + stage_h / 2 + 0.5, "Linear",
-          size=13, bold=True, color=WHITE)
-    _text(ax, cls_x + 4, y_main + stage_h / 2 - 1.1, "768 → 7",
-          size=11, color=WHITE)
-    _text(ax, cls_x + 4, y_main + stage_h / 2 - 2.4, "7 raças",
-          size=10, color=WHITE, italic=True)
-
-    # Seta para fora (predicao)
-    _arrow(ax, cls_x + 4, y_main + 1, cls_x + 4, y_main - 3.5, color=ACCENT)
-    _text(ax, cls_x + 4, y_main - 5, "Predição racial",
-          size=11, bold=True, color=GRAY_DK)
+    # Head: GAP + LN + Linear
+    _rbox(ax, cur_x + 1, y_main + 0.8, 8, stage_h - 1.6, WHITE, ec=NAVY)
+    _text(ax, cur_x + 5, y_main + stage_h / 2 + 1.4, "Head",
+          size=11, bold=True, color=NAVY)
+    _text(ax, cur_x + 5, y_main + stage_h / 2 - 0.1, "GAP + LN",
+          size=10, color=GRAY_DK)
+    _text(ax, cur_x + 5, y_main + stage_h / 2 - 1.5, "Linear 7 classes",
+          size=9, italic=True, color=GRAY_MD)
 
     # =========================================================
-    # BAIXO — marcadores de pontos de insercao FiLM
+    # LINHA 2 — Zoom detalhando o interior de um bloco ConvNeXt
     # =========================================================
-    y_mark = y_main - 2.0
-    for i, cx in enumerate(stage_centers):
-        # Pequena marca em accent abaixo de cada estagio
-        marker = mpatches.Circle(
-            (cx, y_mark), 0.6,
-            fc=WHITE, ec=ACCENT, lw=1.6,
-        )
-        ax.add_patch(marker)
-        ax.text(cx, y_mark, str(i + 1), ha="center", va="center",
-                fontsize=9, fontweight="bold", color=ACCENT)
-        _text(ax, cx, y_mark - 2.0,
-              "ponto FiLM",
-              size=8.5, italic=True, color=ACCENT)
+    # Dashed callout do Estagio 3 para o inset
+    callout_src_x = stage_centers[2]  # estagio 3 (central)
+    callout_src_y = y_main
+    ax.plot([callout_src_x, 50], [callout_src_y, 28],
+            color=NAVY, lw=1.0, linestyle=(0, (4, 3)))
+    ax.plot([callout_src_x, 50], [callout_src_y, 28],
+            color=NAVY, lw=0, marker=",", zorder=1)
 
-    # Linha conectora e rotulo
-    ax.plot([stage_centers[0], stage_centers[-1]],
-            [y_mark - 3.2, y_mark - 3.2],
-            color=ACCENT, lw=1.0, linestyle=":")
-    _text(ax, (stage_centers[0] + stage_centers[-1]) / 2, y_mark - 4.3,
-          "4 pontos naturais de inserção para FiLM "
-          "(após cada estágio, sem modificar blocos internos)",
-          size=10.5, italic=True, bold=True, color=ACCENT)
+    # Container do inset
+    inset_x = 6
+    inset_y = 10
+    inset_w = 88
+    inset_h = 15.5
+    inset = _rbox(ax, inset_x, inset_y, inset_w, inset_h,
+                  (0.985, 0.99, 1.0), ec=NAVY, lw=1.2, dashed=True)
+    _text(ax, inset_x + inset_w / 2, inset_y + inset_h - 1.4,
+          "Dentro de cada bloco ConvNeXt  "
+          "(repetido 3, 3, 9, 3 vezes nos estágios 1–4)",
+          size=11, bold=True, italic=True, color=NAVY)
 
-    # =========================================================
-    # ALTO — propriedades-chave
-    # =========================================================
-    y_prop = 43
-    propriedades = [
-        ("82 % top-1\nImageNet",  "paridade com ViTs"),
-        ("~ 1/3  dos\nparâmetros", "vs. Swin-T"),
-        ("LayerNorm\n(não BN)",   "estável com batch pequeno"),
-        ("~ 300 h  GPU",          "3 sementes × 3 configs"),
+    # Sequencia de operacoes dentro do bloco
+    #  Input -> DW7x7 -> LN -> PW1x1 (4x) -> GELU -> PW1x1 (1x)
+    #        -> LayerScale -> (+residual) -> Output
+    ops = [
+        ("Input",         "", GRAY_LT, NAVY, False),
+        ("DW 7×7",        "depthwise\ngrande kernel", WHITE, NAVY, False),
+        ("LayerNorm",     "não BatchNorm", WHITE, NAVY, False),
+        ("PW 1×1  ↑ 4×",  "expande canais",  BLUE_LIGHT, NAVY, False),
+        ("GELU",          "não ReLU",  WHITE, NAVY, False),
+        ("PW 1×1  ↓ 1×",  "reduz canais",  BLUE_LIGHT, NAVY, False),
+        ("LayerScale",    "escala\naprendida", WHITE, NAVY, False),
+        ("+",             "residual",      ACCENT, WHITE, True),
+        ("Output",        "", GRAY_LT, NAVY, False),
     ]
-    pw = 15
-    gap = 1.5
-    total_w = len(propriedades) * pw + (len(propriedades) - 1) * gap
+    n_ops = len(ops)
+    op_gap = 0.9
+    usable_w = inset_w - 2.0
+    op_w = (usable_w - (n_ops - 1) * op_gap) / n_ops
+    op_h = 7
+    op_y = inset_y + 2.5
+    op_centers = []
+    cur_x = inset_x + 1.0
+    for i, (lbl, note, fc, tc, is_circle) in enumerate(ops):
+        if is_circle:
+            # Pequeno circulo para +residual
+            cx = cur_x + op_w / 2
+            cy = op_y + op_h / 2
+            circ_r = min(op_w, op_h) / 2 * 0.75
+            import matplotlib.patches as mpatches
+            c = mpatches.Circle((cx, cy), circ_r,
+                                 fc=fc, ec=fc, lw=1.5)
+            ax.add_patch(c)
+            ax.text(cx, cy, lbl,
+                    ha="center", va="center",
+                    fontsize=16, fontweight="bold", color=tc)
+            _text(ax, cx, cy - circ_r - 1.0, note,
+                  size=9, italic=True, color=ACCENT)
+        else:
+            _rbox(ax, cur_x, op_y, op_w, op_h, fc, ec=NAVY, lw=1.4)
+            _text(ax, cur_x + op_w / 2, op_y + op_h / 2 + 0.9,
+                  lbl, size=10, bold=True, color=tc)
+            if note:
+                _text(ax, cur_x + op_w / 2, op_y + op_h / 2 - 1.2,
+                      note, size=8, italic=True, color=GRAY_MD)
+        op_centers.append(cur_x + op_w / 2)
+        if i < n_ops - 1:
+            _arrow(ax, cur_x + op_w,
+                   op_y + op_h / 2,
+                   cur_x + op_w + op_gap - 0.1,
+                   op_y + op_h / 2,
+                   lw=1.4, ms=12)
+        cur_x += op_w + op_gap
+
+    # Arco de residual (Input -> + add)
+    # Linha curvada acima dos blocos, do centro do Input ao centro do +
+    import matplotlib.patches as mpatches
+    input_cx = op_centers[0]
+    add_cx = op_centers[7]
+    arc_top_y = op_y + op_h + 1.5
+    # Linha subindo do input
+    ax.plot([input_cx, input_cx], [op_y + op_h, arc_top_y],
+            color=ACCENT, lw=1.5)
+    # Linha horizontal
+    ax.plot([input_cx, add_cx], [arc_top_y, arc_top_y],
+            color=ACCENT, lw=1.5)
+    # Linha descendo para o +
+    _arrow(ax, add_cx, arc_top_y, add_cx, op_y + op_h + 0.3,
+           color=ACCENT, lw=1.5, ms=13)
+    _text(ax, (input_cx + add_cx) / 2, arc_top_y + 0.9,
+          "conexão residual (atalho)",
+          size=9, italic=True, bold=True, color=ACCENT)
+
+    # =========================================================
+    # LINHA 3 — Modernizacoes vs ResNet (comparacao rapida)
+    # =========================================================
+    y_cmp = 3.5
+    pw = 20
+    gap = 2
+    moderniz = [
+        ("conv 7×7 depthwise",  "vs. 3×3 em ResNet"),
+        ("LayerNorm",            "vs. BatchNorm"),
+        ("GELU",                 "vs. ReLU"),
+        ("inverted bottleneck",  "4× expansão interna"),
+    ]
+    total_w = len(moderniz) * pw + (len(moderniz) - 1) * gap
     px0 = (100 - total_w) / 2
-    for i, (big, small) in enumerate(propriedades):
+    _text(ax, 50, y_cmp + 4.0,
+          "Modernizações-chave vs ResNet-34  (justificam a escolha arquitetural)",
+          size=10.5, bold=True, italic=True, color=NAVY)
+    for i, (titulo, sub) in enumerate(moderniz):
         x = px0 + i * (pw + gap)
-        _rbox(ax, x, y_prop - 2, pw, 3.5, WHITE, ec=NAVY, lw=1.2)
-        _text(ax, x + pw / 2, y_prop + 0.3, big,
-              size=11, bold=True, color=NAVY)
-        _text(ax, x + pw / 2, y_prop - 1.2, small,
-              size=9, italic=True, color=GRAY_MD)
+        _rbox(ax, x, y_cmp - 1.5, pw, 3.2, WHITE, ec=NAVY, lw=1.0)
+        _text(ax, x + pw / 2, y_cmp + 0.7, titulo,
+              size=10, bold=True, color=NAVY)
+        _text(ax, x + pw / 2, y_cmp - 0.9, sub,
+              size=8.5, italic=True, color=GRAY_MD)
 
     plt.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)

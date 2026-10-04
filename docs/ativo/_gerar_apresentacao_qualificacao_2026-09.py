@@ -1794,10 +1794,11 @@ def slide_mst_validacao_distribuicao(prs: Presentation) -> None:
 
 
 # ============================================================
-# SLIDE 20 — Etapa 3 (a): Arquitetura ConvNeXt-T (figura + texto)
+# SLIDE 20 — Etapa 3 (a): Arquitetura ConvNeXt-T (figura + anatomia)
 # ============================================================
 def slide_por_que_convnext(prs: Presentation) -> None:
-    """Slide 20 — Etapa 3 (A): figura do backbone ConvNeXt-T + bullets."""
+    """Slide 20 — Etapa 3 (A): figura anatomica do ConvNeXt-T +
+    subsidios para explicar camada por camada. Sem mencao a FiLM."""
     slide = prs.slides.add_slide(_blank(prs))
     add_title(slide, "Etapa 3 (a) — Arquitetura ConvNeXt-T (backbone)")
 
@@ -1806,19 +1807,20 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     )
     ps = sub.text_frame.paragraphs[0]
     ps.text = (
-        "Backbone convolucional moderno — 4 estágios hierárquicos, "
-        "28 M parâmetros, LayerNorm (Liu et al., 2022, CVPR)."
+        "Anatomia do backbone — 4 estágios hierárquicos, 28 M "
+        "parâmetros, modernizações pontuais sobre a família ResNet "
+        "(Liu et al., 2022, CVPR)."
     )
     ps.font.size = Pt(13); ps.font.italic = True
     ps.font.color.rgb = GRAY_MD
 
     # ============================================================
-    # LADO ESQUERDO — figura (convnext_backbone.png, aspect 2.013:1)
+    # LADO ESQUERDO — figura anatomica (aspect ~1.787:1)
     # ============================================================
-    fig_x = 0.40
-    fig_y = 1.80
-    fig_w = 7.60
-    fig_h = fig_w / 2.013  # ~3.78
+    fig_x = 0.30
+    fig_y = 1.75
+    fig_w = 8.00
+    fig_h = fig_w / 1.787  # ~4.48
     slide.shapes.add_picture(
         str(IMG_DIR / "convnext_backbone.png"),
         Inches(fig_x), Inches(fig_y),
@@ -1826,14 +1828,13 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     )
 
     # ============================================================
-    # LADO DIREITO — bullets de justificativa
+    # LADO DIREITO — anatomia camada por camada
     # ============================================================
-    txt_x = fig_x + fig_w + 0.30
-    txt_y = 1.80
-    txt_w = 13.33 - txt_x - 0.40
-    txt_h = 4.60
+    txt_x = fig_x + fig_w + 0.22
+    txt_y = 1.75
+    txt_w = 13.33 - txt_x - 0.35
+    txt_h = fig_h  # casa com a altura da figura
 
-    # Header do bloco
     hdr = slide.shapes.add_shape(
         MSO_SHAPE.ROUNDED_RECTANGLE,
         Inches(txt_x), Inches(txt_y),
@@ -1845,7 +1846,7 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.03)
     p = tf.paragraphs[0]; p.alignment = 2
     r = p.add_run()
-    r.text = "Por que ConvNeXt-T"
+    r.text = "O que cada camada faz"
     r.font.size = Pt(13); r.font.bold = True
     r.font.color.rgb = WHITE
 
@@ -1858,16 +1859,16 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     body.line.color.rgb = NAVY; body.line.width = Pt(1.2)
 
     bullets = [
-        ("Paridade com ViTs a custo convolucional:",
-         "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos parâmetros."),
-        ("Estável em fine-tuning:",
-         "LayerNorm (não BatchNorm) — robusto a batch pequeno, essencial para 3 sementes."),
-        ("Inserção natural de FiLM:",
-         "4 estágios hierárquicos oferecem 4 pontos de inserção sem modificar blocos internos."),
-        ("Comparável ao baseline canônico:",
-         "ResNet-34 do FairFace serve como âncora — ConvNeXt-T isola o efeito do condicionamento."),
-        ("Viável computacionalmente:",
-         "28 M params permitem 3 sementes × 3 configs em GPU comum (~300 h total)."),
+        ("Stem (entrada):",
+         "patchify conv 4×4 stride 4 — downsample inicial 4× sobre a imagem bruta (224×224×3 → 56×56×96)."),
+        ("Blocos (dentro de cada estágio):",
+         "DW 7×7 (grande kernel, canal-a-canal) → LN → PW 1×1 ↑4× → GELU → PW 1×1 ↓1× → LayerScale → residual."),
+        ("Downsample entre estágios:",
+         "LN + conv 2×2 stride 2 — dobra canais e corta a resolução pela metade."),
+        ("Head (saída):",
+         "Global Average Pooling + LayerNorm + Linear 768 → 7 classes."),
+        ("Modernizações-chave vs ResNet-34:",
+         "LayerNorm (não BN) · GELU (não ReLU) · kernel 7×7 depthwise · inverted bottleneck 4×."),
     ]
     tb = slide.shapes.add_textbox(
         Inches(txt_x + 0.14), Inches(txt_y + 0.56),
@@ -1878,11 +1879,11 @@ def slide_por_que_convnext(prs: Presentation) -> None:
         p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
         r1 = p.add_run()
         r1.text = "•  " + head + "  "
-        r1.font.size = Pt(10.5); r1.font.bold = True
+        r1.font.size = Pt(10); r1.font.bold = True
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = body_txt
-        r2.font.size = Pt(10.5); r2.font.color.rgb = GRAY_DK
+        r2.font.size = Pt(10); r2.font.color.rgb = GRAY_DK
         p.space_after = Pt(4)
 
     # Banner inferior
@@ -1895,16 +1896,23 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
     bot.line.fill.background()
     tf = bot.text_frame
-    tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.05)
+    tf.margin_top = Inches(0.06); tf.margin_bottom = Inches(0.05)
     tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
     p1 = tf.paragraphs[0]; p1.alignment = 2
     r1 = p1.add_run()
     r1.text = (
-        "Escolha arquitetural que combina estabilidade de treino, "
-        "paridade de desempenho e naturalidade para condicionamento."
+        "ConvNeXt-T  —  28 M parâmetros · 82 % top-1 ImageNet · "
+        "comparável a Swin-T a 1/3 do custo"
     )
     r1.font.size = Pt(12); r1.font.bold = True
     r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = (
+        "ResNet-34 do FairFace permanece como baseline-âncora da literatura."
+    )
+    r2.font.size = Pt(10); r2.font.italic = True
+    r2.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
     add_page_number(slide, 20)
