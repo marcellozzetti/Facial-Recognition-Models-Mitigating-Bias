@@ -1846,7 +1846,7 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.03)
     p = tf.paragraphs[0]; p.alignment = 2
     r = p.add_run()
-    r.text = "O que cada camada faz"
+    r.text = "Passo a passo, em linguagem simples"
     r.font.size = Pt(13); r.font.bold = True
     r.font.color.rgb = WHITE
 
@@ -1859,20 +1859,18 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     body.line.color.rgb = NAVY; body.line.width = Pt(1.2)
 
     bullets = [
-        ("Stem (patchify) — \"quebra a imagem em ladrilhos\":",
-         "conv 4×4 stride 4 reduz 224×224 em 56×56 e cria 96 canais. Inspirado nos patches do ViT."),
-        ("DW 7×7 (depthwise) — \"janela grande, um canal por vez\":",
-         "convolução espacial 7×7 aprendida por canal, sem misturar canais. Captura padrão local amplo."),
-        ("LayerNorm — \"normaliza por amostra\":",
-         "estatística dentro de cada exemplo (não do batch). Robusto a batch pequeno (3 sementes)."),
-        ("PW 1×1 ↑4× + GELU + PW 1×1 ↓1× — \"MLP entre canais\":",
-         "expande em 4× (abre espaço), ativação suave GELU, comprime de volta — FFN estilo Transformer."),
-        ("LayerScale + atalho residual — \"correção pequena com peso aprendido\":",
-         "LayerScale pondera cada canal; residual soma a entrada ao resultado (evita vanishing)."),
-        ("Downsample entre estágios — \"metade do espaço, dobro dos canais\":",
-         "LN + conv 2×2 stride 2 → 56→28→14→7 pixels e 96→192→384→768 canais."),
-        ("Head — \"achata e classifica\":",
-         "GAP sobre o mapa 7×7 → vetor 768-dim → LN → Linear → 7 classes."),
+        ("Stem — entrada da rede:",
+         "divide a imagem em pedacinhos de 4×4 pixels e cria 96 canais iniciais. É só o preparo para os blocos."),
+        ("DW 7×7 + LayerNorm — olha a vizinhança:",
+         "em cada canal, uma janela de 7×7 pixels captura o contexto espacial local. O LayerNorm ajusta as escalas por imagem — dá estabilidade mesmo com poucas amostras por vez."),
+        ("MLP interna (↑4× → GELU → ↓1×) — mistura os canais:",
+         "expande os canais em 4× para abrir espaço, aplica ativação suave, e comprime de volta. É aqui que a informação se integra entre canais."),
+        ("LayerScale + residual — pequena correção somada à entrada:",
+         "o resultado do bloco é somado à entrada original. LayerScale decide o quanto cada canal contribui. Cada bloco refina, não substitui."),
+        ("Downsample entre estágios — resume o espaço, enriquece os canais:",
+         "a cada estágio, a resolução cai pela metade e os canais dobram. A rede fica mais semântica: de 56×56 com 96 canais até 7×7 com 768."),
+        ("Head — da representação à predição:",
+         "achata o mapa final 7×7 num vetor único (pooling), normaliza, e mapeia para as 7 classes raciais."),
     ]
     tb = slide.shapes.add_textbox(
         Inches(txt_x + 0.14), Inches(txt_y + 0.56),
