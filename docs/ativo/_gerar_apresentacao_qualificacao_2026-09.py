@@ -1,39 +1,38 @@
 """Gera apresentação PowerPoint da defesa da qualificação (05/10/2026).
 
-29 slides, formato 16:9, ~15-20 min de fala.
-Linguagem clara, sem jargão desnecessário, com referências acadêmicas
-fortes inline (Autor Ano) e figuras integradas para tangibilizar.
+28 slides, formato 16:9, ~20 min de fala.
+Linguagem acadêmica formal, referências inline (Autor, ANO) e figuras
+integradas para tangibilizar o estado do trabalho.
 
 Estrutura:
     1  Capa (com logo UNIFESP)
-    2  Agenda (títulos objetivos, sem subexplicações)
-    3  Motivação — contexto (KPIs visuais + citação de destaque)
-    4  Motivação — regulação (timeline visual das regulações)
-    5  Problema — disparidade racial (figura)
-    6  Problema — comparativo SOTA (figura)
-    7  Problema — heterogeneidade fenotípica (layout balanceado)
-    8  Problema — refutação Pangelinan (2 colunas: crítica × resposta)
-    9  Objetivo geral
-    10 Objetivos específicos (6)
-    11 Hipóteses (6)
-    12 Revisão — timeline das mitigações (figura)
-    13 Revisão — 6 baselines de mitigação (referências)
-    14 Revisão — heterogeneidade intra-Latinx (3 disciplinas)
-    15 Revisão — 5 lacunas identificadas
-    16 Metodologia — pipeline 6 etapas (figura)
-    17 Metodologia — Etapa 1 (classificador MST próprio)
-    18 Metodologia — por que ConvNeXt-T (4 critérios vs ResNet vs ViT)  [NOVO]
-    19 Metodologia — por que FiLM (comparação com 7 alternativas)      [NOVO]
-    20 Metodologia — mecanismo FiLM (figura)
-    21 Metodologia — 3 configurações A/B/C
-    22 Metodologia — baselines + cenários
-    23 Metodologia — triangulação de métricas
-    24 Contribuições (3 eixos, 7 contribuições)
+    2  Motivação — contexto sociotécnico
+    3  Motivação — regulação (European AI Act)
+    4  Problema — disparidade racial (figura)
+    5  Problema — heterogeneidade fenotípica (Latinx)
+    6  Problema — refutação Pangelinan
+    7  Objetivo geral
+    8  Objetivos específicos + hipóteses testáveis (consolidado)
+    9  Revisão — linha do tempo das mitigações
+    10 Revisão — baselines de mitigação
+    11 Revisão — lacunas identificadas
+    12 Pipeline experimental em 6 etapas (figura)
+    13 Evolução do pipeline — estado em 04/10/2026 (NOVO)
+    14 Etapa 1 — classificador MST (contexto + datasets)
+    15 Classificador MST — detalhe técnico do backend (NOVO)
+    16 Classificador MST — validação qualitativa (NOVO)
+    17 Classificador MST — distribuição MST × raça (NOVO)
+    18 Racional do backbone ConvNeXt-T
+    19 Racional do mecanismo FiLM
+    20 Mecanismo FiLM (figura)
+    21 Configurações do ablation (A, B, C)
+    22 Protocolo de validação — cenários e norma
+    23 Triangulação de métricas de equidade
+    24 Contribuições esperadas
     25 Cronograma
-    26 Riscos + mitigações
-    27 Estado atual — adiantamento (KPIs visuais)
-    28 Considerações finais
-    29 Perguntas / obrigado
+    26 Riscos e mitigações
+    27 Estado atual do trabalho
+    28 Obrigado / perguntas
 
 Uso:
     python docs/ativo/_gerar_apresentacao_qualificacao_2026-09.py
@@ -63,7 +62,7 @@ AMBER = RGBColor(0xF5, 0xB7, 0x00)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 
 QUALIFICACAO = date(2026, 10, 5)
-TOTAL_SLIDES = 24
+TOTAL_SLIDES = 28
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IMG_DIR = REPO_ROOT / "docs" / "tese" / "images"
@@ -961,7 +960,7 @@ def slide_objetivos_hipoteses(prs: Presentation) -> None:
         p.space_after = Pt(8)
 
     add_footer(slide)
-    add_page_number(slide, 6)
+    add_page_number(slide, 8)
 
 
 # ============================================================
@@ -1045,10 +1044,26 @@ def slide_metodologia_pipeline(prs: Presentation) -> None:
 
 
 # ============================================================
-# SLIDE 17 — Metodologia: Etapa 1
+# SLIDE 13 — Evolução do pipeline (status das 6 etapas em 04/10/2026)
+# ============================================================
+def slide_evolucao_pipeline(prs: Presentation) -> None:
+    add_image_slide(
+        prs, 13,
+        "Evolução do pipeline experimental — estado em 04/10/2026",
+        IMG_DIR / "fig_pipeline_evolucao.png",
+        caption=(
+            "Etapas 1 a 3 em execução (código implementado, validação preliminar em curso); "
+            "etapas 4 a 6 planejadas conforme cronograma. Marco de qualificação assegurado."
+        ),
+        height_in=5.0,
+    )
+
+
+# ============================================================
+# SLIDE 14 — Metodologia: Etapa 1
 # ============================================================
 def slide_metodologia_etapa1(prs: Presentation) -> None:
-    add_bullets(prs, 13, "Etapa 1: classificador MST treinado internamente", [
+    add_bullets(prs, 14, "Etapa 1: classificador MST treinado internamente", [
         ("O que faz:", "produz, para cada imagem facial, o vetor softmax sobre os dez tons da escala Monk."),
         ("Decisão pós-reunião Ago/2026:", "adotar treinamento interno do classificador, reduzindo dependência do release do SkinToneNet (Matias, 2026), cujos pesos e dataset STW ainda não foram divulgados publicamente."),
         ("Datasets de treino:", "Monk Skin Tone Examples (Monk, 2019) e Casual Conversations v2 (Porgali et al., 2023)."),
@@ -1058,10 +1073,61 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
 
 
 # ============================================================
+# SLIDE 15 — Classificador MST em validação: detalhe técnico do backend
+# ============================================================
+def slide_mst_detalhe_tecnico(prs: Presentation) -> None:
+    add_image_slide(
+        prs, 15,
+        "Classificador MST em validação: detalhe técnico do backend",
+        IMG_DIR / "fig_mst_detalhe_tecnico.png",
+        caption=(
+            "Pipeline técnico em cinco etapas: detecção MTCNN → alinhamento por landmarks → "
+            "segmentação de pele → cor dominante via k-means em CIELab → distância euclidiana à paleta Monk. "
+            "Backend operacional durante a fase de validação (sensitivity analysis — Cap. 4 §4.2)."
+        ),
+        height_in=4.6,
+    )
+
+
+# ============================================================
+# SLIDE 16 — Validação preliminar sobre FairFace val (grade qualitativa)
+# ============================================================
+def slide_mst_validacao_faces(prs: Presentation) -> None:
+    add_image_slide(
+        prs, 16,
+        "Classificador MST em validação: amostras FairFace val (qualitativo)",
+        IMG_DIR / "fig_mst_demo_faces.png",
+        caption=(
+            "Para cada raça FairFace: face com tom MST mais claro (acima) e mais escuro (abaixo) "
+            "preditos sobre amostra estratificada de 350 imagens. Evidência visual direta de H1 — "
+            "heterogeneidade fenotípica intra-categorial."
+        ),
+        height_in=5.3,
+    )
+
+
+# ============================================================
+# SLIDE 17 — Validação preliminar sobre FairFace val (distribuição quantitativa)
+# ============================================================
+def slide_mst_validacao_distribuicao(prs: Presentation) -> None:
+    add_image_slide(
+        prs, 17,
+        "Classificador MST em validação: distribuição MST × raça (quantitativo)",
+        IMG_DIR / "fig_mst_demo_distribuicao.png",
+        caption=(
+            "Distribuição percentual (dentro de cada raça) sobre amostra estratificada "
+            "(n = 350, 50 por raça). Nenhuma raça colapsa em um único tom Monk — "
+            "evidência preliminar que sustenta a formalização de H1."
+        ),
+        height_in=4.8,
+    )
+
+
+# ============================================================
 # SLIDE 18 — Por que ConvNeXt-T (justificativa vs ResNet e vs ViT)
 # ============================================================
 def slide_por_que_convnext(prs: Presentation) -> None:
-    add_bullets(prs, 14, "Racional da escolha do backbone: ConvNeXt-T (Liu et al., 2022)", [
+    add_bullets(prs, 18, "Racional da escolha do backbone: ConvNeXt-T (Liu et al., 2022)", [
         ("Paridade com ViTs a custo convolucional:",
          "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos params."),
         ("Estável em fine-tuning:",
@@ -1079,7 +1145,7 @@ def slide_por_que_convnext(prs: Presentation) -> None:
 # SLIDE 19 — Por que FiLM (comparação com 7 alternativas de conditioning)
 # ============================================================
 def slide_por_que_film(prs: Presentation) -> None:
-    add_bullets(prs, 15, "Racional do mecanismo de condicionamento: FiLM (Perez et al., 2018)", [
+    add_bullets(prs, 19, "Racional do mecanismo de condicionamento: FiLM (Perez et al., 2018)", [
         ("Adequação dimensional ao sinal MST:",
          "sinal 10-dim casa naturalmente com γ, β — sem explosão paramétrica."),
         ("Eficiência:",
@@ -1100,7 +1166,7 @@ def slide_por_que_film(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_film(prs: Presentation) -> None:
     add_image_slide(
-        prs, 16,
+        prs, 20,
         "Mecanismo FiLM: modulação de features condicionada ao tom de pele",
         IMG_DIR / "film_pipeline.png",
         caption="FiLM (Perez et al., 2018) modula as features intermediárias do ConvNeXt-T canal a canal, condicionadas ao vetor MST. Overhead paramétrico: aproximadamente 1,3 % do backbone.",
@@ -1113,7 +1179,7 @@ def slide_metodologia_film(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_configs(prs: Presentation) -> None:
     add_table_slide(
-        prs, 17,
+        prs, 21,
         "Configurações do estudo de ablation arquitetural",
         ["ID", "Configuração", "O que testa"],
         [
@@ -1131,7 +1197,7 @@ def slide_metodologia_configs(prs: Presentation) -> None:
 # SLIDE 20 — Baselines + Cenários
 # ============================================================
 def slide_baselines_cenarios(prs: Presentation) -> None:
-    add_bullets(prs, 18, "Protocolo de validação: cenários e norma", [
+    add_bullets(prs, 22, "Protocolo de validação: cenários e norma", [
         ("Cenário A — apenas raça:", "reporte estratificado por classe racial (sete classes do FairFace)."),
         ("Cenário B — raça × gênero:", "análise interseccional (oito subgrupos), conforme protocolo estabelecido por Gender Shades (Buolamwini & Gebru, 2018)."),
         ("Norma seguida:", "ISO/IEC 19795-10:2024, padrão internacional para reporte de desempenho biométrico estratificado entre grupos demográficos."),
@@ -1144,7 +1210,7 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
 # SLIDE 21 — Triangulação de métricas
 # ============================================================
 def slide_metricas(prs: Presentation) -> None:
-    add_bullets(prs, 19, "Triangulação de métricas de equidade", [
+    add_bullets(prs, 23, "Triangulação de métricas de equidade", [
         ("Por que triangular — Kleinberg et al. (2017):", "Teorema da Impossibilidade — demonstra a impossibilidade formal de satisfação simultânea de múltiplas definições de equidade quando as prevalências diferem entre grupos."),
         ("Disparity Ratio:", "razão entre F1 mínimo e máximo entre grupos; mensura a desigualdade de desempenho."),
         ("F1 da pior classe:", "protege o grupo sub-representado; evita ganhos concentrados apenas na média agregada."),
@@ -1159,7 +1225,7 @@ def slide_metricas(prs: Presentation) -> None:
 # ============================================================
 def slide_contribuicoes(prs: Presentation) -> None:
     add_table_slide(
-        prs, 20,
+        prs, 24,
         "Contribuições esperadas",
         ["Eixo", "Contribuições", "Foco"],
         [
@@ -1177,7 +1243,7 @@ def slide_contribuicoes(prs: Presentation) -> None:
 # ============================================================
 def slide_cronograma(prs: Presentation) -> None:
     add_table_slide(
-        prs, 21,
+        prs, 25,
         "Cronograma",
         ["Período", "Etapa", "Entrega"],
         [
@@ -1201,7 +1267,7 @@ def slide_cronograma(prs: Presentation) -> None:
 # ============================================================
 def slide_riscos(prs: Presentation) -> None:
     add_table_slide(
-        prs, 22,
+        prs, 26,
         "Riscos identificados e estratégias de mitigação",
         ["#", "Risco", "Mitigação"],
         [
@@ -1299,7 +1365,7 @@ def slide_estado_atual(prs: Presentation) -> None:
         p.space_after = Pt(6)
 
     add_footer(slide)
-    add_page_number(slide, 23)
+    add_page_number(slide, 27)
 
 
 # ============================================================
@@ -1359,33 +1425,37 @@ def build_presentation() -> Presentation:
     prs.slide_width = Inches(13.33)
     prs.slide_height = Inches(7.5)
 
-    # Opção A do enxugamento: 24 slides (era 29).
-    # Cortados: agenda, comparativo SOTA, 3 disciplinas, considerações finais.
-    # Consolidado: objetivos + hipóteses em um único slide.
-    slide_capa(prs)                          # 1
-    slide_motivacao_contexto(prs)            # 2
-    slide_motivacao_regulacao(prs)           # 3
-    slide_problema_disparidade(prs)          # 4
-    slide_problema_heterogeneidade(prs)      # 5
-    slide_problema_refutacao(prs)            # 6
-    slide_objetivo_geral(prs)                # 7
-    slide_objetivos_hipoteses(prs)           # 8   [CONSOLIDADO]
-    slide_revisao_timeline(prs)              # 9
-    slide_revisao_mitigacao(prs)             # 10
-    slide_revisao_lacunas(prs)               # 11
-    slide_metodologia_pipeline(prs)          # 12
-    slide_metodologia_etapa1(prs)            # 13
-    slide_por_que_convnext(prs)              # 14
-    slide_por_que_film(prs)                  # 15
-    slide_metodologia_film(prs)              # 16
-    slide_metodologia_configs(prs)           # 17
-    slide_baselines_cenarios(prs)            # 18
-    slide_metricas(prs)                      # 19
-    slide_contribuicoes(prs)                 # 20
-    slide_cronograma(prs)                    # 21
-    slide_riscos(prs)                        # 22
-    slide_estado_atual(prs)                  # 23
-    slide_perguntas(prs)                     # 24
+    # 28 slides (era 24): adicionados 4 slides em torno da Etapa 1 com
+    # evidencia empirica — estado do pipeline, detalhe tecnico do classificador
+    # MST em validacao, e dois slides de validacao preliminar sobre FairFace.
+    slide_capa(prs)                           # 1
+    slide_motivacao_contexto(prs)             # 2
+    slide_motivacao_regulacao(prs)            # 3
+    slide_problema_disparidade(prs)           # 4
+    slide_problema_heterogeneidade(prs)       # 5
+    slide_problema_refutacao(prs)             # 6
+    slide_objetivo_geral(prs)                 # 7
+    slide_objetivos_hipoteses(prs)            # 8   [CONSOLIDADO]
+    slide_revisao_timeline(prs)               # 9
+    slide_revisao_mitigacao(prs)              # 10
+    slide_revisao_lacunas(prs)                # 11
+    slide_metodologia_pipeline(prs)           # 12
+    slide_evolucao_pipeline(prs)              # 13  [NOVO — status das 6 etapas]
+    slide_metodologia_etapa1(prs)             # 14
+    slide_mst_detalhe_tecnico(prs)            # 15  [NOVO — pipeline interno MST]
+    slide_mst_validacao_faces(prs)            # 16  [NOVO — evidencia visual]
+    slide_mst_validacao_distribuicao(prs)     # 17  [NOVO — heatmap MST x raca]
+    slide_por_que_convnext(prs)               # 18
+    slide_por_que_film(prs)                   # 19
+    slide_metodologia_film(prs)               # 20
+    slide_metodologia_configs(prs)            # 21
+    slide_baselines_cenarios(prs)             # 22
+    slide_metricas(prs)                       # 23
+    slide_contribuicoes(prs)                  # 24
+    slide_cronograma(prs)                     # 25
+    slide_riscos(prs)                         # 26
+    slide_estado_atual(prs)                   # 27
+    slide_perguntas(prs)                      # 28
 
     return prs
 

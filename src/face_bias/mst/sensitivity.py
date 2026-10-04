@@ -39,14 +39,33 @@ logger = logging.getLogger(__name__)
 
 MST_LABELS = list(range(1, 11))  # 1..10 (escala Monk)
 
+# Escala Monk Skin Tone (Google, 2019) — valores oficiais RGB.
+# Fonte: https://skintone.google/the-scale
+MST_PALETTE_HEX: tuple[str, ...] = (
+    "#f6ede4",  # 1 — claríssimo
+    "#f3e7db",  # 2
+    "#f7ead0",  # 3
+    "#eadaba",  # 4
+    "#d7bd96",  # 5
+    "#a07e56",  # 6
+    "#825c43",  # 7
+    "#604134",  # 8
+    "#3a312a",  # 9
+    "#292420",  # 10 — escuríssimo
+)
+MST_STONE_LABELS: tuple[str, ...] = tuple(f"monk_{i:02d}" for i in range(1, 11))
+
+
 Predictor = Callable[[Path], int]
 
 
 def stone_monk_predictor() -> Predictor:
-    """Backend baseado em ``skin-tone-classifier`` (ChenglongMa) com paleta ``monk``.
+    """Backend baseado em ``skin-tone-classifier`` (ChenglongMa) com paleta Monk.
 
     Instalação: ``pip install skin-tone-classifier``. Import é lazy para
-    não onerar quem só usa o wrapper principal.
+    não onerar quem só usa o wrapper principal. A API passou (a partir
+    de 1.2) a receber a paleta como hex via ``tone_palette`` e os rótulos
+    via ``tone_labels``; passamos os 10 tons oficiais da escala Monk.
     """
     try:
         import stone  # type: ignore
@@ -56,7 +75,12 @@ def stone_monk_predictor() -> Predictor:
         ) from e
 
     def _predict(path: Path) -> int:
-        result = stone.process(str(path), image_type="color", palette="monk")
+        result = stone.process(
+            str(path),
+            image_type="color",
+            tone_palette=list(MST_PALETTE_HEX),
+            tone_labels=list(MST_STONE_LABELS),
+        )
         faces = result.get("faces", []) if isinstance(result, dict) else []
         if not faces:
             return -1  # sem face detectada

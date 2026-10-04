@@ -58,7 +58,8 @@ Documentos consolidados de rodadas anteriores mantidos como âncora.
 | Arquivo | Uso |
 |---|---|
 | `_gerar_apresentacao_qualificacao_2026-09.py` | Script gerador do PPTX de defesa |
-| `material_qualificacao_2026-09-30.pptx` | 25 slides, ~15–20 min de fala |
+| `_gerar_demo_mst_qualificacao.py` | Gera as 4 figuras de evidência (status pipeline + validação MST) |
+| `material_qualificacao_2026-10-05.pptx` | 28 slides, ~20 min de fala |
 
 ## 7. Geradores de figuras da tese
 
@@ -71,6 +72,7 @@ Scripts que produzem imagens LaTeX-ready para os capítulos.
 | `_gerar_imagem_film.py` | Diagrama do mecanismo FiLM |
 | `_gerar_imagem_hardt_metricas.py` | Métricas de fairness (Hardt 2016) |
 | `_gerar_imagem_pipeline_6etapas.py` | Pipeline em 6 etapas (Cap 4) |
+| `_gerar_demo_mst_qualificacao.py` | 4 figuras: evolução + detalhe + validação MST (faces e heatmap) |
 | `imagens/` | Diretório de saída das figuras |
 
 ---
