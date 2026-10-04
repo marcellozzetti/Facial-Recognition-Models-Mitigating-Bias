@@ -4,6 +4,17 @@ A revisão resultou em um corpus de \textbf{104 fichas bibliográficas}, cuja di
 
 A organização do capítulo segue seis frentes teórico-empíricas, uma revisão dos paradigmas arquiteturais de \emph{backbone}, uma fundamentação formal de métricas, uma frente instrumental e o mapeamento final de lacunas. As Seções~\ref{sec:rl_datasets} a~\ref{sec:rl_fairrep} percorrem, em ordem cronológica de emergência na literatura, as respostas historicamente propostas ao problema de \emph{fairness} --- termo aqui definido como paridade de desempenho entre grupos demográficos, na acepção formal de \citeonline{hardt2016equality} adotada ao longo do trabalho. A Seção~\ref{sec:rl_backbones} apresenta os dois paradigmas arquiteturais contemporâneos para classificação facial --- o convolucional (linha ResNet e sua modernização ConvNeXt) e o baseado em atenção (Vision Transformers) ---, contextualizando a escolha do ConvNeXt-T adotada nesta pesquisa. A Seção~\ref{sec:rl_metricas} apresenta as métricas formais de \emph{fairness} \emph{group-level} e o Teorema da Impossibilidade de \citeonline{kleinberg2017inherent}, que motivam o princípio metodológico de triangulação de métricas adotado no Capítulo~\ref{chapter:metodologia}. A Seção~\ref{sec:rl_arquit} apresenta a frente instrumental de auditoria automatizada de datasets e de mecanismos arquiteturais de condicionamento. A Seção~\ref{sec:rl_conditioning_alt} discute alternativas de condicionamento ponderadas antes da escolha metodológica final. A Seção~\ref{sec:rl_gaps} sintetiza as cinco lacunas científicas identificadas no corpus, as quais orientam diretamente os objetivos formulados no Capítulo~\ref{chapter:objetivos}.
 
+A Figura~\ref{fig:timeline-fases} sintetiza a evolução cronológica do campo em quatro fases, mapeando cada fase à seção correspondente deste capítulo e situando a proposta desta pesquisa como fronteira contemporânea (fase~4).
+
+\begin{figure}[htbp]
+\centering
+\caption{Linha do tempo das quatro fases evolutivas da mitigação de viés racial em classificação facial (2018--2026).}
+\centering
+\includegraphics[width=16cm]{images/fig_timeline_fases.png}
+\\ \small Fonte: Autoria própria, com base na síntese das Seções~\ref{sec:rl_datasets} a~\ref{sec:rl_skintone} deste capítulo.
+\label{fig:timeline-fases}
+\end{figure}
+
 \section{Balanceamento de dados}
 \label{sec:rl_datasets}
 
@@ -24,17 +35,6 @@ A linha inaugural é a do \emph{adversarial debiasing}, estabelecida por \citeon
 \citeonline{park2022fair} propuseram o \emph{Fair Supervised Contrastive Learning} (FSCL+), extensão do \emph{Supervised Contrastive Learning} (SupCon) --- técnica que agrupa, no espaço de representação, amostras da mesma classe e afasta amostras de classes diferentes ---, demonstrando formalmente que o SupCon padrão, quando aplicado sobre datasets enviesados, incentiva os \emph{encoders} (as camadas responsáveis por transformar imagens em vetores de \emph{features}) a codificarem indiretamente atributos demográficos, propagando o viés para as camadas posteriores. No mesmo ano, \citeonline{lin2022fairgrape} introduziram o FairGRAPE, técnica de \emph{pruning fairness-aware} que remove seletivamente conexões redundantes da rede neural com controle explícito do impacto sobre subgrupos demográficos; nesse mesmo trabalho, os autores documentaram independentemente o \emph{baseline} canônico de 72\,\% de acurácia agregada da arquitetura ResNet-34 sobre a classificação racial de sete classes do FairFace em regime \emph{in-domain}, isto é, com treino e teste sobre partições do mesmo dataset.
 
 As contribuições mais recentes deslocaram a discussão para arquiteturas Pareto-eficientes e para métricas alternativas de equidade. \citeonline{manzoor2024fineface} propuseram o FineFACE, arquitetura baseada em \emph{cross-layer mutual attention learning} --- mecanismo que permite às camadas de diferentes profundidades trocarem informação por meio de atenção mútua ---, atingindo operação \emph{Pareto-eficiente} no dataset CelebA, isto é, configurações em que não se pode melhorar acurácia sem piorar \emph{fairness}, e vice-versa. Em 2025, \citeonline{liu2025component}, em publicação na conferência ACM FAccT, propuseram o \emph{Bayesian Network-informed Meta Reweighting}, introduzindo a noção de \emph{face component fairness} --- equidade avaliada componente a componente do rosto (olhos, nariz, boca) --- como \emph{surrogate}, ou seja, aproximação operacional mais mensurável, para a noção abstrata de \emph{demographic fairness}.
-
-A Figura~\ref{fig:timeline-mitigacoes} sintetiza cronologicamente as seis contribuições, agrupando-as por categoria metodológica.
-
-\begin{figure}[htbp]
-\centering
-\caption{Linha do tempo das principais contribuições em mitigação algorítmica de viés (2018--2025).}
-\centering
-\includegraphics[width=16cm]{images/fig_timeline_mitigacoes.png}
-\\ \small Fonte: Autoria própria, com base nas publicações originais de \citeonline{zhang2018mitigating}, \citeonline{sagawa2020distribution}, \citeonline{park2022fair}, \citeonline{lin2022fairgrape}, \citeonline{manzoor2024fineface} e \citeonline{liu2025component}.
-\label{fig:timeline-mitigacoes}
-\end{figure}
 
 \section{Vision-Language Models}
 \label{sec:rl_vlm}

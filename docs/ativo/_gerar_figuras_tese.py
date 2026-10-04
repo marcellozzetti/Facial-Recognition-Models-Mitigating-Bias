@@ -9,7 +9,7 @@ Saidas em docs/tese/images/:
   fig_pipeline_6etapas.png       (Cap 4, Metodologia)
   fig_configs_abcd.png           (Cap 4, Metodologia)
   fig_fitzpatrick_vs_mst.png     (Cap 2, sec 2.4)
-  fig_timeline_mitigacoes.png    (Cap 2, sec 2.2)
+  fig_timeline_fases.png         (Cap 2, abertura — 4 fases evolutivas)
   fig_f1_sota_comparativo.png    (Cap 2, sec 2.3)
   fig_film_conceitual.png        (Cap 2, sec 2.7)
 
@@ -959,7 +959,6 @@ def main():
     gerar_fig_pipeline()
     gerar_fig_configs()
     gerar_fig_fitzpatrick_vs_mst()
-    gerar_fig_timeline_mitigacoes()
     gerar_fig_timeline_fases()
     gerar_fig_f1_sota_comparativo()
     gerar_fig_film_conceitual()
