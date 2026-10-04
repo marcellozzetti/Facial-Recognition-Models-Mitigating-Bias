@@ -872,73 +872,91 @@ def gerar_fig_film_conceitual():
 
 
 def gerar_fig_timeline_fases():
-    """Linha do tempo em 4 fases cronologicas (2018-2026).
+    """Linha do tempo em 4 fases com progressao visual tipo March-of-Progress:
+    blocos crescem em altura e saturacao da esquerda para a direita, posicionados
+    sobre uma linha-eixo temporal continua com marcadores de ano.
 
-    Figura simples destinada tanto ao slide 10 do PPTX quanto a
-    secao 2.2 (evolucao das respostas ao problema) da dissertacao.
-    Cada fase e um bloco com janela temporal + rotulo + titulo curto;
-    Fase 4 destacada por ser a proposta da pesquisa.
+    Figura destinada tanto ao slide 10 do PPTX quanto a secao 2.2 da dissertacao.
     """
-    from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+    from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Polygon
 
-    fig, ax = plt.subplots(figsize=(14.5, 3.3), dpi=DPI)
-    ax.set_xlim(0, 100); ax.set_ylim(0, 10); ax.axis("off")
+    fig, ax = plt.subplots(figsize=(15, 5.2), dpi=DPI)
+    ax.set_xlim(2017.4, 2026.6); ax.set_ylim(-0.6, 10)
+    ax.axis("off")
 
-    # (rotulo, janela, titulo, cor_fundo, cor_texto, destaque)
+    # (rotulo, ano_inicio, ano_fim, titulo, cor, cor_texto, altura, destaque)
+    # Alturas progressivas: 3.5 -> 4.5 -> 5.8 -> 7.2 (evolucao visual)
     fases = [
-        ("FASE 1", "2018 – 2020",
-         "Datasets e amostragem", BLUE_LIGHT, GRAY_DK, False),
-        ("FASE 2", "2020 – 2022",
-         "Mitigação algorítmica\ne funções de perda", BLUE_MID, "white", False),
-        ("FASE 3", "2023 – 2025",
-         "VLMs e escala Monk\n(MST)", "#4A6FA8", "white", False),
-        ("FASE 4", "2025 – 2026",
-         "Condicionamento\narquitetural (proposta)", NAVY, "white", True),
+        ("FASE 1", 2018.0, 2020.0,
+         "Datasets e\namostragem",
+         BLUE_LIGHT, GRAY_DK, 3.5, False),
+        ("FASE 2", 2020.0, 2022.0,
+         "Mitigação algorítmica\ne funções de perda",
+         BLUE_MID, "white", 4.6, False),
+        ("FASE 3", 2023.0, 2025.0,
+         "VLMs e escala\nMonk (MST)",
+         "#2E4F8A", "white", 5.9, False),
+        ("FASE 4", 2025.0, 2026.0,
+         "Condicionamento\narquitetural (proposta)",
+         NAVY, "white", 7.2, True),
     ]
 
-    n = len(fases)
-    w = 18.5
-    gap = (100 - n * w) / (n + 1)
-    y = 1.5
-    h = 7.0
+    GROUND_Y = 0.3  # linha-eixo temporal
 
-    for i, (rotulo, janela, titulo, fc, tc, destaque) in enumerate(fases):
-        x = gap + i * (w + gap)
+    # --- Eixo temporal continuo (linha "chao") ---
+    ax.plot([2017.6, 2026.4], [GROUND_Y, GROUND_Y],
+            color=GRAY_DK, linewidth=2.2, zorder=1)
+    # Marcadores de ano
+    for ano in range(2018, 2027):
+        ax.plot([ano, ano], [GROUND_Y - 0.08, GROUND_Y + 0.08],
+                color=GRAY_DK, linewidth=1.5, zorder=2)
+        ax.text(ano, GROUND_Y - 0.42, str(ano),
+                ha="center", va="top",
+                fontsize=11, color=GRAY_DK, fontweight="bold")
+
+    # --- Blocos das fases (crescem em altura) ---
+    for i, (rotulo, ano_i, ano_f, titulo, fc, tc, h, destaque) in enumerate(fases):
+        x = ano_i
+        w = ano_f - ano_i
+        y = GROUND_Y + 0.1
 
         # Caixa principal
         box = FancyBboxPatch(
-            (x, y), w, h,
-            boxstyle="round,pad=0.15,rounding_size=0.55",
+            (x + 0.05, y), w - 0.10, h,
+            boxstyle="round,pad=0.0,rounding_size=0.12",
             facecolor=fc, edgecolor=NAVY,
-            linewidth=2.6 if destaque else 1.3,
+            linewidth=2.4 if destaque else 1.2, zorder=3,
         )
         ax.add_patch(box)
 
-        # Rotulo FASE N
-        ax.text(x + w / 2, y + h - 1.1, rotulo,
+        # Rotulo FASE N (topo do bloco)
+        ax.text(x + w / 2, y + h - 0.45, rotulo,
                 ha="center", va="center",
-                fontsize=14, fontweight="bold", color=tc)
+                fontsize=12.5, fontweight="bold", color=tc, zorder=4)
 
-        # Janela temporal (grande)
-        ax.text(x + w / 2, y + h / 2 + 0.5, janela,
+        # Janela temporal no bloco (abaixo do rotulo)
+        janela = f"{int(ano_i)} – {int(ano_f)}"
+        ax.text(x + w / 2, y + h - 1.05, janela,
                 ha="center", va="center",
-                fontsize=16, fontweight="bold", color=tc)
+                fontsize=10.5, color=tc, zorder=4)
 
-        # Titulo curto da fase
-        ax.text(x + w / 2, y + 1.4, titulo,
+        # Titulo da fase (centro-inferior)
+        ax.text(x + w / 2, y + h / 2 - 0.35, titulo,
                 ha="center", va="center",
-                fontsize=11, color=tc)
+                fontsize=11, color=tc, linespacing=1.3, zorder=4)
 
-        # Seta para a proxima fase
-        if i < n - 1:
-            x_next = gap + (i + 1) * (w + gap)
-            arrow = FancyArrowPatch(
-                (x + w + 0.1, y + h / 2),
-                (x_next - 0.1, y + h / 2),
-                arrowstyle="-|>", mutation_scale=22,
-                color=NAVY, linewidth=2.4,
-            )
-            ax.add_patch(arrow)
+    # --- Seta de evolucao: pequena, no topo, nao interfere nos blocos ---
+    # Marca o sentido temporal sem sobrepor os textos das fases.
+    ARROW_Y = 9.3
+    ax.annotate(
+        "", xy=(2026.2, ARROW_Y), xytext=(2017.8, ARROW_Y),
+        arrowprops=dict(arrowstyle="-|>", color=NAVY, lw=1.6,
+                        mutation_scale=18),
+        zorder=5,
+    )
+    ax.text(2017.6, ARROW_Y + 0.35, "evolução cumulativa",
+            ha="left", va="bottom",
+            fontsize=10, color=NAVY, style="italic", fontweight="bold")
 
     plt.tight_layout()
     out = OUT_DIR / "fig_timeline_fases.png"
