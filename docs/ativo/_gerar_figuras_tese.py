@@ -457,9 +457,9 @@ def gerar_fig_timeline_mitigacoes():
     """
     from matplotlib.patches import FancyBboxPatch, Patch
 
-    fig, ax = plt.subplots(figsize=(15, 7.0), dpi=DPI)
+    fig, ax = plt.subplots(figsize=(15, 7.6), dpi=DPI)
     ax.set_xlim(2017.3, 2026.7)
-    ax.set_ylim(-3.0, 3.4)
+    ax.set_ylim(-3.0, 3.9)
     ax.axis("off")
 
     # Linha do tempo (mais espessa)
@@ -480,6 +480,8 @@ def gerar_fig_timeline_mitigacoes():
     FAM_OURS  = NAVY          # Esta pesquisa
 
     # (ano, metodo, autor, acao em uma linha, cor, y_card, familia_label)
+    # Escalonamento vertical em 2024/2025/2026 para evitar colisao lateral
+    # dos cards consecutivos.
     pubs = [
         (2018, "Adversarial Debiasing", "Zhang et al.",
          "Discriminador remove\nsinal demográfico",
@@ -489,7 +491,7 @@ def gerar_fig_timeline_mitigacoes():
          FAM_OTIM, 1.65),
         (2022, "FSCL+", "Park et al.",
          "Perda contrastiva\nalinha embeddings",
-         FAM_REPR, 2.45),
+         FAM_REPR, 2.60),
         (2022, "FairGRAPE", "Lin et al.",
          "Poda unidades\nenviesadas",
          FAM_SPARS, -1.80),
@@ -498,7 +500,7 @@ def gerar_fig_timeline_mitigacoes():
          FAM_ARQ, 1.65),
         (2025, "Bayesian Meta", "Liu et al.",
          "Meta-reponderação\npor incerteza",
-         FAM_OTIM, 1.65),
+         FAM_OTIM, 2.95),
     ]
 
     def _draw_card(x, y_center, titulo, corpo, autor, cor,

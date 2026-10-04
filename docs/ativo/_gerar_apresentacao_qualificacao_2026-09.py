@@ -1111,16 +1111,44 @@ def slide_revisao_lacunas(prs: Presentation) -> None:
     add_table_slide(
         prs, 12,
         "Lacunas científicas identificadas na literatura",
-        ["#", "Lacuna", "Como endereçamos"],
+        ["#", "Lacuna", "Endereçamento"],
         [
-            ["L1", "Não existe matriz pública MST × classes raciais no FairFace.", "Etapa 2 — Contribuição 2."],
-            ["L2", "FiLM (Perez 2018) nunca foi aplicado em classificação racial multi-classe.", "Etapa 3 — Contribuição 3."],
-            ["L3", "Métricas de fairness multi-classe estão fragmentadas na literatura.", "Etapa 4 — Contribuição 4 (triangulação)."],
-            ["L4", "Transferência de fairness (Madras et al., 2018) para reconhecimento é pouco estudada.", "Etapa 5 — Contribuição 5."],
-            ["L5", "Não há decomposição quantitativa do gap Latinx (fenótipo × algoritmo).", "Etapa 6 — Contribuição 6."],
+            ["L1",
+             "Ausência de tabulação pública MST × raça sobre FairFace. "
+             "Schumann et al. (2023, NeurIPS) estabelecem o protocolo MST "
+             "sem aplicá-lo ao FairFace; Pereira et al. (2026) liberam o "
+             "STW sobre dataset próprio.",
+             "Etapa 2 — Contribuição 2."],
+            ["L2",
+             "FiLM nunca instanciado em classificação racial multi-classe. "
+             "Nem o mecanismo original (Perez et al., 2018) nem sua "
+             "formulação equivalente Conditional Batch Normalization "
+             "(de Vries et al., 2017) foram adotados com condicionamento "
+             "por tom de pele contínuo.",
+             "Etapa 3 — Contribuição 3."],
+            ["L3",
+             "Falta decomposição formal do erro Latinx. Pangelinan et al. "
+             "(2023) decompõem o gender gap em verificação (FST 6-tons), "
+             "mas não estendem a classificação racial multi-classe; o "
+             "patamar F1 ≈ 60 % em Latinx (Lin et al., 2022; AlDahoul "
+             "et al., 2024) permanece sem explicação quantitativa.",
+             "Etapa 6 — Contribuição 5."],
+            ["L4",
+             "Transferência classificação → verificação com condicionamento "
+             "preservado é lacuna. Madras et al. (2018, LAFTR) provam a "
+             "transferência fair apenas em dados tabulares; FairCal (2021), "
+             "MixFairFace (2022) e score normalization (2024) treinam a "
+             "mitigação diretamente em RFW/BFW.",
+             "Etapa 5 — Contribuição 6."],
+            ["L5",
+             "Reporte empírico de mitigação sem triangulação. Apesar do "
+             "Teorema da Impossibilidade (Kleinberg et al., 2017) e dos "
+             "surveys que o catalogam (Mehrabi et al., 2021), papers de "
+             "mitigação continuam reportando um único indicador agregado.",
+             "Etapa 4 — Contribuição 4."],
         ],
-        col_widths=[0.6, 6.5, 5.4],
-        font_size=15,
+        col_widths=[0.5, 8.0, 4.0],
+        font_size=11,
     )
 
 
