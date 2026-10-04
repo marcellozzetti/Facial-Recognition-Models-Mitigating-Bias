@@ -884,20 +884,22 @@ def gerar_fig_timeline_fases():
     ax.set_xlim(0, 10); ax.set_ylim(-0.6, 3.4)
     ax.axis("off")
 
-    # (rotulo, janela, titulo, cor_bg, cor_texto, destaque)
+    # (rotulo, janela, titulo, cor_bg, cor_texto, altura, destaque)
+    # Alturas em leve progressao Darwin — March of Progress sutil
+    #   2.3 -> 2.5 -> 2.7 -> 2.9  (passo de +0.2)
     fases = [
         ("FASE 1", "2018 – 2020",
          "Datasets e\namostragem",
-         BLUE_LIGHT, GRAY_DK, False),
+         BLUE_LIGHT, GRAY_DK, 2.3, False),
         ("FASE 2", "2020 – 2022",
          "Mitigação algorítmica\ne funções de perda",
-         BLUE_MID, "white", False),
+         BLUE_MID, "white", 2.5, False),
         ("FASE 3", "2023 – 2025",
          "VLMs e escala\nMonk (MST)",
-         "#2E4F8A", "white", False),
+         "#2E4F8A", "white", 2.7, False),
         ("FASE 4", "2025 – 2026",
          "Condicionamento\narquitetural (proposta)",
-         NAVY, "white", True),
+         NAVY, "white", 2.9, True),
     ]
 
     GROUND_Y = 0.1  # linha-eixo temporal
@@ -906,15 +908,14 @@ def gerar_fig_timeline_fases():
     ax.plot([0.3, 9.7], [GROUND_Y, GROUND_Y],
             color=GRAY_DK, linewidth=2.0, zorder=1)
 
-    # --- Blocos das fases: largura e altura iguais, distribuicao uniforme ---
+    # --- Blocos das fases: largura igual, altura em leve progressao ---
     BOX_W = 2.1
-    BOX_H = 2.5
     GAP = 0.2
     START = 0.5  # pos. x do canto esq. do 1o bloco
 
-    for i, (rotulo, janela, titulo, fc, tc, destaque) in enumerate(fases):
+    for i, (rotulo, janela, titulo, fc, tc, box_h, destaque) in enumerate(fases):
         x = START + i * (BOX_W + GAP)
-        y = GROUND_Y + 0.25
+        y = GROUND_Y + 0.25  # base ancorada no eixo
         cx = x + BOX_W / 2
 
         # Tick no eixo temporal (centro da fase)
@@ -927,7 +928,7 @@ def gerar_fig_timeline_fases():
 
         # Caixa principal
         box = FancyBboxPatch(
-            (x, y), BOX_W, BOX_H,
+            (x, y), BOX_W, box_h,
             boxstyle="round,pad=0.0,rounding_size=0.10",
             facecolor=fc, edgecolor=NAVY,
             linewidth=2.4 if destaque else 1.2, zorder=3,
@@ -935,12 +936,12 @@ def gerar_fig_timeline_fases():
         ax.add_patch(box)
 
         # Rotulo FASE N (topo do bloco)
-        ax.text(cx, y + BOX_H - 0.32, rotulo,
+        ax.text(cx, y + box_h - 0.32, rotulo,
                 ha="center", va="center",
                 fontsize=12, fontweight="bold", color=tc, zorder=4)
 
         # Titulo da fase (centro do bloco)
-        ax.text(cx, y + BOX_H / 2 - 0.15, titulo,
+        ax.text(cx, y + box_h / 2 - 0.15, titulo,
                 ha="center", va="center",
                 fontsize=10.5, color=tc, linespacing=1.3, zorder=4)
 
