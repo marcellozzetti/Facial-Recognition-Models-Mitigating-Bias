@@ -1715,164 +1715,217 @@ def _add_arrowhead(connector) -> None:
 # SLIDE 20 — Baselines + Cenários
 # ============================================================
 def slide_baselines_cenarios(prs: Presentation) -> None:
-    """Protocolo de validacao em 3 colunas visuais:
-       (I)  O QUE AVALIO     — 2 cenarios de reporte (A, B)
-       (II) COM QUE RIGOR    — norma + rigor estatistico
-       (III) ONDE GENERALIZA — 2 datasets externos (RFW, BFW)
+    """Protocolo de validacao em 3 pergunta-resposta grandes com um
+    numero/badge hero por pergunta. Formato narrativo:
+        'O QUE?'   -> 2 cenarios (hero: 7 e 8)
+        'COMO?'    -> 3 sementes + IC 95 % + norma (hero: 3)
+        'ONDE?'    -> RFW + BFW (hero: 20 K pares)
+    Fluxo narrativo linear facilita a fala.
     """
     slide = prs.slides.add_slide(_blank(prs))
-    add_title(slide, "Protocolo de validação: cenários, rigor e transferência")
+    add_title(slide, "Protocolo de validação")
 
-    # Dados das 3 colunas: (header, cor_header, items)
-    # cada item: (titulo_curto, subt_grande_1linha, body)
-    colunas = [
+    # Subtitulo
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
+    )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Três perguntas, três respostas pré-registradas — nenhum ajuste "
+        "pós-resultado."
+    )
+    ps.font.size = Pt(13)
+    ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    # ---- Dados das 3 perguntas ----
+    # (pergunta, hero_num, hero_sub, linha1, linha2, ref)
+    perguntas = [
         (
-            "O QUE AVALIO",
-            NAVY,
-            [
-                ("Cenário A",
-                 "7 classes raciais",
-                 "Reporte estratificado por classe\nracial do FairFace."),
-                ("Cenário B",
-                 "8 subgrupos (raça × gênero)",
-                 "Análise interseccional segundo\nGender Shades (Buolamwini &\nGebru, 2018)."),
-            ],
+            "O QUE AVALIO?",
+            "7 + 8",
+            "classes & subgrupos",
+            "Cenário A — 7 classes raciais do FairFace",
+            "Cenário B — 8 subgrupos raça × gênero",
+            "Interseccional segundo Buolamwini & Gebru (2018)",
         ),
         (
-            "COM QUE RIGOR",
-            BLUE_MID,
-            [
-                ("Norma",
-                 "ISO/IEC 19795-10:2024",
-                 "Padrão internacional para\nreporte de desempenho biométrico\nestratificado entre grupos."),
-                ("Estatística",
-                 "3 sementes · IC 95 % · pareado",
-                 "Sementes (42, 1, 2); bootstrap\nnão-paramétrico; comparação\npareada entre configs."),
-            ],
+            "COM QUE RIGOR?",
+            "3",
+            "sementes · bootstrap IC 95 %",
+            "Sementes 42, 1, 2 · comparação pareada",
+            "Norma ISO/IEC 19795-10:2024",
+            "Padrão biométrico internacional estratificado",
         ),
         (
-            "ONDE GENERALIZA",
-            GRAY_MD,
-            [
-                ("RFW",
-                 "Racial Faces in-the-Wild",
-                 "Pares oficiais 1 : 1 de verificação\n(Wang et al., 2019). Foco em\ngrupo African."),
-                ("BFW",
-                 "Balanced Faces in-the-Wild",
-                 "Protocolo balanceado por raça\nx gênero (Robinson et al.,\n2020)."),
-            ],
+            "ONDE GENERALIZA?",
+            "~20 K",
+            "pares de verificação externos",
+            "RFW — Racial Faces in-the-Wild (Wang 2019)",
+            "BFW — Balanced Faces in-the-Wild (Robinson 2020)",
+            "Foco em African; transferência via feature-freeze",
         ),
     ]
 
     # Geometria
     SLIDE_W = 13.33
-    COL_W = 4.00
-    COL_GAP = 0.30
-    N = len(colunas)
-    total_w = N * COL_W + (N - 1) * COL_GAP
+    CARD_W = 4.10
+    CARD_GAP = 0.25
+    N = len(perguntas)
+    total_w = N * CARD_W + (N - 1) * CARD_GAP
     start_x = (SLIDE_W - total_w) / 2
-    COL_Y = 1.45
-    HEADER_H = 0.55
-    GAP_H = 0.14          # gap entre header e primeiro item
-    ITEM_H = 2.17         # altura de cada item
-    ITEM_GAP = 0.18       # gap entre itens
-    N_ITEMS = 2
+    CARD_Y = 1.75
+    HEADER_H = 0.65
+    CARD_BODY_H = 4.00
+    CARD_H = HEADER_H + CARD_BODY_H
 
-    for i, (header, cor, items) in enumerate(colunas):
-        col_x = start_x + i * (COL_W + COL_GAP)
+    for i, (pergunta, hero, hero_sub, l1, l2, ref) in enumerate(perguntas):
+        x = start_x + i * (CARD_W + CARD_GAP)
+        hl = (i == 0)  # destaca a primeira ("o que") para orientar o olhar
 
-        # Cabecalho colorido
+        # Header NAVY (pergunta)
         hdr = slide.shapes.add_shape(
             MSO_SHAPE.ROUNDED_RECTANGLE,
-            Inches(col_x), Inches(COL_Y),
-            Inches(COL_W), Inches(HEADER_H),
+            Inches(x), Inches(CARD_Y),
+            Inches(CARD_W), Inches(HEADER_H),
         )
         hdr.fill.solid()
-        hdr.fill.fore_color.rgb = cor
+        hdr.fill.fore_color.rgb = NAVY
         hdr.line.fill.background()
         tf = hdr.text_frame
-        tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.05)
+        tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.05)
         p = tf.paragraphs[0]
         p.alignment = 2
         r = p.add_run()
-        r.text = header
-        r.font.size = Pt(14)
+        r.text = pergunta
+        r.font.size = Pt(16)
         r.font.bold = True
         r.font.color.rgb = WHITE
 
-        # Itens (2 por coluna)
-        for j, (titulo, destaque, body) in enumerate(items):
-            item_y = (COL_Y + HEADER_H + GAP_H
-                      + j * (ITEM_H + ITEM_GAP))
+        # Corpo cinza-claro
+        body = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(CARD_Y + HEADER_H + 0.05),
+            Inches(CARD_W), Inches(CARD_BODY_H),
+        )
+        body.fill.solid()
+        body.fill.fore_color.rgb = GRAY_LT
+        body.line.fill.background()
 
-            box = slide.shapes.add_shape(
-                MSO_SHAPE.ROUNDED_RECTANGLE,
-                Inches(col_x), Inches(item_y),
-                Inches(COL_W), Inches(ITEM_H),
-            )
-            box.fill.solid()
-            box.fill.fore_color.rgb = WHITE
-            box.line.color.rgb = cor
-            box.line.width = Pt(1.4)
-            box.text_frame.margin_top = Inches(0.0)
+        # Hero number (grande, centrado)
+        hero_tb = slide.shapes.add_textbox(
+            Inches(x + 0.15), Inches(CARD_Y + HEADER_H + 0.25),
+            Inches(CARD_W - 0.30), Inches(1.05),
+        )
+        tf = hero_tb.text_frame
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = hero
+        r.font.size = Pt(46)
+        r.font.bold = True
+        r.font.color.rgb = NAVY
 
-            # Titulo curto (eyebrow)
-            t_tb = slide.shapes.add_textbox(
-                Inches(col_x + 0.15), Inches(item_y + 0.10),
-                Inches(COL_W - 0.30), Inches(0.35),
-            )
-            tf = t_tb.text_frame
-            tf.word_wrap = True
-            p = tf.paragraphs[0]
-            p.alignment = 2
-            r = p.add_run()
-            r.text = titulo
-            r.font.size = Pt(11)
-            r.font.bold = True
-            r.font.color.rgb = cor
+        # Hero subtitle
+        sub_tb = slide.shapes.add_textbox(
+            Inches(x + 0.15), Inches(CARD_Y + HEADER_H + 1.30),
+            Inches(CARD_W - 0.30), Inches(0.35),
+        )
+        tf = sub_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = hero_sub
+        r.font.size = Pt(12)
+        r.font.italic = True
+        r.font.color.rgb = GRAY_MD
 
-            # Destaque (1 linha grande, central)
-            d_tb = slide.shapes.add_textbox(
-                Inches(col_x + 0.15), Inches(item_y + 0.50),
-                Inches(COL_W - 0.30), Inches(0.55),
-            )
-            tf = d_tb.text_frame
-            tf.word_wrap = True
-            p = tf.paragraphs[0]
-            p.alignment = 2
-            r = p.add_run()
-            r.text = destaque
-            r.font.size = Pt(15)
-            r.font.bold = True
-            r.font.color.rgb = NAVY
+        # Linha separadora
+        sep = slide.shapes.add_connector(
+            2,
+            Inches(x + 0.30), Inches(CARD_Y + HEADER_H + 1.80),
+            Inches(x + CARD_W - 0.30), Inches(CARD_Y + HEADER_H + 1.80),
+        )
+        sep.line.color.rgb = GRAY_MD
+        sep.line.width = Pt(0.75)
 
-            # Body (explicacao abaixo)
-            b_tb = slide.shapes.add_textbox(
-                Inches(col_x + 0.18), Inches(item_y + 1.08),
-                Inches(COL_W - 0.36), Inches(ITEM_H - 1.15),
-            )
-            tf = b_tb.text_frame
-            tf.word_wrap = True
-            p = tf.paragraphs[0]
-            p.alignment = 2
-            r = p.add_run()
-            r.text = body
-            r.font.size = Pt(12)
-            r.font.color.rgb = GRAY_DK
+        # Linha 1 (bullet grande)
+        l1_tb = slide.shapes.add_textbox(
+            Inches(x + 0.25), Inches(CARD_Y + HEADER_H + 1.95),
+            Inches(CARD_W - 0.50), Inches(0.70),
+        )
+        tf = l1_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = "•  " + l1
+        r.font.size = Pt(12)
+        r.font.bold = True
+        r.font.color.rgb = NAVY
 
-    # Caption
-    cap = slide.shapes.add_textbox(
-        Inches(0.5), Inches(6.60), Inches(12.3), Inches(0.4)
+        # Linha 2 (bullet grande)
+        l2_tb = slide.shapes.add_textbox(
+            Inches(x + 0.25), Inches(CARD_Y + HEADER_H + 2.65),
+            Inches(CARD_W - 0.50), Inches(0.70),
+        )
+        tf = l2_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = "•  " + l2
+        r.font.size = Pt(12)
+        r.font.bold = True
+        r.font.color.rgb = NAVY
+
+        # Referencia/nota (rodape do card)
+        ref_tb = slide.shapes.add_textbox(
+            Inches(x + 0.25), Inches(CARD_Y + HEADER_H + 3.50),
+            Inches(CARD_W - 0.50), Inches(0.45),
+        )
+        tf = ref_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = ref
+        r.font.size = Pt(10)
+        r.font.italic = True
+        r.font.color.rgb = GRAY_MD
+
+    # ---- Banner inferior: compromisso falsificavel ----
+    bot_y = 6.65
+    bot_h = 0.75
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(SLIDE_W - 1.0), Inches(bot_h),
     )
-    pc = cap.text_frame.paragraphs[0]
-    pc.alignment = 2
-    pc.text = (
-        "Fluxo narrativo: o que avalio (cenários A e B) → com que rigor "
-        "(norma + estatística) → onde demonstro generalização (RFW, BFW)."
+    bot.fill.solid()
+    bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    tf.margin_top = Inches(0.06); tf.margin_bottom = Inches(0.05)
+    p1 = tf.paragraphs[0]
+    p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "Protocolo falsificável"
+    r1.font.size = Pt(13)
+    r1.font.bold = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph()
+    p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = (
+        "Critérios binários pré-registrados (H1, H4, H5); nenhum "
+        "ajuste de métrica pós-resultado — alinhado à metodologia "
+        "popperiana e à norma biométrica."
     )
-    pc.font.size = Pt(12)
-    pc.font.italic = True
-    pc.font.color.rgb = GRAY_MD
+    r2.font.size = Pt(11)
+    r2.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
     add_page_number(slide, 23)
