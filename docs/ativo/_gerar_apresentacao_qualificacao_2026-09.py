@@ -1896,8 +1896,8 @@ def slide_metricas(prs: Presentation) -> None:
     )
     ps = sub.text_frame.paragraphs[0]
     ps.text = (
-        "Todas públicas, padrão da literatura — reportar as três "
-        "simultaneamente como exigência metodológica."
+        "Padrão da literatura — valores reportados: SOTA FaceScanPaliGemma "
+        "(AlDahoul et al., 2024) sobre FairFace 7-class in-domain."
     )
     ps.font.size = Pt(13)
     ps.font.italic = True
@@ -1905,33 +1905,36 @@ def slide_metricas(prs: Presentation) -> None:
 
     # ---- 3 cartoes ----
     # (nome, subtitulo, body, referencia, label_estado, valor, contexto)
+    # Valores referenciados em AlDahoul et al. (2024, Nature Sci. Reports)
+    # Tabela 10 (F1 macro) e Tabela 16 (F1 por raca); e Kärkkäinen & Joo
+    # (2021) baseline ResNet-34 do FairFace original.
     cartoes = [
         (
             "F1 macro",
             "performance média",
-            "Média harmônica de precision/recall por\nclasse, depois média simples entre as\n7 raças.",
+            "Média harmônica de precision/recall por\nclasse, depois média simples entre as\n7 raças do FairFace.",
             "Referência: van Rijsbergen 1979",
             "SOTA atual",
             "75 %",
-            "FaceScanPaliGemma",
+            "FaceScanPaliGemma  ·  baseline ResNet-34 = 72 %",
         ),
         (
             "DR",
             "Disparity Ratio",
-            "Razão entre o F1 da pior raça e o F1\nda melhor. Mede o gap entre subgrupos.",
+            "Razão F1_min / F1_max entre raças.\nMede o gap entre o pior e o melhor\nsubgrupo (0 = total disparidade, 1 = paridade).",
             "Referência: Hardt, Price & Srebro 2016 (NeurIPS)",
-            "Estado atual",
+            "SOTA atual",
             "0,67",
-            "60 % Latinx ÷ 90 % Black",
+            "F1 Latinx 60 %  ÷  F1 Black 90 %",
         ),
         (
             "Worst-class F1",
             "pior subgrupo",
-            "F1 da raça em que o modelo erra mais.\nGarante que ninguém fique para trás.",
+            "F1 da raça em que o modelo erra mais.\nGarante que ninguém fique para trás,\nmesmo quando a média agregada é alta.",
             "Referência: Sagawa et al. 2020 (ICLR) — Group DRO",
-            "Estado atual",
+            "SOTA atual",
             "60 %",
-            "Latinx",
+            "Latinx  ·  FaceScanPaliGemma",
         ),
     ]
 
