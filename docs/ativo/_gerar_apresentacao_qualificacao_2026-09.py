@@ -1441,22 +1441,250 @@ def slide_metodologia_film(prs: Presentation) -> None:
 
 
 # ============================================================
-# SLIDE 21 — Metodologia: 3 configurações
+# SLIDE 22 — Metodologia: 3 configurações (shapes nativos PPTX)
 # ============================================================
 def slide_metodologia_configs(prs: Presentation) -> None:
-    add_table_slide(
-        prs, 22,
-        "Configurações do estudo de ablation arquitetural",
-        ["ID", "Configuração", "O que testa"],
-        [
-            ["A", "ConvNeXt-T puro (baseline)", "Sem condicionamento — controle arquitetural."],
-            ["B", "ConvNeXt-T + FiLM (sinal MST direto, 10-dim)", "Proposta principal — tom de pele entra como contexto."],
-            ["C", "ConvNeXt-T + FiLM (sinal via CLIP-text, 512-dim)", "Alternativa moderna — Radford et al. (2021) + Dehdashtian et al. (2024)."],
-        ],
-        col_widths=[0.6, 5.4, 6.5],
-        highlight_rows=[1],
-        font_size=14,
+    """Estudo de ablation arquitetural em 3 configuracoes (A, B, C)
+    desenhadas como cartoes nativos lado a lado. Config B destacada
+    como proposta principal. Mini-pipeline visual dentro de cada card.
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Configurações do estudo de ablation arquitetural")
+
+    # ---- Dados das 3 configuracoes ----
+    # (id, nome, sinal_condicionante, oque_testa, referencia, highlight)
+    configs = [
+        (
+            "A",
+            "ConvNeXt-T puro",
+            None,
+            "Controle arquitetural\nsem condicionamento.",
+            "Baseline",
+            False,
+        ),
+        (
+            "B",
+            "ConvNeXt-T + FiLM\n(MST direto, 10-dim)",
+            "MST (10-dim)",
+            "Proposta principal — tom\nde pele contínuo como\ncontexto arquitetural.",
+            "Perez et al. (2018) + Monk\n(Schumann et al., 2023)",
+            True,
+        ),
+        (
+            "C",
+            "ConvNeXt-T + FiLM\n(CLIP-text, 512-dim)",
+            "CLIP-text (512-dim)",
+            "Alternativa moderna —\nembedding textual rico\ncomo sinal condicionante.",
+            "Radford et al. (2021) +\nDehdashtian et al. (2024)",
+            False,
+        ),
+    ]
+
+    # ---- Geometria ----
+    SLIDE_W = 13.33
+    CARD_W = 4.00
+    CARD_GAP = 0.30
+    CARD_H = 5.05
+    CARD_Y = 1.45
+    n = len(configs)
+    total_w = n * CARD_W + (n - 1) * CARD_GAP
+    start_x = (SLIDE_W - total_w) / 2
+
+    # ---- Cartoes ----
+    for i, (cid, nome, sinal, oque, ref, hl) in enumerate(configs):
+        x = start_x + i * (CARD_W + CARD_GAP)
+
+        # Card background
+        box = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(CARD_Y), Inches(CARD_W), Inches(CARD_H),
+        )
+        box.fill.solid()
+        box.fill.fore_color.rgb = NAVY if hl else WHITE
+        box.line.color.rgb = NAVY
+        box.line.width = Pt(2.4 if hl else 1.3)
+        box.text_frame.margin_top = Inches(0.0)
+
+        # Letter badge (circulo com letra no topo)
+        badge_d = 0.75
+        badge_x = x + (CARD_W - badge_d) / 2
+        badge_y = CARD_Y + 0.25
+        badge = slide.shapes.add_shape(
+            MSO_SHAPE.OVAL,
+            Inches(badge_x), Inches(badge_y),
+            Inches(badge_d), Inches(badge_d),
+        )
+        badge.fill.solid()
+        badge.fill.fore_color.rgb = WHITE if hl else NAVY
+        badge.line.color.rgb = NAVY
+        badge.line.width = Pt(1.5)
+        bf = badge.text_frame
+        bf.margin_top = Inches(0.0); bf.margin_bottom = Inches(0.0)
+        bp = bf.paragraphs[0]
+        bp.alignment = 2
+        br = bp.add_run()
+        br.text = cid
+        br.font.size = Pt(28)
+        br.font.bold = True
+        br.font.color.rgb = NAVY if hl else WHITE
+
+        # Nome da configuracao (abaixo do badge)
+        name_tb = slide.shapes.add_textbox(
+            Inches(x + 0.15), Inches(CARD_Y + 1.10),
+            Inches(CARD_W - 0.30), Inches(0.95),
+        )
+        tf = name_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = nome
+        r.font.size = Pt(16)
+        r.font.bold = True
+        r.font.color.rgb = WHITE if hl else NAVY
+
+        # Mini-pipeline visual (linha com 2 ou 3 pilulas + seta)
+        mini_y = CARD_Y + 2.15
+        _mini_pipeline(slide, x + 0.20, mini_y, CARD_W - 0.40,
+                       sinal, hl)
+
+        # "O que testa" (corpo descritivo)
+        body_tb = slide.shapes.add_textbox(
+            Inches(x + 0.20), Inches(CARD_Y + 3.00),
+            Inches(CARD_W - 0.40), Inches(1.05),
+        )
+        tf = body_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = oque
+        r.font.size = Pt(13)
+        r.font.color.rgb = BLUE_LIGHT if hl else GRAY_DK
+
+        # Referencia / rodape do card
+        ref_tb = slide.shapes.add_textbox(
+            Inches(x + 0.20), Inches(CARD_Y + CARD_H - 0.85),
+            Inches(CARD_W - 0.40), Inches(0.70),
+        )
+        tf = ref_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = ref
+        r.font.size = Pt(10.5)
+        r.font.italic = True
+        r.font.color.rgb = BLUE_LIGHT if hl else GRAY_MD
+
+    # ---- Caption ----
+    cap = slide.shapes.add_textbox(
+        Inches(0.5), Inches(6.60), Inches(12.3), Inches(0.4)
     )
+    pc = cap.text_frame.paragraphs[0]
+    pc.alignment = 2
+    pc.text = (
+        "Ceteris paribus: mesmo backbone (ConvNeXt-T), mesmo dataset "
+        "(FairFace), mesmas três sementes, mesma receita de treino — "
+        "varia-se apenas o sinal condicionante."
+    )
+    pc.font.size = Pt(12)
+    pc.font.italic = True
+    pc.font.color.rgb = GRAY_MD
+
+    add_footer(slide)
+    add_page_number(slide, 22)
+
+
+def _mini_pipeline(slide, x: float, y: float, width: float,
+                   signal: str | None, highlight: bool) -> None:
+    """Desenha mini-pipeline horizontal com pilulas conectadas por seta.
+
+    Config A (sem sinal): [Imagem] -> [ConvNeXt-T]
+    Config B/C (com sinal): [sinal] -> FiLM -> [ConvNeXt-T]
+                              (desenhado com 2 pilulas e seta
+                               convergindo via marcador vertical)
+    """
+    height = 0.55
+    text_color_hl = BLUE_LIGHT
+    text_color_std = NAVY
+
+    def _pill(px, pw, label, fc, ec, fg, size=10, bold=True):
+        pill = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(px), Inches(y),
+            Inches(pw), Inches(height),
+        )
+        pill.fill.solid()
+        pill.fill.fore_color.rgb = fc
+        pill.line.color.rgb = ec
+        pill.line.width = Pt(1.1)
+        tf = pill.text_frame
+        tf.margin_left = Inches(0.04); tf.margin_right = Inches(0.04)
+        tf.margin_top = Inches(0.02); tf.margin_bottom = Inches(0.02)
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = label
+        r.font.size = Pt(size)
+        r.font.bold = bold
+        r.font.color.rgb = fg
+
+    bg_text = text_color_hl if highlight else text_color_std
+
+    if signal is None:
+        # Config A: [Imagem]  ->  [ConvNeXt-T]
+        w1 = width * 0.35
+        w2 = width * 0.45
+        gap = width - w1 - w2
+        _pill(x,                   w1, "Imagem",
+              GRAY_LT, GRAY_DK, GRAY_DK)
+        _pill(x + w1 + gap,        w2, "ConvNeXt-T",
+              WHITE,  NAVY,   NAVY)
+        # seta
+        conn = slide.shapes.add_connector(
+            2,
+            Inches(x + w1), Inches(y + height / 2),
+            Inches(x + w1 + gap), Inches(y + height / 2),
+        )
+        conn.line.color.rgb = GRAY_DK if not highlight else BLUE_LIGHT
+        conn.line.width = Pt(2.0)
+        _add_arrowhead(conn)
+    else:
+        # Config B / C: [sinal] + FiLM -> [ConvNeXt-T]
+        # Layout: [sinal_pill] [+FiLM] -> [ConvNeXt-T]
+        w1 = width * 0.42
+        w2 = width * 0.38
+        gap = width - w1 - w2
+        _pill(x,            w1, signal,
+              GRAY_LT if not highlight else BLUE_MID,
+              NAVY, NAVY if not highlight else WHITE,
+              size=10)
+        _pill(x + w1 + gap, w2, "FiLM · ConvNeXt-T",
+              WHITE if not highlight else BLUE_LIGHT,
+              NAVY, NAVY)
+        # seta de condicionamento
+        conn = slide.shapes.add_connector(
+            2,
+            Inches(x + w1), Inches(y + height / 2),
+            Inches(x + w1 + gap), Inches(y + height / 2),
+        )
+        conn.line.color.rgb = BLUE_MID if not highlight else WHITE
+        conn.line.width = Pt(2.0)
+        _add_arrowhead(conn)
+
+
+def _add_arrowhead(connector) -> None:
+    """Adiciona arrowhead triangular ao final de um connector."""
+    from pptx.oxml.ns import qn
+    from lxml import etree
+    ln = connector.line._get_or_add_ln()
+    tailEnd = ln.find(qn("a:tailEnd"))
+    if tailEnd is None:
+        tailEnd = etree.SubElement(ln, qn("a:tailEnd"))
+    tailEnd.set("type", "triangle")
+    tailEnd.set("w", "med")
+    tailEnd.set("len", "med")
 
 
 # ============================================================
