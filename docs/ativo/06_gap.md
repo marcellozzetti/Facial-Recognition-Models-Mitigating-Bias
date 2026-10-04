@@ -163,9 +163,11 @@ Capítulo 2 — Race classifier condicionado por MST
     backbone), H4 (overlap MST explica misclassificações)
 
 Capítulo 3 — Extensão a face recognition (RFW ou BFW)
-    Pipeline análogo: encoder + FiLM condicionado por MST
-    Métrica primária: TAR @ FAR fixo por raça, foco em Black/African
-    Testa H5 (fair transferência LAFTR-style)
+    Transferência arquitetural: módulo FiLM+ConvNeXt-T pré-treinado
+    no Cap 2 é CONGELADO (feature-freeze) e acoplado a cabeça de
+    verificação. Nenhum re-treino do condicionamento.
+    Métrica primária: TAR @ FAR = 1e-4 por raça, foco em African.
+    Testa H5 (transferência fair LAFTR-style do condicionamento MST).
 
 Síntese — Decomposição final
     erro_total = irredutível_fenotípico + redutível_algorítmico
@@ -182,7 +184,7 @@ Detalhamento em [`07_thesis_statement.md` §4](07_thesis_statement.md).
 | **H2** | ConvNeXt-T vanilla ganha **+2 a +5 pp** F1; Latinx F1 ≈ **60% (±3 pp)** | Ganho no range E Latinx invariante |
 | **H3** | Spread MST de Latinx cobre **≥ 5 categorias** com pico distribuído | Spread ≥ 5 com pico não-concentrado |
 | **H4** (CENTRAL) | **≥ 50%** das misclassificações Latinx em zonas MST de sobreposição | %_overlap ≥ 50% |
-| **H5** (CENTRAL) | Pipeline em face recognition melhora accuracy Black/African **≥ +3 pp** | Ganho ≥ 3 pp sobre baseline sem MST |
+| **H5** (CENTRAL) | O módulo FiLM+MST pré-treinado em classificação racial (Cap 2), transferido via feature-freeze para face recognition (RFW/BFW), melhora **TAR @ FAR = 1 × 10⁻⁴** do grupo African em **≥ +3 pp** sobre backbone equivalente sem condicionamento — demonstrando transferência arquitetural (não re-treinamento) na linha de Madras et al. (2018, LAFTR, Teorema 1) | ΔTAR @ FAR = 1e-4 ≥ +3 pp E encoder MST não re-treinado |
 
 ### 4.3 Contribuições originais declaradas (v3.2)
 

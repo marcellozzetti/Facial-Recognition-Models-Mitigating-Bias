@@ -1026,7 +1026,7 @@ def slide_objetivos_hipoteses(prs: Presentation) -> None:
         ("H2", "Latinx cobre ≥ 5 dos 10 tons Monk", "cobertura ≥ 5"),
         ("H3", "Condicionamento reduz disparidade sem perder acurácia", "DR ↓  ·  F1 ≥ baseline"),
         ("H4", "≥ 50 % dos erros Latinx em zonas de sobreposição", "concentração ≥ 50 %"),
-        ("H5", "Ganho transfere para reconhecimento (RFW/BFW)", "gap ↓ downstream"),
+        ("H5", "Módulo FiLM/MST pré-treinado transfere via feature-freeze para RFW/BFW", "ΔTAR@FAR=1e-4 ≥ +3 pp (African)"),
         ("H6", "Pixel information explica variância do erro (Pangelinan)", "R² ≥ 70 %"),
     ]
     tx = slide.shapes.add_textbox(
@@ -1153,16 +1153,160 @@ def slide_revisao_lacunas(prs: Presentation) -> None:
 
 
 # ============================================================
-# SLIDE 16 — Metodologia: pipeline (figura)
+# SLIDE 13 — Metodologia: pipeline em 6 etapas (shapes nativos PPTX)
 # ============================================================
 def slide_metodologia_pipeline(prs: Presentation) -> None:
-    add_image_slide(
-        prs, 13,
-        "Pipeline experimental em seis etapas",
-        IMG_DIR / "fig_pipeline_6etapas.png",
-        caption="Fluxo top-down organizado em três fases: diagnóstico (etapas 1 e 2), método proposto (etapa 3) e validação e síntese (etapas 4 a 6).",
-        height_in=5.4,
+    """Pipeline em 6 etapas desenhado com shapes nativos (editavel no
+    PowerPoint). Layout horizontal: 6 caixas em uma linha, com faixa de
+    fases acima e setas conectoras entre caixas; Etapa 3 destacada.
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Pipeline experimental em seis etapas")
+
+    # ---- Dados das 6 etapas ----
+    etapas = [
+        (1, "Classificador MST",
+         "Treina rede 10-tons sobre MSTE + CCv2.", False),
+        (2, "Matriz MST × raça",
+         "Tabula tons preditos pelas 7 classes FairFace.", False),
+        (3, "FiLM + ConvNeXt-T",
+         "Rede condiciona features ao vetor MST (método proposto).", True),
+        (4, "Baselines e cenários",
+         "Confronta a proposta com seis famílias já publicadas.", False),
+        (5, "Transferência RFW/BFW",
+         "Verifica herança do condicionamento em reconhecimento.", False),
+        (6, "Decomposição do erro",
+         "Separa componente fenotípico de componente algorítmico.", False),
+    ]
+    # Fases: (label, cor_fundo, cor_texto, indices_etapas 0-based)
+    fases = [
+        ("A. DIAGNÓSTICO", GRAY_LT,   GRAY_DK, [0, 1]),
+        ("B. MÉTODO",      BLUE_LIGHT, NAVY,    [2]),
+        ("C. VALIDAÇÃO",   GRAY_LT,   GRAY_DK, [3, 4, 5]),
+    ]
+
+    # ---- Dimensoes (em polegadas) ----
+    SLIDE_W = 13.33
+    MARGIN_X = 0.35
+    BOX_W = 2.00
+    BOX_GAP = 0.11
+    N_BOXES = 6
+    total_boxes_w = N_BOXES * BOX_W + (N_BOXES - 1) * BOX_GAP
+    start_x = (SLIDE_W - total_boxes_w) / 2
+
+    PHASE_Y = 1.45
+    PHASE_H = 0.42
+    BOX_Y = 2.10
+    BOX_H = 4.30
+
+    # ---- Faixa de fases (topo) ----
+    for label, bg, fg, idxs in fases:
+        x_left = start_x + idxs[0] * (BOX_W + BOX_GAP)
+        x_right = start_x + idxs[-1] * (BOX_W + BOX_GAP) + BOX_W
+        bar = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x_left), Inches(PHASE_Y),
+            Inches(x_right - x_left), Inches(PHASE_H),
+        )
+        bar.fill.solid()
+        bar.fill.fore_color.rgb = bg
+        bar.line.color.rgb = fg
+        bar.line.width = Pt(0.75)
+        tf = bar.text_frame
+        tf.margin_left = Inches(0.08); tf.margin_right = Inches(0.08)
+        tf.margin_top = Inches(0.02); tf.margin_bottom = Inches(0.02)
+        p = tf.paragraphs[0]
+        p.alignment = 2  # center
+        r = p.add_run()
+        r.text = label
+        r.font.size = Pt(13)
+        r.font.bold = True
+        r.font.color.rgb = fg
+
+    # ---- 6 cartoes das etapas ----
+    for i, (num, titulo, subt, highlight) in enumerate(etapas):
+        x = start_x + i * (BOX_W + BOX_GAP)
+        box = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(BOX_Y), Inches(BOX_W), Inches(BOX_H),
+        )
+        box.fill.solid()
+        box.fill.fore_color.rgb = NAVY if highlight else WHITE
+        box.line.color.rgb = NAVY
+        box.line.width = Pt(2.0 if highlight else 1.2)
+        tf = box.text_frame
+        tf.word_wrap = True
+        tf.margin_left = Inches(0.12); tf.margin_right = Inches(0.12)
+        tf.margin_top = Inches(0.15); tf.margin_bottom = Inches(0.12)
+
+        # eyebrow "ETAPA N"
+        p0 = tf.paragraphs[0]
+        p0.alignment = 2
+        r0 = p0.add_run()
+        r0.text = f"ETAPA {num}"
+        r0.font.size = Pt(11)
+        r0.font.bold = True
+        r0.font.color.rgb = BLUE_LIGHT if highlight else BLUE_MID
+
+        # titulo
+        p1 = tf.add_paragraph()
+        p1.alignment = 2
+        p1.space_before = Pt(6)
+        r1 = p1.add_run()
+        r1.text = titulo
+        r1.font.size = Pt(16)
+        r1.font.bold = True
+        r1.font.color.rgb = WHITE if highlight else NAVY
+
+        # subtitulo
+        p2 = tf.add_paragraph()
+        p2.alignment = 2
+        p2.space_before = Pt(14)
+        r2 = p2.add_run()
+        r2.text = subt
+        r2.font.size = Pt(12)
+        r2.font.color.rgb = BLUE_LIGHT if highlight else GRAY_DK
+
+    # ---- Setas horizontais entre caixas ----
+    arrow_y = BOX_Y + BOX_H / 2
+    for i in range(N_BOXES - 1):
+        x_start = start_x + i * (BOX_W + BOX_GAP) + BOX_W
+        x_end = start_x + (i + 1) * (BOX_W + BOX_GAP)
+        conn = slide.shapes.add_connector(
+            2,  # straight connector
+            Inches(x_start), Inches(arrow_y),
+            Inches(x_end), Inches(arrow_y),
+        )
+        conn.line.color.rgb = NAVY
+        conn.line.width = Pt(2.5)
+        # arrowhead no final (direita)
+        line = conn.line
+        from pptx.oxml.ns import qn
+        ln = line._get_or_add_ln()
+        tailEnd = ln.find(qn("a:tailEnd"))
+        if tailEnd is None:
+            from lxml import etree
+            tailEnd = etree.SubElement(ln, qn("a:tailEnd"))
+        tailEnd.set("type", "triangle")
+        tailEnd.set("w", "med")
+        tailEnd.set("len", "med")
+
+    # ---- Caption inferior ----
+    cap = slide.shapes.add_textbox(
+        Inches(0.5), Inches(6.55), Inches(12.3), Inches(0.4)
     )
+    pc = cap.text_frame.paragraphs[0]
+    pc.alignment = 2
+    pc.text = (
+        "Fluxo em três fases: diagnóstico (etapas 1 e 2), "
+        "método proposto (etapa 3, destacada) e validação e síntese (etapas 4 a 6)."
+    )
+    pc.font.size = Pt(12)
+    pc.font.italic = True
+    pc.font.color.rgb = GRAY_MD
+
+    add_footer(slide)
+    add_page_number(slide, 13)
 
 
 # ============================================================
