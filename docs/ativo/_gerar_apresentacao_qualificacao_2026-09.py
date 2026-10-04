@@ -2076,7 +2076,7 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
     p1 = tf.paragraphs[0]
     p1.alignment = 2
     r1 = p1.add_run()
-    r1.text = "Protocolo falsificável"
+    r1.text = "Critério definido antes do experimento"
     r1.font.size = Pt(13)
     r1.font.bold = True
     r1.font.color.rgb = WHITE
@@ -2084,9 +2084,10 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
     p2.alignment = 2
     r2 = p2.add_run()
     r2.text = (
-        "Critérios binários pré-registrados (H1, H4, H5); nenhum "
-        "ajuste de métrica pós-resultado — alinhado à metodologia "
-        "popperiana e à norma biométrica."
+        "Para cada hipótese da pesquisa, o valor-limite de aprovação "
+        "foi fixado antes de rodar os experimentos — o resultado só "
+        "pode confirmar ou refutar, sem reinterpretar a métrica "
+        "depois dos dados."
     )
     r2.font.size = Pt(11)
     r2.font.color.rgb = BLUE_LIGHT
@@ -2309,10 +2310,11 @@ def slide_metricas(prs: Presentation) -> None:
     p2.alignment = 2
     r2 = p2.add_run()
     r2.text = (
-        "Teorema da Impossibilidade (Kleinberg, Mullainathan & Raghavan "
-        "2017, ITCS): nenhuma métrica única de equidade satisfaz "
-        "simultaneamente calibração, equal FPR e equal FNR — reportar "
-        "as três é a forma honesta de comunicar trade-offs."
+        "Teorema da Impossibilidade (Kleinberg et al., 2017): quando as "
+        "prevalências diferem entre grupos, nenhuma métrica única satisfaz "
+        "ao mesmo tempo (1) acertar a probabilidade predita por grupo, "
+        "(2) mesma taxa de falso positivo entre grupos e (3) mesma taxa de "
+        "falso negativo entre grupos. Reportar múltiplas é o único jeito honesto."
     )
     r2.font.size = Pt(11)
     r2.font.color.rgb = BLUE_LIGHT
