@@ -1660,7 +1660,7 @@ def slide_metodologia_etapa1(prs: Presentation) -> None:
             "titulo": "Arquitetura e Saída Esperada",
             "cor_titulo": ACCENT,
             "itens": [
-                ("Backbone:",   "ViT-B/16 (torchvision) fine-tuned para classificação na escala MST de 10 tons; ViT-Small como alternativa opcional para reprodução do SkinToneNet."),
+                ("Backbone:",   "ViT-B/16 (torchvision) fine-tuned para 10 tons MST — mesma família arquitetural do SkinToneNet (Matias 2026, SOTA de referência) + pré-treino ImageNet favorece convergência em dataset pequeno (~7 k)."),
                 ("Saída:",      "vetor de probabilidade softmax 10-dim (um por imagem)."),
                 ("Função no pipeline:", "sinal condicionante estático para as camadas FiLM da Etapa 3 — também alimenta a matriz da Etapa 2."),
             ],
