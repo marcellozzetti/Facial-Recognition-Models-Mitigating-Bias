@@ -1715,27 +1715,390 @@ def _add_arrowhead(connector) -> None:
 # SLIDE 20 — Baselines + Cenários
 # ============================================================
 def slide_baselines_cenarios(prs: Presentation) -> None:
-    add_bullets(prs, 23, "Protocolo de validação: cenários e norma", [
-        ("Cenário A — apenas raça:", "reporte estratificado por classe racial (sete classes do FairFace)."),
-        ("Cenário B — raça × gênero:", "análise interseccional (oito subgrupos), conforme protocolo estabelecido por Gender Shades (Buolamwini & Gebru, 2018)."),
-        ("Norma seguida:", "ISO/IEC 19795-10:2024, padrão internacional para reporte de desempenho biométrico estratificado entre grupos demográficos."),
-        ("Rigor experimental:", "três sementes independentes por experimento (42, 1, 2), comparação pareada e intervalo de confiança de 95 % via bootstrap não paramétrico."),
-        ("Datasets de transferência (Etapa 5):", "RFW (Wang et al., 2019) e BFW (Robinson et al., 2020), com pares oficiais de verificação 1:1."),
-    ])
+    """Protocolo de validacao em 3 colunas visuais:
+       (I)  O QUE AVALIO     — 2 cenarios de reporte (A, B)
+       (II) COM QUE RIGOR    — norma + rigor estatistico
+       (III) ONDE GENERALIZA — 2 datasets externos (RFW, BFW)
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Protocolo de validação: cenários, rigor e transferência")
+
+    # Dados das 3 colunas: (header, cor_header, items)
+    # cada item: (titulo_curto, subt_grande_1linha, body)
+    colunas = [
+        (
+            "O QUE AVALIO",
+            NAVY,
+            [
+                ("Cenário A",
+                 "7 classes raciais",
+                 "Reporte estratificado por classe\nracial do FairFace."),
+                ("Cenário B",
+                 "8 subgrupos (raça × gênero)",
+                 "Análise interseccional segundo\nGender Shades (Buolamwini &\nGebru, 2018)."),
+            ],
+        ),
+        (
+            "COM QUE RIGOR",
+            BLUE_MID,
+            [
+                ("Norma",
+                 "ISO/IEC 19795-10:2024",
+                 "Padrão internacional para\nreporte de desempenho biométrico\nestratificado entre grupos."),
+                ("Estatística",
+                 "3 sementes · IC 95 % · pareado",
+                 "Sementes (42, 1, 2); bootstrap\nnão-paramétrico; comparação\npareada entre configs."),
+            ],
+        ),
+        (
+            "ONDE GENERALIZA",
+            GRAY_MD,
+            [
+                ("RFW",
+                 "Racial Faces in-the-Wild",
+                 "Pares oficiais 1 : 1 de verificação\n(Wang et al., 2019). Foco em\ngrupo African."),
+                ("BFW",
+                 "Balanced Faces in-the-Wild",
+                 "Protocolo balanceado por raça\nx gênero (Robinson et al.,\n2020)."),
+            ],
+        ),
+    ]
+
+    # Geometria
+    SLIDE_W = 13.33
+    COL_W = 4.00
+    COL_GAP = 0.30
+    N = len(colunas)
+    total_w = N * COL_W + (N - 1) * COL_GAP
+    start_x = (SLIDE_W - total_w) / 2
+    COL_Y = 1.45
+    HEADER_H = 0.55
+    GAP_H = 0.14          # gap entre header e primeiro item
+    ITEM_H = 2.17         # altura de cada item
+    ITEM_GAP = 0.18       # gap entre itens
+    N_ITEMS = 2
+
+    for i, (header, cor, items) in enumerate(colunas):
+        col_x = start_x + i * (COL_W + COL_GAP)
+
+        # Cabecalho colorido
+        hdr = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(col_x), Inches(COL_Y),
+            Inches(COL_W), Inches(HEADER_H),
+        )
+        hdr.fill.solid()
+        hdr.fill.fore_color.rgb = cor
+        hdr.line.fill.background()
+        tf = hdr.text_frame
+        tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.05)
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = header
+        r.font.size = Pt(14)
+        r.font.bold = True
+        r.font.color.rgb = WHITE
+
+        # Itens (2 por coluna)
+        for j, (titulo, destaque, body) in enumerate(items):
+            item_y = (COL_Y + HEADER_H + GAP_H
+                      + j * (ITEM_H + ITEM_GAP))
+
+            box = slide.shapes.add_shape(
+                MSO_SHAPE.ROUNDED_RECTANGLE,
+                Inches(col_x), Inches(item_y),
+                Inches(COL_W), Inches(ITEM_H),
+            )
+            box.fill.solid()
+            box.fill.fore_color.rgb = WHITE
+            box.line.color.rgb = cor
+            box.line.width = Pt(1.4)
+            box.text_frame.margin_top = Inches(0.0)
+
+            # Titulo curto (eyebrow)
+            t_tb = slide.shapes.add_textbox(
+                Inches(col_x + 0.15), Inches(item_y + 0.10),
+                Inches(COL_W - 0.30), Inches(0.35),
+            )
+            tf = t_tb.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.alignment = 2
+            r = p.add_run()
+            r.text = titulo
+            r.font.size = Pt(11)
+            r.font.bold = True
+            r.font.color.rgb = cor
+
+            # Destaque (1 linha grande, central)
+            d_tb = slide.shapes.add_textbox(
+                Inches(col_x + 0.15), Inches(item_y + 0.50),
+                Inches(COL_W - 0.30), Inches(0.55),
+            )
+            tf = d_tb.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.alignment = 2
+            r = p.add_run()
+            r.text = destaque
+            r.font.size = Pt(15)
+            r.font.bold = True
+            r.font.color.rgb = NAVY
+
+            # Body (explicacao abaixo)
+            b_tb = slide.shapes.add_textbox(
+                Inches(col_x + 0.18), Inches(item_y + 1.08),
+                Inches(COL_W - 0.36), Inches(ITEM_H - 1.15),
+            )
+            tf = b_tb.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.alignment = 2
+            r = p.add_run()
+            r.text = body
+            r.font.size = Pt(12)
+            r.font.color.rgb = GRAY_DK
+
+    # Caption
+    cap = slide.shapes.add_textbox(
+        Inches(0.5), Inches(6.60), Inches(12.3), Inches(0.4)
+    )
+    pc = cap.text_frame.paragraphs[0]
+    pc.alignment = 2
+    pc.text = (
+        "Fluxo narrativo: o que avalio (cenários A e B) → com que rigor "
+        "(norma + estatística) → onde demonstro generalização (RFW, BFW)."
+    )
+    pc.font.size = Pt(12)
+    pc.font.italic = True
+    pc.font.color.rgb = GRAY_MD
+
+    add_footer(slide)
+    add_page_number(slide, 23)
 
 
 # ============================================================
 # SLIDE 21 — Triangulação de métricas
 # ============================================================
 def slide_metricas(prs: Presentation) -> None:
-    add_bullets(prs, 24, "Triangulação de métricas de equidade", [
-        ("Por que triangular — Kleinberg et al. (2017):", "Teorema da Impossibilidade — demonstra a impossibilidade formal de satisfação simultânea de múltiplas definições de equidade quando as prevalências diferem entre grupos."),
-        ("Disparity Ratio:", "razão entre F1 mínimo e máximo entre grupos; mensura a desigualdade de desempenho."),
-        ("F1 da pior classe:", "protege o grupo sub-representado; evita ganhos concentrados apenas na média agregada."),
-        ("Equal Opportunity — Hardt et al. (2016, NeurIPS):", "requer igualdade de taxa de verdadeiro positivo (TPR) condicionada ao rótulo verdadeiro."),
-        ("Equalized Odds — Hardt et al. (2016):", "requisito estrito: igualdade simultânea de TPR e FPR entre grupos."),
-        ("Visualização Pareto:", "identificação da fronteira Pareto no trade-off acurácia agregada × disparidade demográfica."),
-    ])
+    """As metricas que vamos reportar: 3 cartoes com header NAVY,
+    corpo cinza-claro contendo descricao + referencia + valor
+    numerico atual, e banner inferior NAVY com justificativa
+    (Kleinberg, teorema da impossibilidade).
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "As métricas que vamos reportar")
+
+    # Subtitulo (abaixo da linha do titulo)
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
+    )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Todas públicas, padrão da literatura — reportar as três "
+        "simultaneamente como exigência metodológica."
+    )
+    ps.font.size = Pt(13)
+    ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    # ---- 3 cartoes ----
+    # (nome, subtitulo, body, referencia, label_estado, valor, contexto)
+    cartoes = [
+        (
+            "F1 macro",
+            "performance média",
+            "Média harmônica de precision/recall por\nclasse, depois média simples entre as\n7 raças.",
+            "Referência: van Rijsbergen 1979",
+            "SOTA atual",
+            "75 %",
+            "FaceScanPaliGemma",
+        ),
+        (
+            "DR",
+            "Disparity Ratio",
+            "Razão entre o F1 da pior raça e o F1\nda melhor. Mede o gap entre subgrupos.",
+            "Referência: Hardt, Price & Srebro 2016 (NeurIPS)",
+            "Estado atual",
+            "0,67",
+            "60 % Latinx ÷ 90 % Black",
+        ),
+        (
+            "Worst-class F1",
+            "pior subgrupo",
+            "F1 da raça em que o modelo erra mais.\nGarante que ninguém fique para trás.",
+            "Referência: Sagawa et al. 2020 (ICLR) — Group DRO",
+            "Estado atual",
+            "60 %",
+            "Latinx",
+        ),
+    ]
+
+    SLIDE_W = 13.33
+    CARD_W = 4.00
+    CARD_GAP = 0.25
+    N = len(cartoes)
+    total_w = N * CARD_W + (N - 1) * CARD_GAP
+    start_x = (SLIDE_W - total_w) / 2
+    CARD_Y = 1.75
+    HEADER_H = 0.90
+    CARD_BODY_H = 4.00
+    CARD_H = HEADER_H + CARD_BODY_H
+
+    for i, (nome, sub_nome, descr, refer, label_est, valor, contexto) in enumerate(cartoes):
+        x = start_x + i * (CARD_W + CARD_GAP)
+
+        # Header NAVY
+        hdr = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(CARD_Y),
+            Inches(CARD_W), Inches(HEADER_H),
+        )
+        hdr.fill.solid()
+        hdr.fill.fore_color.rgb = NAVY
+        hdr.line.fill.background()
+        tf = hdr.text_frame
+        tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.05)
+        tf.margin_left = Inches(0.10); tf.margin_right = Inches(0.10)
+        p1 = tf.paragraphs[0]
+        p1.alignment = 2
+        r1 = p1.add_run()
+        r1.text = nome
+        r1.font.size = Pt(22)
+        r1.font.bold = True
+        r1.font.color.rgb = WHITE
+        p2 = tf.add_paragraph()
+        p2.alignment = 2
+        r2 = p2.add_run()
+        r2.text = sub_nome
+        r2.font.size = Pt(12)
+        r2.font.italic = True
+        r2.font.color.rgb = BLUE_LIGHT
+
+        # Corpo (cinza-claro)
+        body = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(CARD_Y + HEADER_H + 0.05),
+            Inches(CARD_W), Inches(CARD_BODY_H),
+        )
+        body.fill.solid()
+        body.fill.fore_color.rgb = GRAY_LT
+        body.line.fill.background()
+
+        # Descricao
+        d_tb = slide.shapes.add_textbox(
+            Inches(x + 0.20), Inches(CARD_Y + HEADER_H + 0.20),
+            Inches(CARD_W - 0.40), Inches(0.90),
+        )
+        tf = d_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        r = p.add_run()
+        r.text = descr
+        r.font.size = Pt(12)
+        r.font.color.rgb = GRAY_DK
+
+        # Referencia
+        ref_tb = slide.shapes.add_textbox(
+            Inches(x + 0.20), Inches(CARD_Y + HEADER_H + 1.35),
+            Inches(CARD_W - 0.40), Inches(0.55),
+        )
+        tf = ref_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        r = p.add_run()
+        r.text = refer
+        r.font.size = Pt(10.5)
+        r.font.italic = True
+        r.font.color.rgb = GRAY_MD
+
+        # Linha separadora
+        sep = slide.shapes.add_connector(
+            2,
+            Inches(x + 0.30), Inches(CARD_Y + HEADER_H + 2.00),
+            Inches(x + CARD_W - 0.30), Inches(CARD_Y + HEADER_H + 2.00),
+        )
+        sep.line.color.rgb = GRAY_MD
+        sep.line.width = Pt(0.75)
+
+        # Label do estado
+        lbl_tb = slide.shapes.add_textbox(
+            Inches(x + 0.20), Inches(CARD_Y + HEADER_H + 2.10),
+            Inches(CARD_W - 0.40), Inches(0.30),
+        )
+        tf = lbl_tb.text_frame
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = label_est
+        r.font.size = Pt(11)
+        r.font.italic = True
+        r.font.color.rgb = GRAY_MD
+
+        # Valor grande
+        val_tb = slide.shapes.add_textbox(
+            Inches(x + 0.20), Inches(CARD_Y + HEADER_H + 2.45),
+            Inches(CARD_W - 0.40), Inches(0.95),
+        )
+        tf = val_tb.text_frame
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = valor
+        r.font.size = Pt(44)
+        r.font.bold = True
+        r.font.color.rgb = NAVY
+
+        # Contexto do valor
+        ctx_tb = slide.shapes.add_textbox(
+            Inches(x + 0.20), Inches(CARD_Y + HEADER_H + 3.45),
+            Inches(CARD_W - 0.40), Inches(0.40),
+        )
+        tf = ctx_tb.text_frame
+        tf.word_wrap = True
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = contexto
+        r.font.size = Pt(11)
+        r.font.color.rgb = GRAY_DK
+
+    # ---- Banner inferior: por que triangular (Kleinberg) ----
+    bot_y = 6.65
+    bot_h = 0.75
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(SLIDE_W - 1.0), Inches(bot_h),
+    )
+    bot.fill.solid()
+    bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    tf.margin_top = Inches(0.06); tf.margin_bottom = Inches(0.05)
+    p1 = tf.paragraphs[0]
+    p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "Por que três métricas e não uma?"
+    r1.font.size = Pt(13)
+    r1.font.bold = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph()
+    p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = (
+        "Teorema da Impossibilidade (Kleinberg, Mullainathan & Raghavan "
+        "2017, ITCS): nenhuma métrica única de equidade satisfaz "
+        "simultaneamente calibração, equal FPR e equal FNR — reportar "
+        "as três é a forma honesta de comunicar trade-offs."
+    )
+    r2.font.size = Pt(11)
+    r2.font.color.rgb = BLUE_LIGHT
+
+    add_footer(slide)
+    add_page_number(slide, 24)
 
 
 # ============================================================
