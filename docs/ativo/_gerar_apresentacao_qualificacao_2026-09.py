@@ -1860,17 +1860,17 @@ def slide_por_que_convnext(prs: Presentation) -> None:
 
     bullets = [
         ("Stem — entrada da rede:",
-         "divide a imagem em pedacinhos de 4×4 pixels e cria 96 canais iniciais. É só o preparo para os blocos."),
-        ("DW 7×7 + LayerNorm — olha a vizinhança:",
-         "em cada canal, uma janela de 7×7 pixels captura o contexto espacial local. O LayerNorm ajusta as escalas por imagem — dá estabilidade mesmo com poucas amostras por vez."),
-        ("MLP interna (↑4× → GELU → ↓1×) — mistura os canais:",
-         "expande os canais em 4× para abrir espaço, aplica ativação suave, e comprime de volta. É aqui que a informação se integra entre canais."),
-        ("LayerScale + residual — pequena correção somada à entrada:",
-         "o resultado do bloco é somado à entrada original. LayerScale decide o quanto cada canal contribui. Cada bloco refina, não substitui."),
-        ("Downsample entre estágios — resume o espaço, enriquece os canais:",
-         "a cada estágio, a resolução cai pela metade e os canais dobram. A rede fica mais semântica: de 56×56 com 96 canais até 7×7 com 768."),
+         "particiona a imagem em patches 4×4 pixels (conv 4×4, stride 4), produzindo o mapa inicial de 56×56 com 96 canais."),
+        ("DW 7×7 + LayerNorm — contexto espacial normalizado:",
+         "convolução depthwise de kernel 7×7 captura padrões espaciais locais por canal; LayerNorm normaliza as features por amostra, estável em batches pequenos."),
+        ("MLP interna (↑4× → GELU → ↓1×) — mistura entre canais:",
+         "expansão em 4× seguida de ativação suave (GELU) e compressão. Responsável por integrar informação entre canais — análogo ao FFN de Transformers."),
+        ("LayerScale + residual — refinamento incremental:",
+         "o resultado é somado à entrada original; LayerScale pondera a contribuição por canal. Cada bloco refina, não substitui."),
+        ("Downsample entre estágios — hierarquia espaço-semântica:",
+         "LN + conv 2×2 stride 2 reduz pela metade a resolução espacial e dobra os canais, progredindo de 56×56×96 até 7×7×768."),
         ("Head — da representação à predição:",
-         "achata o mapa final 7×7 num vetor único (pooling), normaliza, e mapeia para as 7 classes raciais."),
+         "Global Average Pooling sobre o mapa 7×7 → vetor 768-dim → LayerNorm → camada linear → 7 classes raciais."),
     ]
     tb = slide.shapes.add_textbox(
         Inches(txt_x + 0.14), Inches(txt_y + 0.56),
@@ -3629,7 +3629,7 @@ def slide_etapa5_transferencia(prs: Presentation) -> None:
 
     SLIDE_W = 13.33
     PANEL_Y = 1.80
-    PANEL_H = 4.00
+    PANEL_H = 3.70
 
     # Dimensoes dos paineis esquerdo e direito
     SIDE_W = 5.20
@@ -3794,28 +3794,34 @@ def slide_etapa5_transferencia(prs: Presentation) -> None:
                 ACCENT, camadas_depois)
 
     # ============================================================
-    # Rodape auxiliar: datasets + metrica
+    # Rodape auxiliar: datasets + metrica (2 linhas por cartao)
     # ============================================================
-    FOOT_Y = PANEL_Y + PANEL_H + 0.10
+    FOOT_Y = PANEL_Y + PANEL_H + 0.05
     foot_items = [
-        ("Datasets",   "RFW (Wang 2019, 4 raças) · BFW (Robinson 2020, 4 raças × 2 gêneros)"),
-        ("Métrica",    "TAR @ FAR = 1 × 10⁻⁴  estratificada por raça"),
+        ("Datasets",
+         "RFW  ·  BFW",
+         "RFW (Wang 2019, 4 raças)  ·  BFW (Robinson 2020, 4 raças × 2 gêneros)"),
+        ("Métrica",
+         "TAR @ FAR = 10⁻⁴  por raça",
+         "proporção de aceites verdadeiros no limiar em que apenas 1 em 10.000 falsos é aceito — ponto de operação padrão em biometria."),
     ]
     n = len(foot_items)
     gap = 0.20
     pw = (SLIDE_W - 1.0 - (n - 1) * gap) / n
-    for i, (k, v) in enumerate(foot_items):
+    for i, (k, v, descr) in enumerate(foot_items):
         bx = 0.5 + i * (pw + gap)
         card = slide.shapes.add_shape(
             MSO_SHAPE.ROUNDED_RECTANGLE,
             Inches(bx), Inches(FOOT_Y),
-            Inches(pw), Inches(0.52),
+            Inches(pw), Inches(0.78),
         )
         card.fill.solid(); card.fill.fore_color.rgb = WHITE
         card.line.color.rgb = BLUE_MID; card.line.width = Pt(1.2)
         tf = card.text_frame
+        tf.word_wrap = True
         tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.03)
         tf.margin_left = Inches(0.12); tf.margin_right = Inches(0.12)
+        # Linha 1: label + valor principal (bold)
         p = tf.paragraphs[0]
         r1 = p.add_run()
         r1.text = k + ":  "
@@ -3823,8 +3829,14 @@ def slide_etapa5_transferencia(prs: Presentation) -> None:
         r1.font.color.rgb = NAVY
         r2 = p.add_run()
         r2.text = v
-        r2.font.size = Pt(11)
-        r2.font.color.rgb = GRAY_DK
+        r2.font.size = Pt(11); r2.font.bold = True
+        r2.font.color.rgb = NAVY
+        # Linha 2: descricao expandida (italic, menor)
+        p2 = tf.add_paragraph()
+        r3 = p2.add_run()
+        r3.text = descr
+        r3.font.size = Pt(9.5); r3.font.italic = True
+        r3.font.color.rgb = GRAY_DK
 
     # ============================================================
     # Banner inferior: regra H5
