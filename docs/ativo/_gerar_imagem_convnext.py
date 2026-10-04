@@ -68,12 +68,12 @@ def build_figure(out_path: Path) -> None:
     # ---------- Titulo ----------
     ax.text(50, 53, "ConvNeXt-T — anatomia do backbone",
             ha="center", va="center",
-            fontsize=22, fontweight="bold", color=NAVY)
-    ax.text(50, 49.8,
+            fontsize=28, fontweight="bold", color=NAVY)
+    ax.text(50, 49.3,
             "4 estágios hierárquicos  ·  28 M parâmetros  ·  "
             "Liu et al. (2022, CVPR)",
             ha="center", va="center",
-            fontsize=12, color=GRAY_MD, style="italic")
+            fontsize=16, color=GRAY_MD, style="italic")
 
     # =========================================================
     # LINHA PRINCIPAL — Fluxo top-level da arquitetura
@@ -83,21 +83,21 @@ def build_figure(out_path: Path) -> None:
 
     # Imagem de entrada
     _rbox(ax, 1.5, y_main, 8, stage_h, GRAY_LT, ec=NAVY)
-    _text(ax, 5.5, y_main + stage_h / 2 + 0.6, "Imagem", size=12, bold=True)
-    _text(ax, 5.5, y_main + stage_h / 2 - 1.0, "224×224×3",
-          size=10, color=GRAY_DK)
+    _text(ax, 5.5, y_main + stage_h / 2 + 0.8, "Imagem", size=14, bold=True)
+    _text(ax, 5.5, y_main + stage_h / 2 - 1.3, "224×224×3",
+          size=12, color=GRAY_DK)
     _arrow(ax, 9.5, y_main + stage_h / 2, 11.5, y_main + stage_h / 2)
 
     # Stem (patchify conv 4x4 stride 4)
     _rbox(ax, 11.5, y_main + 0.8, 9.5, stage_h - 1.6, WHITE, ec=NAVY)
-    _text(ax, 16.25, y_main + stage_h / 2 + 1.4, "Stem",
-          size=11, bold=True, color=NAVY)
+    _text(ax, 16.25, y_main + stage_h / 2 + 1.6, "Stem",
+          size=14, bold=True, color=NAVY)
     _text(ax, 16.25, y_main + stage_h / 2 - 0.1, "conv 4×4",
-          size=10, color=GRAY_DK)
-    _text(ax, 16.25, y_main + stage_h / 2 - 1.5, "stride 4",
-          size=9, italic=True, color=GRAY_MD)
-    _text(ax, 16.25, y_main - 1.3, "56×56×96",
-          size=9, italic=True, color=NAVY)
+          size=12, color=GRAY_DK)
+    _text(ax, 16.25, y_main + stage_h / 2 - 1.6, "stride 4",
+          size=11, italic=True, color=GRAY_MD)
+    _text(ax, 16.25, y_main - 1.6, "56×56×96",
+          size=12, italic=True, color=NAVY)
     _arrow(ax, 21, y_main + stage_h / 2, 23, y_main + stage_h / 2)
 
     # Os 4 estagios
@@ -113,24 +113,24 @@ def build_figure(out_path: Path) -> None:
     stage_centers = []
     for i, (nome, blocos, dims, fc, tc) in enumerate(stage_data):
         _rbox(ax, cur_x, y_main, stage_w, stage_h, fc, ec=NAVY, lw=1.8)
-        _text(ax, cur_x + stage_w / 2, y_main + stage_h - 1.4,
-              nome, size=12, bold=True, color=tc)
+        _text(ax, cur_x + stage_w / 2, y_main + stage_h - 1.6,
+              nome, size=15, bold=True, color=tc)
         _text(ax, cur_x + stage_w / 2, y_main + stage_h / 2 + 0.1,
-              blocos, size=10.5, color=tc)
-        _text(ax, cur_x + stage_w / 2, y_main - 1.3,
-              dims, size=9, italic=True,
-              color=NAVY if i < 2 else NAVY)
+              blocos, size=13, color=tc)
+        _text(ax, cur_x + stage_w / 2, y_main - 1.6,
+              dims, size=12, italic=True,
+              color=NAVY)
         stage_centers.append(cur_x + stage_w / 2)
         if i < 3:
             # Downsample seta com rotulo "↓2"
             dx = cur_x + stage_w
             _arrow(ax, dx, y_main + stage_h / 2,
                    dx + gap - 0.1, y_main + stage_h / 2)
-            _text(ax, dx + gap / 2, y_main + stage_h + 1.4,
-                  "↓ 2", size=10, bold=True, color=ACCENT)
-            _text(ax, dx + gap / 2, y_main - 2.6,
+            _text(ax, dx + gap / 2, y_main + stage_h + 1.5,
+                  "↓ 2", size=12, bold=True, color=ACCENT)
+            _text(ax, dx + gap / 2, y_main - 3.3,
                   "downsample\nLN + conv 2×2 s=2",
-                  size=8, italic=True, color=ACCENT)
+                  size=10, italic=True, color=ACCENT)
         cur_x += stage_w + gap
 
     # Seta para GAP + LN
@@ -139,12 +139,12 @@ def build_figure(out_path: Path) -> None:
 
     # Head: GAP + LN + Linear
     _rbox(ax, cur_x + 1, y_main + 0.8, 8, stage_h - 1.6, WHITE, ec=NAVY)
-    _text(ax, cur_x + 5, y_main + stage_h / 2 + 1.4, "Head",
-          size=11, bold=True, color=NAVY)
+    _text(ax, cur_x + 5, y_main + stage_h / 2 + 1.6, "Head",
+          size=14, bold=True, color=NAVY)
     _text(ax, cur_x + 5, y_main + stage_h / 2 - 0.1, "GAP + LN",
-          size=10, color=GRAY_DK)
-    _text(ax, cur_x + 5, y_main + stage_h / 2 - 1.5, "Linear 7 classes",
-          size=9, italic=True, color=GRAY_MD)
+          size=12, color=GRAY_DK)
+    _text(ax, cur_x + 5, y_main + stage_h / 2 - 1.6, "Linear 7 classes",
+          size=11, italic=True, color=GRAY_MD)
 
     # =========================================================
     # LINHA 2 — Zoom detalhando o interior de um bloco ConvNeXt

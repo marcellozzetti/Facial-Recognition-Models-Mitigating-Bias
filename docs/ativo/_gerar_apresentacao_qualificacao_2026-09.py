@@ -1935,7 +1935,8 @@ def slide_por_que_film(prs: Presentation) -> None:
     ps = sub.text_frame.paragraphs[0]
     ps.text = (
         "Feature-wise Linear Modulation (Perez et al., 2018) — "
-        "4 camadas FiLM, uma após cada estágio ConvNeXt-T."
+        "aplicação única ao final dos 4 estágios do ConvNeXt-T, "
+        "antes do classificador."
     )
     ps.font.size = Pt(13); ps.font.italic = True
     ps.font.color.rgb = GRAY_MD
@@ -1968,19 +1969,19 @@ def slide_por_que_film(prs: Presentation) -> None:
             "titulo": "O que é FiLM",
             "itens": [
                 ("Origem:", "Perez et al. 2018 (AAAI); generaliza CBN de Vries 2017."),
-                ("Mecanismo:", "para cada canal, par (γ, β) aprendido do contexto."),
-                ("Inserção:", "após cada bloco residual do ConvNeXt-T (4 blocos)."),
+                ("Mecanismo:", "para cada canal, par (γ, β) aprendido do contexto condiciona a feature."),
+                ("Inserção aqui:", "uma única camada após o Stage 4 do ConvNeXt-T, antes do classificador."),
                 ("Uso:", "~1 000+ papers citantes em CV, NLP, RL desde 2018."),
             ],
         },
         {
             "y": 1.80 + sub_h + gap,
             "cor": ACCENT,
-            "titulo": "Por que FiLM aqui",
+            "titulo": "Por que FiLM aqui — instanciação mínima suficiente",
             "itens": [
-                ("Adequação:", "sinal MST 10-dim casa com γ, β — sem explosão."),
-                ("Eficiência:", "~380 k params (~1,3 % do backbone) — « cross-attention."),
-                ("Interpretabilidade:", "γ, β por canal inspecionáveis."),
+                ("Narrativa:", "o backbone extrai features hierárquicas; o FiLM modula os 768 canais finais condicionado ao tom de pele, antes da classificação."),
+                ("Por que uma camada só:", "basta uma inserção para testar a hipótese de condicionamento — defende contra \"por que não 4?\" com rigor empírico mínimo."),
+                ("Custo:", "~14 k params (~0,05 % do backbone); interpretabilidade direta de γ, β por canal."),
                 ("Lacuna:", "sem aplicação prévia em fairness facial multi-classe — Contribuição 3."),
             ],
         },
