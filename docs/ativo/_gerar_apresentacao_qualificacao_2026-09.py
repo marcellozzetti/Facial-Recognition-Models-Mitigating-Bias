@@ -1061,13 +1061,174 @@ def slide_objetivos_hipoteses(prs: Presentation) -> None:
 # SLIDE 12 — Revisão: timeline das mitigações (figura)
 # ============================================================
 def slide_revisao_timeline(prs: Presentation) -> None:
-    add_image_slide(
-        prs, 10,
-        "Linha do tempo das principais respostas ao problema (2018–2026)",
-        IMG_DIR / "fig_timeline_mitigacoes.png",
-        caption="Frentes cronológicas: dados balanceados → funções de perda → arquiteturas Pareto-eficientes → modelos vision-language → escalas MST → heterogeneidade fenotípica.",
-        height_in=4.8,
+    """Linha do tempo em 4 fases: figura compacta no topo + 4 grupos
+    de texto abaixo (foco, marcos, achado/diferencial)."""
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Linha do tempo das principais respostas ao problema (2018 – 2026)")
+
+    # ---- Figura das 4 fases no topo ----
+    img = IMG_DIR / "fig_timeline_fases.png"
+    if img.exists():
+        pic = slide.shapes.add_picture(
+            str(img), Inches(0.5), Inches(1.30),
+            width=Inches(12.3),
+        )
+    # Altura total da figura ~ 1.9in
+
+    # ---- 4 grupos de texto abaixo (foco, marcos, achado) ----
+    # (foco, marcos_list, achado_label, achado_text, destaque)
+    grupos = [
+        (
+            "Rebalanceamento amostral e novos\nrepositórios biométricos.",
+            [
+                "RFW (Wang et al., 2019)",
+                "BFW (Robinson et al., 2020)",
+                "FairFace (Kärkkäinen & Joo, 2021)",
+            ],
+            "Limitação",
+            "Equilíbrio amostral é necessário mas insuficiente em\n"
+            "populações heterogêneas (Latinx). Uso restrito ao\n"
+            "Fitzpatrick I–VI.",
+            False,
+        ),
+        (
+            "Intervenções na otimização e nas\nfunções de perda.",
+            [
+                "Group DRO (Sagawa et al., 2020)",
+                "FSCL+ (Park et al., 2022)",
+                "FairGRAPE (Lin et al., 2022)",
+            ],
+            "Limitação",
+            "Conflito severo entre acurácia global e paridade\n"
+            "demográfica (Teorema da Impossibilidade,\n"
+            "Kleinberg et al., 2017).",
+            False,
+        ),
+        (
+            "Modelos visão-linguagem e\ntransição à escala Monk (MST).",
+            [
+                "FaceScanPaliGemma (AlDahoul et al., 2024)",
+                "FairCLIP (Luo et al., 2024)",
+                "MST (Schumann et al., 2023; Pereira, 2026)",
+            ],
+            "Limitação",
+            "Acurácia agregada sobe (75,7 %) mas persiste gap\n"
+            "de ~30 pp em Latinx (F1 ≈ 60 %); vieses herdados\n"
+            "da web.",
+            False,
+        ),
+        (
+            "Injeção de MST como sinal arquitetural\nintermediário via FiLM.",
+            [
+                "FiLM · ConvNeXt-T (Perez et al., 2018)",
+                "Triangulação ISO/IEC 19795-10:2024",
+                "Decomposição fenotípico × pixel (H6)",
+            ],
+            "Diferencial",
+            "Modulação do fluxo de features pelo tom contínuo —\n"
+            "supera rótulos raciais nominais sem exigir modelos\n"
+            "de bilhões de parâmetros.",
+            True,
+        ),
+    ]
+
+    SLIDE_W = 13.33
+    MARGIN_X = 0.5
+    N = 4
+    GAP = 0.12
+    COL_W = (SLIDE_W - 2 * MARGIN_X - (N - 1) * GAP) / N
+    COL_Y = 3.45
+    COL_H = 3.10
+
+    for i, (foco, marcos, lbl_achado, achado, destaque) in enumerate(grupos):
+        x = MARGIN_X + i * (COL_W + GAP)
+
+        # Linha vertical lateral (acento colorido)
+        cor_barra = NAVY if destaque else BLUE_MID
+        bar = slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE,
+            Inches(x), Inches(COL_Y),
+            Inches(0.07), Inches(COL_H),
+        )
+        bar.fill.solid()
+        bar.fill.fore_color.rgb = cor_barra
+        bar.line.fill.background()
+
+        # Foco (eyebrow + conteudo)
+        foco_tb = slide.shapes.add_textbox(
+            Inches(x + 0.15), Inches(COL_Y + 0.00),
+            Inches(COL_W - 0.15), Inches(0.80),
+        )
+        tf = foco_tb.text_frame
+        tf.word_wrap = True
+        p0 = tf.paragraphs[0]
+        r0 = p0.add_run()
+        r0.text = "FOCO"
+        r0.font.size = Pt(9)
+        r0.font.bold = True
+        r0.font.color.rgb = cor_barra
+        p1 = tf.add_paragraph()
+        r1 = p1.add_run()
+        r1.text = foco
+        r1.font.size = Pt(11)
+        r1.font.color.rgb = GRAY_DK
+
+        # Marcos (eyebrow + lista)
+        marcos_tb = slide.shapes.add_textbox(
+            Inches(x + 0.15), Inches(COL_Y + 0.95),
+            Inches(COL_W - 0.15), Inches(1.25),
+        )
+        tf = marcos_tb.text_frame
+        tf.word_wrap = True
+        p0 = tf.paragraphs[0]
+        r0 = p0.add_run()
+        r0.text = "MARCOS"
+        r0.font.size = Pt(9)
+        r0.font.bold = True
+        r0.font.color.rgb = cor_barra
+        for j, m in enumerate(marcos):
+            p = tf.add_paragraph()
+            r = p.add_run()
+            r.text = "•  " + m
+            r.font.size = Pt(10.5)
+            r.font.color.rgb = NAVY
+
+        # Achado / Diferencial
+        ach_tb = slide.shapes.add_textbox(
+            Inches(x + 0.15), Inches(COL_Y + 2.25),
+            Inches(COL_W - 0.15), Inches(0.85),
+        )
+        tf = ach_tb.text_frame
+        tf.word_wrap = True
+        p0 = tf.paragraphs[0]
+        r0 = p0.add_run()
+        r0.text = lbl_achado.upper()
+        r0.font.size = Pt(9)
+        r0.font.bold = True
+        r0.font.color.rgb = cor_barra
+        p1 = tf.add_paragraph()
+        r1 = p1.add_run()
+        r1.text = achado
+        r1.font.size = Pt(10.5)
+        r1.font.italic = True
+        r1.font.color.rgb = GRAY_DK
+
+    # Caption inferior
+    cap = slide.shapes.add_textbox(
+        Inches(0.5), Inches(6.65), Inches(12.3), Inches(0.35)
     )
+    pc = cap.text_frame.paragraphs[0]
+    pc.alignment = 2
+    pc.text = (
+        "Fluxo cronológico: dados balanceados → funções de perda → "
+        "modelos visão-linguagem com MST → condicionamento arquitetural."
+    )
+    pc.font.size = Pt(11)
+    pc.font.italic = True
+    pc.font.color.rgb = GRAY_MD
+
+    add_footer(slide)
+    add_page_number(slide, 10)
 
 
 # ============================================================

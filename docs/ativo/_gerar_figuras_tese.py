@@ -736,6 +736,82 @@ def gerar_fig_film_conceitual():
     print(f"OK: {out}")
 
 
+def gerar_fig_timeline_fases():
+    """Linha do tempo em 4 fases cronologicas (2018-2026).
+
+    Figura simples destinada tanto ao slide 10 do PPTX quanto a
+    secao 2.2 (evolucao das respostas ao problema) da dissertacao.
+    Cada fase e um bloco com janela temporal + rotulo + titulo curto;
+    Fase 4 destacada por ser a proposta da pesquisa.
+    """
+    from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+
+    fig, ax = plt.subplots(figsize=(14.5, 3.3), dpi=DPI)
+    ax.set_xlim(0, 100); ax.set_ylim(0, 10); ax.axis("off")
+
+    # (rotulo, janela, titulo, cor_fundo, cor_texto, destaque)
+    fases = [
+        ("FASE 1", "2018 – 2020",
+         "Datasets e amostragem", BLUE_LIGHT, GRAY_DK, False),
+        ("FASE 2", "2020 – 2022",
+         "Mitigação algorítmica\ne funções de perda", BLUE_MID, "white", False),
+        ("FASE 3", "2023 – 2025",
+         "VLMs e escala Monk\n(MST)", "#4A6FA8", "white", False),
+        ("FASE 4", "2025 – 2026",
+         "Condicionamento\narquitetural (proposta)", NAVY, "white", True),
+    ]
+
+    n = len(fases)
+    w = 18.5
+    gap = (100 - n * w) / (n + 1)
+    y = 1.5
+    h = 7.0
+
+    for i, (rotulo, janela, titulo, fc, tc, destaque) in enumerate(fases):
+        x = gap + i * (w + gap)
+
+        # Caixa principal
+        box = FancyBboxPatch(
+            (x, y), w, h,
+            boxstyle="round,pad=0.15,rounding_size=0.55",
+            facecolor=fc, edgecolor=NAVY,
+            linewidth=2.6 if destaque else 1.3,
+        )
+        ax.add_patch(box)
+
+        # Rotulo FASE N
+        ax.text(x + w / 2, y + h - 1.1, rotulo,
+                ha="center", va="center",
+                fontsize=14, fontweight="bold", color=tc)
+
+        # Janela temporal (grande)
+        ax.text(x + w / 2, y + h / 2 + 0.5, janela,
+                ha="center", va="center",
+                fontsize=16, fontweight="bold", color=tc)
+
+        # Titulo curto da fase
+        ax.text(x + w / 2, y + 1.4, titulo,
+                ha="center", va="center",
+                fontsize=11, color=tc)
+
+        # Seta para a proxima fase
+        if i < n - 1:
+            x_next = gap + (i + 1) * (w + gap)
+            arrow = FancyArrowPatch(
+                (x + w + 0.1, y + h / 2),
+                (x_next - 0.1, y + h / 2),
+                arrowstyle="-|>", mutation_scale=22,
+                color=NAVY, linewidth=2.4,
+            )
+            ax.add_patch(arrow)
+
+    plt.tight_layout()
+    out = OUT_DIR / "fig_timeline_fases.png"
+    plt.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
+    plt.close()
+    print(f"OK: {out}")
+
+
 def main():
     print("Gerando figuras da qualificacao...")
     gerar_fig_disparidade()
@@ -744,9 +820,10 @@ def main():
     gerar_fig_configs()
     gerar_fig_fitzpatrick_vs_mst()
     gerar_fig_timeline_mitigacoes()
+    gerar_fig_timeline_fases()
     gerar_fig_f1_sota_comparativo()
     gerar_fig_film_conceitual()
-    print("\nTodas as 8 figuras geradas em docs/tese/images/")
+    print("\nTodas as figuras geradas em docs/tese/images/")
 
 
 if __name__ == "__main__":
