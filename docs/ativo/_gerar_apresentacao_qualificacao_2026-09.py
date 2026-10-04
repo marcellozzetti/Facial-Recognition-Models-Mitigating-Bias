@@ -1543,15 +1543,15 @@ def slide_metodologia_configs(prs: Presentation) -> None:
         r.font.bold = True
         r.font.color.rgb = WHITE if hl else NAVY
 
-        # Mini-pipeline visual (linha com 2 ou 3 pilulas + seta)
-        mini_y = CARD_Y + 2.15
+        # Mini-pipeline visual (configuracao arquitetural)
+        mini_y = CARD_Y + 2.10
         _mini_pipeline(slide, x + 0.20, mini_y, CARD_W - 0.40,
                        sinal, hl)
 
         # "O que testa" (corpo descritivo)
         body_tb = slide.shapes.add_textbox(
-            Inches(x + 0.20), Inches(CARD_Y + 3.00),
-            Inches(CARD_W - 0.40), Inches(1.05),
+            Inches(x + 0.20), Inches(CARD_Y + 3.30),
+            Inches(CARD_W - 0.40), Inches(1.00),
         )
         tf = body_tb.text_frame
         tf.word_wrap = True
@@ -1564,8 +1564,8 @@ def slide_metodologia_configs(prs: Presentation) -> None:
 
         # Referencia / rodape do card
         ref_tb = slide.shapes.add_textbox(
-            Inches(x + 0.20), Inches(CARD_Y + CARD_H - 0.85),
-            Inches(CARD_W - 0.40), Inches(0.70),
+            Inches(x + 0.20), Inches(CARD_Y + CARD_H - 0.75),
+            Inches(CARD_W - 0.40), Inches(0.65),
         )
         tf = ref_tb.text_frame
         tf.word_wrap = True
@@ -1598,30 +1598,32 @@ def slide_metodologia_configs(prs: Presentation) -> None:
 
 def _mini_pipeline(slide, x: float, y: float, width: float,
                    signal: str | None, highlight: bool) -> None:
-    """Desenha mini-pipeline horizontal com pilulas conectadas por seta.
+    """Desenha mini-pipeline topologicamente correto para cada config:
 
-    Config A (sem sinal): [Imagem] -> [ConvNeXt-T]
-    Config B/C (com sinal): [sinal] -> FiLM -> [ConvNeXt-T]
-                              (desenhado com 2 pilulas e seta
-                               convergindo via marcador vertical)
+    Config A (sem sinal):
+            [Imagem]  ->  [ConvNeXt-T]
+
+    Config B / C (com sinal condicionante):
+            [Imagem]  ───┐
+                         ├─▶ [FiLM · ConvNeXt-T]
+            [sinal]  ────┘      (sinal nao entra no backbone;
+                                 modula features via gamma, beta)
     """
-    height = 0.55
-    text_color_hl = BLUE_LIGHT
-    text_color_std = NAVY
+    pill_h = 0.42
 
-    def _pill(px, pw, label, fc, ec, fg, size=10, bold=True):
+    def _pill(px, py, pw, label, fc, ec, fg, size=10, bold=True):
         pill = slide.shapes.add_shape(
             MSO_SHAPE.ROUNDED_RECTANGLE,
-            Inches(px), Inches(y),
-            Inches(pw), Inches(height),
+            Inches(px), Inches(py),
+            Inches(pw), Inches(pill_h),
         )
         pill.fill.solid()
         pill.fill.fore_color.rgb = fc
         pill.line.color.rgb = ec
         pill.line.width = Pt(1.1)
         tf = pill.text_frame
-        tf.margin_left = Inches(0.04); tf.margin_right = Inches(0.04)
-        tf.margin_top = Inches(0.02); tf.margin_bottom = Inches(0.02)
+        tf.margin_left = Inches(0.03); tf.margin_right = Inches(0.03)
+        tf.margin_top = Inches(0.01); tf.margin_bottom = Inches(0.01)
         p = tf.paragraphs[0]
         p.alignment = 2
         r = p.add_run()
@@ -1630,48 +1632,70 @@ def _mini_pipeline(slide, x: float, y: float, width: float,
         r.font.bold = bold
         r.font.color.rgb = fg
 
-    bg_text = text_color_hl if highlight else text_color_std
-
     if signal is None:
-        # Config A: [Imagem]  ->  [ConvNeXt-T]
-        w1 = width * 0.35
-        w2 = width * 0.45
+        # Config A: [Imagem] -> [ConvNeXt-T] (unica linha, centrada em y)
+        row_y = y + 0.28
+        w1 = width * 0.38
+        w2 = width * 0.48
         gap = width - w1 - w2
-        _pill(x,                   w1, "Imagem",
+        _pill(x,              row_y, w1, "Imagem",
               GRAY_LT, GRAY_DK, GRAY_DK)
-        _pill(x + w1 + gap,        w2, "ConvNeXt-T",
+        _pill(x + w1 + gap,   row_y, w2, "ConvNeXt-T",
               WHITE,  NAVY,   NAVY)
-        # seta
         conn = slide.shapes.add_connector(
             2,
-            Inches(x + w1), Inches(y + height / 2),
-            Inches(x + w1 + gap), Inches(y + height / 2),
+            Inches(x + w1),       Inches(row_y + pill_h / 2),
+            Inches(x + w1 + gap), Inches(row_y + pill_h / 2),
         )
-        conn.line.color.rgb = GRAY_DK if not highlight else BLUE_LIGHT
+        conn.line.color.rgb = GRAY_DK
         conn.line.width = Pt(2.0)
         _add_arrowhead(conn)
     else:
-        # Config B / C: [sinal] + FiLM -> [ConvNeXt-T]
-        # Layout: [sinal_pill] [+FiLM] -> [ConvNeXt-T]
-        w1 = width * 0.42
-        w2 = width * 0.38
-        gap = width - w1 - w2
-        _pill(x,            w1, signal,
-              GRAY_LT if not highlight else BLUE_MID,
-              NAVY, NAVY if not highlight else WHITE,
-              size=10)
-        _pill(x + w1 + gap, w2, "FiLM · ConvNeXt-T",
-              WHITE if not highlight else BLUE_LIGHT,
-              NAVY, NAVY)
-        # seta de condicionamento
-        conn = slide.shapes.add_connector(
+        # Config B / C: 2 inputs convergindo no FiLM.ConvNeXt-T
+        #   [Imagem]  --->
+        #                 ---->  [FiLM . ConvNeXt-T]
+        #   [sinal]   --->
+        w_in = width * 0.42
+        w_out = width * 0.48
+        gap = width - w_in - w_out
+        in_x = x
+        out_x = x + w_in + gap
+        img_y = y + 0.05
+        sig_y = y + 0.55
+        target_y = y + 0.30  # centro vertical do bloco (entre img e sig)
+
+        # Pilula [Imagem] (sempre fundo neutro, mesmo quando card highlight)
+        _pill(in_x, img_y, w_in, "Imagem",
+              GRAY_LT, GRAY_DK, GRAY_DK)
+        # Pilula [sinal condicionante]
+        signal_fc = BLUE_MID if not highlight else BLUE_LIGHT
+        signal_fg = WHITE if not highlight else NAVY
+        _pill(in_x, sig_y, w_in, signal,
+              signal_fc, NAVY, signal_fg)
+        # Pilula [FiLM . ConvNeXt-T] no destino
+        target_fc = WHITE if not highlight else BLUE_LIGHT
+        _pill(out_x, target_y, w_out, "FiLM · ConvNeXt-T",
+              target_fc, NAVY, NAVY)
+
+        # Seta superior: [Imagem] -> [FiLM.ConvNeXt-T]
+        conn_img = slide.shapes.add_connector(
             2,
-            Inches(x + w1), Inches(y + height / 2),
-            Inches(x + w1 + gap), Inches(y + height / 2),
+            Inches(in_x + w_in),  Inches(img_y + pill_h / 2),
+            Inches(out_x),        Inches(target_y + pill_h / 2),
         )
-        conn.line.color.rgb = BLUE_MID if not highlight else WHITE
-        conn.line.width = Pt(2.0)
-        _add_arrowhead(conn)
+        conn_img.line.color.rgb = GRAY_DK
+        conn_img.line.width = Pt(1.8)
+        _add_arrowhead(conn_img)
+
+        # Seta inferior: [sinal] -> [FiLM.ConvNeXt-T] (condicionamento)
+        conn_sig = slide.shapes.add_connector(
+            2,
+            Inches(in_x + w_in),  Inches(sig_y + pill_h / 2),
+            Inches(out_x),        Inches(target_y + pill_h / 2),
+        )
+        conn_sig.line.color.rgb = BLUE_MID if not highlight else WHITE
+        conn_sig.line.width = Pt(1.8)
+        _add_arrowhead(conn_sig)
 
 
 def _add_arrowhead(connector) -> None:
