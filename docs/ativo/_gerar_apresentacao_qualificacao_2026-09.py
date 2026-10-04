@@ -1901,30 +1901,32 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
 
     # ---- Dados das 3 perguntas ----
     # (pergunta, hero_num, hero_sub, linha1, linha2, ref)
+    # Cada hero number tem explicacao direta nos bullets abaixo, para
+    # que o apresentador consiga responder "o que e isso?" em uma frase.
     perguntas = [
         (
             "O QUE AVALIO?",
-            "7 + 8",
-            "classes & subgrupos",
-            "Cenário A — 7 classes raciais do FairFace",
-            "Cenário B — 8 subgrupos raça × gênero",
-            "Interseccional segundo Buolamwini & Gebru (2018)",
+            "A · B",
+            "dois cenários estratificados",
+            "Cenário A — reporte pelas 7 classes raciais do FairFace",
+            "Cenário B — reporte pelos 8 subgrupos raça × gênero",
+            "Protocolo interseccional (Buolamwini & Gebru, 2018)",
         ),
         (
             "COM QUE RIGOR?",
             "3",
-            "sementes · bootstrap IC 95 %",
-            "Sementes 42, 1, 2 · comparação pareada",
-            "Norma ISO/IEC 19795-10:2024",
+            "sementes · IC 95 % · comparação pareada",
+            "Sementes independentes: 42, 1 e 2",
+            "Bootstrap não-paramétrico · norma ISO/IEC 19795-10:2024",
             "Padrão biométrico internacional estratificado",
         ),
         (
             "ONDE GENERALIZA?",
-            "~20 K",
-            "pares de verificação externos",
-            "RFW — Racial Faces in-the-Wild (Wang 2019)",
-            "BFW — Balanced Faces in-the-Wild (Robinson 2020)",
-            "Foco em African; transferência via feature-freeze",
+            "RFW · BFW",
+            "dois datasets externos de verificação",
+            "RFW — 4 raças, pares oficiais 1 : 1 (Wang et al., 2019)",
+            "BFW — 4 raças × 2 gêneros, balanceado (Robinson et al., 2020)",
+            "Transferência arquitetural via feature-freeze",
         ),
     ]
 
@@ -1973,7 +1975,7 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
         body.fill.fore_color.rgb = GRAY_LT
         body.line.fill.background()
 
-        # Hero number (grande, centrado)
+        # Hero number (grande, centrado) — tamanho ajustado dinamicamente
         hero_tb = slide.shapes.add_textbox(
             Inches(x + 0.15), Inches(CARD_Y + HEADER_H + 0.25),
             Inches(CARD_W - 0.30), Inches(1.05),
@@ -1983,7 +1985,8 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
         p.alignment = 2
         r = p.add_run()
         r.text = hero
-        r.font.size = Pt(46)
+        # hero curto (1-3 char) usa fonte maior; hero mais longo usa menor
+        r.font.size = Pt(46) if len(hero) <= 3 else Pt(36)
         r.font.bold = True
         r.font.color.rgb = NAVY
 
