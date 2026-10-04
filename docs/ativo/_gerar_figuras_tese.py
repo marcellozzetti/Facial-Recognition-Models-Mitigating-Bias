@@ -316,7 +316,7 @@ def gerar_fig_configs():
         ax.add_patch(card)
 
         # ---- Badge "circular" (Ellipse com aspect compensado) ----
-        badge_w = 6.5
+        badge_w = 7.0
         badge_h = badge_w * ASPECT  # fica redondo visualmente
         badge_cx = cx + card_w / 2
         badge_cy = cy + card_h - 10
@@ -324,21 +324,21 @@ def gerar_fig_configs():
             (badge_cx, badge_cy),
             width=badge_w, height=badge_h,
             facecolor="white" if hl else NAVY,
-            edgecolor=NAVY, linewidth=1.5,
+            edgecolor=NAVY, linewidth=1.8,
         )
         ax.add_patch(badge)
         ax.text(
             badge_cx, badge_cy, cid,
             ha="center", va="center",
-            fontsize=22, fontweight="bold",
+            fontsize=26, fontweight="bold",
             color=NAVY if hl else "white",
         )
 
         # ---- Nome da configuracao ----
         ax.text(
-            cx + card_w / 2, cy + card_h - 24, nome,
+            cx + card_w / 2, cy + card_h - 25, nome,
             ha="center", va="center",
-            fontsize=13, fontweight="bold",
+            fontsize=16, fontweight="bold",
             color="white" if hl else NAVY,
             linespacing=1.3,
         )
@@ -357,7 +357,7 @@ def gerar_fig_configs():
         ax.text(
             cx + card_w / 2, cy + 22, descr,
             ha="center", va="center",
-            fontsize=11, color=BLUE_LIGHT if hl else GRAY_DK,
+            fontsize=14, color=BLUE_LIGHT if hl else GRAY_DK,
             linespacing=1.4,
         )
 
@@ -365,19 +365,10 @@ def gerar_fig_configs():
         ax.text(
             cx + card_w / 2, cy + 8, ref,
             ha="center", va="center",
-            fontsize=9, style="italic",
+            fontsize=11, style="italic",
             color=BLUE_LIGHT if hl else GRAY_MD,
             linespacing=1.3,
         )
-
-    # ---- Caption inferior (fora dos cartoes) ----
-    ax.text(
-        50, 2,
-        "Ceteris paribus: mesmo backbone, dataset, sementes e receita "
-        "de treino — varia-se apenas o sinal condicionante.",
-        ha="center", va="center",
-        fontsize=10, style="italic", color=GRAY_MD,
-    )
 
     plt.tight_layout()
     out = OUT_DIR / "fig_configs_abcd.png"
@@ -400,30 +391,30 @@ def _desenhar_pipeline_simples(ax, cx, y, card_w, hl):
     img_box = FancyBboxPatch(
         (px1, y - ph / 2), pw1, ph,
         boxstyle="round,pad=0.1,rounding_size=0.7",
-        facecolor=GRAY_LT, edgecolor=GRAY_DK, linewidth=1.0,
+        facecolor=GRAY_LT, edgecolor=GRAY_DK, linewidth=1.2,
     )
     ax.add_patch(img_box)
     ax.text(px1 + pw1 / 2, y, "Imagem",
             ha="center", va="center",
-            fontsize=10, fontweight="bold", color=GRAY_DK)
+            fontsize=12, fontweight="bold", color=GRAY_DK)
 
     # ConvNeXt-T
     cnx_fc = "white" if not hl else BLUE_LIGHT
     cnx = FancyBboxPatch(
         (px2, y - ph / 2), pw2, ph,
         boxstyle="round,pad=0.1,rounding_size=0.7",
-        facecolor=cnx_fc, edgecolor=NAVY, linewidth=1.0,
+        facecolor=cnx_fc, edgecolor=NAVY, linewidth=1.2,
     )
     ax.add_patch(cnx)
     ax.text(px2 + pw2 / 2, y, "ConvNeXt-T",
             ha="center", va="center",
-            fontsize=10, fontweight="bold", color=NAVY)
+            fontsize=12, fontweight="bold", color=NAVY)
 
     # Seta
     arrow = FancyArrowPatch(
         (px1 + pw1, y), (px2, y),
-        arrowstyle="-|>", mutation_scale=16,
-        color="white" if hl else GRAY_DK, linewidth=1.8,
+        arrowstyle="-|>", mutation_scale=18,
+        color="white" if hl else GRAY_DK, linewidth=2.0,
     )
     ax.add_patch(arrow)
 
@@ -447,12 +438,12 @@ def _desenhar_pipeline_condicionado(ax, cx, y, card_w, sinal, hl):
     img = FancyBboxPatch(
         (px_in, y_img - ph / 2), pw_in, ph,
         boxstyle="round,pad=0.1,rounding_size=0.6",
-        facecolor=GRAY_LT, edgecolor=GRAY_DK, linewidth=1.0,
+        facecolor=GRAY_LT, edgecolor=GRAY_DK, linewidth=1.2,
     )
     ax.add_patch(img)
     ax.text(px_in + pw_in / 2, y_img, "Imagem",
             ha="center", va="center",
-            fontsize=10, fontweight="bold", color=GRAY_DK)
+            fontsize=12, fontweight="bold", color=GRAY_DK)
 
     # Pilula [sinal condicionante]
     sig_fc = BLUE_MID if not hl else BLUE_LIGHT
@@ -460,39 +451,39 @@ def _desenhar_pipeline_condicionado(ax, cx, y, card_w, sinal, hl):
     sig = FancyBboxPatch(
         (px_in, y_sig - ph / 2), pw_in, ph,
         boxstyle="round,pad=0.1,rounding_size=0.6",
-        facecolor=sig_fc, edgecolor=NAVY, linewidth=1.0,
+        facecolor=sig_fc, edgecolor=NAVY, linewidth=1.2,
     )
     ax.add_patch(sig)
     ax.text(px_in + pw_in / 2, y_sig, sinal,
             ha="center", va="center",
-            fontsize=9.5, fontweight="bold", color=sig_tc)
+            fontsize=11, fontweight="bold", color=sig_tc)
 
     # Pilula [FiLM . ConvNeXt-T] no destino
     tgt_fc = "white" if not hl else BLUE_LIGHT
     tgt = FancyBboxPatch(
         (px_out, y_target - ph / 2), pw_out, ph,
         boxstyle="round,pad=0.1,rounding_size=0.6",
-        facecolor=tgt_fc, edgecolor=NAVY, linewidth=1.0,
+        facecolor=tgt_fc, edgecolor=NAVY, linewidth=1.2,
     )
     ax.add_patch(tgt)
     ax.text(px_out + pw_out / 2, y_target,
             "FiLM · ConvNeXt-T",
             ha="center", va="center",
-            fontsize=10, fontweight="bold", color=NAVY)
+            fontsize=12, fontweight="bold", color=NAVY)
 
     # Seta superior: Imagem -> target
     arr_img = FancyArrowPatch(
         (px_in + pw_in, y_img), (px_out, y_target),
-        arrowstyle="-|>", mutation_scale=14,
-        color="white" if hl else GRAY_DK, linewidth=1.6,
+        arrowstyle="-|>", mutation_scale=16,
+        color="white" if hl else GRAY_DK, linewidth=1.8,
     )
     ax.add_patch(arr_img)
 
     # Seta inferior: sinal -> target
     arr_sig = FancyArrowPatch(
         (px_in + pw_in, y_sig), (px_out, y_target),
-        arrowstyle="-|>", mutation_scale=14,
-        color="white" if hl else BLUE_MID, linewidth=1.6,
+        arrowstyle="-|>", mutation_scale=16,
+        color="white" if hl else BLUE_MID, linewidth=1.8,
     )
     ax.add_patch(arr_sig)
 
