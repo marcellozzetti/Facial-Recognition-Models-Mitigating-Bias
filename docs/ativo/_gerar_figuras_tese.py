@@ -252,98 +252,131 @@ def gerar_fig_pipeline():
 # FIGURA 4 - 3 configuracoes A/B/C do estudo de ablation (Cap 4)
 # ============================================================
 def gerar_fig_configs():
-    """3 blocos comparativos do ablation arquitetural, com destaque da Config B.
+    """Figura das 3 configuracoes do ablation arquitetural, alinhada
+    ao design do slide 22 do PPTX de qualificacao: cada config e um
+    cartao com badge circular (A/B/C), nome, mini-pipeline
+    topologicamente correto (sinal + imagem convergindo no backbone),
+    descricao e referencia. Config B destacada como proposta principal.
 
-    Após a reunião com o orientador (Ago/2026), a antiga Config C
-    (Gated FiLM) foi consolidada como variante interna da Config B
-    e a antiga Config D (FiLM CLIP-text) passou a ser a Config C.
-    Nome do arquivo mantido (fig_configs_abcd.png) para não quebrar
-    a referência no LaTeX (metodologia.tex).
+    Nome do arquivo mantido (fig_configs_abcd.png) para nao quebrar
+    a referencia em metodologia.tex.
     """
-    fig, ax = plt.subplots(figsize=(12, 4.8), dpi=DPI)
-    ax.set_xlim(0, 13)
-    ax.set_ylim(0, 6.0)
-    ax.axis("off")
+    from matplotlib.patches import FancyBboxPatch, FancyArrowPatch, Ellipse
 
+    FIG_W, FIG_H = 15.0, 7.3
+    ASPECT = FIG_W / FIG_H  # ~2.055 — compensar nos circulos
+    fig, ax = plt.subplots(figsize=(FIG_W, FIG_H), dpi=DPI)
+    ax.set_xlim(0, 100); ax.set_ylim(0, 100); ax.axis("off")
+
+    # (id, nome, sinal_condicionante, descricao, referencia, destaque)
     configs = [
-        {
-            "x": 0.7,
-            "id": "A",
-            "titulo": "Baseline",
-            "corpo": "ConvNeXt-T",
-            "sinal": "sem condicionamento",
-            "destaque": False,
-        },
-        {
-            "x": 4.7,
-            "id": "B",
-            "titulo": "FiLM  (MST direto)",
-            "corpo": "ConvNeXt-T + FiLM",
-            "sinal": "vetor MST 10-dim",
-            "destaque": True,
-        },
-        {
-            "x": 8.7,
-            "id": "C",
-            "titulo": "FiLM  (CLIP-text)",
-            "corpo": "ConvNeXt-T + FiLM",
-            "sinal": "embedding CLIP-text 512-dim",
-            "destaque": False,
-        },
+        (
+            "A", "ConvNeXt-T puro", None,
+            "Controle arquitetural\nsem condicionamento.",
+            "Baseline",
+            False,
+        ),
+        (
+            "B", "ConvNeXt-T + FiLM\n(MST direto, 10-dim)",
+            "MST (10-dim)",
+            "Proposta principal — tom\nde pele contínuo como\ncontexto arquitetural.",
+            "Perez et al. (2018) +\nMonk (Schumann et al., 2023)",
+            True,
+        ),
+        (
+            "C", "ConvNeXt-T + FiLM\n(CLIP-text, 512-dim)",
+            "CLIP-text (512-dim)",
+            "Alternativa moderna —\nembedding textual rico\ncomo sinal condicionante.",
+            "Radford et al. (2021) +\nDehdashtian et al. (2024)",
+            False,
+        ),
     ]
 
-    dx, dy = 3.6, 2.6
+    # Geometria dos cartoes
+    n = len(configs)
+    card_w = 28
+    card_gap = 4
+    total = n * card_w + (n - 1) * card_gap
+    start_x = (100 - total) / 2
+    card_bot = 6
+    card_h = 88
 
-    box_bottom = 1.6
-    box_top = box_bottom + dy
+    for i, (cid, nome, sinal, descr, ref, hl) in enumerate(configs):
+        cx = start_x + i * (card_w + card_gap)
+        cy = card_bot
 
-    for c in configs:
-        face = BLUE_MID if c["destaque"] else BLUE_LIGHT
-        body_color = "white" if c["destaque"] else NAVY
-        lw = 2.2 if c["destaque"] else 1.2
+        # Fundo do cartao
+        card = FancyBboxPatch(
+            (cx, cy), card_w, card_h,
+            boxstyle="round,pad=0.5,rounding_size=2.0",
+            facecolor=NAVY if hl else "white",
+            edgecolor=NAVY,
+            linewidth=2.8 if hl else 1.6,
+        )
+        ax.add_patch(card)
 
-        # Cabeçalho — sempre acima da caixa, em fundo branco
+        # ---- Badge "circular" (Ellipse com aspect compensado) ----
+        badge_w = 6.5
+        badge_h = badge_w * ASPECT  # fica redondo visualmente
+        badge_cx = cx + card_w / 2
+        badge_cy = cy + card_h - 10
+        badge = Ellipse(
+            (badge_cx, badge_cy),
+            width=badge_w, height=badge_h,
+            facecolor="white" if hl else NAVY,
+            edgecolor=NAVY, linewidth=1.5,
+        )
+        ax.add_patch(badge)
         ax.text(
-            c["x"] + dx / 2, box_top + 0.95,
-            f"Configuração {c['id']}",
+            badge_cx, badge_cy, cid,
             ha="center", va="center",
-            fontsize=14, fontweight="bold", color=NAVY,
-        )
-        ax.text(
-            c["x"] + dx / 2, box_top + 0.4,
-            c["titulo"],
-            ha="center", va="center",
-            fontsize=11, color=GRAY_DK, style="italic",
+            fontsize=22, fontweight="bold",
+            color=NAVY if hl else "white",
         )
 
-        # Caixa principal
-        box = FancyBboxPatch(
-            (c["x"], box_bottom), dx, dy,
-            boxstyle="round,pad=0.05",
-            linewidth=lw,
-            edgecolor=NAVY if c["destaque"] else GRAY_DK,
-            facecolor=face,
-        )
-        ax.add_patch(box)
+        # ---- Nome da configuracao ----
         ax.text(
-            c["x"] + dx / 2, box_bottom + dy / 2, c["corpo"],
+            cx + card_w / 2, cy + card_h - 24, nome,
             ha="center", va="center",
-            fontsize=13, fontweight="bold", color=body_color,
+            fontsize=13, fontweight="bold",
+            color="white" if hl else NAVY,
+            linespacing=1.3,
         )
 
-        # Sinal condicionante — sempre fora da caixa (abaixo), fundo branco
+        # ---- Mini-pipeline (topologicamente correto) ----
+        pipe_y_top = cy + card_h - 36
+        if sinal is None:
+            # Config A: [Imagem] -> [ConvNeXt-T]
+            _desenhar_pipeline_simples(ax, cx, pipe_y_top, card_w, hl)
+        else:
+            # Config B/C: [Imagem] + [sinal] -> [FiLM.ConvNeXt-T]
+            _desenhar_pipeline_condicionado(ax, cx, pipe_y_top, card_w,
+                                             sinal, hl)
+
+        # ---- Descricao (corpo) ----
         ax.text(
-            c["x"] + dx / 2, box_bottom - 0.5, c["sinal"],
+            cx + card_w / 2, cy + 22, descr,
             ha="center", va="center",
-            fontsize=11, style="italic", color=GRAY_DK,
+            fontsize=11, color=BLUE_LIGHT if hl else GRAY_DK,
+            linespacing=1.4,
         )
 
-    # Marca "» proposta principal" sob a Config B
+        # ---- Referencia (rodape do card) ----
+        ax.text(
+            cx + card_w / 2, cy + 8, ref,
+            ha="center", va="center",
+            fontsize=9, style="italic",
+            color=BLUE_LIGHT if hl else GRAY_MD,
+            linespacing=1.3,
+        )
+
+    # ---- Caption inferior (fora dos cartoes) ----
     ax.text(
-        configs[1]["x"] + dx / 2, box_bottom - 1.2,
-        "» proposta principal",
+        50, 2,
+        "Ceteris paribus: mesmo backbone, dataset, sementes e receita "
+        "de treino — varia-se apenas o sinal condicionante.",
         ha="center", va="center",
-        fontsize=11, fontweight="bold", color=NAVY,
+        fontsize=10, style="italic", color=GRAY_MD,
     )
 
     plt.tight_layout()
@@ -351,6 +384,117 @@ def gerar_fig_configs():
     plt.savefig(out, dpi=DPI, bbox_inches="tight", facecolor="white")
     plt.close()
     print(f"OK: {out}")
+
+
+def _desenhar_pipeline_simples(ax, cx, y, card_w, hl):
+    """Config A: [Imagem]  ->  [ConvNeXt-T] (linha horizontal unica)."""
+    from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+    pw1 = 8.5
+    pw2 = 10
+    gap = card_w - 4 - pw1 - pw2
+    px1 = cx + 2
+    px2 = cx + 2 + pw1 + gap
+    ph = 4.5
+
+    # Imagem (sempre neutra)
+    img_box = FancyBboxPatch(
+        (px1, y - ph / 2), pw1, ph,
+        boxstyle="round,pad=0.1,rounding_size=0.7",
+        facecolor=GRAY_LT, edgecolor=GRAY_DK, linewidth=1.0,
+    )
+    ax.add_patch(img_box)
+    ax.text(px1 + pw1 / 2, y, "Imagem",
+            ha="center", va="center",
+            fontsize=10, fontweight="bold", color=GRAY_DK)
+
+    # ConvNeXt-T
+    cnx_fc = "white" if not hl else BLUE_LIGHT
+    cnx = FancyBboxPatch(
+        (px2, y - ph / 2), pw2, ph,
+        boxstyle="round,pad=0.1,rounding_size=0.7",
+        facecolor=cnx_fc, edgecolor=NAVY, linewidth=1.0,
+    )
+    ax.add_patch(cnx)
+    ax.text(px2 + pw2 / 2, y, "ConvNeXt-T",
+            ha="center", va="center",
+            fontsize=10, fontweight="bold", color=NAVY)
+
+    # Seta
+    arrow = FancyArrowPatch(
+        (px1 + pw1, y), (px2, y),
+        arrowstyle="-|>", mutation_scale=16,
+        color="white" if hl else GRAY_DK, linewidth=1.8,
+    )
+    ax.add_patch(arrow)
+
+
+def _desenhar_pipeline_condicionado(ax, cx, y, card_w, sinal, hl):
+    """Config B/C: [Imagem] e [sinal] convergindo no [FiLM.ConvNeXt-T]."""
+    from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
+    pw_in = 10
+    pw_out = 11
+    gap = card_w - 4 - pw_in - pw_out
+    px_in = cx + 2
+    px_out = cx + 2 + pw_in + gap
+    ph = 3.8
+    stack_offset = 3.0  # distancia vertical entre as duas entradas
+
+    y_img = y + stack_offset
+    y_sig = y - stack_offset
+    y_target = y
+
+    # Pilula [Imagem] (sempre fundo neutro)
+    img = FancyBboxPatch(
+        (px_in, y_img - ph / 2), pw_in, ph,
+        boxstyle="round,pad=0.1,rounding_size=0.6",
+        facecolor=GRAY_LT, edgecolor=GRAY_DK, linewidth=1.0,
+    )
+    ax.add_patch(img)
+    ax.text(px_in + pw_in / 2, y_img, "Imagem",
+            ha="center", va="center",
+            fontsize=10, fontweight="bold", color=GRAY_DK)
+
+    # Pilula [sinal condicionante]
+    sig_fc = BLUE_MID if not hl else BLUE_LIGHT
+    sig_tc = "white" if not hl else NAVY
+    sig = FancyBboxPatch(
+        (px_in, y_sig - ph / 2), pw_in, ph,
+        boxstyle="round,pad=0.1,rounding_size=0.6",
+        facecolor=sig_fc, edgecolor=NAVY, linewidth=1.0,
+    )
+    ax.add_patch(sig)
+    ax.text(px_in + pw_in / 2, y_sig, sinal,
+            ha="center", va="center",
+            fontsize=9.5, fontweight="bold", color=sig_tc)
+
+    # Pilula [FiLM . ConvNeXt-T] no destino
+    tgt_fc = "white" if not hl else BLUE_LIGHT
+    tgt = FancyBboxPatch(
+        (px_out, y_target - ph / 2), pw_out, ph,
+        boxstyle="round,pad=0.1,rounding_size=0.6",
+        facecolor=tgt_fc, edgecolor=NAVY, linewidth=1.0,
+    )
+    ax.add_patch(tgt)
+    ax.text(px_out + pw_out / 2, y_target,
+            "FiLM · ConvNeXt-T",
+            ha="center", va="center",
+            fontsize=10, fontweight="bold", color=NAVY)
+
+    # Seta superior: Imagem -> target
+    arr_img = FancyArrowPatch(
+        (px_in + pw_in, y_img), (px_out, y_target),
+        arrowstyle="-|>", mutation_scale=14,
+        color="white" if hl else GRAY_DK, linewidth=1.6,
+    )
+    ax.add_patch(arr_img)
+
+    # Seta inferior: sinal -> target
+    arr_sig = FancyArrowPatch(
+        (px_in + pw_in, y_sig), (px_out, y_target),
+        arrowstyle="-|>", mutation_scale=14,
+        color="white" if hl else BLUE_MID, linewidth=1.6,
+    )
+    ax.add_patch(arr_sig)
 
 
 # ============================================================
