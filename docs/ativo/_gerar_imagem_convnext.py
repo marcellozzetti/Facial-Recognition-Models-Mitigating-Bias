@@ -59,8 +59,9 @@ def _arrow(ax, x0, y0, x1, y1, color=NAVY, lw=2.0, ms=18, style="-|>"):
 
 
 def build_figure(out_path: Path) -> None:
-    # figura mais curta agora que a faixa inferior foi removida
-    fig, ax = plt.subplots(figsize=(16, 8), dpi=300)
+    # figura mais larga para acomodar os 9 blocos essenciais do inset
+    # com fontes legiveis
+    fig, ax = plt.subplots(figsize=(20, 10), dpi=300)
     ax.set_xlim(0, 100)
     ax.set_ylim(0, 56)
     ax.axis("off")
@@ -122,15 +123,13 @@ def build_figure(out_path: Path) -> None:
               color=NAVY)
         stage_centers.append(cur_x + stage_w / 2)
         if i < 3:
-            # Downsample seta com rotulo "↓2"
+            # Downsample seta com rotulo "↓2" apenas (detalhes vao
+            # para o texto do slide — manter so o essencial visual)
             dx = cur_x + stage_w
             _arrow(ax, dx, y_main + stage_h / 2,
                    dx + gap - 0.1, y_main + stage_h / 2)
             _text(ax, dx + gap / 2, y_main + stage_h + 1.5,
-                  "↓ 2", size=12, bold=True, color=ACCENT)
-            _text(ax, dx + gap / 2, y_main - 3.3,
-                  "downsample\nLN + conv 2×2 s=2",
-                  size=10, italic=True, color=ACCENT)
+                  "↓ 2", size=14, bold=True, color=ACCENT)
         cur_x += stage_w + gap
 
     # Seta para GAP + LN
@@ -157,89 +156,80 @@ def build_figure(out_path: Path) -> None:
     ax.plot([callout_src_x, 50], [callout_src_y, 28],
             color=NAVY, lw=0, marker=",", zorder=1)
 
-    # Container do inset
-    inset_x = 6
-    inset_y = 10
-    inset_w = 88
-    inset_h = 15.5
+    # Container do inset (mais largo para acomodar 9 blocos com texto grande)
+    inset_x = 3
+    inset_y = 9
+    inset_w = 94
+    inset_h = 16.5
     inset = _rbox(ax, inset_x, inset_y, inset_w, inset_h,
-                  (0.985, 0.99, 1.0), ec=NAVY, lw=1.2, dashed=True)
-    _text(ax, inset_x + inset_w / 2, inset_y + inset_h - 1.4,
+                  (0.985, 0.99, 1.0), ec=NAVY, lw=1.4, dashed=True)
+    _text(ax, inset_x + inset_w / 2, inset_y + inset_h - 1.3,
           "Dentro de cada bloco ConvNeXt  "
           "(repetido 3, 3, 9, 3 vezes nos estágios 1–4)",
-          size=11, bold=True, italic=True, color=NAVY)
+          size=16, bold=True, italic=True, color=NAVY)
 
-    # Sequencia de operacoes dentro do bloco
-    #  Input -> DW7x7 -> LN -> PW1x1 (4x) -> GELU -> PW1x1 (1x)
-    #        -> LayerScale -> (+residual) -> Output
+    # Sequencia ESSENCIAL de operacoes dentro do bloco — todos os 9
+    # pecas sao arquitetonicas e preservadas. Removidas apenas as
+    # anotacoes textuais secundarias (ex. "normaliza por amostra").
+    #   Input -> DW 7x7 -> LN -> PW 1x1 up4x -> GELU -> PW 1x1 down1x
+    #        -> LayerScale -> + (residual) -> Output
     ops = [
-        ("Input",         "", GRAY_LT, NAVY, False),
-        ("DW 7×7",        "depthwise\ngrande kernel", WHITE, NAVY, False),
-        ("LayerNorm",     "normaliza\npor amostra", WHITE, NAVY, False),
-        ("PW 1×1  ↑ 4×",  "expande\ncanais",  BLUE_LIGHT, NAVY, False),
-        ("GELU",          "ativação\nsuave",  WHITE, NAVY, False),
-        ("PW 1×1  ↓ 1×",  "reduz\ncanais",  BLUE_LIGHT, NAVY, False),
-        ("LayerScale",    "escala\naprendida", WHITE, NAVY, False),
-        ("+",             "residual",      ACCENT, WHITE, True),
-        ("Output",        "", GRAY_LT, NAVY, False),
+        ("Input",         GRAY_LT,     NAVY,  False),
+        ("DW 7×7",        WHITE,       NAVY,  False),
+        ("LayerNorm",     WHITE,       NAVY,  False),
+        ("PW 1×1  ↑ 4×",  BLUE_LIGHT,  NAVY,  False),
+        ("GELU",          WHITE,       NAVY,  False),
+        ("PW 1×1  ↓ 1×",  BLUE_LIGHT,  NAVY,  False),
+        ("LayerScale",    WHITE,       NAVY,  False),
+        ("+",             ACCENT,      WHITE, True),
+        ("Output",        GRAY_LT,     NAVY,  False),
     ]
     n_ops = len(ops)
-    op_gap = 0.9
+    op_gap = 1.0
     usable_w = inset_w - 2.0
-    op_w = (usable_w - (n_ops - 1) * op_gap) / n_ops
-    op_h = 7
-    op_y = inset_y + 2.5
+    op_w = (usable_w - (n_ops - 1) * op_gap) / n_ops   # ~9.3
+    op_h = 6.5
+    op_y = inset_y + 2.6
     op_centers = []
     cur_x = inset_x + 1.0
-    for i, (lbl, note, fc, tc, is_circle) in enumerate(ops):
+    import matplotlib.patches as mpatches
+    for i, (lbl, fc, tc, is_circle) in enumerate(ops):
         if is_circle:
-            # Pequeno circulo para +residual
             cx = cur_x + op_w / 2
             cy = op_y + op_h / 2
-            circ_r = min(op_w, op_h) / 2 * 0.75
-            import matplotlib.patches as mpatches
+            circ_r = min(op_w, op_h) / 2 * 0.85
             c = mpatches.Circle((cx, cy), circ_r,
-                                 fc=fc, ec=fc, lw=1.5)
+                                 fc=fc, ec=fc, lw=2.0)
             ax.add_patch(c)
             ax.text(cx, cy, lbl,
                     ha="center", va="center",
-                    fontsize=16, fontweight="bold", color=tc)
-            _text(ax, cx, cy - circ_r - 1.0, note,
-                  size=9, italic=True, color=ACCENT)
+                    fontsize=22, fontweight="bold", color=tc)
         else:
-            _rbox(ax, cur_x, op_y, op_w, op_h, fc, ec=NAVY, lw=1.4)
-            _text(ax, cur_x + op_w / 2, op_y + op_h / 2 + 0.9,
-                  lbl, size=10, bold=True, color=tc)
-            if note:
-                _text(ax, cur_x + op_w / 2, op_y + op_h / 2 - 1.2,
-                      note, size=8, italic=True, color=GRAY_MD)
+            _rbox(ax, cur_x, op_y, op_w, op_h, fc, ec=NAVY, lw=1.8)
+            _text(ax, cur_x + op_w / 2, op_y + op_h / 2,
+                  lbl, size=14, bold=True, color=tc)
         op_centers.append(cur_x + op_w / 2)
         if i < n_ops - 1:
             _arrow(ax, cur_x + op_w,
                    op_y + op_h / 2,
                    cur_x + op_w + op_gap - 0.1,
                    op_y + op_h / 2,
-                   lw=1.4, ms=12)
+                   lw=1.8, ms=16)
         cur_x += op_w + op_gap
 
-    # Arco de residual (Input -> + add)
-    # Linha curvada acima dos blocos, do centro do Input ao centro do +
-    import matplotlib.patches as mpatches
+    # Arco de residual (Input -> +)
     input_cx = op_centers[0]
     add_cx = op_centers[7]
-    arc_top_y = op_y + op_h + 1.5
-    # Linha subindo do input
+    arc_top_y = op_y + op_h + 1.8
     ax.plot([input_cx, input_cx], [op_y + op_h, arc_top_y],
-            color=ACCENT, lw=1.5)
-    # Linha horizontal
+            color=ACCENT, lw=2.2)
     ax.plot([input_cx, add_cx], [arc_top_y, arc_top_y],
-            color=ACCENT, lw=1.5)
-    # Linha descendo para o +
+            color=ACCENT, lw=2.2)
     _arrow(ax, add_cx, arc_top_y, add_cx, op_y + op_h + 0.3,
-           color=ACCENT, lw=1.5, ms=13)
+           color=ACCENT, lw=2.2, ms=18)
     _text(ax, (input_cx + add_cx) / 2, arc_top_y + 0.9,
-          "conexão residual (atalho)",
-          size=9, italic=True, bold=True, color=ACCENT)
+          "conexão residual",
+          size=13, italic=True, bold=True, color=ACCENT)
 
     plt.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)

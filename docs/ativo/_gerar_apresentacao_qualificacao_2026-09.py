@@ -1859,14 +1859,16 @@ def slide_por_que_convnext(prs: Presentation) -> None:
     body.line.color.rgb = NAVY; body.line.width = Pt(1.2)
 
     bullets = [
-        ("Stem — \"quebra a imagem em ladrilhos\":",
-         "conv 4×4 stride 4 — reduz o tamanho em 4× e cria 96 canais (224×224×3 → 56×56×96)."),
-        ("DW 7×7 — \"janela grande, um canal por vez\":",
-         "cada canal aprende seu próprio padrão espacial amplo, sem misturar com os outros."),
-        ("MLP interna 1×1 (↑4× → GELU → ↓1×) — \"FFN estilo Transformer\":",
-         "expande os canais em 4×, aplica ativação suave, comprime de volta."),
-        ("Atalho residual + LayerScale — \"soma a entrada, pesada\":",
-         "o bloco contribui como uma correção pequena; LayerScale decide o quanto pesa."),
+        ("Stem (patchify) — \"quebra a imagem em ladrilhos\":",
+         "conv 4×4 stride 4 reduz 224×224 em 56×56 e cria 96 canais. Inspirado nos patches do ViT."),
+        ("DW 7×7 (depthwise) — \"janela grande, um canal por vez\":",
+         "convolução espacial 7×7 aprendida por canal, sem misturar canais. Captura padrão local amplo."),
+        ("LayerNorm — \"normaliza por amostra\":",
+         "estatística dentro de cada exemplo (não do batch). Robusto a batch pequeno (3 sementes)."),
+        ("PW 1×1 ↑4× + GELU + PW 1×1 ↓1× — \"MLP entre canais\":",
+         "expande em 4× (abre espaço), ativação suave GELU, comprime de volta — FFN estilo Transformer."),
+        ("LayerScale + atalho residual — \"correção pequena com peso aprendido\":",
+         "LayerScale pondera cada canal; residual soma a entrada ao resultado (evita vanishing)."),
         ("Downsample entre estágios — \"metade do espaço, dobro dos canais\":",
          "LN + conv 2×2 stride 2 → 56→28→14→7 pixels e 96→192→384→768 canais."),
         ("Head — \"achata e classifica\":",
@@ -1942,7 +1944,7 @@ def slide_por_que_film(prs: Presentation) -> None:
     ps.font.color.rgb = GRAY_MD
 
     # ============================================================
-    # LADO ESQUERDO — figura film_pipeline.png (aspect 1.808:1)
+    # LADO ESQUERDO — figura film_pipeline.png (aspect 1.806:1)
     # ============================================================
     fig_x = 0.40
     fig_y = 1.80

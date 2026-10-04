@@ -71,12 +71,12 @@ def build_figure(out_path: Path) -> None:
     # ========================================================
     ax.text(50, 56.5, "FiLM — Feature-wise Linear Modulation",
             ha="center", va="center",
-            fontsize=30, fontweight="bold", color=NAVY)
-    ax.text(50, 52.5,
+            fontsize=34, fontweight="bold", color=NAVY)
+    ax.text(50, 52.0,
             "Aplicação única ao final dos 4 estágios do ConvNeXt-T, "
             "antes do classificador",
             ha="center", va="center",
-            fontsize=17, color=GRAY_MD, style="italic")
+            fontsize=20, color=GRAY_MD, style="italic")
 
     # ========================================================
     # LINHA SUPERIOR — Geracao do sinal condicionante
@@ -86,45 +86,37 @@ def build_figure(out_path: Path) -> None:
 
     _box(ax, 2, y_top, 12, box_h,
          "Imagem\n224 × 224 × 3",
-         fc=GRAY_LT, ec=NAVY, fs=15, fw="bold")
+         fc=GRAY_LT, ec=NAVY, fs=18, fw="bold")
     _arrow(ax, 14, y_top + box_h / 2, 18, y_top + box_h / 2,
-           color=GREEN, lw=2.6)
+           color=GREEN, lw=2.8)
 
     # Classificador MST (verde — congelado)
     _box(ax, 18, y_top, 18, box_h,
          "Classificador MST\ncongelado",
-         fc=GREEN, ec=GREEN, fs=16, fw="bold", tc=WHITE)
-    ax.text(27, y_top + box_h + 1.6,
-            "treinado na Etapa 1  (MSTE + CCv2)",
-            ha="center", va="center",
-            fontsize=13, color=GRAY_MD, style="italic")
+         fc=GREEN, ec=GREEN, fs=19, fw="bold", tc=WHITE)
     _arrow(ax, 36, y_top + box_h / 2, 40, y_top + box_h / 2,
-           color=NAVY, lw=2.6)
+           color=NAVY, lw=2.8)
 
     # Vetor z (10-dim)
     _box(ax, 40, y_top, 20, box_h, "",
-         fc=WHITE, ec=NAVY, fs=16, fw="bold", lw=1.8)
-    ax.text(50, y_top + box_h / 2 + 1.6,
+         fc=WHITE, ec=NAVY, fs=18, fw="bold", lw=1.8)
+    ax.text(50, y_top + box_h / 2 + 1.8,
             "Vetor  z  ∈  ℝ¹⁰",
             ha="center", va="center",
-            fontsize=18, fontweight="bold", color=NAVY)
-    ax.text(50, y_top + box_h / 2 - 1.9,
+            fontsize=22, fontweight="bold", color=NAVY)
+    ax.text(50, y_top + box_h / 2 - 2.0,
             "softmax sobre os 10 tons Monk",
             ha="center", va="center",
-            fontsize=13, color=GRAY_MD, style="italic")
+            fontsize=16, color=GRAY_MD, style="italic")
     _arrow(ax, 60, y_top + box_h / 2, 64, y_top + box_h / 2,
-           color=NAVY, lw=2.6)
+           color=NAVY, lw=2.8)
 
     # MLPs f_g, f_b
     mlp_x = 64
     mlp_w = 24
     _box(ax, mlp_x, y_top, mlp_w, box_h,
          "MLPs   f_γ  ,   f_β",
-         fc=WHITE, ec=ACCENT, fs=17, fw="bold", tc=ACCENT, lw=2.4)
-    ax.text(mlp_x + mlp_w / 2, y_top + box_h + 1.6,
-            "≈ 14 k parâmetros  (≈ 0,05 % do backbone)",
-            ha="center", va="center",
-            fontsize=13, color=GRAY_MD, style="italic")
+         fc=WHITE, ec=ACCENT, fs=21, fw="bold", tc=ACCENT, lw=2.4)
 
     # ========================================================
     # LINHA INFERIOR — Backbone ConvNeXt-T (4 estagios) + FiLM + Classif
@@ -135,9 +127,9 @@ def build_figure(out_path: Path) -> None:
     # Imagem (entrada do backbone)
     _box(ax, 2, y_bb, 10, bb_h,
          "Imagem\n224 × 224 × 3",
-         fc=GRAY_LT, ec=NAVY, fs=15, fw="bold")
+         fc=GRAY_LT, ec=NAVY, fs=18, fw="bold")
     _arrow(ax, 12, y_bb + bb_h / 2, 15, y_bb + bb_h / 2,
-           color=NAVY, lw=2.8)
+           color=NAVY, lw=3.0)
 
     # Container "ConvNeXt-T backbone"
     stages_x0 = 15
@@ -151,11 +143,11 @@ def build_figure(out_path: Path) -> None:
         linestyle=(0, (4, 3)),
     )
     ax.add_patch(container)
-    # Rotulo ACIMA do container (fora dele), afastado dos estagios
+    # Rotulo ACIMA do container
     ax.text(stages_x0 - 0.8 + container_w / 2, y_bb + bb_h + 2.3,
-            "ConvNeXt-T backbone  (4 estágios hierárquicos  ·  ≈ 28 M parâmetros)",
+            "ConvNeXt-T backbone",
             ha="center", va="center",
-            fontsize=14, fontweight="bold", color=NAVY, style="italic")
+            fontsize=18, fontweight="bold", color=NAVY, style="italic")
 
     # 4 estagios
     stage_data = [
@@ -170,10 +162,10 @@ def build_figure(out_path: Path) -> None:
              fc=fc, ec=NAVY, lw=1.5)
         ax.text(cur_x + stage_w / 2, y_bb + bb_h / 2 + 1.5,
                 nome, ha="center", va="center",
-                fontsize=14, fontweight="bold", color=tc)
-        ax.text(cur_x + stage_w / 2, y_bb + bb_h / 2 - 1.5,
+                fontsize=17, fontweight="bold", color=tc)
+        ax.text(cur_x + stage_w / 2, y_bb + bb_h / 2 - 1.8,
                 dims, ha="center", va="center",
-                fontsize=11, color=tc, style="italic")
+                fontsize=14, color=tc, style="italic")
         if i < 3:
             dx = cur_x + stage_w
             _arrow(ax, dx, y_bb + bb_h / 2,
@@ -192,21 +184,17 @@ def build_figure(out_path: Path) -> None:
     film_w = 11
     _box(ax, film_x, y_bb, film_w, bb_h,
          "FiLM",
-         fc=NAVY, ec=NAVY, fs=24, fw="bold", tc=WHITE, lw=2.6)
-    ax.text(film_x + film_w / 2, y_bb + bb_h + 0.4,
-            "modula as 768 features finais",
-            ha="center", va="center",
-            fontsize=12, color=GRAY_MD, style="italic")
+         fc=NAVY, ec=NAVY, fs=28, fw="bold", tc=WHITE, lw=2.6)
     _arrow(ax, film_x + film_w, y_bb + bb_h / 2,
            film_x + film_w + 2.5, y_bb + bb_h / 2,
-           color=NAVY, lw=2.8)
+           color=NAVY, lw=3.0)
 
     # Classificador 7 racas
     class_x = film_x + film_w + 2.5
     class_w = 10
     _box(ax, class_x, y_bb, class_w, bb_h,
          "Classif.\n7 raças",
-         fc=ACCENT, ec=ACCENT, fs=15, fw="bold", tc=WHITE, lw=2.2)
+         fc=ACCENT, ec=ACCENT, fs=18, fw="bold", tc=WHITE, lw=2.2)
     class_center = class_x + class_w / 2
     # (Removida a seta e rotulo "Predicao de raca" para evitar
     #  sobreposicao com a legenda no rodape. O proprio bloco
@@ -230,39 +218,39 @@ def build_figure(out_path: Path) -> None:
            color=ACCENT, lw=2.6, ms=22)
 
     # Rotulo (gamma, beta)
-    ax.text(film_top_x + 1.8, mid_y + 1.6,
+    ax.text(film_top_x + 2.0, mid_y + 1.8,
             "(γ, β)",
             ha="left", va="center",
-            fontsize=18, fontweight="bold",
+            fontsize=22, fontweight="bold",
             color=ACCENT, style="italic")
 
     # ========================================================
     # Rodape — equacao canonica + legenda
     # ========================================================
-    _box(ax, 4, 0.5, 44, 5.5, "",
+    _box(ax, 4, 0.5, 42, 6, "",
          fc=WHITE, ec=NAVY, lw=2.0)
-    ax.text(26, 4.2,
+    ax.text(25, 4.6,
             "Equação canônica  (Perez et al., 2018)",
             ha="center", va="center",
-            fontsize=14, fontweight="bold", color=NAVY)
-    ax.text(26, 1.8,
+            fontsize=17, fontweight="bold", color=NAVY)
+    ax.text(25, 1.9,
             "F′  =  γ  ⊙  F  +  β",
             ha="center", va="center",
-            fontsize=24, fontweight="bold", color=ACCENT, style="italic")
+            fontsize=28, fontweight="bold", color=ACCENT, style="italic")
 
     legend_items = [
-        (GREEN,  "Congelado  (classificador MST, Etapa 1)"),
+        (GREEN,  "Congelado  (classificador MST)"),
         (NAVY,   "Treinado end-to-end  (backbone + FiLM)"),
         (ACCENT, "Camadas novas  (~0,05 % dos params)"),
     ]
-    legend_x = 55
+    legend_x = 52
     for i, (color, text) in enumerate(legend_items):
-        y_leg = 4.5 - i * 1.6
+        y_leg = 5.0 - i * 1.9
         ax.add_patch(mpatches.Rectangle(
-            (legend_x, y_leg), 2.6, 1.1, fc=color, ec=color))
-        ax.text(legend_x + 3.6, y_leg + 0.55, text,
+            (legend_x, y_leg), 3.0, 1.3, fc=color, ec=color))
+        ax.text(legend_x + 4.0, y_leg + 0.65, text,
                 ha="left", va="center",
-                fontsize=13, color=GRAY_DK)
+                fontsize=16, color=GRAY_DK)
 
     plt.tight_layout()
     out_path.parent.mkdir(parents=True, exist_ok=True)
