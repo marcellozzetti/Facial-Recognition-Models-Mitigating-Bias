@@ -63,7 +63,7 @@ AMBER = RGBColor(0xF5, 0xB7, 0x00)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 
 QUALIFICACAO = date(2026, 10, 5)
-TOTAL_SLIDES = 29
+TOTAL_SLIDES = 33
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IMG_DIR = REPO_ROOT / "docs" / "tese" / "images"
@@ -1554,13 +1554,13 @@ def slide_mst_validacao_distribuicao(prs: Presentation) -> None:
 # SLIDE 18 — Por que ConvNeXt-T (justificativa vs ResNet e vs ViT)
 # ============================================================
 def slide_por_que_convnext(prs: Presentation) -> None:
-    add_bullets(prs, 19, "Racional da escolha do backbone: ConvNeXt-T (Liu et al., 2022)", [
+    add_bullets(prs, 20, "Racional da escolha do backbone: ConvNeXt-T (Liu et al., 2022)", [
         ("Paridade com ViTs a custo convolucional:",
-         "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos params."),
+         "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos parâmetros."),
         ("Estável em fine-tuning:",
          "LayerNorm (não BatchNorm) — robusto a batch pequeno, essencial para 3 sementes."),
-        ("Inserção natural de FiLM:",
-         "4 estágios hierárquicos oferecem 4 pontos de inserção sem modificar blocos internos."),
+        ("Saída com dimensionalidade compacta:",
+         "768 canais na saída do backbone — admite inserção de FiLM com overhead paramétrico mínimo."),
         ("Comparável ao baseline canônico:",
          "ResNet-34 do FairFace serve como âncora — ConvNeXt-T isola o efeito do condicionamento."),
         ("Viável computacionalmente:",
@@ -1572,19 +1572,19 @@ def slide_por_que_convnext(prs: Presentation) -> None:
 # SLIDE 19 — Por que FiLM (comparação com 7 alternativas de conditioning)
 # ============================================================
 def slide_por_que_film(prs: Presentation) -> None:
-    add_bullets(prs, 20, "Racional do mecanismo de condicionamento: FiLM (Perez et al., 2018)", [
+    add_bullets(prs, 21, "Racional do mecanismo de condicionamento: FiLM (Perez et al., 2018)", [
+        ("Instanciação mínima suficiente:",
+         "uma única camada FiLM após o backbone, antes do classificador — menor instanciação possível do mecanismo."),
         ("Adequação dimensional ao sinal MST:",
-         "sinal 10-dim casa naturalmente com γ, β — sem explosão paramétrica."),
-        ("Eficiência:",
-         "~380 k parâmetros (~1,3 % do backbone) — muito abaixo de cross-attention (~3×)."),
+         "sinal 10-dim casa naturalmente com γ, β de 768 dim — sem explosão paramétrica."),
+        ("Eficiência extrema:",
+         "~14 k parâmetros adicionais (~0,05 % do backbone) — abaixo de qualquer alternativa (cross-attention, adapters, LoRA)."),
         ("Interpretabilidade direta:",
-         "γ e β por canal permitem inspecionar como cada tom modula as features."),
+         "γ e β por canal permitem inspecionar como o tom modula as 768 features finais."),
         ("Compatibilidade nativa:",
-         "opera bem com LayerNorm do ConvNeXt-T; init identidade preserva backbone."),
+         "opera sobre as features de saída do ConvNeXt-T; inicialização identidade (γ=1, β=0) preserva o backbone."),
         ("Lacuna documentada:",
          "sem aplicação prévia em fairness facial multi-classe — Contribuição 3 desta pesquisa."),
-        ("Descartadas com justificativa formal (Cap 2):",
-         "Concatenação, CBN, Cross-attention, AdaIN, SPADE, HyperNetworks, LoRA/Adaptadores."),
     ])
 
 
@@ -1593,10 +1593,10 @@ def slide_por_que_film(prs: Presentation) -> None:
 # ============================================================
 def slide_metodologia_film(prs: Presentation) -> None:
     add_image_slide(
-        prs, 21,
+        prs, 22,
         "Mecanismo FiLM: modulação de features condicionada ao tom de pele",
         IMG_DIR / "film_pipeline.png",
-        caption="FiLM (Perez et al., 2018) modula as features intermediárias do ConvNeXt-T canal a canal, condicionadas ao vetor MST. Overhead paramétrico: aproximadamente 1,3 % do backbone.",
+        caption="FiLM (Perez et al., 2018) na instanciação mínima: uma única camada inserida após o backbone, modulando as 768 features finais canal a canal, condicionadas ao vetor MST. Overhead paramétrico: ~0,05 % do backbone.",
         height_in=4.6,
     )
 
@@ -1754,7 +1754,7 @@ def slide_metodologia_configs(prs: Presentation) -> None:
     pc.font.color.rgb = GRAY_MD
 
     add_footer(slide)
-    add_page_number(slide, 22)
+    add_page_number(slide, 23)
 
 
 def _mini_pipeline(slide, x: float, y: float, width: float,
@@ -2093,7 +2093,7 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
     r2.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
-    add_page_number(slide, 23)
+    add_page_number(slide, 27)
 
 
 # ============================================================
@@ -2320,7 +2320,7 @@ def slide_metricas(prs: Presentation) -> None:
     r2.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
-    add_page_number(slide, 24)
+    add_page_number(slide, 28)
 
 
 # ============================================================
@@ -2328,7 +2328,7 @@ def slide_metricas(prs: Presentation) -> None:
 # ============================================================
 def slide_contribuicoes(prs: Presentation) -> None:
     add_table_slide(
-        prs, 25,
+        prs, 29,
         "Contribuições esperadas",
         ["Eixo", "Contribuições", "Foco"],
         [
@@ -2346,7 +2346,7 @@ def slide_contribuicoes(prs: Presentation) -> None:
 # ============================================================
 def slide_cronograma(prs: Presentation) -> None:
     add_table_slide(
-        prs, 26,
+        prs, 30,
         "Cronograma",
         ["Período", "Etapa", "Entrega"],
         [
@@ -2370,7 +2370,7 @@ def slide_cronograma(prs: Presentation) -> None:
 # ============================================================
 def slide_riscos(prs: Presentation) -> None:
     add_table_slide(
-        prs, 27,
+        prs, 31,
         "Riscos identificados e estratégias de mitigação",
         ["#", "Risco", "Mitigação"],
         [
@@ -2468,7 +2468,7 @@ def slide_estado_atual(prs: Presentation) -> None:
         p.space_after = Pt(6)
 
     add_footer(slide)
-    add_page_number(slide, 28)
+    add_page_number(slide, 32)
 
 
 # ============================================================
@@ -2521,6 +2521,480 @@ def slide_perguntas(prs: Presentation) -> None:
 
 
 # ============================================================
+# Helper comum: slide-detalhamento de uma etapa do pipeline
+# (3 cartoes Entrada / Processo / Saida + banner inferior
+#  "Regra de aprovacao" com hipotese testada)
+# ============================================================
+def _slide_etapa_detalhe(
+    prs: Presentation,
+    numero: int,
+    titulo: str,
+    subtitulo: str,
+    entrada: list,
+    processo: list,
+    saida: list,
+    regra_titulo: str,
+    regra_texto: str,
+    extra_visual: callable | None = None,
+) -> None:
+    """Monta um slide-detalhamento de etapa com shapes nativos.
+
+    extra_visual: funcao opcional (slide, x, y, w, h) para desenhar um
+    elemento visual especifico da etapa logo abaixo dos 3 cartoes.
+    """
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, titulo)
+
+    # Subtitulo
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
+    )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = subtitulo
+    ps.font.size = Pt(13)
+    ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    # 3 cartoes horizontais
+    SLIDE_W = 13.33
+    CARD_W = 4.10
+    CARD_GAP = 0.25
+    CARD_Y = 1.75
+    HEADER_H = 0.55
+    CARD_BODY_H = 3.00
+    CARD_H = HEADER_H + CARD_BODY_H
+    total_w = 3 * CARD_W + 2 * CARD_GAP
+    start_x = (SLIDE_W - total_w) / 2
+
+    cartoes = [
+        ("ENTRADA",   NAVY,     entrada),
+        ("PROCESSO",  BLUE_MID, processo),
+        ("SAÍDA",     ACCENT,   saida),
+    ]
+
+    for i, (header, cor, bullets) in enumerate(cartoes):
+        x = start_x + i * (CARD_W + CARD_GAP)
+
+        # Header colorido
+        hdr = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(CARD_Y),
+            Inches(CARD_W), Inches(HEADER_H),
+        )
+        hdr.fill.solid()
+        hdr.fill.fore_color.rgb = cor
+        hdr.line.fill.background()
+        tf = hdr.text_frame
+        tf.margin_top = Inches(0.06); tf.margin_bottom = Inches(0.05)
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = header
+        r.font.size = Pt(14)
+        r.font.bold = True
+        r.font.color.rgb = WHITE
+
+        # Corpo branco com borda colorida
+        body = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(x), Inches(CARD_Y + HEADER_H + 0.03),
+            Inches(CARD_W), Inches(CARD_BODY_H),
+        )
+        body.fill.solid()
+        body.fill.fore_color.rgb = WHITE
+        body.line.color.rgb = cor
+        body.line.width = Pt(1.2)
+
+        # Bullets dentro do corpo
+        tb = slide.shapes.add_textbox(
+            Inches(x + 0.18), Inches(CARD_Y + HEADER_H + 0.15),
+            Inches(CARD_W - 0.36), Inches(CARD_BODY_H - 0.25),
+        )
+        tf = tb.text_frame
+        tf.word_wrap = True
+        for j, bullet in enumerate(bullets):
+            p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
+            r = p.add_run()
+            r.text = "•  " + bullet
+            r.font.size = Pt(12)
+            r.font.color.rgb = NAVY
+            p.space_after = Pt(6)
+
+    # Visual extra opcional (abaixo dos cartoes)
+    if extra_visual is not None:
+        extra_visual(slide, 0.5, CARD_Y + CARD_H + 0.18, 12.3, 1.05)
+
+    # Banner inferior: Regra de aprovacao
+    bot_y = 6.60
+    bot_h = 0.80
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(SLIDE_W - 1.0), Inches(bot_h),
+    )
+    bot.fill.solid()
+    bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.05)
+    p1 = tf.paragraphs[0]
+    p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = regra_titulo
+    r1.font.size = Pt(13)
+    r1.font.bold = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph()
+    p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = regra_texto
+    r2.font.size = Pt(11)
+    r2.font.color.rgb = BLUE_LIGHT
+
+    add_footer(slide)
+    add_page_number(slide, numero)
+
+
+# ============================================================
+# SLIDE 19 — Etapa 2: Matriz MST × raca (detalhamento)
+# ============================================================
+def slide_etapa2_matriz_mst_raca(prs: Presentation) -> None:
+    def viz(slide, x, y, w, h):
+        # Mini-heatmap esquematico 7x10 com cores MST
+        from pptx.util import Emu
+        mst_colors = [
+            RGBColor(0xF6, 0xED, 0xE4), RGBColor(0xF3, 0xE7, 0xDB),
+            RGBColor(0xF7, 0xEA, 0xD0), RGBColor(0xEA, 0xDA, 0xBA),
+            RGBColor(0xD7, 0xBD, 0x96), RGBColor(0xA0, 0x7E, 0x56),
+            RGBColor(0x82, 0x5C, 0x43), RGBColor(0x60, 0x41, 0x34),
+            RGBColor(0x3A, 0x31, 0x2A), RGBColor(0x29, 0x24, 0x20),
+        ]
+        cell_w = w * 0.055
+        cell_h = h * 0.80
+        start_cx = x + (w - 10 * cell_w) / 2
+        start_cy = y + 0.10
+        # Rotulo
+        lbl = slide.shapes.add_textbox(
+            Inches(x), Inches(y),
+            Inches(w / 2), Inches(0.30),
+        )
+        pl = lbl.text_frame.paragraphs[0]
+        pl.text = "Paleta Monk 10 tons (eixo horizontal da matriz 7 × 10):"
+        pl.font.size = Pt(10)
+        pl.font.italic = True
+        pl.font.color.rgb = GRAY_MD
+        for i, col in enumerate(mst_colors):
+            cell = slide.shapes.add_shape(
+                MSO_SHAPE.RECTANGLE,
+                Inches(start_cx + i * cell_w), Inches(start_cy + 0.35),
+                Inches(cell_w - 0.02), Inches(cell_h - 0.35),
+            )
+            cell.fill.solid()
+            cell.fill.fore_color.rgb = col
+            cell.line.color.rgb = GRAY_DK
+            cell.line.width = Pt(0.5)
+            # numero MST
+            tn = slide.shapes.add_textbox(
+                Inches(start_cx + i * cell_w), Inches(start_cy + cell_h + 0.03),
+                Inches(cell_w), Inches(0.22),
+            )
+            pt = tn.text_frame.paragraphs[0]
+            pt.alignment = 2
+            r = pt.add_run()
+            r.text = str(i + 1)
+            r.font.size = Pt(9)
+            r.font.color.rgb = GRAY_DK
+
+    _slide_etapa_detalhe(
+        prs, 19,
+        "Etapa 2 — Matriz MST × raça",
+        "Diagnóstico fenotípico: distribuição de tons Monk predita por raça do FairFace.",
+        entrada=[
+            "FairFace val (≈ 10 954 imagens)",
+            "Classificador MST da Etapa 1 (congelado)",
+            "Rótulos raciais FairFace (7 classes)",
+        ],
+        processo=[
+            "Inferência MST sobre todas as imagens",
+            "Agregação por raça: contagem de cada tom",
+            "Normalização para % dentro de cada raça",
+            "Teste χ² de homogeneidade de distribuição",
+        ],
+        saida=[
+            "Matriz pública 7 × 10 (CSV) — contribuição 2",
+            "Spread por raça (nº de tons distintos)",
+            "Rank de heterogeneidade intra-categorial",
+        ],
+        regra_titulo="Regra de aprovação — hipótese H3",
+        regra_texto=(
+            "Latinx cobre pelo menos 5 dos 10 tons MST com pico "
+            "distribuído (não concentrado em um único tom). "
+            "Confirma heterogeneidade fenotípica intra-categorial."
+        ),
+        extra_visual=viz,
+    )
+
+
+# ============================================================
+# SLIDE 24 — Etapa 4: Comparacao com baselines (detalhamento)
+# ============================================================
+def slide_etapa4_baselines(prs: Presentation) -> None:
+    def viz(slide, x, y, w, h):
+        # Lista horizontal de 6 badges de baselines + nossa proposta
+        badges = [
+            ("ResNet-34", "FairFace\nbaseline"),
+            ("ConvNeXt-T", "backbone\npuro"),
+            ("Adv. Debiasing", "Zhang\n2018"),
+            ("Group DRO", "Sagawa\n2020"),
+            ("FSCL+", "Park\n2022"),
+            ("FineFACE", "Manzoor\n2024"),
+            ("FiLM + MST", "nossa\nproposta"),
+        ]
+        n = len(badges)
+        gap = 0.08
+        bw = (w - (n - 1) * gap) / n
+        bh = 0.90
+        for i, (nome, sub) in enumerate(badges):
+            bx = x + i * (bw + gap)
+            hl = (i == n - 1)
+            box = slide.shapes.add_shape(
+                MSO_SHAPE.ROUNDED_RECTANGLE,
+                Inches(bx), Inches(y),
+                Inches(bw), Inches(bh),
+            )
+            box.fill.solid()
+            box.fill.fore_color.rgb = NAVY if hl else WHITE
+            box.line.color.rgb = NAVY
+            box.line.width = Pt(1.8 if hl else 1.0)
+            tf = box.text_frame
+            tf.margin_top = Inches(0.03); tf.margin_bottom = Inches(0.02)
+            p = tf.paragraphs[0]
+            p.alignment = 2
+            r = p.add_run()
+            r.text = nome
+            r.font.size = Pt(10.5)
+            r.font.bold = True
+            r.font.color.rgb = WHITE if hl else NAVY
+            p2 = tf.add_paragraph()
+            p2.alignment = 2
+            r2 = p2.add_run()
+            r2.text = sub
+            r2.font.size = Pt(8.5)
+            r2.font.italic = True
+            r2.font.color.rgb = BLUE_LIGHT if hl else GRAY_MD
+
+    _slide_etapa_detalhe(
+        prs, 24,
+        "Etapa 4 — Comparação sistemática com baselines",
+        "Confronta a proposta FiLM + MST contra seis famílias publicadas sob o mesmo protocolo.",
+        entrada=[
+            "FairFace train split (padrão)",
+            "6 famílias de mitigação (6 implementações oficiais)",
+            "Nossa configuração B (FiLM + MST, Etapa 3)",
+            "Mesmo backbone, dataset e receita de treino",
+        ],
+        processo=[
+            "Treino de cada método: 3 sementes (42, 1, 2)",
+            "Avaliação pareada por classe racial",
+            "Cálculo das 3 métricas triangulares por grupo",
+            "Teste pareado (bootstrap IC 95 %) entre configs",
+        ],
+        saida=[
+            "Tabela comparativa 7 métodos × 3 métricas",
+            "Fronteira Pareto (acurácia × disparidade)",
+            "Ranking de métodos no espaço F1 vs DR",
+        ],
+        regra_titulo="Regra de aprovação — hipótese H1 (central)",
+        regra_texto=(
+            "Nossa proposta supera o melhor baseline em F1 macro ≥ +2 "
+            "pontos percentuais E reduz Disparity Ratio em ≥ 20 % — "
+            "ambos critérios satisfeitos simultaneamente."
+        ),
+        extra_visual=viz,
+    )
+
+
+# ============================================================
+# SLIDE 25 — Etapa 5: Transferencia RFW/BFW (detalhamento)
+# ============================================================
+def slide_etapa5_transferencia(prs: Presentation) -> None:
+    def viz(slide, x, y, w, h):
+        # Mini-fluxo: Classificador 7 racas CONGELADO -> cabeca de verificacao -> RFW/BFW
+        parts = [
+            ("ConvNeXt-T\n+ FiLM (MST)",      "congelado",    True),
+            ("Cabeça de\nverificação",         "treinada",     False),
+            ("RFW · BFW\npairs 1 : 1",          "avaliação",    False),
+        ]
+        n = len(parts)
+        gap = 0.12
+        pw = (w - (n - 1) * gap - 0.6) / n   # 0.6 reserva para setas
+        ph = 0.90
+        for i, (titulo, nota, congelado) in enumerate(parts):
+            px = x + i * (pw + gap + 0.20)
+            box = slide.shapes.add_shape(
+                MSO_SHAPE.ROUNDED_RECTANGLE,
+                Inches(px), Inches(y),
+                Inches(pw), Inches(ph),
+            )
+            box.fill.solid()
+            if congelado:
+                box.fill.fore_color.rgb = GREEN
+            else:
+                box.fill.fore_color.rgb = WHITE
+            box.line.color.rgb = NAVY
+            box.line.width = Pt(1.5)
+            tf = box.text_frame
+            tf.margin_top = Inches(0.03); tf.margin_bottom = Inches(0.02)
+            p = tf.paragraphs[0]
+            p.alignment = 2
+            r = p.add_run()
+            r.text = titulo
+            r.font.size = Pt(11)
+            r.font.bold = True
+            r.font.color.rgb = WHITE if congelado else NAVY
+            p2 = tf.add_paragraph()
+            p2.alignment = 2
+            r2 = p2.add_run()
+            r2.text = nota
+            r2.font.size = Pt(9)
+            r2.font.italic = True
+            r2.font.color.rgb = GRAY_LT if congelado else GRAY_MD
+            # Seta para o proximo
+            if i < n - 1:
+                conn = slide.shapes.add_connector(
+                    2,
+                    Inches(px + pw), Inches(y + ph / 2),
+                    Inches(px + pw + 0.20), Inches(y + ph / 2),
+                )
+                conn.line.color.rgb = NAVY
+                conn.line.width = Pt(2.0)
+                _add_arrowhead(conn)
+
+    _slide_etapa_detalhe(
+        prs, 25,
+        "Etapa 5 — Transferência arquitetural para verificação",
+        "Testa se o condicionamento FiLM + MST herda-se de classificação para verificação, sem re-treino.",
+        entrada=[
+            "FiLM + ConvNeXt-T pré-treinado (Cap. 2)",
+            "RFW: 4 raças, pares oficiais 1 : 1 (Wang 2019)",
+            "BFW: 4 raças × 2 gêneros (Robinson 2020)",
+        ],
+        processo=[
+            "Encoder + FiLM CONGELADOS (feature-freeze)",
+            "Treina apenas cabeça de verificação (par-a-par)",
+            "Avaliação TAR @ FAR = 1 × 10⁻⁴ por raça",
+            "Comparação: backbone igual sem condicionamento",
+        ],
+        saida=[
+            "Métricas de verificação estratificadas por raça",
+            "Delta TAR por grupo demográfico",
+            "Teste empírico do Teorema 1 de LAFTR",
+        ],
+        regra_titulo="Regra de aprovação — hipótese H5 (central)",
+        regra_texto=(
+            "ΔTAR @ FAR = 1 × 10⁻⁴ ≥ +3 pontos percentuais no grupo "
+            "African, sobre backbone equivalente sem condicionamento — "
+            "demonstra transferência via feature-freeze (Madras et al., 2018)."
+        ),
+        extra_visual=viz,
+    )
+
+
+# ============================================================
+# SLIDE 26 — Etapa 6: Decomposicao do erro (detalhamento)
+# ============================================================
+def slide_etapa6_decomposicao(prs: Presentation) -> None:
+    def viz(slide, x, y, w, h):
+        # Barra horizontal: fenotipico (irredutivel) + algoritmico (mitigavel)
+        bar_x = x + 0.3
+        bar_w = w - 0.6
+        bar_h = 0.55
+        bar_y = y + 0.20
+
+        # Segmento fenotipico (hipotetico 70%)
+        fen = slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE,
+            Inches(bar_x), Inches(bar_y),
+            Inches(bar_w * 0.70), Inches(bar_h),
+        )
+        fen.fill.solid()
+        fen.fill.fore_color.rgb = BLUE_MID
+        fen.line.color.rgb = NAVY
+        fen.line.width = Pt(1.0)
+        tf = fen.text_frame
+        tf.margin_top = Inches(0.02); tf.margin_bottom = Inches(0.02)
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = "Fenotípico (irredutível) — ~70 %"
+        r.font.size = Pt(11)
+        r.font.bold = True
+        r.font.color.rgb = WHITE
+
+        alg = slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE,
+            Inches(bar_x + bar_w * 0.70), Inches(bar_y),
+            Inches(bar_w * 0.30), Inches(bar_h),
+        )
+        alg.fill.solid()
+        alg.fill.fore_color.rgb = ACCENT
+        alg.line.color.rgb = NAVY
+        alg.line.width = Pt(1.0)
+        tf = alg.text_frame
+        tf.margin_top = Inches(0.02); tf.margin_bottom = Inches(0.02)
+        p = tf.paragraphs[0]
+        p.alignment = 2
+        r = p.add_run()
+        r.text = "Algorítmico (mitigável) — ~30 %"
+        r.font.size = Pt(11)
+        r.font.bold = True
+        r.font.color.rgb = WHITE
+
+        # legenda
+        cap = slide.shapes.add_textbox(
+            Inches(bar_x), Inches(bar_y + bar_h + 0.05),
+            Inches(bar_w), Inches(0.30),
+        )
+        pc = cap.text_frame.paragraphs[0]
+        pc.alignment = 2
+        pc.text = "Partição ilustrativa do R² — a proporção real é o resultado do experimento."
+        pc.font.size = Pt(10)
+        pc.font.italic = True
+        pc.font.color.rgb = GRAY_MD
+
+    _slide_etapa_detalhe(
+        prs, 26,
+        "Etapa 6 — Decomposição do erro Latinx",
+        "Separa quanto do erro vem de heterogeneidade fenotípica vs limitação do algoritmo.",
+        entrada=[
+            "Predições do melhor modelo (Config B, Etapa 3)",
+            "Rótulos raciais verdadeiros (FairFace val)",
+            "Vetor MST por imagem (Etapa 1)",
+            "Fração de pixels faciais (BiSeNet; Pangelinan)",
+        ],
+        processo=[
+            "Regressão linear: erro ~ MST_spread + pixel_info",
+            "Decomposição ANOVA: fenotípico × algorítmico",
+            "Cálculo R² por componente (variância explicada)",
+            "Repetição por raça (foco em Latinx)",
+        ],
+        saida=[
+            "R² componente fenotípico (irredutível)",
+            "R² componente algorítmico (mitigável)",
+            "Resposta quantitativa à tese de Pangelinan",
+        ],
+        regra_titulo="Regra de aprovação — hipótese H6 (teste da tese Pangelinan)",
+        regra_texto=(
+            "Se R² componente de pixel-info ≥ 70 %, confirma a refutação "
+            "de Pangelinan e vira contribuição quantitativa. Se < 70 %, "
+            "evidência contrária. Ambos os desfechos são resultado científico válido."
+        ),
+        extra_visual=viz,
+    )
+
+
+# ============================================================
 # Main
 # ============================================================
 def build_presentation() -> Presentation:
@@ -2528,18 +3002,18 @@ def build_presentation() -> Presentation:
     prs.slide_width = Inches(13.33)
     prs.slide_height = Inches(7.5)
 
-    # 29 slides (era 28): adicionada ancora academica de motivacao em slide 2
-    # — reescritura formal do episodio Buolamwini (MIT Media Lab, 2016),
-    # consolidado em Gender Shades (2018) e Unmasking AI (2023).
+    # 33 slides (era 29): adicionados 4 slides de detalhamento por etapa
+    # do pipeline — Etapa 2 (matriz MST x raca), Etapa 4 (baselines),
+    # Etapa 5 (transferencia RFW/BFW), Etapa 6 (decomposicao do erro).
     slide_capa(prs)                           # 1
-    slide_motivacao_academica(prs)            # 2   [NOVO — origem academica Buolamwini]
+    slide_motivacao_academica(prs)            # 2
     slide_motivacao_contexto(prs)             # 3
     slide_motivacao_regulacao(prs)            # 4
     slide_problema_disparidade(prs)           # 5
     slide_problema_heterogeneidade(prs)       # 6
     slide_problema_refutacao(prs)             # 7
     slide_objetivo_geral(prs)                 # 8
-    slide_objetivos_hipoteses(prs)            # 9   [CONSOLIDADO]
+    slide_objetivos_hipoteses(prs)            # 9
     slide_revisao_timeline(prs)               # 10
     slide_revisao_mitigacao(prs)              # 11
     slide_revisao_lacunas(prs)                # 12
@@ -2549,17 +3023,21 @@ def build_presentation() -> Presentation:
     slide_mst_detalhe_tecnico(prs)            # 16
     slide_mst_validacao_faces(prs)            # 17
     slide_mst_validacao_distribuicao(prs)     # 18
-    slide_por_que_convnext(prs)               # 19
-    slide_por_que_film(prs)                   # 20
-    slide_metodologia_film(prs)               # 21
-    slide_metodologia_configs(prs)            # 22
-    slide_baselines_cenarios(prs)             # 23
-    slide_metricas(prs)                       # 24
-    slide_contribuicoes(prs)                  # 25
-    slide_cronograma(prs)                     # 26
-    slide_riscos(prs)                         # 27
-    slide_estado_atual(prs)                   # 28
-    slide_perguntas(prs)                      # 29
+    slide_etapa2_matriz_mst_raca(prs)         # 19  [NOVO — Etapa 2 detalhamento]
+    slide_por_que_convnext(prs)               # 20
+    slide_por_que_film(prs)                   # 21
+    slide_metodologia_film(prs)               # 22
+    slide_metodologia_configs(prs)            # 23
+    slide_etapa4_baselines(prs)               # 24  [NOVO — Etapa 4 detalhamento]
+    slide_etapa5_transferencia(prs)           # 25  [NOVO — Etapa 5 detalhamento]
+    slide_etapa6_decomposicao(prs)            # 26  [NOVO — Etapa 6 detalhamento]
+    slide_baselines_cenarios(prs)             # 27
+    slide_metricas(prs)                       # 28
+    slide_contribuicoes(prs)                  # 29
+    slide_cronograma(prs)                     # 30
+    slide_riscos(prs)                         # 31
+    slide_estado_atual(prs)                   # 32
+    slide_perguntas(prs)                      # 33
 
     return prs
 
