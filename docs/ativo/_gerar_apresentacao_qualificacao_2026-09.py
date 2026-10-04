@@ -63,7 +63,7 @@ AMBER = RGBColor(0xF5, 0xB7, 0x00)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 
 QUALIFICACAO = date(2026, 10, 5)
-TOTAL_SLIDES = 33
+TOTAL_SLIDES = 32
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 IMG_DIR = REPO_ROOT / "docs" / "tese" / "images"
@@ -1794,54 +1794,257 @@ def slide_mst_validacao_distribuicao(prs: Presentation) -> None:
 
 
 # ============================================================
-# SLIDE 18 — Por que ConvNeXt-T (justificativa vs ResNet e vs ViT)
+# SLIDE 20 — Etapa 3 (a): Arquitetura ConvNeXt-T (figura + texto)
 # ============================================================
 def slide_por_que_convnext(prs: Presentation) -> None:
-    add_bullets(prs, 20, "Racional da escolha do backbone: ConvNeXt-T (Liu et al., 2022)", [
+    """Slide 20 — Etapa 3 (A): figura do backbone ConvNeXt-T + bullets."""
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Etapa 3 (a) — Arquitetura ConvNeXt-T (backbone)")
+
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
+    )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Backbone convolucional moderno — 4 estágios hierárquicos, "
+        "28 M parâmetros, LayerNorm (Liu et al., 2022, CVPR)."
+    )
+    ps.font.size = Pt(13); ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    # ============================================================
+    # LADO ESQUERDO — figura (convnext_backbone.png, aspect 2.013:1)
+    # ============================================================
+    fig_x = 0.40
+    fig_y = 1.80
+    fig_w = 7.60
+    fig_h = fig_w / 2.013  # ~3.78
+    slide.shapes.add_picture(
+        str(IMG_DIR / "convnext_backbone.png"),
+        Inches(fig_x), Inches(fig_y),
+        width=Inches(fig_w), height=Inches(fig_h),
+    )
+
+    # ============================================================
+    # LADO DIREITO — bullets de justificativa
+    # ============================================================
+    txt_x = fig_x + fig_w + 0.30
+    txt_y = 1.80
+    txt_w = 13.33 - txt_x - 0.40
+    txt_h = 4.60
+
+    # Header do bloco
+    hdr = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(txt_x), Inches(txt_y),
+        Inches(txt_w), Inches(0.42),
+    )
+    hdr.fill.solid(); hdr.fill.fore_color.rgb = NAVY
+    hdr.line.fill.background()
+    tf = hdr.text_frame
+    tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.03)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "Por que ConvNeXt-T"
+    r.font.size = Pt(13); r.font.bold = True
+    r.font.color.rgb = WHITE
+
+    body = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(txt_x), Inches(txt_y + 0.46),
+        Inches(txt_w), Inches(txt_h - 0.46),
+    )
+    body.fill.solid(); body.fill.fore_color.rgb = WHITE
+    body.line.color.rgb = NAVY; body.line.width = Pt(1.2)
+
+    bullets = [
         ("Paridade com ViTs a custo convolucional:",
          "82 % top-1 ImageNet, comparável a Swin-T, ~1/3 dos parâmetros."),
         ("Estável em fine-tuning:",
          "LayerNorm (não BatchNorm) — robusto a batch pequeno, essencial para 3 sementes."),
-        ("Saída com dimensionalidade compacta:",
-         "768 canais na saída do backbone — admite inserção de FiLM com overhead paramétrico mínimo."),
+        ("Inserção natural de FiLM:",
+         "4 estágios hierárquicos oferecem 4 pontos de inserção sem modificar blocos internos."),
         ("Comparável ao baseline canônico:",
          "ResNet-34 do FairFace serve como âncora — ConvNeXt-T isola o efeito do condicionamento."),
         ("Viável computacionalmente:",
          "28 M params permitem 3 sementes × 3 configs em GPU comum (~300 h total)."),
-    ])
+    ]
+    tb = slide.shapes.add_textbox(
+        Inches(txt_x + 0.14), Inches(txt_y + 0.56),
+        Inches(txt_w - 0.28), Inches(txt_h - 0.60),
+    )
+    tf = tb.text_frame; tf.word_wrap = True
+    for j, (head, body_txt) in enumerate(bullets):
+        p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
+        r1 = p.add_run()
+        r1.text = "•  " + head + "  "
+        r1.font.size = Pt(10.5); r1.font.bold = True
+        r1.font.color.rgb = NAVY
+        r2 = p.add_run()
+        r2.text = body_txt
+        r2.font.size = Pt(10.5); r2.font.color.rgb = GRAY_DK
+        p.space_after = Pt(4)
+
+    # Banner inferior
+    bot_y = 6.60; bot_h = 0.70
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(12.33), Inches(bot_h),
+    )
+    bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.05)
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    p1 = tf.paragraphs[0]; p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = (
+        "Escolha arquitetural que combina estabilidade de treino, "
+        "paridade de desempenho e naturalidade para condicionamento."
+    )
+    r1.font.size = Pt(12); r1.font.bold = True
+    r1.font.color.rgb = WHITE
+
+    add_footer(slide)
+    add_page_number(slide, 20)
 
 
 # ============================================================
-# SLIDE 19 — Por que FiLM (comparação com 7 alternativas de conditioning)
+# SLIDE 21 — Etapa 3 (b): FiLM mecanismo (figura + 2 colunas)
 # ============================================================
 def slide_por_que_film(prs: Presentation) -> None:
-    add_bullets(prs, 21, "Racional do mecanismo de condicionamento: FiLM (Perez et al., 2018)", [
-        ("Instanciação mínima suficiente:",
-         "uma única camada FiLM após o backbone, antes do classificador — menor instanciação possível do mecanismo."),
-        ("Adequação dimensional ao sinal MST:",
-         "sinal 10-dim casa naturalmente com γ, β de 768 dim — sem explosão paramétrica."),
-        ("Eficiência extrema:",
-         "~14 k parâmetros adicionais (~0,05 % do backbone) — abaixo de qualquer alternativa (cross-attention, adapters, LoRA)."),
-        ("Interpretabilidade direta:",
-         "γ e β por canal permitem inspecionar como o tom modula as 768 features finais."),
-        ("Compatibilidade nativa:",
-         "opera sobre as features de saída do ConvNeXt-T; inicialização identidade (γ=1, β=0) preserva o backbone."),
-        ("Lacuna documentada:",
-         "sem aplicação prévia em fairness facial multi-classe — Contribuição 3 desta pesquisa."),
-    ])
+    """Slide 21 — Etapa 3 (B): figura FiLM pipeline + 2 colunas (O que
+    e / Por que escolhemos). Merge do antigo slide_metodologia_film."""
+    slide = prs.slides.add_slide(_blank(prs))
+    add_title(slide, "Etapa 3 (b) — Mecanismo FiLM (condicionamento)")
 
-
-# ============================================================
-# SLIDE 20 — Metodologia: mecanismo FiLM (figura)
-# ============================================================
-def slide_metodologia_film(prs: Presentation) -> None:
-    add_image_slide(
-        prs, 22,
-        "Mecanismo FiLM: modulação de features condicionada ao tom de pele",
-        IMG_DIR / "film_pipeline.png",
-        caption="FiLM (Perez et al., 2018) na instanciação mínima: uma única camada inserida após o backbone, modulando as 768 features finais canal a canal, condicionadas ao vetor MST. Overhead paramétrico: ~0,05 % do backbone.",
-        height_in=4.6,
+    sub = slide.shapes.add_textbox(
+        Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
     )
+    ps = sub.text_frame.paragraphs[0]
+    ps.text = (
+        "Feature-wise Linear Modulation (Perez et al., 2018) — "
+        "4 camadas FiLM, uma após cada estágio ConvNeXt-T."
+    )
+    ps.font.size = Pt(13); ps.font.italic = True
+    ps.font.color.rgb = GRAY_MD
+
+    # ============================================================
+    # LADO ESQUERDO — figura film_pipeline.png (aspect 1.808:1)
+    # ============================================================
+    fig_x = 0.40
+    fig_y = 1.80
+    fig_w = 7.20
+    fig_h = fig_w / 1.808  # ~3.98
+    slide.shapes.add_picture(
+        str(IMG_DIR / "film_pipeline.png"),
+        Inches(fig_x), Inches(fig_y),
+        width=Inches(fig_w), height=Inches(fig_h),
+    )
+
+    # ============================================================
+    # LADO DIREITO — 2 subsecoes empilhadas
+    # ============================================================
+    sub_x = fig_x + fig_w + 0.25
+    sub_w = 13.33 - sub_x - 0.40
+    sub_h = 2.30
+    gap = 0.15
+
+    subsecoes = [
+        {
+            "y": 1.80,
+            "cor": NAVY,
+            "titulo": "O que é FiLM",
+            "itens": [
+                ("Origem:", "Perez et al. 2018 (AAAI); generaliza CBN de Vries 2017."),
+                ("Mecanismo:", "para cada canal, par (γ, β) aprendido do contexto."),
+                ("Inserção:", "após cada bloco residual do ConvNeXt-T (4 blocos)."),
+                ("Uso:", "~1 000+ papers citantes em CV, NLP, RL desde 2018."),
+            ],
+        },
+        {
+            "y": 1.80 + sub_h + gap,
+            "cor": ACCENT,
+            "titulo": "Por que FiLM aqui",
+            "itens": [
+                ("Adequação:", "sinal MST 10-dim casa com γ, β — sem explosão."),
+                ("Eficiência:", "~380 k params (~1,3 % do backbone) — « cross-attention."),
+                ("Interpretabilidade:", "γ, β por canal inspecionáveis."),
+                ("Lacuna:", "sem aplicação prévia em fairness facial multi-classe — Contribuição 3."),
+            ],
+        },
+    ]
+
+    for sec in subsecoes:
+        # Header
+        hdr = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(sub_x), Inches(sec["y"]),
+            Inches(sub_w), Inches(0.38),
+        )
+        hdr.fill.solid(); hdr.fill.fore_color.rgb = sec["cor"]
+        hdr.line.fill.background()
+        tf = hdr.text_frame
+        tf.margin_top = Inches(0.04); tf.margin_bottom = Inches(0.03)
+        p = tf.paragraphs[0]; p.alignment = 2
+        r = p.add_run()
+        r.text = sec["titulo"]
+        r.font.size = Pt(12); r.font.bold = True
+        r.font.color.rgb = WHITE
+
+        body = slide.shapes.add_shape(
+            MSO_SHAPE.ROUNDED_RECTANGLE,
+            Inches(sub_x), Inches(sec["y"] + 0.41),
+            Inches(sub_w), Inches(sub_h - 0.41),
+        )
+        body.fill.solid(); body.fill.fore_color.rgb = WHITE
+        body.line.color.rgb = sec["cor"]; body.line.width = Pt(1.0)
+
+        tb = slide.shapes.add_textbox(
+            Inches(sub_x + 0.12), Inches(sec["y"] + 0.48),
+            Inches(sub_w - 0.24), Inches(sub_h - 0.52),
+        )
+        tf = tb.text_frame; tf.word_wrap = True
+        for j, (head, body_txt) in enumerate(sec["itens"]):
+            p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
+            r1 = p.add_run()
+            r1.text = "•  " + head + "  "
+            r1.font.size = Pt(9.5); r1.font.bold = True
+            r1.font.color.rgb = sec["cor"]
+            r2 = p.add_run()
+            r2.text = body_txt
+            r2.font.size = Pt(9.5); r2.font.color.rgb = GRAY_DK
+            p.space_after = Pt(2)
+
+    # Banner inferior
+    bot_y = 6.60; bot_h = 0.70
+    bot = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(0.5), Inches(bot_y),
+        Inches(12.33), Inches(bot_h),
+    )
+    bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
+    bot.line.fill.background()
+    tf = bot.text_frame
+    tf.margin_top = Inches(0.06); tf.margin_bottom = Inches(0.05)
+    tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
+    p1 = tf.paragraphs[0]; p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "Equação canônica:  F′ = γ ⊙ F + β"
+    r1.font.size = Pt(13); r1.font.bold = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = (
+        "Alternativas descartadas no Cap. 2:  Concatenação · CBN · "
+        "Cross-attention · AdaIN · SPADE · HyperNetworks · LoRA/Adaptadores."
+    )
+    r2.font.size = Pt(10); r2.font.italic = True
+    r2.font.color.rgb = BLUE_LIGHT
+
+    add_footer(slide)
+    add_page_number(slide, 21)
 
 
 # ============================================================
@@ -1997,7 +2200,7 @@ def slide_metodologia_configs(prs: Presentation) -> None:
     pc.font.color.rgb = GRAY_MD
 
     add_footer(slide)
-    add_page_number(slide, 23)
+    add_page_number(slide, 22)
 
 
 def _mini_pipeline(slide, x: float, y: float, width: float,
@@ -2336,7 +2539,7 @@ def slide_baselines_cenarios(prs: Presentation) -> None:
     r2.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
-    add_page_number(slide, 27)
+    add_page_number(slide, 26)
 
 
 # ============================================================
@@ -2563,7 +2766,7 @@ def slide_metricas(prs: Presentation) -> None:
     r2.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
-    add_page_number(slide, 28)
+    add_page_number(slide, 27)
 
 
 # ============================================================
@@ -2571,7 +2774,7 @@ def slide_metricas(prs: Presentation) -> None:
 # ============================================================
 def slide_contribuicoes(prs: Presentation) -> None:
     add_table_slide(
-        prs, 29,
+        prs, 28,
         "Contribuições esperadas",
         ["Eixo", "Contribuições", "Foco"],
         [
@@ -2589,7 +2792,7 @@ def slide_contribuicoes(prs: Presentation) -> None:
 # ============================================================
 def slide_cronograma(prs: Presentation) -> None:
     add_table_slide(
-        prs, 30,
+        prs, 29,
         "Cronograma",
         ["Período", "Etapa", "Entrega"],
         [
@@ -2613,7 +2816,7 @@ def slide_cronograma(prs: Presentation) -> None:
 # ============================================================
 def slide_riscos(prs: Presentation) -> None:
     add_table_slide(
-        prs, 31,
+        prs, 30,
         "Riscos identificados e estratégias de mitigação",
         ["#", "Risco", "Mitigação"],
         [
@@ -2711,7 +2914,7 @@ def slide_estado_atual(prs: Presentation) -> None:
         p.space_after = Pt(6)
 
     add_footer(slide)
-    add_page_number(slide, 32)
+    add_page_number(slide, 31)
 
 
 # ============================================================
@@ -3385,7 +3588,7 @@ def slide_etapa4_baselines(prs: Presentation) -> None:
     r2.font.size = Pt(11); r2.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
-    add_page_number(slide, 24)
+    add_page_number(slide, 23)
 
 
 # ============================================================
@@ -3640,29 +3843,30 @@ def slide_etapa5_transferencia(prs: Presentation) -> None:
     r2.font.size = Pt(11); r2.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
-    add_page_number(slide, 25)
+    add_page_number(slide, 24)
 
 
 # ============================================================
 # SLIDE 26 — Etapa 6: Decomposicao do erro (detalhamento)
 # ============================================================
 def slide_etapa6_decomposicao(prs: Presentation) -> None:
-    """Etapa 6: layout com barra de decomposicao gigante como heroi.
+    """Etapa 6: FORK diagram (isolamento dos componentes do erro) + bar.
 
-    Mostra visualmente a particao da variancia do erro Latinx em
-    FENOTIPICO (irredutivel) vs ALGORITMICO (mitigavel). Side-cards
-    explicam COMO se mede e O QUE se responde (tese de Pangelinan).
+    Hero: diagrama em arvore invertida —
+      Erro total (Latinx) --> H4 Fenotipico (entropia MST, irredutivel)
+                          --> H6 Algoritmico (alinhamento + FiLM, mitigavel)
+    Abaixo: barra de resultado ilustrativo + banner com resultado intelectual.
     """
     slide = prs.slides.add_slide(_blank(prs))
-    add_title(slide, "Etapa 6 — Decomposição do erro Latinx")
+    add_title(slide, "Etapa 6 — Decomposição diagnóstica do erro")
 
     sub = slide.shapes.add_textbox(
         Inches(0.5), Inches(1.28), Inches(12.3), Inches(0.35)
     )
     ps = sub.text_frame.paragraphs[0]
     ps.text = (
-        "Separa quanto do erro vem de heterogeneidade fenotípica "
-        "intrínseca vs limitação do algoritmo — resposta à tese de Pangelinan."
+        "Isola o componente fenotípico (irredutível) do algorítmico "
+        "(mitigável) — primeiro diagnóstico quantitativo do limite teórico de equidade."
     )
     ps.font.size = Pt(13); ps.font.italic = True
     ps.font.color.rgb = GRAY_MD
@@ -3670,194 +3874,235 @@ def slide_etapa6_decomposicao(prs: Presentation) -> None:
     SLIDE_W = 13.33
 
     # ============================================================
-    # HEROI VISUAL — Barra gigante de decomposicao
+    # HEROI VISUAL — FORK DIAGRAM: erro total -> 2 componentes
+    # ============================================================
+    # Caixa topo: Erro total (Latinx)
+    TOP_X = 4.33
+    TOP_Y = 1.80
+    TOP_W = 4.67
+    TOP_H = 0.80
+    top_box = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(TOP_X), Inches(TOP_Y),
+        Inches(TOP_W), Inches(TOP_H),
+    )
+    top_box.fill.solid(); top_box.fill.fore_color.rgb = NAVY
+    top_box.line.color.rgb = NAVY; top_box.line.width = Pt(1.5)
+    tf = top_box.text_frame
+    tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.05)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "Erro total do classificador em Latinx"
+    r.font.size = Pt(14); r.font.bold = True
+    r.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    r2 = p2.add_run()
+    r2.text = "100 % da variância observada"
+    r2.font.size = Pt(10); r2.font.italic = True
+    r2.font.color.rgb = BLUE_LIGHT
+
+    # Dois ramos — H4 (esquerda) e H6 (direita)
+    FORK_Y_TOP = TOP_Y + TOP_H
+    BRANCH_Y = 3.10
+    BRANCH_H = 1.55
+    LEFT_X = 0.60
+    RIGHT_X = SLIDE_W - 0.60 - 5.80
+    BRANCH_W = 5.80
+
+    top_center_x = TOP_X + TOP_W / 2
+    left_center_x = LEFT_X + BRANCH_W / 2
+    right_center_x = RIGHT_X + BRANCH_W / 2
+
+    # Linhas Y da conexao fork (vertical do centro + horizontal + descida)
+    FORK_MID_Y = 2.85
+
+    # Vertical descendente do centro
+    v1 = slide.shapes.add_connector(
+        1,
+        Inches(top_center_x), Inches(FORK_Y_TOP),
+        Inches(top_center_x), Inches(FORK_MID_Y),
+    )
+    v1.line.color.rgb = NAVY; v1.line.width = Pt(2.0)
+    # Horizontal esquerda
+    h1 = slide.shapes.add_connector(
+        1,
+        Inches(left_center_x), Inches(FORK_MID_Y),
+        Inches(top_center_x), Inches(FORK_MID_Y),
+    )
+    h1.line.color.rgb = NAVY; h1.line.width = Pt(2.0)
+    # Horizontal direita
+    h2 = slide.shapes.add_connector(
+        1,
+        Inches(top_center_x), Inches(FORK_MID_Y),
+        Inches(right_center_x), Inches(FORK_MID_Y),
+    )
+    h2.line.color.rgb = NAVY; h2.line.width = Pt(2.0)
+    # Descida esquerda com seta
+    da1 = slide.shapes.add_connector(
+        2,
+        Inches(left_center_x), Inches(FORK_MID_Y),
+        Inches(left_center_x), Inches(BRANCH_Y),
+    )
+    da1.line.color.rgb = BLUE_MID; da1.line.width = Pt(2.2)
+    _add_arrowhead(da1)
+    # Descida direita com seta
+    da2 = slide.shapes.add_connector(
+        2,
+        Inches(right_center_x), Inches(FORK_MID_Y),
+        Inches(right_center_x), Inches(BRANCH_Y),
+    )
+    da2.line.color.rgb = ACCENT; da2.line.width = Pt(2.2)
+    _add_arrowhead(da2)
+
+    # ============================================================
+    # BRANCH ESQUERDA — H4 Fenotipico
+    # ============================================================
+    left_card = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(LEFT_X), Inches(BRANCH_Y),
+        Inches(BRANCH_W), Inches(BRANCH_H),
+    )
+    left_card.fill.solid(); left_card.fill.fore_color.rgb = BLUE_MID
+    left_card.line.color.rgb = NAVY; left_card.line.width = Pt(1.8)
+    tf = left_card.text_frame
+    tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.05)
+    tf.margin_left = Inches(0.15); tf.margin_right = Inches(0.15)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "H4 · Componente FENOTÍPICO / BIOLÓGICO"
+    r.font.size = Pt(13); r.font.bold = True
+    r.font.color.rgb = WHITE
+    p1 = tf.add_paragraph(); p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "irredutível"
+    r1.font.size = Pt(11); r1.font.italic = True
+    r1.font.color.rgb = BLUE_LIGHT
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    p2.space_before = Pt(5)
+    r2a = p2.add_run()
+    r2a.text = "Medida:  "
+    r2a.font.size = Pt(11); r2a.font.bold = True
+    r2a.font.color.rgb = WHITE
+    r2b = p2.add_run()
+    r2b.text = "entropia das probabilidades do extrator MST"
+    r2b.font.size = Pt(11); r2b.font.color.rgb = WHITE
+    p3 = tf.add_paragraph(); p3.alignment = 2
+    r3 = p3.add_run()
+    r3.text = (
+        "sobreposição biológica real + instabilidade\n"
+        "dos rótulos sociais de raça em Latinx"
+    )
+    r3.font.size = Pt(10); r3.font.italic = True
+    r3.font.color.rgb = BLUE_LIGHT
+
+    # ============================================================
+    # BRANCH DIREITA — H6 Algoritmico
+    # ============================================================
+    right_card = slide.shapes.add_shape(
+        MSO_SHAPE.ROUNDED_RECTANGLE,
+        Inches(RIGHT_X), Inches(BRANCH_Y),
+        Inches(BRANCH_W), Inches(BRANCH_H),
+    )
+    right_card.fill.solid(); right_card.fill.fore_color.rgb = ACCENT
+    right_card.line.color.rgb = ACCENT; right_card.line.width = Pt(1.8)
+    tf = right_card.text_frame
+    tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.05)
+    tf.margin_left = Inches(0.15); tf.margin_right = Inches(0.15)
+    p = tf.paragraphs[0]; p.alignment = 2
+    r = p.add_run()
+    r.text = "H6 · Componente ALGORÍTMICO / ÓPTICO"
+    r.font.size = Pt(13); r.font.bold = True
+    r.font.color.rgb = WHITE
+    p1 = tf.add_paragraph(); p1.alignment = 2
+    r1 = p1.add_run()
+    r1.text = "mitigável"
+    r1.font.size = Pt(11); r1.font.italic = True
+    r1.font.color.rgb = WHITE
+    p2 = tf.add_paragraph(); p2.alignment = 2
+    p2.space_before = Pt(5)
+    r2a = p2.add_run()
+    r2a.text = "Medida:  "
+    r2a.font.size = Pt(11); r2a.font.bold = True
+    r2a.font.color.rgb = WHITE
+    r2b = p2.add_run()
+    r2b.text = "variação de desempenho sob alinhamento estrito + FiLM"
+    r2b.font.size = Pt(11); r2b.font.color.rgb = WHITE
+    p3 = tf.add_paragraph(); p3.alignment = 2
+    r3 = p3.add_run()
+    r3.text = (
+        "o espaço onde o condicionamento\n"
+        "arquitetural pode efetivamente agir"
+    )
+    r3.font.size = Pt(10); r3.font.italic = True
+    r3.font.color.rgb = WHITE
+
+    # ============================================================
+    # BARRA DE RESULTADO ILUSTRATIVO (abaixo do fork)
     # ============================================================
     BAR_X = 1.00
-    BAR_Y = 2.00
+    BAR_Y = 5.00
     BAR_W = SLIDE_W - 2 * BAR_X
-    BAR_H = 1.30
-    FEN_FRAC = 0.70   # ilustrativo
-    ALG_FRAC = 0.30
+    BAR_H = 0.80
+    FEN_FRAC = 0.70
 
-    # Legenda acima da barra
+    # Rotulo
     hdr = slide.shapes.add_textbox(
-        Inches(BAR_X), Inches(BAR_Y - 0.35),
-        Inches(BAR_W), Inches(0.30),
+        Inches(BAR_X), Inches(BAR_Y - 0.26),
+        Inches(BAR_W), Inches(0.22),
     )
     ph = hdr.text_frame.paragraphs[0]; ph.alignment = 2
-    r = ph.add_run()
-    r.text = "100 % da variância do erro Latinx"
-    r.font.size = Pt(13); r.font.bold = True
-    r.font.italic = True
-    r.font.color.rgb = GRAY_MD
+    rh = ph.add_run()
+    rh.text = (
+        "Partição ilustrativa do R²  —  o resultado experimental "
+        "da Etapa 6 determina a proporção real:"
+    )
+    rh.font.size = Pt(10); rh.font.italic = True
+    rh.font.color.rgb = GRAY_MD
 
-    # Segmento FENOTIPICO (grande)
     fen = slide.shapes.add_shape(
         MSO_SHAPE.RECTANGLE,
         Inches(BAR_X), Inches(BAR_Y),
         Inches(BAR_W * FEN_FRAC), Inches(BAR_H),
     )
     fen.fill.solid(); fen.fill.fore_color.rgb = BLUE_MID
-    fen.line.color.rgb = NAVY; fen.line.width = Pt(1.5)
+    fen.line.color.rgb = NAVY; fen.line.width = Pt(1.2)
     tf = fen.text_frame
-    tf.margin_top = Inches(0.15); tf.margin_bottom = Inches(0.10)
+    tf.margin_top = Inches(0.06); tf.margin_bottom = Inches(0.04)
     p = tf.paragraphs[0]; p.alignment = 2
     r = p.add_run()
-    r.text = "FENOTÍPICO"
-    r.font.size = Pt(22); r.font.bold = True
+    r.text = "FENOTÍPICO · ~70 %"
+    r.font.size = Pt(14); r.font.bold = True
     r.font.color.rgb = WHITE
     p2 = tf.add_paragraph(); p2.alignment = 2
     r2 = p2.add_run()
-    r2.text = "irredutível — intrínseco ao problema"
-    r2.font.size = Pt(13); r2.font.italic = True
+    r2.text = "H4 — define o LIMITE TEÓRICO de equidade atingível"
+    r2.font.size = Pt(10); r2.font.italic = True
     r2.font.color.rgb = BLUE_LIGHT
-    p3 = tf.add_paragraph(); p3.alignment = 2
-    r3 = p3.add_run()
-    r3.text = "variância explicada por MST_spread  +  pixel_info"
-    r3.font.size = Pt(10)
-    r3.font.color.rgb = BLUE_LIGHT
 
-    # Segmento ALGORITMICO
     alg = slide.shapes.add_shape(
         MSO_SHAPE.RECTANGLE,
         Inches(BAR_X + BAR_W * FEN_FRAC), Inches(BAR_Y),
-        Inches(BAR_W * ALG_FRAC), Inches(BAR_H),
+        Inches(BAR_W * (1 - FEN_FRAC)), Inches(BAR_H),
     )
     alg.fill.solid(); alg.fill.fore_color.rgb = ACCENT
-    alg.line.color.rgb = NAVY; alg.line.width = Pt(1.5)
+    alg.line.color.rgb = NAVY; alg.line.width = Pt(1.2)
     tf = alg.text_frame
-    tf.margin_top = Inches(0.15); tf.margin_bottom = Inches(0.10)
+    tf.margin_top = Inches(0.06); tf.margin_bottom = Inches(0.04)
     p = tf.paragraphs[0]; p.alignment = 2
     r = p.add_run()
-    r.text = "ALGORÍTMICO"
-    r.font.size = Pt(18); r.font.bold = True
+    r.text = "ALGORÍTMICO · ~30 %"
+    r.font.size = Pt(13); r.font.bold = True
     r.font.color.rgb = WHITE
     p2 = tf.add_paragraph(); p2.alignment = 2
     r2 = p2.add_run()
-    r2.text = "mitigável"
-    r2.font.size = Pt(12); r2.font.italic = True
+    r2.text = "H6 — o teto da mitigação"
+    r2.font.size = Pt(10); r2.font.italic = True
     r2.font.color.rgb = WHITE
-    p3 = tf.add_paragraph(); p3.alignment = 2
-    r3 = p3.add_run()
-    r3.text = "o espaço onde a proposta pode agir"
-    r3.font.size = Pt(10)
-    r3.font.color.rgb = WHITE
-
-    # Escala debaixo da barra
-    scale_y = BAR_Y + BAR_H + 0.05
-    # 0 %, 70 %, 100 %
-    for frac, label in [(0.0, "0 %"), (FEN_FRAC, "70 %"), (1.0, "100 %")]:
-        tick_x = BAR_X + BAR_W * frac
-        # Tick vertical
-        tick = slide.shapes.add_shape(
-            MSO_SHAPE.RECTANGLE,
-            Inches(tick_x - 0.01), Inches(scale_y),
-            Inches(0.02), Inches(0.14),
-        )
-        tick.fill.solid(); tick.fill.fore_color.rgb = GRAY_DK
-        tick.line.fill.background()
-        # Rotulo
-        tx = slide.shapes.add_textbox(
-            Inches(tick_x - 0.40), Inches(scale_y + 0.18),
-            Inches(0.80), Inches(0.25),
-        )
-        pt = tx.text_frame.paragraphs[0]; pt.alignment = 2
-        rt = pt.add_run()
-        rt.text = label
-        rt.font.size = Pt(10); rt.font.bold = True
-        rt.font.color.rgb = GRAY_DK
-
-    # Nota ilustrativa
-    note_y = scale_y + 0.55
-    note = slide.shapes.add_textbox(
-        Inches(BAR_X), Inches(note_y),
-        Inches(BAR_W), Inches(0.30),
-    )
-    pn = note.text_frame.paragraphs[0]; pn.alignment = 2
-    rn = pn.add_run()
-    rn.text = (
-        "Partição ilustrativa — a proporção real é o resultado experimental da Etapa 6."
-    )
-    rn.font.size = Pt(10); rn.font.italic = True
-    rn.font.color.rgb = GRAY_MD
 
     # ============================================================
-    # Duas colunas abaixo
+    # Banner inferior: resultado intelectual
     # ============================================================
-    COL_Y = 4.20
-    COL_H = 2.20
-    COL_W = 6.00
-    COL_GAP = 0.33
-    col1_x = (SLIDE_W - 2 * COL_W - COL_GAP) / 2
-    col2_x = col1_x + COL_W + COL_GAP
-
-    colunas = [
-        {
-            "titulo": "Como se mede",
-            "cor_titulo": BLUE_MID,
-            "itens": [
-                ("Variáveis:", "spread MST por imagem (Etapa 1) · fração de pixels faciais (BiSeNet, método Pangelinan)."),
-                ("Modelo:",     "regressão linear  erro ~ MST_spread + pixel_info  + ANOVA decomposicional."),
-                ("Métrica:",    "R² por componente (variância explicada)."),
-            ],
-        },
-        {
-            "titulo": "O que se responde",
-            "cor_titulo": ACCENT,
-            "itens": [
-                ("Para a tese:", "quanto do erro Latinx é inerente ao problema e quanto é atribuível ao algoritmo?"),
-                ("Para Pangelinan (2023):", "confirmação ou refutação quantitativa da hipótese de \"erro fenotípico dominante\"."),
-                ("Para a proposta:", "define o teto empírico de mitigação possível com condicionamento FiLM + MST."),
-            ],
-        },
-    ]
-    for col_i, col in enumerate(colunas):
-        x = col1_x if col_i == 0 else col2_x
-        # Header
-        hdr = slide.shapes.add_shape(
-            MSO_SHAPE.ROUNDED_RECTANGLE,
-            Inches(x), Inches(COL_Y),
-            Inches(COL_W), Inches(0.45),
-        )
-        hdr.fill.solid(); hdr.fill.fore_color.rgb = col["cor_titulo"]
-        hdr.line.fill.background()
-        tf = hdr.text_frame
-        tf.margin_top = Inches(0.05); tf.margin_bottom = Inches(0.03)
-        p = tf.paragraphs[0]; p.alignment = 2
-        r = p.add_run()
-        r.text = col["titulo"]
-        r.font.size = Pt(13); r.font.bold = True
-        r.font.color.rgb = WHITE
-
-        body = slide.shapes.add_shape(
-            MSO_SHAPE.ROUNDED_RECTANGLE,
-            Inches(x), Inches(COL_Y + 0.48),
-            Inches(COL_W), Inches(COL_H - 0.48),
-        )
-        body.fill.solid(); body.fill.fore_color.rgb = WHITE
-        body.line.color.rgb = col["cor_titulo"]; body.line.width = Pt(1.2)
-
-        tb = slide.shapes.add_textbox(
-            Inches(x + 0.18), Inches(COL_Y + 0.56),
-            Inches(COL_W - 0.36), Inches(COL_H - 0.62),
-        )
-        tf = tb.text_frame; tf.word_wrap = True
-        for j, (head, body_txt) in enumerate(col["itens"]):
-            p = tf.paragraphs[0] if j == 0 else tf.add_paragraph()
-            r1 = p.add_run()
-            r1.text = "•  " + head + "  "
-            r1.font.size = Pt(11); r1.font.bold = True
-            r1.font.color.rgb = col["cor_titulo"]
-            r2 = p.add_run()
-            r2.text = body_txt
-            r2.font.size = Pt(11)
-            r2.font.color.rgb = GRAY_DK
-            p.space_after = Pt(4)
-
-    # ============================================================
-    # Banner inferior: regra H6
-    # ============================================================
-    bot_y = 6.60; bot_h = 0.80
+    bot_y = 6.20; bot_h = 1.20
     bot = slide.shapes.add_shape(
         MSO_SHAPE.ROUNDED_RECTANGLE,
         Inches(0.5), Inches(bot_y),
@@ -3866,23 +4111,31 @@ def slide_etapa6_decomposicao(prs: Presentation) -> None:
     bot.fill.solid(); bot.fill.fore_color.rgb = NAVY
     bot.line.fill.background()
     tf = bot.text_frame
-    tf.margin_top = Inches(0.07); tf.margin_bottom = Inches(0.05)
+    tf.margin_top = Inches(0.10); tf.margin_bottom = Inches(0.08)
     tf.margin_left = Inches(0.25); tf.margin_right = Inches(0.25)
     p1 = tf.paragraphs[0]; p1.alignment = 2
     r1 = p1.add_run()
-    r1.text = "Regra de aprovação — hipótese H6 (desfecho bidirecional, cada caso é resultado válido)"
-    r1.font.size = Pt(12); r1.font.bold = True
+    r1.text = "Resultado intelectual da Etapa 6"
+    r1.font.size = Pt(14); r1.font.bold = True
     r1.font.color.rgb = WHITE
     p2 = tf.add_paragraph(); p2.alignment = 2
     r2 = p2.add_run()
     r2.text = (
-        "Se R² fenotípico ≥ 70 %  →  confirma Pangelinan.    "
-        "Se < 70 %  →  evidência contrária, nova contribuição teórica."
+        "Primeiro diagnóstico quantitativo na literatura sobre o "
+        "LIMITE TEÓRICO de equidade em classificadores raciais."
     )
-    r2.font.size = Pt(11); r2.font.color.rgb = BLUE_LIGHT
+    r2.font.size = Pt(12); r2.font.color.rgb = BLUE_LIGHT
+    p3 = tf.add_paragraph(); p3.alignment = 2
+    r3 = p3.add_run()
+    r3.text = (
+        "Regra:  R² fenotípico ≥ 70 %  →  confirma Pangelinan.   "
+        "R² fenotípico < 70 %  →  evidência contrária, nova contribuição teórica."
+    )
+    r3.font.size = Pt(10); r3.font.italic = True
+    r3.font.color.rgb = BLUE_LIGHT
 
     add_footer(slide)
-    add_page_number(slide, 26)
+    add_page_number(slide, 25)
 
 
 # ============================================================
@@ -3915,20 +4168,19 @@ def build_presentation() -> Presentation:
     slide_mst_validacao_faces(prs)            # 17
     slide_mst_validacao_distribuicao(prs)     # 18
     slide_etapa2_matriz_mst_raca(prs)         # 19  [NOVO — Etapa 2 detalhamento]
-    slide_por_que_convnext(prs)               # 20
-    slide_por_que_film(prs)                   # 21
-    slide_metodologia_film(prs)               # 22
-    slide_metodologia_configs(prs)            # 23
-    slide_etapa4_baselines(prs)               # 24  [NOVO — Etapa 4 detalhamento]
-    slide_etapa5_transferencia(prs)           # 25  [NOVO — Etapa 5 detalhamento]
-    slide_etapa6_decomposicao(prs)            # 26  [NOVO — Etapa 6 detalhamento]
-    slide_baselines_cenarios(prs)             # 27
-    slide_metricas(prs)                       # 28
-    slide_contribuicoes(prs)                  # 29
-    slide_cronograma(prs)                     # 30
-    slide_riscos(prs)                         # 31
-    slide_estado_atual(prs)                   # 32
-    slide_perguntas(prs)                      # 33
+    slide_por_que_convnext(prs)               # 20  [Etapa 3a — ConvNeXt arquitetura]
+    slide_por_que_film(prs)                   # 21  [Etapa 3b — FiLM mecanismo + figura]
+    slide_metodologia_configs(prs)            # 22
+    slide_etapa4_baselines(prs)               # 23  [Etapa 4 detalhamento]
+    slide_etapa5_transferencia(prs)           # 24  [Etapa 5 detalhamento]
+    slide_etapa6_decomposicao(prs)            # 25  [Etapa 6 detalhamento]
+    slide_baselines_cenarios(prs)             # 26
+    slide_metricas(prs)                       # 27
+    slide_contribuicoes(prs)                  # 28
+    slide_cronograma(prs)                     # 29
+    slide_riscos(prs)                         # 30
+    slide_estado_atual(prs)                   # 31
+    slide_perguntas(prs)                      # 32
 
     return prs
 
