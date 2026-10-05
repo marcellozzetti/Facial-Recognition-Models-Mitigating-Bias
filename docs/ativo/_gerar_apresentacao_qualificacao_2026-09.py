@@ -1105,16 +1105,17 @@ def slide_revisao_timeline(prs: Presentation) -> None:
             False,
         ),
         (
-            "Modelos visão-linguagem e\ntransição à escala Monk (MST).",
+            "Novas arquiteturas e escalas\n(ViT, VLM, MST).",
             [
+                "ConvNeXt-T (Liu et al., 2022)",
                 "FaceScanPaliGemma (AlDahoul et al., 2024)",
-                "FairCLIP (Luo et al., 2024)",
                 "MST (Schumann et al., 2023; Pereira, 2026)",
             ],
             "Limitação",
-            "Acurácia agregada sobe (75,7 %) mas persiste gap\n"
-            "de ~30 pp em Latinx (F1 ≈ 60 %); vieses herdados\n"
-            "da web.",
+            "Melhora global sem fechar o gap racial — SOTA\n"
+            "(FaceScanPaliGemma, 75,7 %) mantém ~30 pp em\n"
+            "Latinx; nenhuma vertente condiciona o backbone\n"
+            "pelo tom de pele.",
             False,
         ),
         (

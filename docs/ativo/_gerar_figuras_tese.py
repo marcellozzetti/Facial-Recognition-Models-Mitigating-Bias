@@ -895,7 +895,7 @@ def gerar_fig_timeline_fases():
          "Mitigação algorítmica\ne funções de perda",
          BLUE_MID, "white", 2.5, False),
         ("FASE 3", "2023 – 2025",
-         "VLMs e escala\nMonk (MST)",
+         "Arquiteturas e escalas\n(ViT, VLM, MST)",
          "#2E4F8A", "white", 2.7, False),
         ("FASE 4", "2025 – 2026",
          "Condicionamento\narquitetural (proposta)",
