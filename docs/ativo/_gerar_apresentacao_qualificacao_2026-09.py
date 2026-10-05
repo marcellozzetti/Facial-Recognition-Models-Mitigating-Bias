@@ -3394,59 +3394,69 @@ def slide_etapa4_baselines(prs: Presentation) -> None:
 
     # Header
     lhdr = slide.shapes.add_textbox(
-        Inches(LEFT_X), Inches(PANEL_Y + 0.08),
-        Inches(LEFT_W), Inches(0.35),
+        Inches(LEFT_X), Inches(PANEL_Y + 0.05),
+        Inches(LEFT_W), Inches(0.45),
     )
-    plh = lhdr.text_frame.paragraphs[0]; plh.alignment = 2
+    tf_lhdr = lhdr.text_frame
+    plh = tf_lhdr.paragraphs[0]; plh.alignment = 2
     rh = plh.add_run()
-    rh.text = "6 famílias de mitigação já publicadas"
+    rh.text = "3 referências obrigatórias (uma por categoria)"
     rh.font.size = Pt(13); rh.font.bold = True
     rh.font.color.rgb = NAVY
+    # Sub-linha: justificativa do escopo reduzido
+    plh2 = tf_lhdr.add_paragraph(); plh2.alignment = 2
+    rh2 = plh2.add_run()
+    rh2.text = (
+        "demais famílias (Adv. Debiasing, DRO, FineFACE, Bayesian Meta, "
+        "FairGRAPE) ficam no cronograma de execução"
+    )
+    rh2.font.size = Pt(9); rh2.font.italic = True
+    rh2.font.color.rgb = GRAY_MD
 
-    # 6 mini-cards: 3 cols x 2 rows
+    # 3 mini-cards (1 linha): ancora de literatura, SOTA, mitigacao classica
     baselines = [
-        ("Adv. Debiasing",   "Zhang 2018",       "loss adversarial"),
-        ("Group DRO",         "Sagawa 2020",      "worst-case group"),
-        ("FSCL+",             "Park 2022",        "contrastive fair"),
-        ("FineFACE",          "Manzoor 2024",     "Pareto-eficiente"),
-        ("Bayes. Meta",       "Liu 2025",         "component fairness"),
-        ("FaceScanPaliGemma", "AlDahoul 2024",    "VLM / VQA"),
+        ("ResNet-34",         "Lin 2022 · AlDahoul 2024",
+         "âncora de literatura\n(FairFace canonical, 72 % F1)"),
+        ("FaceScanPaliGemma", "AlDahoul 2024",
+         "SOTA atual\n(VLM / VQA, 75,7 % F1)"),
+        ("FSCL+",             "Park 2022",
+         "mitigação clássica\n(contrastive fair loss)"),
     ]
-    COLS = 3; ROWS = 2
-    inner_margin = 0.18
-    inner_gap = 0.12
+    COLS = 3; ROWS = 1
+    inner_margin = 0.20
+    inner_gap = 0.18
     card_w = (LEFT_W - 2 * inner_margin - (COLS - 1) * inner_gap) / COLS
-    card_h = (PANEL_H - 0.55 - inner_margin - (ROWS - 1) * inner_gap) / ROWS
-    grid_y0 = PANEL_Y + 0.50
+    card_h = PANEL_H - 0.75 - inner_margin
+    grid_y0 = PANEL_Y + 0.65
 
     for i, (nome, ref, nota) in enumerate(baselines):
-        row = i // COLS
-        col = i % COLS
+        col = i
         cx = LEFT_X + inner_margin + col * (card_w + inner_gap)
-        cy = grid_y0 + row * (card_h + inner_gap)
+        cy = grid_y0
         card = slide.shapes.add_shape(
             MSO_SHAPE.ROUNDED_RECTANGLE,
             Inches(cx), Inches(cy),
             Inches(card_w), Inches(card_h),
         )
         card.fill.solid(); card.fill.fore_color.rgb = WHITE
-        card.line.color.rgb = NAVY; card.line.width = Pt(1.0)
+        card.line.color.rgb = NAVY; card.line.width = Pt(1.2)
         tf = card.text_frame
-        tf.margin_top = Inches(0.08); tf.margin_bottom = Inches(0.05)
+        tf.margin_top = Inches(0.14); tf.margin_bottom = Inches(0.08)
         p = tf.paragraphs[0]; p.alignment = 2
         r = p.add_run()
         r.text = nome
-        r.font.size = Pt(11); r.font.bold = True
+        r.font.size = Pt(13); r.font.bold = True
         r.font.color.rgb = NAVY
         p2 = tf.add_paragraph(); p2.alignment = 2
         r2 = p2.add_run()
         r2.text = ref
-        r2.font.size = Pt(9); r2.font.italic = True
+        r2.font.size = Pt(10); r2.font.italic = True
         r2.font.color.rgb = GRAY_MD
         p3 = tf.add_paragraph(); p3.alignment = 2
+        p3.space_before = Pt(6)
         r3 = p3.add_run()
         r3.text = nota
-        r3.font.size = Pt(9)
+        r3.font.size = Pt(10.5)
         r3.font.color.rgb = GRAY_DK
 
     # ============================================================
@@ -3545,7 +3555,7 @@ def slide_etapa4_baselines(prs: Presentation) -> None:
     )
     pph = phd.text_frame.paragraphs[0]; pph.alignment = 2
     rh = pph.add_run()
-    rh.text = "Protocolo pareado  —  o que mantemos constante entre os 7 métodos"
+    rh.text = "Protocolo pareado  —  o que mantemos constante entre os 4 métodos"
     rh.font.size = Pt(11); rh.font.italic = True
     rh.font.bold = True
     rh.font.color.rgb = GRAY_MD
