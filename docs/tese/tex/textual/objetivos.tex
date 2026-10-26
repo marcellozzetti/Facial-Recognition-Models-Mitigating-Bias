@@ -3,7 +3,7 @@
 
 Este trabalho tem como objetivo geral \textbf{caracterizar o viés racial em classificação facial e estudar o efeito do condicionamento por tom de pele --- escala Monk Skin Tone, com dez classes --- como sinal auxiliar arquitetural}. A pesquisa foca a disparidade de desempenho entre grupos raciais no dataset FairFace~\cite{karkkainen2021fairface} (108.501 imagens, sete classes) e investiga se o condicionamento por FiLM~\cite{perez2018film} sobre \emph{backbone} ConvNeXt-T reduz essa disparidade em comparação a \emph{baselines} públicos.
 
-A contribuição principal projetada é \textbf{uma instância empírica documentada, até onde sabemos, do uso de tom de pele explícito como contexto arquitetural para \emph{race classification} multi-classe}, avaliada mediante triangulação de métricas fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent} e com transferência do mecanismo para verificação facial como \emph{downstream task}.
+A contribuição principal projetada é \textbf{uma instância empírica documentada, conforme levantamento bibliográfico sistemático, do uso de tom de pele explícito como contexto arquitetural para \emph{race classification} multi-classe}, avaliada mediante triangulação de métricas fundamentada no Teorema da Impossibilidade~\cite{kleinberg2017inherent} e com transferência do mecanismo para verificação facial como \emph{downstream task}.
 
 \section{Objetivos específicos}
 \label{sec:obj_especificos}
@@ -56,9 +56,9 @@ Quatro contribuições estruturais são pretendidas, organizadas nos dois eixos 
 \begin{description}[font=\bfseries\sffamily]
 \item[Contribuição 1.] Extrator MST treinado sobre datasets públicos de referência (MSTE, CCv2), com protocolo de validação humana cega, aplicável a datasets faciais não anotados.
 
-\item[Contribuição 2.] Matriz de distribuição cruzada Monk Skin Tone $\times$ classes raciais sobre o FairFace \emph{validation set}, até onde sabemos inédita na literatura, evidenciando a variação fenotípica intra-racial.
+\item[Contribuição 2.] Matriz de distribuição cruzada Monk Skin Tone $\times$ classes raciais sobre o FairFace \emph{validation set}, não identificada na literatura revisada, evidenciando a variação fenotípica intra-racial.
 
-\item[Contribuição 3.] Instância documentada, até onde sabemos, de FiLM-condicionamento~\cite{perez2018film} aplicado a \emph{fairness} facial em \emph{race classification} multi-classe, com \emph{ablation} arquitetural (três configurações), comparação contra três \emph{baselines} e protocolo auditável (três sementes, \emph{bootstrap} CI, triangulação de métricas).
+\item[Contribuição 3.] Instância documentada na literatura revisada de FiLM-condicionamento~\cite{perez2018film} aplicado a \emph{fairness} facial em \emph{race classification} multi-classe, com \emph{ablation} arquitetural (três configurações), comparação contra três \emph{baselines} e protocolo auditável (três sementes, \emph{bootstrap} CI, triangulação de métricas).
 
 \item[Contribuição 4.] Evidência quantitativa de transferência do condicionamento MST para verificação facial via \emph{feature-freeze}, com avaliação de disparidade de TAR@FAR por grupo racial em RFW~\cite{wang2019racial} e BFW~\cite{robinson2020face}, acompanhada de formalização do mecanismo pelo qual a melhoria no classificador se materializa na tarefa de verificação.
 \end{description}

@@ -12,7 +12,7 @@ Esta pesquisa parte da seguinte constatação: o reconhecimento facial funciona 
 \section{Problemática}
 \label{sec:problema}
 
-A problemática central desta pesquisa é direta: \textbf{sistemas de classificação facial apresentam disparidade demográfica significativa em acurácia entre grupos raciais, mesmo quando treinados sobre datasets explicitamente balanceados por design}.
+A problemática central desta pesquisa é direta: \textbf{sistemas de classificação facial apresentam disparidade demográfica significativa em acurácia entre grupos raciais, mesmo quando treinados sobre datasets intencionalmente balanceados}.
 
 \subsection{Disparidade documentada no estado da arte}
 \label{sec:problema_disparidade}
@@ -28,7 +28,7 @@ Apesar do F1 macro de 75\,\% reportado pelo FaceScanPaliGemma~\cite{aldahoul2024
 \label{fig:disparidade-sota}
 \end{figure}
 
-A disparidade não é artefato de um único modelo. O baseline canônico ResNet-34 originalmente treinado por \citeonline{karkkainen2021fairface} sobre o FairFace apresenta padrão análogo: 72\,\% de acurácia agregada, porém apenas 59,6\,\% em Hispanic contra 83,2\,\% em Black, conforme reportado independentemente por \citeonline{lin2022fairgrape} em experimentos de pruning \emph{fairness-aware}. A hierarquia de dificuldade entre raças mostra-se \textbf{estável através de múltiplos métodos, arquiteturas e datasets}, o que sugere um problema estrutural em vez de algorítmico contingente.
+A disparidade não é artefato de um único modelo. O baseline canônico ResNet-34 originalmente treinado por \citeonline{karkkainen2021fairface} sobre o FairFace apresenta padrão análogo: 72\,\% de acurácia agregada, porém apenas 59,6\,\% em Hispanic contra 83,2\,\% em Black, conforme reportado independentemente por \citeonline{lin2022fairgrape} em experimentos de pruning \emph{fairness-aware}. A hierarquia de dificuldade entre raças mostra-se \textbf{estável em múltiplos métodos, arquiteturas e datasets}, o que sugere um problema estrutural em vez de algorítmico contingente.
 
 \subsection{Balanceamento de dados}
 \label{sec:problema_balanceamento}
@@ -59,8 +59,8 @@ A pesquisa propõe-se \textbf{caracterizar} o viés racial em classificação fa
 As contribuições da pesquisa organizam-se em dois eixos principais, detalhados no Capítulo~\ref{chapter:objetivos}:
 
 \begin{enumerate}[label=(\roman*)]
-\item uma matriz de distribuição cruzada MST~$\times$~classes raciais sobre o FairFace \emph{validation set}, até onde sabemos inédita na literatura (eixo fenotípico-empírico);
-\item uma instância empírica documentada, até onde sabemos, do uso de tom de pele como contexto arquitetural em \emph{race classification} multi-classe com transferência para verificação facial, acompanhada de protocolo auditável com três sementes e intervalos de confiança (eixo metodológico-arquitetural).
+\item uma matriz de distribuição cruzada MST~$\times$~classes raciais sobre o FairFace \emph{validation set}, não identificada na literatura revisada (eixo fenotípico-empírico);
+\item uma instância empírica documentada, conforme levantamento bibliográfico sistemático, do uso de tom de pele como contexto arquitetural em \emph{race classification} multi-classe com transferência para verificação facial, acompanhada de protocolo auditável com três sementes e intervalos de confiança (eixo metodológico-arquitetural).
 \end{enumerate}
 
 A pesquisa é conduzida em conformidade com o \emph{European AI Act} (2024), que estabelece obrigatoriedade de auditoria de \emph{fairness} em sistemas biométricos classificados como de alto risco.
