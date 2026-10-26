@@ -15,19 +15,13 @@ Solicitação da qualificação ao PPG-CC & Julho de 2026 & Encaminhamento da do
 
 \textbf{Exame de Qualificação} & \textbf{Setembro de 2026 a Outubro de 2026} & Apresentação e avaliação do projeto de pesquisa pela banca examinadora. \\
 
-Implementação da infraestrutura experimental (Etapa~1 do pipeline, Seção~\ref{sec:pipeline}) & Novembro de 2026 & Consolidação do ambiente computacional, treinamento do classificador MST próprio sobre datasets públicos de referência, preparação dos conjuntos de dados e definição dos protocolos. \\
+Etapa~1 — Extrator MST e diagnóstico fenotípico (Seção~\ref{sec:pipeline}) & Novembro de 2026 & Treinamento do extrator ViT-B/16 sobre MSTE e CCv2; diagnóstico MST~$\times$~FairFace; validação humana interna cega. \\
 
-Auditoria fenotípica do FairFace (Etapa~2) & Dezembro de 2026 & Construção da matriz pública Monk Skin Tone~$\times$~classes raciais e validação humana interna prevista na Seção~\ref{sec:validacao_interna}. \\
+Etapa~2 — Classificador condicionado + \emph{ablation} (Seção~\ref{sec:pipeline}) & Dezembro de 2026 a Março de 2027 & Treinamento do ConvNeXt-T + FiLM sobre FairFace; \emph{ablation} com três configurações; comparação contra os três \emph{baselines}; triangulação de métricas. \\
 
-Classificador racial condicionado (Etapa~3) & Janeiro de 2027 a Março de 2027 & Treinamento do ConvNeXt-T com camadas FiLM sobre o FairFace \emph{train}, incluindo as três configurações do estudo de \emph{ablation} (Seção~\ref{sec:ablation}). \\
+Etapa~3 — Transferência para verificação (Seção~\ref{sec:pipeline}) & Abril de 2027 & \emph{Feature-freeze} do encoder + FiLM; treinamento da cabeça de verificação sobre RFW/BFW; avaliação de TAR@FAR por grupo racial. \\
 
-Comparação contra \emph{baselines} de mitigação (Etapa~4) & Abril de 2027 & Avaliação sistemática das três configurações contra os seis \emph{baselines} (Seção~\ref{sec:baselines}), com triangulação de métricas (Seção~\ref{sec:metricas}). \\
-
-Transferência \emph{fair} para \emph{face recognition} (Etapa~5) & Maio de 2027 & Validação da propriedade \emph{fair} do \emph{backbone} sobre RFW/BFW, com controle de \emph{pixel information} e descritores de qualidade de imagem. \\
-
-Síntese decompositiva e análise consolidada (Etapa~6) & Junho de 2027 & Decomposição do erro Latinx em componente fenotípico irredutível \emph{versus} componente algorítmico mitigável, com integração dos achados das etapas anteriores. \\
-
-Redação da dissertação & Novembro de 2026 a Julho de 2027 & Elaboração e revisão contínua dos capítulos da dissertação em paralelo ao desenvolvimento da pesquisa. \\
+Redação da dissertação & Novembro de 2026 a Junho de 2027 & Elaboração e revisão contínua dos capítulos em paralelo ao desenvolvimento experimental, incluindo a conclusão. \\
 
 Defesa da dissertação & Segundo semestre de 2027 & Entrega da versão final e defesa pública perante banca examinadora. \\
 \bottomrule
@@ -42,15 +36,15 @@ Defesa da dissertação & Segundo semestre de 2027 & Entrega da versão final e 
 Quatro classes principais de risco foram identificadas, com respectivas estratégias de mitigação documentadas:
 
 \begin{description}[font=\bfseries\sffamily]
-\item[Risco~1 --- Refutação de hipóteses.] Qualquer uma das seis hipóteses testáveis (Seção~\ref{sec:hipoteses}) pode ser refutada pelos dados empíricos. \\
-\textbf{Mitigação}: cada hipótese possui plano B documentado; a observação negativa é resultado científico válido, e as refutações, tornam-se contribuição empírica ao debate central da literatura (Seção~\ref{sec:rl_fairrep}).
+\item[Risco~1 --- Resultados negativos.] Qualquer uma das quatro hipóteses testáveis (Seção~\ref{sec:hipoteses}) pode ser refutada pelos dados empíricos. \\
+\textbf{Mitigação}: observação negativa é resultado científico válido; refutações tornam-se contribuição empírica ao debate da literatura (Seção~\ref{sec:rl_fairrep}).
 
-\item[Risco~2 --- Qualidade do classificador MST próprio.] A Etapa~1 do pipeline depende da qualidade das predições produzidas pelo classificador MST treinado internamente sobre datasets públicos de referência; erros sistemáticos de classificação podem propagar-se para o condicionamento arquitetural das Etapas~3 e~5. \\
-\textbf{Mitigação em três camadas}: (i) \emph{validação humana interna estratificada} (Seção~\ref{sec:validacao_interna}) sobre subset FairFace de aproximadamente duzentas a trezentas imagens, com métricas $\kappa$ de Cohen e acurácia categórica com intervalo de confiança de $95\,\%$ obtido por \emph{bootstrap}; (ii) \emph{sensitivity analysis} com dois ou três classificadores MST alternativos, incluindo o SkinToneNet~\cite{matias2026large} quando publicamente acessível e um classificador clássico baseado em segmentação e \emph{k-means} sobre a paleta Monk; (iii) \emph{benchmark externo condicional} sobre o dataset STW quando disponível, permitindo comparação direta com o classificador de referência da literatura no mesmo protocolo de teste.
+\item[Risco~2 --- Qualidade do extrator MST próprio.] A Etapa~1 do pipeline depende da qualidade do extrator ViT-B/16; erros sistemáticos podem propagar-se para o condicionamento das Etapas~2 e~3. \\
+\textbf{Mitigação}: (i) validação humana interna estratificada e cega (Seção~\ref{sec:validacao_interna}) com métricas $\kappa$ de Cohen e acurácia com \emph{bootstrap} CI 95\,\%; (ii) dataset STW~\cite{matias2026large} como referência externa condicional quando disponível.
 
-\item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \citeonline{pangelinan2023exploring} argumentam que o principal fator estrutural do gap em FR é \emph{pixel information}, não tom de pele. \\
-\textbf{Mitigação}: hipótese reformulada com controle explícito de \emph{pixel information} via alinhamento e \emph{crop}; há ainda uma hipótese formalizada como teste direto da tese de Pangelinan (decomposição de variância). Refutação parcial converte-se em contribuição quantitativa.
+\item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \citeonline{pangelinan2023exploring} argumentam que o principal fator estrutural do gap é \emph{pixel information}, não tom de pele. \\
+\textbf{Mitigação}: a Hipótese H4 testa diretamente esse efeito. Refutação parcial converte-se em contribuição quantitativa.
 
 \item[Risco~4 --- Limitação computacional.] Treinamento múltiplo com três sementes por configuração pode exigir tempo de GPU significativo. \\
-\textbf{Mitigação}: ConvNeXt-T é arquitetura relativamente leve, com 28 milhões de parâmetros; estima-se necessidade de aproximadamente 200 a 400 horas de GPU para a totalidade dos experimentos do Capítulo~\ref{chapter:metodologia}.
+\textbf{Mitigação}: ConvNeXt-T com 28M parâmetros é arquitetura de porte moderado; a camada FiLM adiciona menos de 0,1\,\% de parâmetros extras; o custo estimado para a totalidade dos experimentos é compatível com recursos disponíveis.
 \end{description}
