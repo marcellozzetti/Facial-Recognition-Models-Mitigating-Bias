@@ -1,11 +1,11 @@
-"""Gera figura do pipeline experimental em 3 etapas (Cap. 4 §4.2).
+"""Gera figura do pipeline experimental em 3 etapas.
 
-Layout corrigido: math explícita para posicionamento dentro das caixas,
-sem overflow. Texto left-aligned, fontes legíveis.
+figsize=(6.5, 9.8) ≈ 16.5 cm — tamanho real de inclusão LaTeX (width=16cm).
+Conteúdo das linhas calibrado para ≤ 50 chars @ 8.5pt, sem overflow.
+GAP=7 entre caixas para acomodar label das setas sem sobreposição.
 
 Saida: docs/tese/images/fig_pipeline_6etapas.png
 """
-
 from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,43 +16,48 @@ from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
 
 NAVY      = (31/255,  42/255,  78/255)
 NAVY_SOFT = (61/255, 104/255, 187/255)
-BLUE_TINT = (230/255, 236/255, 248/255)
+BLUE_TINT = (228/255, 236/255, 252/255)
 GRAY_DK   = (61/255,  66/255,  78/255)
 GRAY_MD   = (112/255, 118/255, 130/255)
-GRAY_LT   = (215/255, 220/255, 228/255)
+GRAY_LT   = (210/255, 215/255, 224/255)
 PAPER     = (252/255, 252/255, 250/255)
 WHITE     = (1.0, 1.0, 1.0)
 
-# ── coordenadas: 100 × 100 mapeado sobre FIG_W × FIG_H polegadas ─────────
-FIG_W, FIG_H = 16, 18        # polegadas
-UNIT_W = FIG_W / 100         # 0.16 polegadas por unidade horizontal
-UNIT_H = FIG_H / 100         # 0.18 polegadas por unidade vertical
+FIG_W, FIG_H = 6.5, 9.8
+DPI = 200
 
-# ── geometria das caixas ─────────────────────────────────────────────────
-BOX_W   = 82.0
-BOX_H   = 25.0   # calculado: 3×25 + 2×5 (gap) = 85, sobram 6 unidades
-GAP     = 5.0
-BOX_X   = 11.0
-TOP_Y   = 91.0   # topo do box 1
+# ── grid 100 × 100 ────────────────────────────────────────────────────────
+# 1 unidade W = 6.5/100 = 0.065 pol = 4.68 pt
+# 1 unidade H = 9.8/100 = 0.098 pol = 7.06 pt
+# char a 8.5 pt ≈ 4.8 pt de largura → 4.8/4.68 ≈ 1.03 unidades/char
+# → 50 chars ocupam ≈ 51.5 unidades; VALUE_X=33, max_x=91 → 58 unidades disp. ✓
 
-# posições das 3 caixas (y = canto inferior esquerdo)
-#   box1_top = TOP_Y → box1_bottom = TOP_Y - BOX_H = 66
-#   box2_top = 66 - GAP = 61  → box2_bottom = 36
-#   box3_top = 36 - GAP = 31  → box3_bottom = 6
+BOX_X  = 11.0
+BOX_W  = 82.0          # max_x = 93; texto termina em 93-2 = 91
+BOX_H  = 25.0
+GAP    = 7.0           # gap entre caixas; acomoda label da seta
+TOP_Y  = 92.0
 
-# ── layout INTERNO de cada caixa (relativo ao canto inferior y) ──────────
-# Reserva simétrica: INNER_TOP = 4, INNER_BOT = 1.5 (va="top" → ok)
-TITLE_Y   = BOX_H - 4.0      # 21.0  topo do título
-SUB_Y     = BOX_H - 9.5      # 15.5  topo do subtítulo
-SEP_Y     = BOX_H - 13.0     # 12.0  y da linha separadora
-ROW0_Y    = BOX_H - 16.5     #  8.5  topo da 1ª linha de dados
-ROW1_Y    = BOX_H - 20.0     #  5.0
-ROW2_Y    = BOX_H - 23.5     #  1.5  (ainda acima do fundo: 1.5 unidades)
+# posição y do fundo de cada caixa
+#   box[0] = 92-25 = 67
+#   box[1] = 67-7-25 = 35
+#   box[2] = 35-7-25 = 3
+BOX_Y = [TOP_Y - BOX_H,
+         TOP_Y - BOX_H - GAP - BOX_H,
+         TOP_Y - BOX_H - 2*GAP - 2*BOX_H]
 
-STRIP_W   = 9.0
-TEXT_X    = BOX_X + STRIP_W + 4.0          # início do texto à direita da faixa
-LABEL_W   = 13.0                            # largura da coluna do rótulo
-VALUE_X   = TEXT_X + LABEL_W               # início do valor
+STRIP_W = 9.0
+TEXT_X  = BOX_X + STRIP_W + 3.5   # = 23.5
+LABEL_W = 11.0
+VALUE_X = TEXT_X + LABEL_W         # = 34.5   → 91-34.5 = 56.5 un. disponíveis
+
+# posições verticais DENTRO da caixa (relativas ao fundo y)
+TITLE_Y = BOX_H - 4.5    # 20.5
+SUB_Y   = BOX_H - 9.5    # 15.5
+SEP_Y   = BOX_H - 13.5   # 11.5
+ROW_YS  = [BOX_H - 17.0,  #  8.0   primeira linha de dados
+            BOX_H - 20.0,  #  5.0
+            BOX_H - 23.0]  #  2.0   última linha — fundo do texto ≈ y+0.9 > y ✓
 
 
 @dataclass
@@ -60,183 +65,153 @@ class Stage:
     number: int
     title: str
     subtitle: str
-    rows: List[tuple]    # (label, value)
+    rows: List[tuple]          # (label, value) — value ≤ 50 chars
     highlight: bool = False
 
 
+# Conteúdo calibrado: valor ≤ 50 chars cada linha
 STAGES = [
     Stage(
         1,
         "Extrator MST e diagnóstico fenotípico",
-        "ViT-B/16 treinado em MSTE + CCv2 — saída: vetor softmax de 10 tons de pele",
+        "ViT-B/16 treinado em MSTE + CCv2",
         rows=[
-            ("Insumo", "MSTE (~1 500 imgs)  ·  Casual Conversations v2 (~55 000 frames)  ·  FairFace val set"),
-            ("Método", "Fine-tuning ViT-B/16  ·  Softmax 10 classes  ·  Validação humana cega e independente"),
-            ("Saída",  "Extrator MST  z ∈ ℝ¹⁰  +  Matriz de distribuição MST × 7 raças (FairFace)"),
+            ("Insumo", "MSTE  ·  CCv2 (~55 000 frames)  ·  FairFace val"),
+            ("Método", "ViT-B/16 fine-tuning  ·  10 classes  ·  val. cega"),
+            ("Saída",  "z ∈ ℝ¹⁰  ·  Matriz MST × 7 raças (FairFace)"),
         ],
     ),
     Stage(
         2,
         "Classificador racial condicionado + ablation",
-        "ConvNeXt-T + FiLM condicionado em z — ablation A / B / C e 3 baselines",
+        "ConvNeXt-T + FiLM condicionado em z — ablation A / B / C",
         rows=[
-            ("Insumo", "FairFace train split  (86 744 imgs, 7 classes)  ·  vetor z da Etapa 1"),
-            ("Método", "ConvNeXt-T + FiLM  ·  Ablation A/B/C  ·  3 baselines  ·  3 seeds  ·  bootstrap CI 95 %"),
-            ("Saída",  "Classificador racial:  F1-macro  ·  Disparity Ratio  ·  Worst-class F1"),
+            ("Insumo", "FairFace train (86 744 imgs)  ·  vetor z da Etapa 1"),
+            ("Método", "ConvNeXt-T + FiLM  ·  Ablation A/B/C  ·  3 seeds"),
+            ("Saída",  "F1-macro  ·  Disparity Ratio  ·  Worst-class F1"),
         ],
         highlight=True,
     ),
     Stage(
         3,
         "Transferência para verificação facial",
-        "Feature-freeze encoder + FiLM → nova cabeça treinada em RFW e BFW",
+        "Feature-freeze encoder + FiLM → nova cabeça em RFW e BFW",
         rows=[
-            ("Insumo", "Encoder + FiLM congelado (Etapa 2)  ·  RFW (~11 000 pares)  ·  BFW (~50 000 pares)"),
-            ("Método", "Feature-freeze (LAFTR, Madras 2018)  ·  Nova cabeça de verificação  ·  Threshold único fixo"),
-            ("Saída",  "TAR@FAR = 10⁻⁴  por grupo racial em RFW e BFW  +  formalização do mecanismo"),
+            ("Insumo", "Encoder + FiLM congelado  ·  RFW  ·  BFW"),
+            ("Método", "Feature-freeze (LAFTR 2018)  ·  nova cabeça de verif."),
+            ("Saída",  "TAR@FAR = 10⁻⁴  por grupo racial  ·  RFW e BFW"),
         ],
     ),
 ]
 
 METAS = [
-    ("META 1", (1, 2), NAVY_SOFT),
-    ("META 2", (3, 3), GRAY_DK),
+    ("META 1", (0, 1), NAVY_SOFT),
+    ("META 2", (2, 2), GRAY_DK),
 ]
 
-ARROW_LABELS = {
-    (1, 2): "z ∈ ℝ¹⁰",
-    (2, 3): "encoder + FiLM  (congelado)",
+ARROWS = {
+    (0, 1): "z ∈ ℝ¹⁰",
+    (1, 2): "encoder + FiLM  (congelado)",
 }
 
 
-def _box(ax, x, y, w, h, fc, ec, lw=1.2, rounding=0.6, zorder=2):
+def _box(ax, x, y, w, h, fc, ec, lw=1.0, r=0.5, z=2):
     ax.add_patch(FancyBboxPatch(
         (x, y), w, h,
-        boxstyle=f"round,pad=0.0,rounding_size={rounding}",
-        fc=fc, ec=ec, lw=lw, zorder=zorder,
+        boxstyle=f"round,pad=0.0,rounding_size={r}",
+        fc=fc, ec=ec, lw=lw, zorder=z,
     ))
 
 
-def _draw_stage(ax, stage: Stage, x: float, y: float):
-    w, h = BOX_W, BOX_H
-    highlighted = stage.highlight
-    body_fc = BLUE_TINT if highlighted else PAPER
-    body_ec = NAVY       if highlighted else GRAY_MD
-    body_lw = 2.8        if highlighted else 1.2
-
-    # caixa externa
-    _box(ax, x, y, w, h, fc=body_fc, ec=body_ec, lw=body_lw, rounding=1.0)
-
-    # faixa do número
-    fc_strip = NAVY if highlighted else GRAY_DK
-    _box(ax, x, y, STRIP_W, h, fc=fc_strip, ec=fc_strip, lw=0, rounding=1.0, zorder=3)
-    ax.text(x + STRIP_W / 2, y + h / 2, str(stage.number),
+def _draw_stage(ax, s: Stage, y: float):
+    hl = s.highlight
+    _box(ax, BOX_X, y, BOX_W, BOX_H,
+         fc=BLUE_TINT if hl else PAPER,
+         ec=NAVY if hl else GRAY_MD,
+         lw=2.2 if hl else 1.0, r=0.8, z=2)
+    _box(ax, BOX_X, y, STRIP_W, BOX_H,
+         fc=NAVY if hl else GRAY_DK,
+         ec="none", lw=0, r=0.8, z=3)
+    ax.text(BOX_X + STRIP_W/2, y + BOX_H/2, str(s.number),
             ha="center", va="center",
-            color=WHITE, fontsize=36, fontweight="bold", zorder=4)
+            color=WHITE, fontsize=30, fontweight="bold", zorder=4)
 
-    tx = TEXT_X    # x do texto
-    mx = x + w - 2 # x máximo
+    tx = TEXT_X
+    ax.text(tx, y + TITLE_Y, s.title,
+            ha="left", va="top", color=NAVY,
+            fontsize=10.0, fontweight="bold", zorder=4, clip_on=False)
+    ax.text(tx, y + SUB_Y, s.subtitle,
+            ha="left", va="top", color=GRAY_MD,
+            fontsize=8.0, style="italic", zorder=4, clip_on=False)
+    ax.plot([tx, BOX_X + BOX_W - 2], [y + SEP_Y, y + SEP_Y],
+            color=GRAY_LT, lw=0.8, zorder=3)
 
-    # título
-    ax.text(tx, y + TITLE_Y, stage.title,
-            ha="left", va="top",
-            color=NAVY, fontsize=13, fontweight="bold", zorder=4)
-
-    # subtítulo
-    ax.text(tx, y + SUB_Y, stage.subtitle,
-            ha="left", va="top",
-            color=GRAY_MD, fontsize=9.5, style="italic", zorder=4)
-
-    # separador
-    ax.plot([tx, mx], [y + SEP_Y, y + SEP_Y], color=GRAY_LT, lw=0.9, zorder=4)
-
-    # linhas de dados
-    row_ys = [ROW0_Y, ROW1_Y, ROW2_Y]
-    lbl_col = NAVY_SOFT if highlighted else GRAY_DK
-
-    for (lbl, val), ry in zip(stage.rows, row_ys):
+    lc = NAVY_SOFT if hl else GRAY_DK
+    for (lbl, val), ry in zip(s.rows, ROW_YS):
         ax.text(tx, y + ry, f"{lbl}:",
-                ha="left", va="top",
-                color=lbl_col, fontsize=9.5, fontweight="bold", zorder=4)
+                ha="left", va="top", color=lc,
+                fontsize=8.5, fontweight="bold", zorder=4)
         ax.text(VALUE_X, y + ry, val,
-                ha="left", va="top",
-                color=GRAY_DK, fontsize=9.5, zorder=4)
-
-
-def _arrow_between(ax, cx, y_top_prev, y_bot_next, label: str):
-    """Seta do fundo de uma caixa para o topo da próxima."""
-    y_from = y_top_prev        # fundo da caixa anterior
-    y_to   = y_bot_next        # topo da caixa seguinte
-    mid_y  = (y_from + y_to) / 2
-
-    ax.add_patch(FancyArrowPatch(
-        (cx, y_from - 0.3), (cx, y_to + 0.3),
-        arrowstyle="-|>", color=NAVY, lw=2.2,
-        mutation_scale=16, shrinkA=1, shrinkB=1, zorder=5,
-    ))
-    # rótulo do dado transferido — à direita da seta
-    ax.text(cx + 3.5, mid_y, label,
-            ha="left", va="center",
-            color=NAVY, fontsize=10.5, style="italic", fontweight="medium",
-            bbox=dict(fc=GRAY_LT, ec="none", pad=3.5, boxstyle="round"),
-            zorder=6)
+                ha="left", va="top", color=GRAY_DK,
+                fontsize=8.5, zorder=4, clip_on=False)
 
 
 def build_figure(out_path: Path) -> None:
-    fig, ax = plt.subplots(figsize=(FIG_W, FIG_H), dpi=200)
+    fig, ax = plt.subplots(figsize=(FIG_W, FIG_H), dpi=DPI)
     ax.set_xlim(0, 100)
     ax.set_ylim(0, 100)
     ax.axis("off")
     fig.patch.set_facecolor("white")
 
     # cabeçalho
-    ax.text(50, 97.5, "Pipeline experimental — 3 etapas",
+    ax.text(50, 98.0, "Pipeline experimental — 3 etapas",
             ha="center", va="center",
-            color=NAVY, fontsize=18, fontweight="bold")
-    ax.text(50, 94.2,
-            "Meta 1: extrator MST + classificador condicionado     ·     Meta 2: transferência para verificação facial",
-            ha="center", va="center", color=GRAY_MD, fontsize=10)
+            color=NAVY, fontsize=13, fontweight="bold")
+    ax.text(50, 94.8,
+            "Meta 1: extrator MST + classificador condicionado   ·   "
+            "Meta 2: transferência para verificação facial",
+            ha="center", va="center", color=GRAY_MD, fontsize=8.0)
 
-    # caixas
-    # box_y[i] = canto inferior esquerdo da caixa i (0-indexed)
-    box_y = [TOP_Y - BOX_H]  # box 0 (Etapa 1): y = 66
-    for _ in range(1, len(STAGES)):
-        box_y.append(box_y[-1] - BOX_H - GAP)
-    # box_y = [66, 36, 6]  verificado: 6 + 25 = 31 < 91 ✓
+    for s, y in zip(STAGES, BOX_Y):
+        _draw_stage(ax, s, y)
 
-    for stage, y in zip(STAGES, box_y):
-        _draw_stage(ax, stage, BOX_X, y)
-
-    # setas entre caixas (do fundo de i para o topo de i+1)
-    arrow_cx = BOX_X + BOX_W / 2
+    # setas
+    cx = BOX_X + BOX_W / 2
     for i in range(len(STAGES) - 1):
-        y_from = box_y[i]                    # fundo da caixa i
-        y_to   = box_y[i + 1] + BOX_H       # topo da caixa i+1
-        label  = ARROW_LABELS.get((i + 1, i + 2), "")
-        _arrow_between(ax, arrow_cx, y_from, y_to, label)
+        y_from = BOX_Y[i]                  # fundo da caixa i
+        y_to   = BOX_Y[i + 1] + BOX_H     # topo da caixa i+1
+        mid_y  = (y_from + y_to) / 2
+        label  = ARROWS.get((i, i + 1), "")
 
-    # barra lateral META 1 / META 2
+        ax.add_patch(FancyArrowPatch(
+            (cx, y_from - 0.4), (cx, y_to + 0.4),
+            arrowstyle="-|>", color=NAVY, lw=1.8,
+            mutation_scale=13, shrinkA=1, shrinkB=1, zorder=5,
+        ))
+        # label centrado na seta
+        ax.text(cx, mid_y, label,
+                ha="center", va="center",
+                color=NAVY, fontsize=8.5, style="italic",
+                bbox=dict(fc="white", ec=GRAY_LT, lw=0.8,
+                          pad=2.5, boxstyle="round"),
+                zorder=6)
+
+    # barras META (i_start, i_end = índices em BOX_Y)
     BAR_X, BAR_W = 3.0, 5.5
-    meta_spans = {
-        1: (box_y[0], box_y[0] + BOX_H),    # Meta 1 — Etapa 1
-        2: (box_y[1], box_y[1] + BOX_H),    # Meta 1 — Etapa 2
-        3: (box_y[2], box_y[2] + BOX_H),    # Meta 2 — Etapa 3
-    }
-    for label, (start_stage, end_stage), color in METAS:
-        y_bot = meta_spans[end_stage][0]    # fundo da última etapa da meta
-        y_top = meta_spans[start_stage][1]  # topo da primeira etapa da meta
+    for label, (i0, i1), color in METAS:
+        y_bot = BOX_Y[i1]
+        y_top = BOX_Y[i0] + BOX_H
         _box(ax, BAR_X, y_bot, BAR_W, y_top - y_bot,
-             fc=color, ec=color, lw=0, rounding=0.8)
-        ax.text(BAR_X + BAR_W / 2, (y_top + y_bot) / 2, label,
+             fc=color, ec=color, lw=0, r=0.7, z=3)
+        ax.text(BAR_X + BAR_W/2, (y_top + y_bot)/2, label,
                 rotation=90, ha="center", va="center",
-                color=WHITE, fontsize=11, fontweight="bold", zorder=4)
+                color=WHITE, fontsize=8.5, fontweight="bold", zorder=4)
 
     plt.tight_layout(pad=0.2)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    plt.savefig(str(out_path), dpi=200, bbox_inches="tight", facecolor="white")
+    plt.savefig(str(out_path), dpi=DPI, bbox_inches="tight", facecolor="white")
     plt.close(fig)
-    print(f"Gerado: {out_path}")
-    print(f"Tamanho: {out_path.stat().st_size / 1024:.1f} KB")
+    print(f"Gerado: {out_path}  ({out_path.stat().st_size/1024:.0f} KB)")
 
 
 def main() -> None:
