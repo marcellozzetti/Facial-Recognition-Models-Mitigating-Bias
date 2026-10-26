@@ -198,11 +198,12 @@ def train_one_config(
 
     # Cosine annealing com warmup linear nos primeiros 5 % das épocas.
     warmup_epochs = max(1, int(0.05 * max_epochs))
+    cosine_epochs = max(1, max_epochs - warmup_epochs)
     scheduler: torch.optim.lr_scheduler.LRScheduler = SequentialLR(
         optimizer,
         schedulers=[
             LinearLR(optimizer, start_factor=0.1, end_factor=1.0, total_iters=warmup_epochs),
-            CosineAnnealingLR(optimizer, T_max=max_epochs - warmup_epochs, eta_min=1e-6),
+            CosineAnnealingLR(optimizer, T_max=cosine_epochs, eta_min=1e-6),
         ],
         milestones=[warmup_epochs],
     )
@@ -261,10 +262,11 @@ def train_one_config(
         val_acc = float((preds == tgts).mean())
 
         # Métricas de fairness calculadas a cada época.
-        per_f1 = per_class_f1(tgts, preds, num_classes=FAIRFACE_CLASSES)
-        val_f1_macro = float(np.mean(per_f1))
-        val_dr = float(disparity_ratio(per_f1))
-        val_worst_f1 = float(np.min(per_f1))
+        per_f1 = per_class_f1(tgts, preds, FAIRFACE_CLASSES)
+        val_f1_macro = float(np.nanmean(per_f1))
+        valid_f1 = per_f1[~np.isnan(per_f1)]
+        val_dr = float(valid_f1.min() / valid_f1.max()) if valid_f1.size >= 2 and valid_f1.max() > 0 else float("nan")
+        val_worst_f1 = float(np.nanmin(per_f1))
 
         history.append({
             "epoch": epoch,
