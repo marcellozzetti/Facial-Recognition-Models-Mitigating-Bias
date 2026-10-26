@@ -48,6 +48,9 @@ data/raw/
 data/processed/
 data/synthetic/
 data/dataset/
+# Exceções: CSVs de split (pequenos, reprodutíveis, úteis no repo)
+!data/raw/stw/*.csv
+!data/raw/fairface/*.csv
 
 # --- Outputs (training/eval artifacts) ---
 outputs/
