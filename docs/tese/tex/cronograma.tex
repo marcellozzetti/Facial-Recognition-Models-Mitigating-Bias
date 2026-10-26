@@ -43,7 +43,7 @@ Quatro classes principais de risco foram identificadas, com respectivas estraté
 \textbf{Mitigação}: (i) validação humana interna estratificada e cega (Seção~\ref{sec:validacao_interna}) com métricas $\kappa$ de Cohen e acurácia com \emph{bootstrap} CI 95\,\%; (ii) dataset STW~\cite{matias2026large} como referência externa condicional quando disponível.
 
 \item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \citeonline{pangelinan2023exploring} argumentam que o principal fator estrutural do gap é \emph{pixel information}, não tom de pele. \\
-\textbf{Mitigação}: a Hipótese H4 testa diretamente esse efeito. Refutação parcial converte-se em contribuição quantitativa.
+\textbf{Mitigação}: a Etapa~2 inclui controle de \emph{pixel information} como \emph{confounder} no protocolo experimental (Seção~\ref{sec:pipeline}). Refutação parcial converte-se em contribuição quantitativa.
 
 \item[Risco~4 --- Limitação computacional.] Treinamento múltiplo com três sementes por configuração pode exigir tempo de GPU significativo. \\
 \textbf{Mitigação}: ConvNeXt-T com 28M parâmetros é arquitetura de porte moderado; a camada FiLM adiciona menos de 0,1\,\% de parâmetros extras; o custo estimado para a totalidade dos experimentos é compatível com recursos disponíveis.

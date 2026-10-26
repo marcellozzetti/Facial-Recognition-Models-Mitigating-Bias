@@ -40,7 +40,7 @@ Quatro hipóteses testáveis, com critérios formais de confirmação e refutaç
 \midrule
 H1 & O condicionamento por tom de pele (FiLM + MST) melhora o F1 macro e reduz o \emph{Disparity Ratio} em comparação ao \emph{baseline} ResNet-34 & Melhora simultânea em ambas as métricas & Ausência de melhora em qualquer das métricas \\
 H2 & O ConvNeXt-T sem condicionamento (controle arquitetural) não resolve a disparidade Latinx em relação ao ResNet-34 & Disparidade Latinx se mantém no mesmo patamar relativo & Latinx melhora substancialmente com a troca de arquitetura \\
-H3 & A categoria Latinx no FairFace exibe \emph{spread} MST expressivo através de múltiplas classes da escala Monk & \emph{Spread} sobre ao menos metade das dez classes MST & Concentração em poucas classes MST \\
+H3 & A categoria Latinx no FairFace exibe \emph{spread} MST expressivo através de múltiplas classes da escala Monk & \emph{Spread} expressivo sobre diversas classes MST (superior ao observado em outras categorias raciais) & Spread similar ao de outras categorias, sem destaque particular \\
 H4 & O encoder + FiLM treinado em classificação racial transfere propriedade de menor disparidade para verificação facial via \emph{feature-freeze} & Redução de disparidade de TAR@FAR entre grupos em RFW/BFW & Ausência de redução ou degradação após transferência \\
 \bottomrule
 \end{tabular}
