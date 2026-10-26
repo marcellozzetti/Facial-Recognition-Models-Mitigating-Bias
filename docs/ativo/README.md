@@ -1,11 +1,11 @@
 # docs/ativo/ — materiais em uso ativo
 
-> Diretório de trabalho corrente. Contém o essencial para (a) a defesa
-> da qualificação em **05/10/2026** e (b) a execução das Etapas 1–6 do
-> pipeline. Materiais concluídos, reuniões passadas e emails já
-> enviados foram arquivados em `docs/historico/` ou removidos.
+> Diretório de trabalho corrente. Fase pós-qualificação (aprovado em
+> 05/10/2026) — execução das 3 etapas / 2 metas do pipeline com prazo
+> de ~6 meses até a defesa. Materiais da qualificação foram arquivados
+> em `docs/historico/qualificacao_2026-10-05/`.
 >
-> **Última revisão:** 2026-08-30.
+> **Última revisão:** 2026-10-26.
 
 ## 1. Bases narrativas dos capítulos
 
@@ -13,11 +13,10 @@ Documentos-fonte para a escrita no Overleaf.
 
 | Arquivo | Vira qual capítulo |
 |---|---|
-| `_pre_qualificacao_narrativa.md` | Cap 1 (Introdução) + estrutura geral |
 | `_validacao_cientifica_pipeline.md` | Cap 4 (Metodologia — pipeline) |
 | `_decisao_arquitetural_film.md` | Cap 4 (seção FiLM) |
 | `_mapa_citacoes_por_capitulo.md` | Cap 2 (mapa das fichas por seção) |
-| `_resumo_qualificacao.md` | Elemento pré-textual (resumo/abstract) |
+| `_mudancas_pos_defesa.md` | Checklist de edições pós-qualificação |
 
 ## 2. Adequação ética CEP (Art. 8º Res. 200/2021)
 
@@ -53,13 +52,15 @@ Documentos consolidados de rodadas anteriores mantidos como âncora.
 | `mestrado_architecture.md` | Mapa de código × Etapas do Cap 4 |
 | `etapa1_report.md` | Relatório operacional da Etapa 1 |
 
-## 6. Material da qualificação — próxima entrega (05/10/2026)
+## 6. Apresentação pós-qualificação
 
 | Arquivo | Uso |
 |---|---|
-| `_gerar_apresentacao_qualificacao_2026-09.py` | Script gerador do PPTX de defesa |
-| `_gerar_demo_mst_qualificacao.py` | Gera as 4 figuras de evidência (status pipeline + validação MST) |
-| `material_qualificacao_2026-10-05.pptx` | 28 slides, ~20 min de fala |
+| `_gerar_apresentacao_pos_qualificacao_2026-10-26.py` | Script gerador do PPTX pós-qualificação |
+| `material_pos_qualificacao_2026-10-26.pptx` | 12–15 slides, reunião de orientação |
+
+> Material da qualificação (05/10/2026) arquivado em
+> `docs/historico/qualificacao_2026-10-05/`.
 
 ## 7. Geradores de figuras da tese
 
@@ -71,7 +72,6 @@ Scripts que produzem imagens LaTeX-ready para os capítulos.
 | `_gerar_imagem_convnext.py` | Arquitetura ConvNeXt-T |
 | `_gerar_imagem_film.py` | Diagrama do mecanismo FiLM |
 | `_gerar_imagem_hardt_metricas.py` | Métricas de fairness (Hardt 2016) |
-| `_gerar_imagem_pipeline_6etapas.py` | Pipeline em 6 etapas (Cap 4) |
 | `_gerar_demo_mst_qualificacao.py` | 4 figuras: evolução + detalhe + validação MST (faces e heatmap) |
 | `imagens/` | Diretório de saída das figuras |
 
@@ -82,6 +82,8 @@ Scripts que produzem imagens LaTeX-ready para os capítulos.
 - `reuniao_2026-07-13/` — cola + evolução da reunião de 13/jul
 - `reuniao_2026-07-20/` — cola + evolução + PPTX da reunião de 20/jul
 - `reuniao_2026-08-17/` — script + PPTX da reunião de 17/ago
+- `qualificacao_2026-10-05/` — gerador, PPTX (32 slides), narrativa,
+  resumo, demo MST, pipeline 6-etapas, gabarito conceitual, sota review
 - Reuniões e apresentações anteriores (jun/2026), scripts operacionais
   one-shot e análises intermediárias consolidadas
 
