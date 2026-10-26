@@ -40,7 +40,7 @@ Quatro classes principais de risco foram identificadas, com respectivas estraté
 \textbf{Mitigação}: observação negativa é resultado científico válido; refutações tornam-se contribuição empírica ao debate da literatura (Seção~\ref{sec:rl_fairrep}).
 
 \item[Risco~2 --- Qualidade do extrator MST próprio.] A Etapa~1 do pipeline depende da qualidade do extrator ViT-B/16; erros sistemáticos podem propagar-se para o condicionamento das Etapas~2 e~3. \\
-\textbf{Mitigação}: (i) validação humana interna estratificada e cega (Seção~\ref{sec:validacao_interna}) com métricas $\kappa$ de Cohen e acurácia com \emph{bootstrap} CI 95\,\%; (ii) dataset STW~\cite{matias2026large} como referência externa condicional quando disponível.
+\textbf{Mitigação}: (i) validação humana interna estratificada e cega (Seção~\ref{sec:validacao_interna}) com métricas $\kappa$ de Cohen e acurácia com \emph{bootstrap} CI 95\,\%; (ii) treinamento sobre STW~\cite{matias2026large} (CC BY 4.0, ~42k imagens) como base primária --- MST-E e CCv2 são reservados para validação exclusivamente, por restrições de licença que vedam re-treinamento.
 
 \item[Risco~3 --- Refutação parcial por \emph{pixel information}.] \citeonline{pangelinan2023exploring} argumentam que o principal fator estrutural do gap é \emph{pixel information}, não tom de pele. \\
 \textbf{Mitigação}: a Etapa~2 inclui controle de \emph{pixel information} como \emph{confounder} no protocolo experimental (Seção~\ref{sec:pipeline}). Refutação parcial converte-se em contribuição quantitativa.

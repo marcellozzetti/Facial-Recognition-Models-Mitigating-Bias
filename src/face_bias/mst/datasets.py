@@ -1,17 +1,19 @@
 """Loaders para datasets de tom de pele Monk (MST) — Etapa 1.
 
-Datasets suportados:
-    - MSTE (Google, Monk Skin Tone Examples): ~1500 imagens, público
-    - CCv2 (Casual Conversations v2, Meta): frames MST-anotados, requer EULA
-    - STW (Matias 2026): 42k imagens, aguardando publicação
+Datasets suportados e papeis no pipeline:
+    - STW (Matias 2026, arXiv:2603.02475): ~42k imagens, CC BY 4.0 — TREINO
+    - MSTE (Google, Monk Skin Tone Examples, Schumann et al. 2023): ~1500 imagens — somente VALIDAÇÃO
+    - CCv2 (Casual Conversations v2, Meta): frames MST-anotados — somente VALIDAÇÃO
+
+ATENÇÃO LICENÇAS: MSTE e CCv2 proíbem explicitamente o re-treinamento de modelos
+(confirmado por Matias et al. 2026, §3). Usar exclusivamente para validação humana
+e análise qualitativa. Apenas o STW (CC BY 4.0) pode ser empregado como conjunto
+de treinamento do extrator MST.
 
 Cada loader produz um pandas.DataFrame com colunas:
     file (str)      — caminho absoluto da imagem
     mst_label (int) — rótulo 1..10 na escala Monk
     source (str)    — origem: "mste" | "ccv2" | "stw"
-
-Interface uniforme + factory ``build_mst_dataset`` para composição
-(train = MSTE + CCv2 frames, por exemplo).
 """
 
 from __future__ import annotations

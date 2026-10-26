@@ -18,7 +18,7 @@ O pipeline metodológico estrutura-se em três etapas sequenciais, organizadas e
 \end{figure}
 
 \begin{enumerate}
-\item \textbf{Etapa 1 --- Extrator MST e diagnóstico fenotípico}: treinamento de extrator MST próprio (ViT-B/16) a partir de datasets públicos --- MSTE~\cite{monk2019scale} (~1.500 imagens) e Casual Conversations v2~\cite{porgali2023casual} (~5.500 vídeos, ~55k \emph{frames} extraídos) --- com validação humana cega (Seção~\ref{sec:validacao_interna}). A saída do extrator é o vetor \emph{softmax} $z \in \mathbb{R}^{10}$ que alimenta as etapas seguintes. Em paralelo, aplica-se o extrator sobre o FairFace \emph{validation set} para construir a matriz MST~$\times$~classes raciais (Objetivo~1).
+\item \textbf{Etapa 1 --- Extrator MST e diagnóstico fenotípico}: treinamento de extrator MST próprio (ViT-B/16) sobre o dataset STW~\cite{matias2026large} (~42.313 imagens, licença CC BY 4.0), com validação humana cega sobre amostras estratificadas por raça e faixa MST (Seção~\ref{sec:validacao_interna}). O MST-E~\cite{schumann2023consensus} e o Casual Conversations v2~\cite{porgali2023casual} são empregados exclusivamente como referências de validação externa --- suas licenças vedam o uso para re-treinamento de modelos. A saída do extrator é o vetor \emph{softmax} $z \in \mathbb{R}^{10}$ que alimenta as etapas seguintes. Em paralelo, aplica-se o extrator sobre o FairFace \emph{validation set} para construir a matriz MST~$\times$~classes raciais (Objetivo~1).
 
 \item \textbf{Etapa 2 --- Classificador racial condicionado e \emph{ablation}}: o vetor $z$ da Etapa~1 é usado como sinal condicionante do mecanismo FiLM (Seção~\ref{sec:film}) inserido em ConvNeXt-T. O treinamento é realizado sobre o FairFace \emph{train split} (86.744 imagens, sete classes). A etapa compreende o \emph{ablation} arquitetural com três configurações (Seção~\ref{sec:ablation}) e a comparação sistemática contra os \emph{baselines} (Seção~\ref{sec:baselines}), com triangulação de métricas (Seção~\ref{sec:metricas}). Experimentos anteriores com variações de hiperparâmetros, estratégias de pré-processamento e funções de perda alternativas não produziram ganhos consistentes de \emph{fairness}; esse resultado é registrado e os hiperparâmetros adotados na comparação final são os descritos na Seção~\ref{sec:film}.
 
@@ -32,7 +32,8 @@ Todos os datasets adotados são secundários e publicamente disponíveis, sem co
 
 \begin{description}[font=\bfseries\sffamily]
 \item[Treino de classificação racial]: FairFace \emph{train split}, 86.744 imagens com sete classes raciais~\cite{karkkainen2021fairface}.
-\item[Validação de MST]: STW~\cite{matias2026large} e Casual Conversations v2~\cite{porgali2023casual}.
+\item[Treino do extrator MST]: STW~\cite{matias2026large}, ~42.313 imagens com anotação Monk Skin Tone em dez pontos (licença CC BY 4.0).
+\item[Validação de MST]: MST-E~\cite{schumann2023consensus} (~1.500 imagens) e Casual Conversations v2~\cite{porgali2023casual} --- uso restrito a validação; licenças vedam re-treinamento de modelos.
 \item[Teste de classificação racial]: FairFace \emph{test split}, 10.954 imagens~\cite{karkkainen2021fairface}.
 \item[Teste de transferência \emph{fair}]: RFW~\cite{wang2019racial} e/ou BFW~\cite{robinson2020face}.
 \end{description}
