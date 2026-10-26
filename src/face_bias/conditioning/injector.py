@@ -1,7 +1,9 @@
-"""Integração FiLM ↔ ConvNeXt-T — pontos de inserção por estágio hierárquico.
+"""Integração FiLM ↔ ConvNeXt-T — única camada após Stage 4.
 
-Cap. 4 §4.5 e §4.6. ConvNeXt-T tem 4 estágios hierárquicos com canais
-{96, 192, 384, 768}. Inserimos uma camada FiLM ao final de cada estágio.
+Cap. 4 §4.5 e §4.6 (Etapa 2). Insere-se uma única camada FiLM imediatamente
+após o Stage 4 do ConvNeXt-T (feature map 7×7×768), ponto de maior abstração
+semântica da hierarquia convolucional. O custo paramétrico é de ≈14 000
+parâmetros (<0,1 % do backbone de 28 M params).
 
 Uso típico:
     from torchvision.models import convnext_tiny, ConvNeXt_Tiny_Weights
@@ -25,14 +27,17 @@ import torch.nn as nn
 from face_bias.conditioning.film import FiLMLayer
 
 CONVNEXT_TINY_STAGE_CHANNELS = (96, 192, 384, 768)
+# torchvision ConvNeXt: backbone.features é Sequential de 8 elementos
+# (stem+downsample, stage, downsample, stage, ...). Stage 4 está no índice 7.
+_STAGE4_INDEX = 7
 
 
 class FiLMConditionedConvNeXt(nn.Module):
-    """ConvNeXt-T com camadas FiLM inseridas após cada estágio hierárquico.
+    """ConvNeXt-T com única camada FiLM inserida após Stage 4 (7×7×768).
 
     O ``forward`` aceita ``z`` opcional:
       - ``z=None`` → comportamento retrocompatível (backbone puro).
-      - ``z`` presente → modulação FiLM aplicada em todos os estágios.
+      - ``z`` presente → modulação FiLM aplicada após Stage 4.
 
     Parâmetros
     ----------
@@ -42,7 +47,7 @@ class FiLMConditionedConvNeXt(nn.Module):
     cond_dim:
         Dimensão do sinal condicionante (10 para MST, 512 para CLIP-text).
     hidden_dim:
-        Dimensão oculta dos MLPs geradores de γ/β.
+        Dimensão oculta do MLP gerador de γ/β.
     gated:
         Se True, aplica porta sigmoide (variante de implementação da Config B).
     num_classes:
@@ -61,24 +66,14 @@ class FiLMConditionedConvNeXt(nn.Module):
         super().__init__()
         self.backbone = backbone
         self.cond_dim = int(cond_dim)
-        self.num_stages = len(CONVNEXT_TINY_STAGE_CHANNELS)
 
-        self.film_layers = nn.ModuleList(
-            [
-                FiLMLayer(
-                    cond_dim=cond_dim,
-                    feature_channels=c,
-                    hidden_dim=hidden_dim,
-                    gated=gated,
-                )
-                for c in CONVNEXT_TINY_STAGE_CHANNELS
-            ]
+        # Única camada FiLM após Stage 4 (768 canais, feature map 7×7).
+        self.film_layer = FiLMLayer(
+            cond_dim=cond_dim,
+            feature_channels=CONVNEXT_TINY_STAGE_CHANNELS[-1],  # 768
+            hidden_dim=hidden_dim,
+            gated=gated,
         )
-
-        # torchvision ConvNeXt: features é Sequential com 8 elementos alternando
-        # (downsample, stage, downsample, stage, downsample, stage, downsample, stage).
-        # Índices dos stages (após cada downsample): 1, 3, 5, 7.
-        self._stage_indices = (1, 3, 5, 7)
 
         # Head opcional
         if num_classes and num_classes > 0:
@@ -98,20 +93,17 @@ class FiLMConditionedConvNeXt(nn.Module):
                 f"z tem dim {z.shape[1]}, esperado {self.cond_dim}"
             )
         feats = x
-        stage_ptr = 0
         for i, layer in enumerate(self.backbone.features):
             feats = layer(feats)
-            if i in self._stage_indices:
-                if z is not None:
-                    feats = self.film_layers[stage_ptr](feats, z)
-                stage_ptr += 1
+            if i == _STAGE4_INDEX and z is not None:
+                feats = self.film_layer(feats, z)
 
         if self.head is not None:
             return self.head(feats)
         return feats
 
     def film_num_params(self) -> int:
-        return sum(p.numel() for p in self.film_layers.parameters() if p.requires_grad)
+        return sum(p.numel() for p in self.film_layer.parameters() if p.requires_grad)
 
     def backbone_num_params(self) -> int:
         return sum(p.numel() for p in self.backbone.parameters() if p.requires_grad)
@@ -124,7 +116,7 @@ def wrap_convnext_with_film(
     gated: bool = False,
     num_classes: Optional[int] = None,
 ) -> FiLMConditionedConvNeXt:
-    """Envolve um ConvNeXt-T com camadas FiLM em cada estágio.
+    """Envolve um ConvNeXt-T com camada FiLM única após Stage 4.
 
     Suporte inicial: apenas ``torchvision.models.convnext_tiny``.
     """

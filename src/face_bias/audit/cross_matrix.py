@@ -92,22 +92,28 @@ def coefficient_variation(matrix: pd.DataFrame) -> pd.Series:
 
 @dataclass(frozen=True)
 class H3Result:
-    """Resultado do teste H3 do Cap. 3 (spread Latinx ≥ 5 tons MST)."""
+    """Resultado qualitativo do teste H3 do Cap. 3 (spread fenotípico Latinx).
+
+    H3 é avaliado qualitativamente: compara o spread Latinx ao das demais
+    raças sem limiar numérico pré-fixado (conforme revisão pós-qualificação).
+    """
 
     latinx_spread: int
     threshold: float
-    min_spread_required: int
-    confirmed: bool
     per_race_spread: dict
+    latinx_rank_among_races: int    # posição em ordem decrescente de spread
+    num_races: int                  # total de raças na matriz
+    median_other_spread: float      # mediana do spread das demais raças
 
     def as_dict(self) -> dict:
         return {
             "hypothesis": "H3",
-            "statement": "Spread Latinx >= 5 tons MST",
+            "statement": "Latinx exibe spread MST expressivo comparado às demais raças (qualitativo)",
             "threshold_prop": self.threshold,
-            "min_spread_required": self.min_spread_required,
             "latinx_spread": self.latinx_spread,
-            "confirmed": self.confirmed,
+            "latinx_rank_among_races": self.latinx_rank_among_races,
+            "num_races": self.num_races,
+            "median_other_spread": self.median_other_spread,
             "per_race_spread": self.per_race_spread,
         }
 
@@ -115,24 +121,28 @@ class H3Result:
 def assess_hypothesis_h3(
     matrix: pd.DataFrame,
     threshold: float = 0.05,
-    min_spread_required: int = 5,
     latinx_key: str = "Latino_Hispanic",
 ) -> H3Result:
-    """H3 (Cap. 3): a classe Latinx apresenta spread MST ≥ 5 tons.
+    """H3 (Cap. 3): Latinx exibe spread MST expressivamente superior às demais raças.
 
-    "Spread" aqui é o número de tons MST cuja massa relativa é
-    ≥ ``threshold`` (default 5%). Confirma H3 se ``latinx_spread ≥ 5``.
+    Avaliação qualitativa: reporta o spread observado, sua posição relativa
+    entre as raças e a mediana das demais — sem limiar numérico pré-fixado.
     """
     if latinx_key not in matrix.index:
         raise KeyError(f"{latinx_key!r} não presente na matriz. Índices: {list(matrix.index)}")
     spreads = spread_per_race(matrix, threshold=threshold).astype(int)
     latinx_spread = int(spreads.loc[latinx_key])
+    sorted_spreads = spreads.sort_values(ascending=False)
+    rank = int(list(sorted_spreads.index).index(latinx_key) + 1)
+    other_vals = [int(v) for k, v in spreads.items() if k != latinx_key]
+    median_other = float(np.median(other_vals)) if other_vals else 0.0
     return H3Result(
         latinx_spread=latinx_spread,
         threshold=threshold,
-        min_spread_required=min_spread_required,
-        confirmed=latinx_spread >= min_spread_required,
         per_race_spread={k: int(v) for k, v in spreads.items()},
+        latinx_rank_among_races=rank,
+        num_races=int(len(spreads)),
+        median_other_spread=median_other,
     )
 
 

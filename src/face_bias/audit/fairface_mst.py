@@ -1,6 +1,6 @@
-"""Auditoria fenotípica do FairFace via MSTClassifier — Etapa 2.
+"""Auditoria fenotípica do FairFace via MSTClassifier — Etapa 1 (diagnóstico).
 
-Cap. 4 §4.2 (Etapa 2). Combina a inferência MST da Etapa 1 (parquet
+Cap. 4 §4.2 (Etapa 1). Combina a inferência MST da Etapa 1 (parquet
 gerado por ``pipelines/03_mst_inference.py``) com os rótulos raciais do
 FairFace, produzindo o insumo canônico para a matriz Contribuição 2
 (``cross_matrix.build_matrix``).
@@ -79,7 +79,7 @@ def audit_from_files(
     fairface_labels_csv: Path,
     dataset_root: Optional[Path] = None,
 ) -> pd.DataFrame:
-    """Etapa 2 padrão: carrega predições MST + labels FairFace + junta."""
+    """Etapa 1 (diagnóstico): carrega predições MST + labels FairFace + junta."""
     predictions = pd.read_parquet(mst_predictions_parquet)
     labels = load_fairface_labels(fairface_labels_csv)
     merged = join_predictions(predictions, labels, dataset_root=dataset_root)

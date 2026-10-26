@@ -1,4 +1,4 @@
-"""Condicionamento arquitetural — Etapa 3 do pipeline (Cap. 4 §4.6–§4.7)."""
+"""Condicionamento arquitetural — Etapa 2 do pipeline (Cap. 4 §4.6–§4.7)."""
 
 from face_bias.conditioning.clip_prompts import (
     CLIP_EMBED_DIM,

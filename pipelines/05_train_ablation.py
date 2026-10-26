@@ -1,4 +1,4 @@
-"""Pipeline stage — Etapa 3: treinamento das 3 configurações A/B/C.
+"""Pipeline stage — Etapa 2: treinamento das 3 configurações A/B/C.
 
 Cap. 4 §4.7. Todas as configurações compartilham backbone (ConvNeXt-T),
 dataset (FairFace) e protocolo de treinamento — o que varia é apenas
@@ -11,13 +11,14 @@ Config C: ConvNeXt-T + FiLM com sinal via CLIP-text (512-dim)
 Uso:
     python pipelines/05_train_ablation.py --config-id A --seed 42
     python pipelines/05_train_ablation.py --config-id B --seed 42 \\
-        --mst-predictions outputs/etapa1/fairface_val_mst.parquet
+        --mst-predictions outputs/etapa1/fairface_train_mst.parquet
     python pipelines/05_train_ablation.py --config-id C --seed 42 \\
-        --mst-predictions outputs/etapa1/fairface_val_mst.parquet \\
-        --clip-cache outputs/etapa3/clip_bank.npy
+        --mst-predictions outputs/etapa1/fairface_train_mst.parquet \\
+        --clip-cache outputs/etapa2/clip_bank.npy
 
 Rigor experimental: rodar 3 sementes (42, 1, 2) por configuração.
 Total: 3 configs × 3 sementes = 9 treinos.
+Critério de checkpoint e early stopping: F1-macro no validation set (paciência 5).
 """
 
 from __future__ import annotations
@@ -35,6 +36,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 from torchvision.models import ConvNeXt_Tiny_Weights, convnext_tiny
@@ -47,6 +49,7 @@ from face_bias.conditioning import (  # noqa: E402
     CLIPPromptEnsembler,
     wrap_convnext_with_film,
 )
+from face_bias.fairness.disparity_ratio import disparity_ratio, per_class_f1  # noqa: E402
 
 logger = logging.getLogger("pipelines.05_train_ablation")
 
@@ -119,6 +122,7 @@ def _train_transform() -> transforms.Compose:
         transforms.Resize(256),
         transforms.RandomCrop(IMAGE_SIZE),
         transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.1, hue=0.05),
         transforms.ToTensor(),
         transforms.Normalize(IMAGENET_MEAN, IMAGENET_STD),
     ])
@@ -151,6 +155,9 @@ def _set_seed(seed: int) -> None:
 # --------------------------------------------------------------------------- #
 # Loop de treino                                                              #
 # --------------------------------------------------------------------------- #
+EARLY_STOPPING_PATIENCE = 5
+
+
 def train_one_config(
     config_id: str,
     train_loader: DataLoader,
@@ -168,10 +175,11 @@ def train_one_config(
     loss_fn = nn.CrossEntropyLoss()
 
     if config_id == "A":
-        params = model.parameters()
-        optimizer = torch.optim.AdamW(params, lr=lr_backbone, weight_decay=weight_decay)
+        optimizer = torch.optim.AdamW(
+            model.parameters(), lr=lr_backbone, weight_decay=weight_decay
+        )
     else:
-        film_ids = {id(p) for p in model.film_layers.parameters()}
+        film_ids = {id(p) for p in model.film_layer.parameters()}
         head_ids = {id(p) for p in model.head.parameters()}
         film_params = [p for p in model.parameters() if id(p) in film_ids]
         head_params = [p for p in model.parameters() if id(p) in head_ids]
@@ -187,6 +195,17 @@ def train_one_config(
             ],
             weight_decay=weight_decay,
         )
+
+    # Cosine annealing com warmup linear nos primeiros 5 % das épocas.
+    warmup_epochs = max(1, int(0.05 * max_epochs))
+    scheduler: torch.optim.lr_scheduler.LRScheduler = SequentialLR(
+        optimizer,
+        schedulers=[
+            LinearLR(optimizer, start_factor=0.1, end_factor=1.0, total_iters=warmup_epochs),
+            CosineAnnealingLR(optimizer, T_max=max_epochs - warmup_epochs, eta_min=1e-6),
+        ],
+        milestones=[warmup_epochs],
+    )
 
     def _step(batch, training: bool) -> tuple[float, np.ndarray, np.ndarray]:
         if len(batch) == 3:
@@ -212,8 +231,10 @@ def train_one_config(
         return float(loss.item()), logits.argmax(-1).detach().cpu().numpy(), y.cpu().numpy()
 
     history: list[dict] = []
-    best_acc = -1.0
+    best_f1 = -1.0
     best_state: Optional[dict] = None
+    patience_counter = 0
+
     for epoch in range(1, max_epochs + 1):
         model.train()
         train_loss_acc, n = 0.0, 0
@@ -225,41 +246,66 @@ def train_one_config(
         train_loss = train_loss_acc / max(n, 1)
 
         model.eval()
-        preds, tgts, val_loss_acc, n = [], [], 0.0, 0
+        preds_list, tgts_list, val_loss_acc, n = [], [], 0.0, 0
         with torch.inference_mode():
             for batch in val_loader:
                 loss, p, t = _step(batch, training=False)
                 bs = batch[0].size(0)
                 val_loss_acc += loss * bs
                 n += bs
-                preds.append(p)
-                tgts.append(t)
-        preds = np.concatenate(preds)
-        tgts = np.concatenate(tgts)
+                preds_list.append(p)
+                tgts_list.append(t)
+        preds = np.concatenate(preds_list)
+        tgts = np.concatenate(tgts_list)
         val_loss = val_loss_acc / max(n, 1)
         val_acc = float((preds == tgts).mean())
+
+        # Métricas de fairness calculadas a cada época.
+        per_f1 = per_class_f1(tgts, preds, num_classes=FAIRFACE_CLASSES)
+        val_f1_macro = float(np.mean(per_f1))
+        val_dr = float(disparity_ratio(per_f1))
+        val_worst_f1 = float(np.min(per_f1))
+
         history.append({
             "epoch": epoch,
-            "train_loss": train_loss,
-            "val_loss": val_loss,
-            "val_acc": val_acc,
+            "train_loss": round(train_loss, 6),
+            "val_loss": round(val_loss, 6),
+            "val_acc": round(val_acc, 6),
+            "val_f1_macro": round(val_f1_macro, 6),
+            "val_disparity_ratio": round(val_dr, 6),
+            "val_worst_class_f1": round(val_worst_f1, 6),
         })
         logger.info(
-            "cfg=%s seed=%d ep=%d train_loss=%.4f val_loss=%.4f val_acc=%.4f",
-            config_id, seed, epoch, train_loss, val_loss, val_acc,
+            "cfg=%s seed=%d ep=%d train_loss=%.4f val_loss=%.4f "
+            "val_acc=%.4f val_f1=%.4f dr=%.4f worst_f1=%.4f",
+            config_id, seed, epoch, train_loss, val_loss,
+            val_acc, val_f1_macro, val_dr, val_worst_f1,
         )
-        if val_acc > best_acc:
-            best_acc = val_acc
-            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
 
-    return {"history": history, "best_val_acc": best_acc, "best_state": best_state}
+        scheduler.step()
+
+        # Checkpoint e early stopping por F1-macro.
+        if val_f1_macro > best_f1:
+            best_f1 = val_f1_macro
+            best_state = {k: v.detach().cpu().clone() for k, v in model.state_dict().items()}
+            patience_counter = 0
+        else:
+            patience_counter += 1
+            if patience_counter >= EARLY_STOPPING_PATIENCE:
+                logger.info(
+                    "Early stopping: cfg=%s seed=%d ep=%d (patience=%d)",
+                    config_id, seed, epoch, EARLY_STOPPING_PATIENCE,
+                )
+                break
+
+    return {"history": history, "best_val_f1_macro": best_f1, "best_state": best_state}
 
 
 # --------------------------------------------------------------------------- #
 # CLI                                                                         #
 # --------------------------------------------------------------------------- #
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Etapa 3 — treino ablation A/B/C.")
+    p = argparse.ArgumentParser(description="Etapa 2 — treino ablation A/B/C.")
     p.add_argument("--config-id", choices=["A", "B", "C"], required=True)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--dataset-root", type=Path, required=True)
@@ -330,14 +376,14 @@ def main(argv: list[str] | None = None) -> int:
         "state_dict": result["best_state"],
         "config_id": args.config_id,
         "seed": args.seed,
-        "best_val_acc": result["best_val_acc"],
+        "best_val_f1_macro": result["best_val_f1_macro"],
     }, ckpt)
     (args.output / f"{args.config_id}_seed{args.seed}_history.json").write_text(
         json.dumps(result["history"], indent=2), encoding="utf-8"
     )
     logger.info(
-        "config=%s seed=%d best_val_acc=%.4f tempo=%.1fs ckpt=%s",
-        args.config_id, args.seed, result["best_val_acc"], elapsed, ckpt,
+        "config=%s seed=%d best_val_f1_macro=%.4f tempo=%.1fs ckpt=%s",
+        args.config_id, args.seed, result["best_val_f1_macro"], elapsed, ckpt,
     )
     return 0
 

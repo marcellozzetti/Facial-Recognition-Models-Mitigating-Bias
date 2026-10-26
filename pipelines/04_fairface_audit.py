@@ -1,4 +1,4 @@
-"""Pipeline stage — Etapa 2: auditoria fenotípica FairFace × MST.
+"""Pipeline stage — Etapa 1 (diagnóstico): auditoria fenotípica FairFace × MST.
 
 Consome o parquet gerado pelo pipeline 03 (``fairface_val_mst.parquet``)
 + CSV de labels do FairFace, produz a matriz Contribuição 2 e testa H3.
@@ -44,7 +44,7 @@ logger = logging.getLogger("pipelines.04_fairface_audit")
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Etapa 2 — auditoria FairFace × MST.")
+    p = argparse.ArgumentParser(description="Etapa 1 (diagnóstico) — auditoria FairFace × MST.")
     p.add_argument("--mst-predictions", type=Path, required=True)
     p.add_argument("--fairface-labels", type=Path, required=True)
     p.add_argument("--dataset-root", type=Path, default=None)
@@ -55,18 +55,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=0.05,
         help="Massa mínima por tom MST para contar no spread (default 0.05).",
     )
-    p.add_argument(
-        "--h3-min-spread",
-        type=int,
-        default=5,
-        help="Spread mínimo requerido para confirmar H3 (Cap 3).",
-    )
     return p.parse_args(argv)
 
 
 def generate_report(matrix: pd.DataFrame, resumo: pd.DataFrame, h3) -> str:
     lines = [
-        "# Etapa 2 — Auditoria fenotípica FairFace × MST",
+        "# Etapa 1 (diagnóstico) — Auditoria fenotípica FairFace × MST",
         "",
         "Matriz Contribuição 2 (proporção intra-raça por tom Monk).",
         "",
@@ -81,12 +75,15 @@ def generate_report(matrix: pd.DataFrame, resumo: pd.DataFrame, h3) -> str:
         )
     lines += [
         "",
-        f"## H3 (Cap. 3): spread Latinx ≥ {h3.min_spread_required} tons MST",
+        "## H3 (Cap. 3): heterogeneidade fenotípica Latinx (avaliação qualitativa)",
         "",
-        f"- Threshold: {h3.threshold:.0%} de massa por tom",
-        f"- Latinx spread observado: **{h3.latinx_spread}**",
-        f"- Requerido: {h3.min_spread_required}",
-        f"- **{'CONFIRMADA' if h3.confirmed else 'REFUTADA'}**",
+        f"- Threshold de massa por tom: {h3.threshold:.0%}",
+        f"- Latinx spread observado: **{h3.latinx_spread} tons** "
+        f"(posição {h3.latinx_rank_among_races}ª de {h3.num_races} raças em ordem decrescente)",
+        f"- Mediana das demais raças: {h3.median_other_spread:.1f} tons",
+        "",
+        "> H3 é avaliada qualitativamente: o spread Latinx é comparado ao das",
+        "> demais raças sem limiar numérico pré-fixado.",
         "",
         "## Matriz completa (proporção intra-raça)",
         "",
@@ -122,11 +119,7 @@ def main(argv: list[str] | None = None) -> int:
     resumo = summarize(matrix, threshold=args.spread_threshold)
     resumo.to_csv(args.output_dir / "resumo_por_raca.csv")
 
-    h3 = assess_hypothesis_h3(
-        matrix,
-        threshold=args.spread_threshold,
-        min_spread_required=args.h3_min_spread,
-    )
+    h3 = assess_hypothesis_h3(matrix, threshold=args.spread_threshold)
     (args.output_dir / "h3_result.json").write_text(
         json.dumps(h3.as_dict(), indent=2), encoding="utf-8"
     )
@@ -136,11 +129,11 @@ def main(argv: list[str] | None = None) -> int:
     report = generate_report(matrix, resumo, h3)
     (args.output_dir / "relatorio.md").write_text(report, encoding="utf-8")
     logger.info(
-        "H3 (%s): Latinx spread=%d (requerido >=%d) → %s",
-        "confirmada" if h3.confirmed else "refutada",
+        "H3 (qualitativo): Latinx spread=%d tons | rank %dº de %d | mediana outras=%.1f",
         h3.latinx_spread,
-        h3.min_spread_required,
-        "CONFIRMADA" if h3.confirmed else "REFUTADA",
+        h3.latinx_rank_among_races,
+        h3.num_races,
+        h3.median_other_spread,
     )
     logger.info("Saídas em %s.", args.output_dir)
     return 0
