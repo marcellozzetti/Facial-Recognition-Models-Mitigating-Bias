@@ -13,6 +13,7 @@ from face_bias.conditioning.film import (
     compute_film_overhead,
 )
 from face_bias.conditioning.injector import (
+    CLIPViTWithFiLM,
     CONVNEXT_TINY_STAGE_CHANNELS,
     FiLMConditionedConvNeXt,
     wrap_convnext_with_film,
@@ -21,6 +22,7 @@ from face_bias.conditioning.injector import (
 __all__ = [
     "CLIP_EMBED_DIM",
     "CLIPPromptEnsembler",
+    "CLIPViTWithFiLM",
     "CONVNEXT_TINY_STAGE_CHANNELS",
     "DEFAULT_MODEL",
     "DEFAULT_TEMPLATE",

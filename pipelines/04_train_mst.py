@@ -26,6 +26,10 @@ import time
 from pathlib import Path
 from typing import Optional
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
 import numpy as np
 import pandas as pd
 import torch
@@ -139,6 +143,7 @@ def train_mst_extractor(
     weight_decay: float,
     seed:         int,
     class_weights: Optional[torch.Tensor] = None,
+    patience:     int = EARLY_STOPPING_PATIENCE,
 ) -> dict:
     _set_seed(seed)
     model = build_vit_mst().to(device)
@@ -233,8 +238,8 @@ def train_mst_extractor(
             patience_counter = 0
         else:
             patience_counter += 1
-            if patience_counter >= EARLY_STOPPING_PATIENCE:
-                logger.info("Early stopping ep=%d (patience=%d)", epoch, EARLY_STOPPING_PATIENCE)
+            if patience_counter >= patience:
+                logger.info("Early stopping ep=%d (patience=%d)", epoch, patience)
                 break
 
     return {"history": history, "best_val_acc": best_acc, "best_val_mae": best_mae, "best_state": best_state}
@@ -257,6 +262,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     p.add_argument("--lr-backbone",   type=float, default=1e-5)
     p.add_argument("--lr-head",       type=float, default=1e-4)
     p.add_argument("--weight-decay",  type=float, default=0.05)
+    p.add_argument("--patience",        type=int,   default=EARLY_STOPPING_PATIENCE,
+                   help="Paciência do early stopping. Use 999 para desativar.")
     p.add_argument("--no-class-weight", action="store_true",
                    help="Desabilita weighted sampler (não recomendado — classes muito desequilibradas).")
     p.add_argument("--device", default="cuda")
@@ -316,6 +323,7 @@ def main(argv: list[str] | None = None) -> int:
         weight_decay=args.weight_decay,
         seed=args.seed,
         class_weights=class_weights,
+        patience=args.patience,
     )
     elapsed = time.time() - t0
 
@@ -334,7 +342,78 @@ def main(argv: list[str] | None = None) -> int:
         "seed=%d best_val_acc=%.4f best_val_mae=%.4f tempo=%.1fs ckpt=%s",
         args.seed, result["best_val_acc"], result["best_val_mae"], elapsed, ckpt,
     )
+
+    _plot_mst_curves(result["history"], args.output / f"mst_vit_b16_seed{args.seed}_curves.png")
     return 0
+
+
+def _plot_mst_curves(history: list[dict], out_path: Path) -> None:
+    """Gera curvas de treino MST: Loss (train+val) | Val Acc | Val MAE."""
+    GREY_BG   = "#F9F9F7"
+    BLUE_MAIN = "#1F2A4E"
+    BLUE_MID  = "#3D68BB"
+    ORANGE    = "#C4792A"
+    GREEN     = "#2A7A4F"
+    GREY_TEXT = "#6B7585"
+
+    plt.rcParams.update({
+        "figure.facecolor": GREY_BG, "axes.facecolor": GREY_BG,
+        "axes.edgecolor": GREY_TEXT, "axes.labelcolor": BLUE_MAIN,
+        "xtick.color": GREY_TEXT, "ytick.color": GREY_TEXT,
+        "text.color": BLUE_MAIN, "font.family": "sans-serif",
+        "font.size": 11, "axes.titlesize": 13, "axes.titleweight": "bold",
+    })
+
+    epochs     = [h["epoch"]     for h in history]
+    train_loss = [h["train_loss"] for h in history]
+    val_loss   = [h["val_loss"]   for h in history]
+    val_acc    = [h["val_acc"]    for h in history]
+    val_mae    = [h["val_mae"]    for h in history]
+
+    best_idx = val_acc.index(max(val_acc))
+    best_ep  = epochs[best_idx]
+
+    fig, (ax_loss, ax_acc, ax_mae) = plt.subplots(1, 3, figsize=(18, 5))
+    fig.patch.set_facecolor(GREY_BG)
+
+    # Loss
+    ax_loss.plot(epochs, train_loss, color=BLUE_MID,  linewidth=2.2, linestyle="-",  label="train")
+    ax_loss.plot(epochs, val_loss,   color=ORANGE,    linewidth=2.2, linestyle="--", label="val")
+    ax_loss.set_title("Loss por época")
+    ax_loss.set_ylabel("Cross-entropy loss")
+    ax_loss.legend(fontsize=10)
+
+    # Val Acc
+    ax_acc.plot(epochs, val_acc, color=GREEN, linewidth=2.2)
+    ax_acc.axvline(best_ep, color=ORANGE, linestyle=":", linewidth=1.5, alpha=0.8)
+    ax_acc.scatter([best_ep], [max(val_acc)], color=ORANGE, s=90, zorder=5,
+                   label=f"Best ep.{best_ep} ({max(val_acc):.3f})")
+    ax_acc.set_title("Val Accuracy por época")
+    ax_acc.set_ylabel("Accuracy (top-1)")
+    ax_acc.legend(fontsize=10)
+
+    # Val MAE
+    ax_mae.plot(epochs, val_mae, color=ORANGE, linewidth=2.2)
+    ax_mae.axvline(best_ep, color=ORANGE, linestyle=":", linewidth=1.5, alpha=0.8)
+    ax_mae.scatter([best_ep], [val_mae[best_idx]], color=ORANGE, s=90, zorder=5,
+                   label=f"Best ep.{best_ep} (MAE {val_mae[best_idx]:.3f})")
+    ax_mae.set_title("Val MAE por época")
+    ax_mae.set_ylabel("MAE (escala 0–9)")
+    ax_mae.legend(fontsize=10)
+
+    for ax in (ax_loss, ax_acc, ax_mae):
+        ax.set_xlabel("Época")
+        ax.grid(True, alpha=0.25, linestyle=":")
+        for spine in ["top", "right"]:
+            ax.spines[spine].set_visible(False)
+
+    fig.suptitle("MST Extrator ViT-B/16 — dinâmica de treinamento (STW val)",
+                 fontsize=14, fontweight="bold", color=BLUE_MAIN)
+    fig.tight_layout(rect=[0, 0, 1, 0.95])
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    logging.getLogger("pipelines.04_train_mst").info("Saved training curves → %s", out_path)
 
 
 if __name__ == "__main__":

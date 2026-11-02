@@ -1,0 +1,1837 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reunião Orientador — 09 nov 2026</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F7F6F2;--bg2:#FFFFFF;--fg:#1C2333;--fg2:#4A5468;--fg3:#8892A4;
+  --c1:#1F4E8C;--c1l:#E8EEF8;--c1m:#3B6FBA;--c2:#C86A1C;--c2l:#FBF0E6;
+  --good:#1F7A4A;--goodl:#E4F3EA;--warn:#B84040;--warnl:#FBEAEA;
+  --attn:#7B3F9E;--attnl:#F2EAF9;
+  --border:#DDD9CF;--code:#ECEAE4;
+  color-scheme:light;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){
+  --bg:#131820;--bg2:#1A2236;--fg:#E4E1D8;--fg2:#9AA3B4;--fg3:#5C6880;
+  --c1:#5B8FD4;--c1l:#1A2B4A;--c1m:#4A7BBE;--c2:#E07A38;--c2l:#2A1A0A;
+  --good:#2E9460;--goodl:#0F2A1A;--warn:#E06060;--warnl:#2A0F0F;
+  --attn:#A96FCC;--attnl:#221432;
+  --border:#263044;--code:#1E2840;
+  color-scheme:dark;
+}}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.65}
+
+/* ── page header ── */
+.phdr{background:var(--bg2);border-bottom:2px solid var(--c1);padding:16px 24px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.phdr-text{}
+.phdr-eye{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);margin:0 0 3px}
+.phdr-title{font-family:'Source Serif 4',Georgia,serif;font-size:clamp(18px,3.5vw,26px);font-weight:600;color:var(--fg);margin:0 0 4px;line-height:1.15}
+.phdr-meta{font-size:12px;color:var(--fg3);display:flex;flex-wrap:wrap;gap:10px}
+.phdr-meta span::before{content:"· "}
+.phdr-meta span:first-child::before{content:""}
+
+/* ── tab bar ── */
+.tab-bar{background:var(--bg2);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;padding:0 16px}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-btn{padding:11px 18px;border:none;border-bottom:2.5px solid transparent;background:none;cursor:pointer;white-space:nowrap;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:500;color:var(--fg3);margin-bottom:-2px;transition:color .15s,border-color .15s}
+.tab-btn:hover:not(.active){color:var(--fg)}
+.tab-btn.active{color:var(--c1);border-bottom-color:var(--c1)}
+.tab-btn.res-btn{font-size:12px;opacity:.85}
+.tab-btn.res-btn.active{color:var(--good);border-bottom-color:var(--good)}
+.tab-bar .sep{display:inline-block;width:1px;background:var(--border);margin:8px 4px;height:18px;align-self:center}
+
+/* ── content ── */
+.content{max-width:860px;margin:0 auto;padding:32px max(20px,env(safe-area-inset-left,0px)) 80px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── section ── */
+.sec-eye{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg3);margin:32px 0 3px}
+.sec-eye:first-child{margin-top:0}
+.sec-title{font-family:'Source Serif 4',Georgia,serif;font-size:19px;font-weight:600;color:var(--fg);margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.subsec{font-family:'Source Serif 4',Georgia,serif;font-size:16px;font-weight:600;color:var(--fg);margin:24px 0 8px}
+p{margin:0 0 10px;color:var(--fg2)}
+strong{color:var(--fg);font-weight:600}
+
+/* ── callouts ── */
+.callout{border-left:3px solid var(--c1);background:var(--c1l);border-radius:0 8px 8px 0;padding:11px 14px;font-size:13.5px;margin:12px 0;color:var(--fg)}
+.callout.warn{border-color:var(--warn);background:var(--warnl)}
+.callout.good{border-color:var(--good);background:var(--goodl)}
+.callout strong{color:var(--c1)}
+.callout.warn strong{color:var(--warn)}
+.callout.good strong{color:var(--good)}
+
+/* ── tiles ── */
+.tile-row{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.tile{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:13px 16px;min-width:110px;flex:1 1 110px}
+.tile-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--fg3);margin-bottom:3px}
+.tile-val{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;color:var(--c1);font-variant-numeric:tabular-nums}
+.tile-val.good{color:var(--good)}
+.tile-val.warn{color:var(--warn)}
+.tile-sub{font-size:11px;color:var(--fg3);margin-top:2px}
+
+/* ── table ── */
+.tw{overflow-x:auto;margin:12px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg3);font-weight:500;padding:7px 11px;text-align:left;border-bottom:2px solid var(--border)}
+td{padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--fg2)}
+tr:last-child td{border-bottom:none}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--fg);font-variant-numeric:tabular-nums}
+.badge{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;letter-spacing:.04em}
+.badge.urg{background:var(--warnl);color:var(--warn)}
+.badge.ok {background:var(--goodl);color:var(--good)}
+.badge.mid{background:var(--c1l);color:var(--c1)}
+.badge.grey{background:var(--code);color:var(--fg3)}
+.badge.closed{background:var(--code);color:var(--fg3);text-decoration:line-through}
+
+/* ── arch cards ── */
+.acard{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin:8px 0}
+.acard.hl{border-color:var(--c1);border-left-width:3px}
+.acard-tag{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--fg3);background:var(--code);border-radius:3px;padding:1px 6px;margin-bottom:5px}
+.acard-tag.ac{background:var(--c1l);color:var(--c1)}
+.acard-name{font-weight:600;color:var(--fg);font-size:14.5px;margin:0 0 5px}
+.acard-body{font-size:13px;color:var(--fg2);line-height:1.65}
+.acard-body p{margin:4px 0;color:var(--fg2)}
+
+/* ── equation ── */
+.eq-block{background:var(--code);border-radius:8px;padding:10px 14px;margin:8px 0;overflow-x:auto;text-align:center}
+.eq-block mjx-container{margin:0!important}
+.eq-inline{background:var(--code);border-radius:3px;padding:1px 5px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--fg)}
+.code-block{background:var(--code);border-radius:8px;padding:13px 16px;overflow-x:auto;margin:10px 0}
+.code-block pre{margin:0;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.65;color:var(--fg)}
+code{font-family:'IBM Plex Mono',monospace;font-size:12px;background:var(--code);padding:1px 4px;border-radius:3px}
+ul,ol{color:var(--fg2);padding-left:20px;margin:8px 0}
+li{margin-bottom:5px}
+li strong{color:var(--fg)}
+
+/* ════════════════════════════════════════════════
+   PIPELINE (tab 1)
+   ════════════════════════════════════════════════ */
+.cfg-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.cfg-btn{padding:6px 15px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;color:var(--fg2);transition:all .15s}
+.cfg-btn:hover:not(.active){border-color:var(--c1);color:var(--c1)}
+.cfg-btn.active{background:var(--c1);border-color:var(--c1);color:#fff}
+.cfg-btn.active.cb{background:var(--c2);border-color:var(--c2)}
+.cfg-btn.active.cc{background:var(--good);border-color:var(--good)}
+.cfg-desc-box{font-size:12.5px;color:var(--fg2);background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 13px;margin-bottom:16px;min-height:38px}
+
+.diagram{position:relative;padding:4px 0 12px}
+.lane{display:flex;align-items:center;gap:0}
+.lane+.lane{margin-top:14px}
+.lane-lbl{writing-mode:vertical-rl;transform:rotate(180deg);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3);font-family:'IBM Plex Mono',monospace;padding-right:8px;flex-shrink:0;white-space:nowrap;width:20px}
+.blk{background:var(--bg2);border:1.5px solid var(--border);border-radius:9px;padding:9px 11px;text-align:center;flex-shrink:0;transition:all .18s;cursor:pointer}
+.blk:hover{border-color:var(--c1);transform:translateY(-2px);box-shadow:0 3px 12px color-mix(in srgb,var(--c1) 16%,transparent)}
+.blk.film{border-color:var(--c2);background:var(--c2l)}
+.blk.film.off{border-color:var(--border);background:var(--bg2);opacity:.4;pointer-events:none}
+.blk.clipbb{border-color:var(--good);background:var(--goodl)}
+.blk.sel{border-color:var(--c1);box-shadow:0 0 0 3px color-mix(in srgb,var(--c1) 18%,transparent)}
+.blk.film.sel{border-color:var(--c2);box-shadow:0 0 0 3px color-mix(in srgb,var(--c2) 18%,transparent)}
+
+.bi{display:flex;align-items:center;justify-content:center;height:42px;margin-bottom:5px}
+.bn{font-size:11.5px;font-weight:600;color:var(--fg);line-height:1.2;margin-bottom:1px}
+.bs{font-size:10px;color:var(--fg3);font-family:'IBM Plex Mono',monospace}
+.bb{display:inline-block;font-size:9px;font-family:'IBM Plex Mono',monospace;padding:1px 5px;border-radius:3px;margin-top:3px;background:var(--c1l);color:var(--c1)}
+.film .bb{background:var(--c2l);color:var(--c2)}
+.clipbb .bb{background:var(--goodl);color:var(--good)}
+.bl-s{width:106px}.bl-m{width:138px}
+
+.arr{flex-shrink:0;padding:0 3px;display:flex;align-items:center;color:var(--fg3)}
+.arr-film line,.arr-film polyline{stroke:var(--c2)!important}
+.arr-off{opacity:.2}
+
+.vconn{display:flex;align-items:center;padding:2px 0}
+@keyframes dash{to{stroke-dashoffset:-16}}
+.flow{stroke-dasharray:5 4;animation:dash .9s linear infinite}
+
+.tone-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2.5px;width:66px}
+.tdot{width:9px;height:9px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}
+.vit-stack{display:flex;flex-direction:column;gap:2px;align-items:center}
+.vit-b{height:4.5px;border-radius:1px}
+.bars-mini{display:flex;gap:2px;align-items:flex-end;height:36px}
+.bar-mini{width:7px;border-radius:1px 1px 0 0;border:1px solid rgba(0,0,0,.1)}
+.stages{display:flex;flex-direction:column;gap:2.5px;align-items:center}
+.stage-b{height:6.5px;border-radius:2px}
+.outbars{display:flex;flex-direction:column;gap:2px}
+.obrow{display:flex;align-items:center;gap:3px}
+.oblbl{font-size:8px;color:var(--fg3);width:10px;text-align:right;font-family:'IBM Plex Mono',monospace}
+.obwrap{flex:1;height:4px;background:var(--code);border-radius:2px;overflow:hidden}
+.obfill{height:100%;border-radius:2px}
+
+/* ── drawer ── */
+.drawer{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:2px solid var(--border);transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);z-index:200;max-height:52vh;overflow-y:auto}
+.drawer.open{transform:translateY(0)}
+.dhdr{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2)}
+.dtitle{font-size:14px;font-weight:600;color:var(--fg)}
+.dclose{background:none;border:none;cursor:pointer;color:var(--fg3);font-size:17px;padding:3px 8px;border-radius:5px}
+.dclose:hover{color:var(--fg);background:var(--code)}
+.dbody{padding:14px 18px 22px;display:grid;gap:12px}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.dc{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 13px}
+.dc-t{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--fg3);font-family:'IBM Plex Mono',monospace;margin-bottom:7px}
+.dc p{font-size:12.5px;color:var(--fg2);margin:0 0 5px}
+.dc p:last-child{margin:0}
+.dc .eq{background:var(--code);border-radius:5px;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--fg);margin:5px 0;line-height:1.6}
+.hint-bar{text-align:center;font-size:11px;color:var(--fg3);padding:4px 0 12px;display:flex;align-items:center;justify-content:center;gap:6px}
+.hint-bar::before,.hint-bar::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── roadmap ── */
+.roadmap{margin:16px 0}
+.rm-row{display:flex;gap:10px;margin:0 0 8px;align-items:flex-start}
+.rm-date{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--fg3);flex-shrink:0;padding-top:2px;width:72px}
+.rm-item{flex:1;font-size:13px;color:var(--fg2)}
+.rm-item strong{color:var(--fg)}
+.rm-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.rm-done{background:var(--good)}
+.rm-now{background:var(--c2)}
+.rm-next{background:var(--border)}
+
+@media(max-width:600px){
+  .lane{overflow-x:auto;padding-bottom:4px}
+  .bl-s{width:92px}.bl-m{width:118px}
+  .drawer{max-height:68vh}
+}
+
+/* ── architecture diagrams ── */
+.arq-sub-bar{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.arq-sub-btn{padding:6px 14px;border-radius:16px;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;font-family:inherit;font-size:12px;font-weight:500;color:var(--fg3);transition:all .15s}
+.arq-sub-btn:hover:not(.active){border-color:var(--c1);color:var(--c1)}
+.arq-sub-btn.active{background:var(--c1);border-color:var(--c1);color:#fff}
+.arq-sub-panel{display:none}
+.arq-sub-panel.active{display:block}
+.arch-wrap{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.arch-col{display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--fg3)}
+.leg-dot{width:10px;height:10px;border-radius:2px}
+.node{border-radius:8px;border:1.5px solid;padding:8px 14px;text-align:center;cursor:pointer;transition:all .18s;width:220px}
+.node:hover{transform:scale(1.02);z-index:5}
+.node-input{background:var(--code);border-color:var(--fg3)}
+.node-embed{background:var(--c1l);border-color:var(--c1)}
+.node-attn{background:var(--attnl);border-color:var(--attn)}
+.node-mlp{background:#FFF7ED;border-color:#D97706}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .node-mlp{background:#2A1F0A;border-color:#B87830}}
+.node-norm{background:var(--goodl);border-color:var(--good)}
+.node-film2{background:var(--c2l);border-color:var(--c2)}
+.node-out2{background:var(--c1l);border-color:var(--c1m);border-width:2px}
+.node-name{font-size:12.5px;font-weight:600;color:var(--fg);margin-bottom:2px}
+.node-sub{font-size:10.5px;color:var(--fg2);font-family:'IBM Plex Mono',monospace}
+.node-badge2{display:inline-block;font-size:9px;font-family:'IBM Plex Mono',monospace;padding:1px 5px;border-radius:3px;margin-top:3px}
+.nb-attn{background:var(--attnl);color:var(--attn)}
+.nb-film{background:var(--c2l);color:var(--c2)}
+.nb-good{background:var(--goodl);color:var(--good)}
+.nb-blue{background:var(--c1l);color:var(--c1)}
+.arrow-w{display:flex;align-items:center;justify-content:center;height:28px;width:220px;flex-shrink:0}
+.blk-grp{border:1.5px dashed var(--border);border-radius:10px;padding:12px 14px;margin:4px 0;position:relative;width:220px}
+.blk-grp-lbl{position:absolute;top:-9px;left:10px;font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--fg3);background:var(--bg);padding:0 5px}
+.det-panel{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;margin-top:16px;animation:slideIn .2s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.det-title{font-size:13px;font-weight:600;color:var(--fg);margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.det-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.det-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px}
+.det-card-t{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--fg3);font-family:'IBM Plex Mono',monospace;margin-bottom:6px}
+.det-card p{font-size:12px;color:var(--fg2);margin:0 0 4px}
+.det-card p:last-child{margin:0}
+.det-card .eq{background:var(--code);border-radius:5px;padding:6px 9px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--fg);margin:5px 0;line-height:1.65}
+.det-close{background:none;border:none;cursor:pointer;color:var(--fg3);font-size:14px;padding:2px 6px;border-radius:4px;margin-left:auto}
+.det-close:hover{color:var(--fg);background:var(--code)}
+.clip-dual{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+.clip-col{display:flex;flex-direction:column;align-items:center;gap:0}
+.clip-mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-top:70px}
+</style>
+</head>
+<body>
+
+<header class="phdr">
+  <div class="phdr-text">
+    <p class="phdr-eye">Reunião de orientação · 09 nov 2026</p>
+    <h1 class="phdr-title">Reconhecimento Facial &amp; Mitigação de Viés</h1>
+    <div class="phdr-meta">
+      <span>Marcello Ozzetti</span>
+      <span>Mestrado · Unifesp/ICT</span>
+      <span>Ciência da Computação</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('pipeline',this)">Visão Geral</button>
+  <button class="tab-btn" onclick="showTab('sota',this)">SOTA 2024</button>
+  <button class="tab-btn" onclick="showTab('arq',this)">Arquiteturas</button>
+  <button class="tab-btn" onclick="showTab('clip',this)">CLIP + FiLM</button>
+  <button class="tab-btn" onclick="showTab('mst',this)">MST Extrator</button>
+  <button class="tab-btn" onclick="showTab('conf',this)">Conferências</button>
+  <div class="sep"></div>
+  <button class="tab-btn res-btn" onclick="showTab('resa',this)">Config A — Resultados</button>
+  <button class="tab-btn res-btn" onclick="showTab('resb',this)">Config B — Resultados</button>
+  <button class="tab-btn res-btn" onclick="showTab('resc',this)">Config C — Resultados</button>
+</nav>
+
+<div class="content">
+
+<!-- ══════════════════════════ TAB 1 — VISÃO GERAL ══════════════════════════ -->
+<div class="tab-panel active" id="tab-pipeline">
+
+  <p class="sec-eye">Pipeline proposto</p>
+  <h2 class="sec-title">3 etapas / 2 metas — clique nos blocos para detalhes</h2>
+
+  <!-- Config selector -->
+  <div class="cfg-row">
+    <button class="cfg-btn active" onclick="setCfg('A',this)">Config A — Baseline</button>
+    <button class="cfg-btn cb"     onclick="setCfg('B',this)">Config B — FiLM + MST</button>
+    <button class="cfg-btn cc"     onclick="setCfg('C',this)">Config C — CLIP + FiLM</button>
+  </div>
+  <div class="cfg-desc-box" id="cfg-desc">ConvNeXt-T sem condicionamento — mede o viés base. F1-macro=0,710, DR=0,605 · gap 40% entre Black (0,882) e Latinx (0,535).</div>
+
+  <!-- Diagram -->
+  <div class="diagram">
+
+    <!-- Lane 1: MST -->
+    <div class="lane">
+      <div class="lane-lbl">Etapa 1</div>
+
+      <div class="blk bl-s" id="bl-stw" onclick="openD('stw')">
+        <div class="bi"><div class="tone-grid" id="tone-grid"></div></div>
+        <div class="bn">STW Dataset</div>
+        <div class="bs">14.278 faces</div>
+        <span class="bb">10 tons MST</span>
+      </div>
+
+      <div class="arr">
+        <svg width="26" height="16"><line x1="2" y1="8" x2="19" y2="8" stroke="currentColor" stroke-width="1.5"/><polyline points="15,4 21,8 15,12" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+
+      <div class="blk bl-m" id="bl-vit" onclick="openD('vit')">
+        <div class="bi"><div class="vit-stack" id="vit-stack"></div></div>
+        <div class="bn" id="vit-name">MST Extrator</div>
+        <div class="bs" id="vit-sub">ViT-B/16 · fine-tuned</div>
+        <span class="bb" id="vit-bb">86M params · STW</span>
+      </div>
+
+      <div class="arr">
+        <svg width="26" height="16"><line x1="2" y1="8" x2="19" y2="8" stroke="currentColor" stroke-width="1.5"/><polyline points="15,4 21,8 15,12" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+
+      <div class="blk bl-s" id="bl-zmst" onclick="openD('zmst')">
+        <div class="bi"><div class="bars-mini" id="zmst-bars"></div></div>
+        <div class="bn">z_mst</div>
+        <div class="bs">10-dim · P(MST)</div>
+        <span class="bb">condição FiLM</span>
+      </div>
+    </div>
+
+    <!-- Vertical connector: z_mst → FiLM -->
+    <div class="vconn" id="vconn" style="padding-left:calc(20px + 106px + 26px + 138px + 26px + 53px)">
+      <svg width="22" height="26">
+        <line class="flow" x1="11" y1="1" x2="11" y2="19" stroke="var(--c2)" stroke-width="1.8"/>
+        <polyline points="7,15 11,23 15,15" fill="none" stroke="var(--c2)" stroke-width="1.8"/>
+      </svg>
+    </div>
+
+    <!-- Lane 2: Classifier -->
+    <div class="lane">
+      <div class="lane-lbl">Etapa 2</div>
+
+      <div class="blk bl-s" id="bl-ff" onclick="openD('ff')">
+        <div class="bi"><svg width="66" height="42" id="ff-svg"></svg></div>
+        <div class="bn">FairFace</div>
+        <div class="bs">108k faces</div>
+        <span class="bb">7 grupos raciais</span>
+      </div>
+
+      <div class="arr">
+        <svg width="26" height="16"><line x1="2" y1="8" x2="19" y2="8" stroke="currentColor" stroke-width="1.5"/><polyline points="15,4 21,8 15,12" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+
+      <div class="blk bl-m" id="bl-bb" onclick="openD('backbone')">
+        <div class="bi"><div class="stages" id="stage-stack"></div></div>
+        <div class="bn" id="bb-name">ConvNeXt-T</div>
+        <div class="bs" id="bb-sub">4 stages · 28M params</div>
+        <span class="bb" id="bb-bb">ImageNet-1k</span>
+      </div>
+
+      <div class="arr arr-film" id="arr-film">
+        <svg width="26" height="16"><line x1="2" y1="8" x2="19" y2="8" stroke="currentColor" stroke-width="1.5"/><polyline points="15,4 21,8 15,12" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+
+      <div class="blk bl-m film" id="bl-film" onclick="openD('film')">
+        <div class="bi">
+          <svg width="88" height="42" viewBox="0 0 88 42">
+            <rect x="1" y="9" width="14" height="22" rx="2" fill="var(--c1l)" stroke="var(--c1)" stroke-width="1"/>
+            <text x="8" y="24" text-anchor="middle" font-size="7" fill="var(--c1)" font-family="monospace">F</text>
+            <rect x="24" y="5" width="14" height="12" rx="2" fill="var(--c2l)" stroke="var(--c2)" stroke-width="1"/>
+            <text x="31" y="14" text-anchor="middle" font-size="8" fill="var(--c2)" font-family="monospace">γ</text>
+            <rect x="24" y="24" width="14" height="11" rx="2" fill="var(--c2l)" stroke="var(--c2)" stroke-width="1"/>
+            <text x="31" y="32" text-anchor="middle" font-size="8" fill="var(--c2)" font-family="monospace">β</text>
+            <line x1="15" y1="20" x2="24" y2="11" stroke="var(--fg3)" stroke-width="1"/>
+            <line x1="15" y1="20" x2="24" y2="29" stroke="var(--fg3)" stroke-width="1"/>
+            <circle cx="52" cy="14" r="6" fill="none" stroke="var(--c2)" stroke-width="1.5"/>
+            <text x="52" y="18" text-anchor="middle" font-size="9" fill="var(--c2)" font-family="monospace">⊙</text>
+            <text x="64" y="18" text-anchor="middle" font-size="10" fill="var(--fg3)">+</text>
+            <text x="75" y="18" text-anchor="middle" font-size="8" fill="var(--c2)" font-family="monospace">β</text>
+            <line x1="38" y1="11" x2="46" y2="11" stroke="var(--fg3)" stroke-width="1"/>
+            <line x1="38" y1="29" x2="58" y2="20" stroke="var(--fg3)" stroke-width="1"/>
+            <rect x="68" y="26" width="14" height="11" rx="2" fill="var(--goodl)" stroke="var(--good)" stroke-width="1"/>
+            <text x="75" y="35" text-anchor="middle" font-size="7" fill="var(--good)" font-family="monospace">F'</text>
+          </svg>
+        </div>
+        <div class="bn">FiLM</div>
+        <div class="bs" id="film-sub">Stage 4 · γ⊙F+β</div>
+        <span class="bb" id="film-bb">z_mst → γ, β</span>
+      </div>
+
+      <div class="arr">
+        <svg width="26" height="16"><line x1="2" y1="8" x2="19" y2="8" stroke="currentColor" stroke-width="1.5"/><polyline points="15,4 21,8 15,12" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+
+      <div class="blk bl-s" id="bl-out" onclick="openD('output')">
+        <div class="bi"><div class="outbars" id="out-bars"></div></div>
+        <div class="bn">Saída</div>
+        <div class="bs">7 classes · F1-macro</div>
+        <span class="bb" id="out-bb">DR · equidade</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint-bar">clique em qualquer bloco para ver a arquitetura detalhada</div>
+
+  <!-- 3 Configs -->
+  <p class="sec-eye" style="margin-top:28px">Ablação proposta</p>
+  <h2 class="sec-title">3 configurações — o que cada uma responde</h2>
+
+  <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0">
+    <div class="acard hl" style="border-left-color:var(--c1);display:flex;gap:14px;align-items:flex-start">
+      <div style="min-width:52px;text-align:center;padding-top:4px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--c1)">A</div>
+        <div style="font-size:10px;color:var(--fg3);font-family:monospace">Baseline</div>
+      </div>
+      <div>
+        <div class="acard-name">ConvNeXt-T puro · sem condicionamento</div>
+        <div class="acard-body">
+          <p><strong>Arquitetura:</strong> ConvNeXt-T (28M params, ImageNet-1k) → GlobalAvgPool → Linear(768→7). <strong>Sem</strong> FiLM, sem z_mst.</p>
+          <p><strong>Responde:</strong> qual é o viés base do backbone? Qual o gap F1 entre grupos raciais sem nenhuma intervenção?</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="acard hl" style="border-left-color:var(--c2);display:flex;gap:14px;align-items:flex-start">
+      <div style="min-width:52px;text-align:center;padding-top:4px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--c2)">B</div>
+        <div style="font-size:10px;color:var(--fg3);font-family:monospace">Proposta</div>
+      </div>
+      <div>
+        <div class="acard-name">ConvNeXt-T + FiLM(z_mst, 10-dim) — proposta principal</div>
+        <div class="acard-body">
+          <p><strong>Arquitetura:</strong> mesma base do Config A + camada FiLM inserida após Stage 4 (7×7×768). O vetor z_mst (10-dim, P(MST) do extrator) condiciona γ e β da modulação.</p>
+          <p><strong>Responde:</strong> fornecer o tom de pele explicitamente via FiLM reduz a disparidade F1 entre grupos? (Hipótese H1/H2)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="acard hl" style="border-left-color:var(--good);display:flex;gap:14px;align-items:flex-start">
+      <div style="min-width:52px;text-align:center;padding-top:4px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--good)">C</div>
+        <div style="font-size:10px;color:var(--fg3);font-family:monospace">Ablação</div>
+      </div>
+      <div>
+        <div class="acard-name">CLIP ViT-B/16 + FiLM([CLS], z_mst) — backbone semântico</div>
+        <div class="acard-body">
+          <p><strong>Arquitetura:</strong> encoder visual CLIP (~86M) pré-treinado em 400M pares WIT + FiLM no token [CLS] após bloco 12 → projeção 768→512 → Linear(512→7).</p>
+          <p><strong>Responde:</strong> embeddings semânticos CLIP potencializam a redução de viés pelo FiLM em relação ao Config B? (Hipótese H3)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Comparação casada:</strong> A vs B testa o efeito do FiLM com backbone fixo. B vs C testa o efeito do backbone semântico com FiLM fixo. Todas executadas com 3 seeds (42, 1, 2) — resultados nas abas Config A / B / C.
+  </div>
+
+  <!-- Roadmap -->
+  <p class="sec-eye" style="margin-top:28px">Plano de trabalho</p>
+  <h2 class="sec-title">Cronograma até defesa</h2>
+
+  <div class="roadmap">
+    <div class="rm-row"><div class="rm-dot rm-done"></div><div class="rm-date">out 2026</div><div class="rm-item"><strong>Config A concluída</strong> — baseline definido, viés documentado (DR=0,605)</div></div>
+    <div class="rm-row"><div class="rm-dot rm-now"></div><div class="rm-date">nov 2026</div><div class="rm-item"><strong>MST v2 + Config A 50ep</strong> — curvas completas de convergência · em execução agora</div></div>
+    <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date">nov–dez 2026</div><div class="rm-item"><strong>Config B</strong> — ConvNeXt-T + FiLM com z_mst · 3 seeds · 50ep · comparação A vs B</div></div>
+    <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date">dez 2026–jan 2027</div><div class="rm-item"><strong>Diagnóstico H3</strong> — matriz MST × classe racial · correlação tom de pele / erro</div></div>
+    <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date" style="color:var(--c1);font-weight:600">31 jan 2027</div><div class="rm-item"><strong>Submissão IJCNN 2027</strong> — 6pp IEEE · Config A + MST + H3 · Cape Town jun/2027</div></div>
+    <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date" style="color:var(--c1);font-weight:600">09 abr 2027</div><div class="rm-item"><strong>Submissão IJCB 2027</strong> — face recognition + bias · <strong>Foz do Iguaçu, Brasil</strong></div></div>
+    <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date">jan–mar 2027</div><div class="rm-item"><strong>Config C</strong> — CLIP ViT-B/16 + FiLM · só se Config B validar H3 estatisticamente</div></div>
+    <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date">2027</div><div class="rm-item"><strong>Dissertação + defesa</strong></div></div>
+  </div>
+
+</div><!-- /tab-pipeline -->
+
+<!-- ══════════════════════════ TAB 2 — SOTA ══════════════════════════ -->
+<div class="tab-panel" id="tab-sota">
+
+  <p class="sec-eye">Estado da arte — benchmark</p>
+  <h2 class="sec-title">FairFace (2021) → SOTA 2024 — onde nos posicionamos</h2>
+
+  <p>Nossa pesquisa usa o <strong>FairFace</strong> como benchmark (Kärkkäinen &amp; Joo, WACV 2021). Em 2024, o melhor resultado publicado no benchmark de 7 classes raciais atingiu <strong>75,7% de acurácia</strong> — nosso objetivo é igualar ou superar esse número <em>com menor disparidade entre grupos</em>.</p>
+
+  <div class="tile-row">
+    <div class="tile"><div class="tile-lbl">Baseline 2021</div><div class="tile-val">73,2%</div><div class="tile-sub">ResNet-34 · Kärkkäinen</div></div>
+    <div class="tile"><div class="tile-lbl">SOTA 2024</div><div class="tile-val good">75,7%</div><div class="tile-sub">PaliGemma fine-tuned</div></div>
+    <div class="tile"><div class="tile-lbl">Gap SOTA</div><div class="tile-val warn">~10pp</div><div class="tile-sub">entre melhor/pior grupo</div></div>
+    <div class="tile"><div class="tile-lbl">Nossa meta</div><div class="tile-val" style="color:var(--c1)">≥75% + DR↑</div><div class="tile-sub">menor disparidade</div></div>
+  </div>
+
+  <div class="subsec">Benchmark — FairFace dataset (2021)</div>
+
+  <p><strong>FairFace</strong> foi criado para endereçar o desequilíbrio racial em datasets de reconhecimento facial: LFW e VGGFace2 tinham ~80% de faces brancas. Os autores coletaram 108.501 faces do YFCC-100M, anotadas via Amazon Mechanical Turk (consenso ≥2/3 anotadores).</p>
+
+  <div class="tile-row">
+    <div class="tile"><div class="tile-lbl">Total</div><div class="tile-val">108 K</div><div class="tile-sub">faces</div></div>
+    <div class="tile"><div class="tile-lbl">Grupos</div><div class="tile-val mono">7</div><div class="tile-sub">raciais balanceados</div></div>
+    <div class="tile"><div class="tile-lbl">Por grupo</div><div class="tile-val">~15 K</div><div class="tile-sub">train + val</div></div>
+    <div class="tile"><div class="tile-lbl">Sist. comerciais</div><div class="tile-val warn">34pp</div><div class="tile-sub">gap Buolamwini 2018</div></div>
+  </div>
+
+  <p><strong>7 grupos:</strong> White · Black · Latino Hispanic · East Asian · Southeast Asian · Indian · Middle Eastern.</p>
+
+  <div class="subsec">Arquitetura do paper original — ResNet-34 (baseline 2021)</div>
+
+  <div class="acard">
+    <span class="acard-tag">Kärkkäinen &amp; Joo · WACV 2021</span>
+    <div class="acard-name">ResNet-34 — classificador de referência do dataset</div>
+    <div class="acard-body">
+      <p><strong>Backbone:</strong> ResNet-34 pré-treinado ImageNet → fine-tuned para 7 classes raciais. <strong>Input:</strong> <code>224×224</code> (face alinhada via dlib, 5 landmarks). <strong>~21M params.</strong></p>
+      <p><strong>Head:</strong> GlobalAvgPool(512) → Linear(512→7) + CrossEntropyLoss. SGD momentum=0.9, 20 épocas, LR decay por plateau.</p>
+      <p><strong>Resultado:</strong> ~73,2% de acurácia média · ~78% para White/E.Asian · ~68% para M.Eastern → <strong>gap de ~10pp.</strong></p>
+      <p><strong>Limitação central:</strong> nenhum sinal explícito de tom de pele — o modelo usa somente características faciais brutas. Nossa hipótese: z_mst via FiLM reduz este gap sem modificar o dataset.</p>
+    </div>
+  </div>
+
+  <div class="subsec">SOTA atual — FaceScanPaliGemma (2024)</div>
+
+  <div class="acard hl">
+    <span class="acard-tag ac">Exploração de VLMs · arXiv 2410.24148 · outubro 2024</span>
+    <div class="acard-name">FaceScanPaliGemma — PaliGemma fine-tuned para atributos faciais</div>
+    <div class="acard-body">
+      <p><strong>Backbone:</strong> PaliGemma (Google, 2024) — Vision-Language Model com encoder visual SigLIP + decoder Gemma. Fine-tuned para classificação de raça, gênero, emoção e idade no FairFace.</p>
+      <p><strong>Resultado nas 7 classes de raça:</strong> <strong>75,7% de acurácia · F1 = 75%.</strong> Supera GPT-4o e os métodos CNN anteriores no mesmo benchmark.</p>
+      <p><strong>Por que é relevante para nossa pesquisa:</strong> mesmo o melhor método 2024 usa um VLM genérico sem condicionamento explícito em tom de pele. Nossa proposta é ortogonal: condicionamento via FiLM pode reduzir o gap inter-grupo independente do backbone.</p>
+    </div>
+  </div>
+
+  <div class="callout good">
+    <strong>Posicionamento da nossa proposta:</strong> não competimos diretamente em acurácia bruta com VLMs de 3B+ params. Nossa contribuição é a <em>redução de disparidade</em>: mostrar que fornecer z_mst via FiLM reduz o gap F1 entre grupos mantendo acurácia comparável ao baseline ConvNeXt-T (~73–75%).
+  </div>
+
+  <p class="sec-eye" style="margin-top:28px">Arquitetura — FaceScanPaliGemma (2024)</p>
+  <h2 class="sec-title">Vision-Language Model — paradigma generativo vs. classificação direta</h2>
+
+  <p>A principal diferença do FaceScanPaliGemma em relação às CNNs anteriores é o <strong>paradigma</strong>: ao invés de produzir logits de classificação, o modelo <strong>gera texto</strong> em resposta a um prompt. A previsão de raça é a string gerada pelo decoder de linguagem — "White", "Black", etc. — tratada como uma tarefa de geração condicionada à imagem.</p>
+
+  <div style="font-size:11px;color:var(--fg3);font-family:'IBM Plex Mono',monospace;margin:4px 0 0;text-align:right">Clique nos blocos para ver detalhes →</div>
+
+  <div style="overflow-x:auto;margin:20px 0">
+  <div style="display:inline-flex;gap:18px;align-items:flex-start;min-width:560px">
+
+    <!-- Coluna 1: SigLIP encoder -->
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--c1);margin-bottom:8px;text-align:center">① Encoder Visual<br><span style="color:var(--fg3);font-size:8.5px">SigLIP · ~400M params</span></div>
+      <div class="node node-input" style="width:185px" onclick="openD('pg_img')"><div class="node-name">Imagem facial 224×224</div><div class="node-sub">face-aligned · normalização SigLIP</div></div>
+      <div class="arrow-w" style="width:185px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-embed" style="width:185px" onclick="openD('pg_patch')"><div class="node-name">Patch Embedding 14×14</div><div class="node-sub">grade 16×16 patches → 256 tokens visuais</div><span class="node-badge2 nb-blue">256 tokens · 1152-d</span></div>
+      <div class="arrow-w" style="width:185px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-attn" style="width:185px" onclick="openD('pg_siglip')"><div class="node-name">Transformer — 27 blocos</div><div class="node-sub">MHSA bidirecional + MLP · pré-treino sigmoid</div><span class="node-badge2 nb-attn">So400M architecture</span></div>
+      <div class="arrow-w" style="width:185px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-norm" style="width:185px" onclick="openD('pg_proj')"><div class="node-name">Projeção Linear</div><div class="node-sub">1152-d → 2048-d (dim. do Gemma)</div><span class="node-badge2 nb-good">256 tokens visuais prontos</span></div>
+    </div>
+
+    <!-- Seta para o decoder -->
+    <div style="display:flex;align-items:center;padding-top:160px">
+      <svg width="32" height="20"><line x1="2" y1="10" x2="26" y2="10" stroke="var(--c1)" stroke-width="1.8"/><polyline points="22,6 28,10 22,14" fill="none" stroke="var(--c1)" stroke-width="1.8"/></svg>
+    </div>
+
+    <!-- Coluna 2: Gemma decoder -->
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--attn);margin-bottom:8px;text-align:center">② Decoder de Linguagem<br><span style="color:var(--fg3);font-size:8.5px">Gemma · 2B params</span></div>
+      <div class="node" style="width:200px;background:var(--attnl);border:1.5px solid var(--attn);border-radius:8px;padding:8px 14px;text-align:center;cursor:pointer" onclick="openD('pg_prompt')"><div class="node-name">Prompt de texto</div><div class="node-sub">"What is the race of this person?"</div><span class="node-badge2 nb-attn">tokenizado BPE</span></div>
+      <div class="arrow-w" style="width:200px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node" style="width:200px;background:var(--c2l);border:1.5px solid var(--c2);border-radius:8px;padding:8px 14px;text-align:center;cursor:pointer" onclick="openD('pg_concat')"><div class="node-name">Concatenação de tokens</div><div class="node-sub">[256 tokens visuais] + [tokens de texto]</div><span class="node-badge2 nb-film">contexto completo para Gemma</span></div>
+      <div class="arrow-w" style="width:200px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-attn" style="width:200px;border-color:var(--attn)" onclick="openD('pg_gemma')"><div class="node-name">Gemma Decoder — 18 blocos</div><div class="node-sub">atenção causal · cross-modal na seq. unificada</div><span class="node-badge2 nb-attn">fine-tuned multi-atributo</span></div>
+      <div class="arrow-w" style="width:200px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-norm" style="width:200px;border-color:var(--good);border-width:2px" onclick="openD('pg_output')"><div class="node-name">Token gerado → label</div><div class="node-sub">"White" / "Black" / "Latino" / …</div><span class="node-badge2 nb-good">acurácia = 75,7% (7 classes)</span></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="tile-row">
+    <div class="tile"><div class="tile-lbl">Encoder Visual</div><div class="tile-val mono" style="font-size:14px">SigLIP</div><div class="tile-sub">~400M · 256 tokens visuais</div></div>
+    <div class="tile"><div class="tile-lbl">Decoder LLM</div><div class="tile-val mono" style="font-size:14px">Gemma-2B</div><div class="tile-sub">2B params · geração autoregressiva</div></div>
+    <div class="tile"><div class="tile-lbl">Total</div><div class="tile-val mono" style="font-size:14px">~3B</div><div class="tile-sub">params (×100× o nosso Config A)</div></div>
+    <div class="tile"><div class="tile-lbl">Saída</div><div class="tile-val mono" style="font-size:14px">texto</div><div class="tile-sub">label gerado, não logits</div></div>
+  </div>
+
+  <div class="acard" style="margin-top:12px">
+    <span class="acard-tag">Fine-tuning para atributos faciais</span>
+    <div class="acard-name">Multi-tarefa: raça + gênero + emoção + idade simultaneamente</div>
+    <div class="acard-body">
+      <p>O modelo foi fine-tuned no FairFace respondendo a múltiplos prompts ("What is the race?", "What is the gender?", etc.) em uma única sessão de treino. A abordagem multi-tarefa favorece generalização entre atributos correlacionados.</p>
+      <p><strong>Sem condicionamento explícito de tom de pele</strong> — usa somente a imagem + prompt de texto. Nossa proposta (z_mst via FiLM) é <em>ortogonal</em>: poderia ser aplicada a qualquer backbone, inclusive ao SigLIP.</p>
+    </div>
+  </div>
+
+</div><!-- /tab-sota -->
+
+<!-- ══════════════════════════ TAB 3 — CLIP + FiLM ══════════════════════════ -->
+<div class="tab-panel" id="tab-clip">
+
+  <p class="sec-eye">Ablação C — Config C</p>
+  <h2 class="sec-title">CLIP + FiLM — por que usar um encoder treinado em texto?</h2>
+
+  <div class="callout" style="margin-bottom:20px">
+    <strong>A ideia central:</strong> o CLIP foi treinado para alinhar imagens com descrições de texto. Isso significa que sua representação visual já "entende" conceitos como "tom de pele claro" ou "pele escura" — não porque aprendeu pixels, mas porque esses conceitos apareceram em bilhões de legendas de imagens. Nossa hipótese é que esse ponto de partida mais rico, combinado com o condicionamento FiLM em z_mst, pode reduzir mais o viés entre grupos raciais do que o ConvNeXt-T sozinho.
+  </div>
+
+  <p class="sec-eye">Como o CLIP é treinado — dois encoders, um espaço compartilhado</p>
+  <h2 class="sec-title">Pré-treino contrastivo em 400 milhões de pares imagem-texto</h2>
+
+  <div style="overflow-x:auto;margin:16px 0 8px">
+  <div class="clip-dual" style="min-width:480px">
+    <div class="clip-col">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--c1);margin-bottom:8px;text-align:center">Encoder Visual (ViT-B/16)</div>
+      <div class="node node-input" style="width:190px"><div class="node-name">Imagem · 224×224</div><div class="node-sub">qualquer imagem da web (WIT)</div></div>
+      <div class="arrow-w" style="width:190px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-embed" style="width:190px"><div class="node-name">Patch Embed + [CLS]</div><div class="node-sub">imagem dividida em 196 patches de 16×16</div><span class="node-badge2 nb-blue">196 regiões visuais</span></div>
+      <div class="arrow-w" style="width:190px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-attn" style="width:190px"><div class="node-name">12 blocos Transformer</div><div class="node-sub">cada bloco vê todos os patches ao mesmo tempo</div><span class="node-badge2 nb-attn">atenção global</span></div>
+      <div class="arrow-w" style="width:190px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-norm" style="width:190px"><div class="node-name">Vetor Visual V</div><div class="node-sub">512 dimensões, normalizado</div><span class="node-badge2 nb-good">representa o "significado" da imagem</span></div>
+    </div>
+
+    <div class="clip-mid">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;color:var(--c2);text-align:center;margin-bottom:8px;font-weight:600">OBJETIVO DO TREINO</div>
+      <div style="background:var(--c2l);border:1.5px solid var(--c2);border-radius:10px;padding:12px 14px;width:130px;text-align:center">
+        <div style="font-size:12px;font-weight:600;color:var(--c2);margin-bottom:6px">Aproximar pares corretos</div>
+        <div style="font-size:11px;color:var(--fg2);line-height:1.6">imagem + legenda<br>correspondente<br>→ vetores similares</div>
+      </div>
+      <div style="margin-top:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;width:90px" id="sota-sim-mat"></div>
+      <div style="font-size:9px;font-family:monospace;color:var(--fg3);margin-top:3px;text-align:center">diagonal = pares certos</div>
+      <div style="margin-top:10px;background:var(--code);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--fg2);line-height:1.65;text-align:center;width:130px">
+        400M pares<br>imagem ↔ texto<br>treinado em 256 GPUs
+      </div>
+    </div>
+
+    <div class="clip-col">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--attn);margin-bottom:8px;text-align:center">Encoder Textual</div>
+      <div class="node node-input" style="width:190px;border-color:var(--attn)"><div class="node-name">Legenda da imagem</div><div class="node-sub">"a dark-skinned person smiling"</div></div>
+      <div class="arrow-w" style="width:190px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-embed" style="width:190px;border-color:var(--attn);background:var(--attnl)"><div class="node-name">Tokens de Texto</div><div class="node-sub">cada palavra vira um vetor numérico</div><span class="node-badge2 nb-attn">até 77 tokens</span></div>
+      <div class="arrow-w" style="width:190px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-attn" style="width:190px;border-color:var(--attn)"><div class="node-name">12 blocos Transformer</div><div class="node-sub">processa o texto sequencialmente</div><span class="node-badge2 nb-attn">entende linguagem</span></div>
+      <div class="arrow-w" style="width:190px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-norm" style="width:190px"><div class="node-name">Vetor Textual U</div><div class="node-sub">512 dimensões, normalizado</div><span class="node-badge2 nb-good">representa o "significado" do texto</span></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="callout" style="border-color:var(--c1);background:var(--c1l);margin:12px 0 20px">
+    <strong style="color:var(--c1)">Por que isso importa para o nosso trabalho:</strong> ao ver 400 milhões de imagens com legendas descrevendo pessoas de diferentes etnias e tons de pele, o CLIP aprende a separar essas faces no espaço de representação — não por regras explícitas, mas pela linguagem. Esse encoder já parte de uma base mais informativa sobre diversidade humana do que um modelo treinado apenas em classificação de objetos (ImageNet).
+  </div>
+
+  <p class="sec-eye">Como usamos o CLIP — Config C</p>
+  <h2 class="sec-title">Encoder visual CLIP + FiLM condicionado em tom de pele</h2>
+
+  <p>Na Config C, descartamos o encoder textual e usamos apenas o <strong>encoder visual</strong> do CLIP como backbone — substituindo o ConvNeXt-T da Config B. O condicionamento FiLM em z_mst funciona da mesma forma: o vetor de tom de pele ajusta as representações internas da rede antes da classificação final.</p>
+
+  <div style="overflow-x:auto;margin:16px 0">
+  <div style="display:inline-flex;gap:12px;align-items:center;min-width:480px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+      <div class="node node-input" style="width:175px"><div class="node-name">Face 224×224</div><div class="node-sub">FairFace · 7 grupos raciais</div></div>
+      <div class="arrow-w" style="width:175px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-embed" style="width:175px"><div class="node-name">CLIP ViT-B/16</div><div class="node-sub">12 blocos Transformer · pesos congelados do pré-treino</div><span class="node-badge2 nb-blue">86M params · WIT 400M</span></div>
+      <div class="arrow-w" style="width:175px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-film2" style="width:175px"><div class="node-name">FiLM no token [CLS]</div><div class="node-sub">z_mst ajusta a representação global da face</div><span class="node-badge2 nb-film">γ ⊙ [CLS] + β</span></div>
+      <div class="arrow-w" style="width:175px"><svg width="20" height="24"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-norm" style="width:175px;border-color:var(--good);border-width:2px"><div class="node-name">Linear → 7 grupos</div><div class="node-sub">classificação final · F1-macro + DR</div><span class="node-badge2 nb-good">ablação vs Config B</span></div>
+    </div>
+
+    <div style="display:flex;align-items:center;padding-top:80px">
+      <svg width="26" height="70"><line x1="13" y1="5" x2="13" y2="60" stroke="var(--c2)" stroke-width="1.5" stroke-dasharray="4 3"/><polyline points="9,56 13,64 17,56" fill="none" stroke="var(--c2)" stroke-width="1.5"/></svg>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;padding-top:100px;gap:6px">
+      <div style="background:var(--c2l);border:1.5px solid var(--c2);border-radius:8px;padding:9px 12px;text-align:center;width:145px">
+        <div style="font-size:12px;font-weight:600;color:var(--c2);margin-bottom:4px">z_mst</div>
+        <div style="font-size:11px;color:var(--fg2);line-height:1.55">tom de pele<br>10-dim · MST Extrator</div>
+      </div>
+      <div style="font-size:10px;color:var(--fg3);font-family:monospace;text-align:center">→ gera γ e β<br>≈ 1,2M params extras</div>
+    </div>
+  </div>
+  </div>
+
+  <p class="sec-eye" style="margin-top:24px">Comparação das 3 configs</p>
+  <h2 class="sec-title">O que muda entre A, B e C</h2>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Config</th><th>Backbone</th><th>Pré-treino backbone</th><th>FiLM em z_mst</th><th>Params total</th></tr></thead>
+      <tbody>
+        <tr><td><strong>A</strong> Baseline</td><td>ConvNeXt-T</td><td>ImageNet (1k classes de objetos)</td><td>—</td><td class="mono">28M</td></tr>
+        <tr><td><strong>B</strong> Proposta</td><td>ConvNeXt-T</td><td>ImageNet (1k classes de objetos)</td><td>Stage 4 · canal a canal</td><td class="mono">28M + 1,2M</td></tr>
+        <tr><td><strong>C</strong> Ablação</td><td>CLIP ViT-B/16</td><td>WIT 400M pares imagem-texto</td><td>Token [CLS] · após bloco 12</td><td class="mono">86M + 1,2M</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn" style="margin-top:12px">
+    <strong>Pergunta que a Config C responde:</strong> um backbone que "sabe" o que é tom de pele pelo texto beneficia mais o condicionamento FiLM do que um backbone que só viu objetos? Se B &gt; A <em>e</em> C &gt; B, o pré-treino linguístico amplifica o efeito do FiLM.
+  </div>
+
+</div><!-- /tab-clip -->
+
+<!-- ══════════════════════════ TAB 4 — CONFERÊNCIAS ══════════════════════════ -->
+<div class="tab-panel" id="tab-conf">
+
+  <p class="sec-eye">Publicações</p>
+  <h2 class="sec-title">Conferências — onde submeter</h2>
+
+  <div class="callout warn">
+    <strong>⚠ CVPR 2027 fecha em 16/11/2026 — 14 dias.</strong> Enrollment obrigatório até 10/11. Estado atual (Configs B e C ainda não executadas): submissão inviável neste prazo, mas o orientador precisa estar ciente da janela.
+  </div>
+
+  <div class="callout warn" style="margin-top:8px">
+    <strong>FAccT 2027 fechou ontem (03/11/2026).</strong> Teria sido a conferência ideal para o ângulo de fairness/accountability. Monitorar FAccT 2028.
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th>Conferência</th><th>Deadline</th><th>Evento</th><th>Local</th><th>Páginas</th><th>Relevância / status</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>IJCNN 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">Int. Joint Conf. Neural Networks</span></td>
+          <td class="mono"><span class="badge ok">31/01/2027</span></td>
+          <td class="mono">14–18 jun 2027</td><td>Cape Town, África do Sul</td><td class="mono">6pp IEEE</td>
+          <td><span class="badge ok">Recomendado</span> — redes neurais + fairness, alinhado com o trabalho</td>
+        </tr>
+        <tr>
+          <td><strong>IJCB 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">Int. Joint Conf. on Biometrics</span></td>
+          <td class="mono"><span class="badge ok">09/04/2027</span><br><span style="font-size:10px;color:var(--fg3)">provisório</span></td>
+          <td class="mono">13–17 set 2027</td><td><strong>Foz do Iguaçu, Brasil</strong></td><td class="mono">~8pp IEEE</td>
+          <td><span class="badge ok">★ Tema perfeito</span> — face recognition + bias, <strong>no Brasil</strong></td>
+        </tr>
+        <tr>
+          <td><strong>ICCV 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">Int. Conf. Computer Vision</span></td>
+          <td class="mono"><span class="badge mid">~mar/2027</span><br><span style="font-size:10px;color:var(--fg3)">estimativa</span></td>
+          <td class="mono">out 2027</td><td>Hong Kong</td><td class="mono">8pp</td>
+          <td><span class="badge mid">Top-2 CV</span> — muito competitivo, exige A+B+C prontos</td>
+        </tr>
+        <tr>
+          <td><strong>NeurIPS 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">Conf. Neural Information Processing</span></td>
+          <td class="mono"><span class="badge mid">~mai/2027</span></td>
+          <td class="mono">dez 2027</td><td>Europa (TBD)</td><td class="mono">8pp</td>
+          <td><span class="badge mid">ML geral</span> — altamente competitivo, ângulo de equidade pode diferenciar</td>
+        </tr>
+        <tr>
+          <td><strong>ICLR 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">Int. Conf. on Learning Representations</span></td>
+          <td class="mono"><span class="badge closed">~out/2026</span></td>
+          <td class="mono">mai 2027</td><td>TBD</td><td class="mono">9pp</td>
+          <td><span class="badge grey">Fechada</span> — top-3 DL + fairness em ML, monitorar ICLR 2028 (~set/2027)</td>
+        </tr>
+        <tr>
+          <td><strong>SIBGRAPI 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">Conf. on Graphics, Patterns &amp; Images</span></td>
+          <td class="mono"><span class="badge mid">~jun/2027</span></td>
+          <td class="mono">out 2027</td><td>Brasil</td><td class="mono">6pp</td>
+          <td><span class="badge mid">Nacional</span> — boa visibilidade no Brasil, CAPES reconhecida</td>
+        </tr>
+        <tr>
+          <td><strong>CVPR 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">Conf. Computer Vision &amp; Pattern Rec.</span></td>
+          <td class="mono"><span class="badge urg">16/11/2026</span><br><span style="font-size:10px;color:var(--fg3)">enrollment 10/11</span></td>
+          <td class="mono">20–25 jun 2027</td><td>Seattle, EUA</td><td class="mono">8pp</td>
+          <td><span class="badge urg">Inviável</span> — prazo 14 dias, Config B/C não prontas</td>
+        </tr>
+        <tr>
+          <td><strong>FAccT 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">ACM Fairness, Accountability, Transparency</span></td>
+          <td class="mono"><span class="badge closed">03/11/2026</span></td>
+          <td class="mono">21–24 jun 2027</td><td>TBD</td><td class="mono">—</td>
+          <td><span class="badge grey">Fechada ontem</span> — monitorar FAccT 2028</td>
+        </tr>
+        <tr>
+          <td><strong>IEEE FG 2027</strong><br><span style="font-size:11.5px;color:var(--fg3)">Int. Conf. Face and Gesture Recog.</span></td>
+          <td class="mono"><span class="badge closed">09/10/2026</span></td>
+          <td class="mono">abr 2027</td><td>Marrakesh, Marrocos</td><td class="mono">—</td>
+          <td><span class="badge grey">Fechada</span> — face recognition específica</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="subsec">Estratégia recomendada</div>
+
+  <div class="callout good">
+    <strong>Caminho principal:</strong> IJCNN 2027 (31/jan) com Config A + MST + H3 (diagnóstico de viés). Após: IJCB 2027 (abr) com resultado completo A+B — tema de biometria facial + equidade, no Brasil, prazo generoso.
+  </div>
+
+  <p><strong>Artigo IJCNN 2027 (6pp) — conteúdo proposto:</strong></p>
+  <ul>
+    <li><strong>§1 Motivação:</strong> viés racial em FR, gap de 40% no baseline (Config A)</li>
+    <li><strong>§2 Extrator MST:</strong> ViT-B/16 fine-tuned no STW, escala Monk, acc=82%+</li>
+    <li><strong>§3 FiLM conditioning:</strong> Config B vs A — delta no DR</li>
+    <li><strong>§4 Diagnóstico H3:</strong> correlação MST × erro por grupo racial</li>
+    <li><strong>§5 Conclusão:</strong> Config C como trabalho futuro</li>
+  </ul>
+
+</div><!-- /tab-conf -->
+
+<!-- ══════════════════════════ TAB 5b — MST EXTRATOR ══════════════════════════ -->
+<div class="tab-panel" id="tab-mst">
+
+  <p class="sec-eye">Etapa 1 — ViT-B/16 fine-tuned no STW</p>
+  <h2 class="sec-title">Extrator MST — arquitetura, treinamento e resultados</h2>
+
+  <div class="tile-row">
+    <div class="tile"><div class="tile-lbl">Val Accuracy</div><div class="tile-val good">83,9%</div><div class="tile-sub">ep=50 · seed=42 · melhor</div></div>
+    <div class="tile"><div class="tile-lbl">Val MAE</div><div class="tile-val good">0,19</div><div class="tile-sub">erro ordinal médio</div></div>
+    <div class="tile"><div class="tile-lbl">Épocas</div><div class="tile-val mono">50</div><div class="tile-sub">patience=999 (desabilitado)</div></div>
+    <div class="tile"><div class="tile-lbl">Duração</div><div class="tile-val mono">~1h45</div><div class="tile-sub">6270s · 1× GPU</div></div>
+  </div>
+
+  <!-- Arquitetura -->
+  <div class="subsec">Arquitetura — ViT-B/16 fine-tuned</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0">
+    <div class="arch-wrap" style="margin:0">
+      <div class="arch-col" style="gap:6px">
+        <div class="node node-input" style="padding:7px 12px"><div class="node-name" style="font-size:12px">Input 224×224×3</div><div class="node-sub">Resize(256) → CenterCrop(224) · ImageNet norm</div></div>
+        <div class="arrow-w"><svg width="20" height="20"><line x1="10" y1="2" x2="10" y2="18" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,14 10,18 14,14" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-embed" style="padding:7px 12px"><div class="node-name" style="font-size:12px">Patch Embedding</div><div class="node-sub">Conv2d(3→768, k=16, s=16) → 196 tokens</div><span class="node-badge2 nb-blue">(B, 196, 768)</span></div>
+        <div class="arrow-w"><svg width="20" height="20"><line x1="10" y1="2" x2="10" y2="18" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,14 10,18 14,14" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-embed" style="padding:7px 12px"><div class="node-name" style="font-size:12px">[CLS] + Pos. Encoding</div><div class="node-sub">concat CLS → +E_pos aprendido</div><span class="node-badge2 nb-blue">(B, 197, 768)</span></div>
+        <div class="arrow-w"><svg width="20" height="20"><line x1="10" y1="2" x2="10" y2="18" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,14 10,18 14,14" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="blk-grp" style="padding:8px 10px">
+          <div class="blk-grp-lbl">× 12 Transformer Blocks (Pre-LN)</div>
+          <div class="node node-attn" style="width:100%;padding:6px 10px"><div class="node-name" style="font-size:11px">MHSA — H=12, d_k=64</div><div class="node-sub">197×197 attn + residual</div></div>
+          <div class="arrow-w" style="width:100%"><svg width="20" height="16"><line x1="10" y1="2" x2="10" y2="14" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+          <div class="node node-mlp" style="width:100%;padding:6px 10px"><div class="node-name" style="font-size:11px">MLP 768→3072 (GELU) →768</div></div>
+        </div>
+        <div class="arrow-w"><svg width="20" height="20"><line x1="10" y1="2" x2="10" y2="18" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,14 10,18 14,14" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-norm" style="padding:7px 12px"><div class="node-name" style="font-size:12px">CLS → LayerNorm → Head MST</div><div class="node-sub">x[:,0,:] → LN → Linear(768→10) → Softmax</div><span class="node-badge2 nb-good">z_mst ∈ ℝ¹⁰</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="acard" style="margin-bottom:8px">
+        <span class="acard-tag">Pré-treino</span>
+        <div class="acard-name" style="font-size:13px">ViT_B_16_Weights.DEFAULT</div>
+        <div class="acard-body" style="font-size:12px">
+          <p>ImageNet-21k (pesos oficiais torchvision). Head original Linear(768→1000) substituída por Linear(768→10).</p>
+          <p><strong>~86M parâmetros</strong> totais. Fine-tune completo (backbone lr=1e-5, head lr=1e-4) com gradient clipping=5.0.</p>
+        </div>
+      </div>
+      <div class="acard">
+        <span class="acard-tag">Otimizador</span>
+        <div class="acard-name" style="font-size:13px">AdamW + Cosine Annealing</div>
+        <div class="acard-body" style="font-size:12px">
+          <p>LinearLR warmup 5% épocas → CosineAnnealingLR (η_min=1e-6). weight_decay=0.05.</p>
+          <p>WeightedRandomSampler + CrossEntropyLoss(weight=1/freq) para imbalance severo (258:1).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Training curves -->
+  <div class="subsec">Curvas de aprendizado — seed=42, 50 épocas</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0">
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+      <div style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:2px">Val Accuracy ↑</div>
+      <div style="font-size:10px;color:var(--fg3);margin-bottom:8px">De 2,1% (ep=1) para 83,9% (ep=50)</div>
+      <canvas id="mst-acc-chart" width="340" height="190" style="width:100%;height:auto;display:block"></canvas>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+      <div style="font-size:12px;font-weight:600;color:var(--fg);margin-bottom:2px">Val MAE ↓ (erro ordinal)</div>
+      <div style="font-size:10px;color:var(--fg3);margin-bottom:8px">De 4,65 (ep=1) para 0,19 (ep=50)</div>
+      <canvas id="mst-mae-chart" width="340" height="190" style="width:100%;height:auto;display:block"></canvas>
+    </div>
+  </div>
+
+  <!-- Distribution -->
+  <div class="subsec">Distribuição STW — imbalance severo (razão 258:1)</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:8px 0">
+    <canvas id="mst-dist-chart" width="700" height="200" style="width:100%;height:auto;display:block"></canvas>
+  </div>
+
+  <!-- MST color scale -->
+  <div class="subsec">Escala Monk Skin Tone — 10 tonalidades classificadas</div>
+  <div id="mst-scale-grid" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:flex-start"></div>
+
+  <!-- Protocol notes -->
+  <div class="callout warn" style="margin-top:16px">
+    <strong>Nota metodológica — double class weighting:</strong> o pipeline usa WeightedRandomSampler <em>e</em> CrossEntropyLoss(weight=1/freq) simultaneamente — ambos combatem o imbalance, mas de formas redundantes. O modelo convergiu bem (83,9%) mas o artigo deve documentar essa escolha e incluir ablação WRS-only vs. loss-weight-only para rigor científico.
+  </div>
+
+  <div class="callout good" style="margin-top:8px">
+    <strong>Checkpoint disponível:</strong> <code>outputs/etapa1/mst_extractor_v2/mst_vit_b16_seed42.pt</code> — pronto para inferência no FairFace via <code>04b_infer_mst_fairface.py</code>. Pré-requisito dos Configs B e C.
+  </div>
+
+</div><!-- /tab-mst -->
+
+<!-- ══════════════════════════ TAB 5 — ARQUITETURAS ══════════════════════════ -->
+<div class="tab-panel" id="tab-arq">
+
+  <p class="sec-eye">Contribuição do trabalho</p>
+  <h2 class="sec-title">Arquitetura proposta — sistema completo</h2>
+
+  <div class="cfg-row" style="margin-bottom:8px">
+    <button class="cfg-btn active" id="propA" onclick="setPropCfg('A',this)">Config A — Baseline</button>
+    <button class="cfg-btn cb" id="propB" onclick="setPropCfg('B',this)">Config B — FiLM + MST</button>
+    <button class="cfg-btn cc" id="propC" onclick="setPropCfg('C',this)">Config C — CLIP + FiLM</button>
+  </div>
+  <div class="cfg-desc-box" id="prop-cfg-desc">ConvNeXt-T sem FiLM — z_mst extraído mas não usado pelo classificador. Mede o viés base: F1=0,710, DR=0,605, gap=40%.</div>
+
+  <!-- Two-stream diagram -->
+  <div style="overflow-x:auto;margin:16px 0">
+  <div style="display:inline-flex;gap:32px;align-items:flex-start;min-width:520px">
+
+    <!-- Stream 1: MST Extractor -->
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);margin-bottom:10px;text-align:center">Etapa 1 — MST Extrator<br><span style="color:var(--fg3);font-size:8.5px">(treino offline · STW)</span></div>
+      <div class="node node-input" style="width:190px"><div class="node-name">STW Dataset</div><div class="node-sub">14.278 faces · 10 tons MST</div></div>
+      <div class="arrow-w" style="width:190px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-embed" style="width:190px"><div class="node-name">ViT-B/16 fine-tuned</div><div class="node-sub">112×112 → 196 tokens → 12 blocos</div><span class="node-badge2 nb-blue">86M params · acc=83%</span></div>
+      <div class="arrow-w" style="width:190px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node node-film2" style="width:190px"><div class="node-name" style="color:var(--c2)">z_mst ∈ ℝ¹⁰</div><div class="node-sub">Softmax → P(tom de pele)</div><span class="node-badge2 nb-film">.detach() — sem gradiente</span></div>
+      <div id="prop-conn-arr" style="height:36px;display:flex;align-items:center;justify-content:center;width:190px;opacity:.15">
+        <svg width="20" height="34"><line x1="10" y1="2" x2="10" y2="28" stroke="var(--c2)" stroke-width="1.5" stroke-dasharray="4 3"/><polyline points="6,24 10,30 14,24" fill="none" stroke="var(--c2)" stroke-width="1.5"/></svg>
+      </div>
+      <div id="prop-conn-lbl" style="font-size:10px;font-family:'IBM Plex Mono',monospace;color:var(--c2);text-align:center;width:190px;opacity:.15">→ FiLM conditioning</div>
+    </div>
+
+    <!-- Vertical separator -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding-top:50px">
+      <div style="width:1px;height:120px;background:var(--border)"></div>
+      <div style="font-size:8.5px;font-family:monospace;color:var(--fg3);text-align:center;padding:4px 0;white-space:nowrap">treinos<br>independentes</div>
+      <div style="width:1px;height:120px;background:var(--border)"></div>
+    </div>
+
+    <!-- Stream 2: Classifier -->
+    <div style="display:flex;flex-direction:column;align-items:center">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);margin-bottom:10px;text-align:center">Etapa 2 — Classificador<br><span id="prop-etapa-sub" style="font-size:8.5px;color:var(--c1)">FairFace · CrossEntropy pond.</span></div>
+      <div class="node node-input" style="width:220px"><div class="node-name">FairFace Dataset</div><div class="node-sub">108.501 faces · 7 grupos raciais</div></div>
+      <div class="arrow-w" style="width:220px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node" id="prop-backbone-node" style="width:220px;background:var(--c1l);border-color:var(--c1);border-radius:8px;border-width:1.5px;padding:8px 14px;text-align:center">
+        <div class="node-name" id="prop-bb-name">ConvNeXt-T</div>
+        <div class="node-sub" id="prop-bb-sub">4 stages · 28M params · ImageNet-1k</div>
+        <span class="node-badge2 nb-blue" id="prop-bb-dim">→ 768-d via GlobalAvgPool</span>
+      </div>
+      <div class="arrow-w" style="width:220px" id="prop-film-arw">
+        <svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--c2)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--c2)" stroke-width="1.5"/></svg>
+      </div>
+      <div class="node node-film2" id="prop-film-node" style="width:220px">
+        <div class="node-name">FiLM conditioning</div>
+        <div class="node-sub" id="prop-film-sub">Stage 4 · γ = W_γ·z_mst + b_γ</div>
+        <span class="node-badge2 nb-film">FiLM(F; z) = γ ⊙ F + β</span>
+      </div>
+      <div class="arrow-w" style="width:220px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+      <div class="node" style="width:220px;background:var(--code);border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;text-align:center">
+        <div class="node-name">Head — Classificação</div>
+        <div class="node-sub" id="prop-head-sub">Linear(768→7)</div>
+        <span class="node-badge2 nb-blue">CrossEntropyLoss ponderada</span>
+      </div>
+      <div class="arrow-w" style="width:220px"><svg width="20" height="26"><line x1="10" y1="2" x2="10" y2="20" stroke="var(--good)" stroke-width="1.5"/><polyline points="6,16 10,22 14,16" fill="none" stroke="var(--good)" stroke-width="1.5"/></svg></div>
+      <div class="node node-norm" style="width:220px;border-color:var(--good);border-width:2px">
+        <div class="node-name">Saída — 7 grupos raciais</div>
+        <div class="node-sub">F1-macro · DR = min F1 / max F1</div>
+        <span class="node-badge2 nb-good" id="prop-results">Config A: F1=0,710 · DR=0,605</span>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!-- Comparison table -->
+  <p class="sec-eye" style="margin-top:28px">Comparação das configurações</p>
+  <h2 class="sec-title">A → B → C — hipóteses e métricas-alvo</h2>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Config</th><th>Backbone</th><th>FiLM</th><th>F1-macro</th><th>DR</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><strong>A</strong> Baseline</td><td>ConvNeXt-T · 28M</td><td>—</td><td class="mono" style="color:var(--good)">0,710 ±0,002</td><td class="mono">0,605 ±0,006</td><td><span class="badge ok">Concluída</span></td></tr>
+        <tr><td><strong>B</strong> FiLM+MST</td><td>ConvNeXt-T · 28M</td><td>Stage 4 · z_mst</td><td class="mono">H1: &gt; 0,710</td><td class="mono">H2: &gt; 0,75</td><td><span class="badge mid">Próxima</span></td></tr>
+        <tr><td><strong>C</strong> CLIP+FiLM</td><td>CLIP ViT-B/16 · 86M</td><td>[CLS] bloco 12</td><td class="mono">ablação</td><td class="mono">ablação</td><td><span class="badge grey">Futura</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout warn">
+    <strong>Gap atual (Config A):</strong> F1(Black)=0,882 vs F1(Latinx)=0,535 — diferença de 40%. Config B hipótese: FiLM com z_mst reduz esse gap ao dar ao modelo informação explícita sobre tom de pele durante o treino.
+  </div>
+
+  <div style="display:none" id="arq-tab-vit-unused">
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--c1)"></div> Embedding / projeção</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--attn)"></div> Multi-head self-attention</div>
+      <div class="leg"><div class="leg-dot" style="background:#D97706"></div> MLP / feed-forward</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--good)"></div> Normalização / saída</div>
+    </div>
+    <div class="arch-wrap">
+      <div class="arch-col">
+        <div class="node node-input" onclick="showDet('vit','input')"><div class="node-name">Imagem de entrada</div><div class="node-sub">224 × 224 × 3 (RGB, face-aligned)</div></div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-embed" onclick="showDet('vit','patch')"><div class="node-name">Patch Embedding</div><div class="node-sub">Conv2d(3→768, k=16, s=16)</div><span class="node-badge2 nb-blue">196 patches × 768-d</span></div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-embed" onclick="showDet('vit','cls')"><div class="node-name">[CLS] + Pos. Encoding</div><div class="node-sub">concat CLS → 197 tokens; +E_pos</div><span class="node-badge2 nb-blue">197 × 768</span></div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="blk-grp" onclick="showDet('vit','block')">
+          <div class="blk-grp-lbl">× 12 blocos Transformer</div>
+          <div class="node node-norm" style="width:100%"><div class="node-name">LayerNorm</div><div class="node-sub">LN independente por token</div></div>
+          <div class="arrow-w" style="width:100%"><svg width="20" height="22"><line x1="10" y1="2" x2="10" y2="16" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,12 10,18 14,12" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+          <div class="node node-attn" style="width:100%" onclick="showDet('vit','mhsa')"><div class="node-name">Multi-Head Self-Attention</div><div class="node-sub">H=12 · d_k=64 · 197×197</div><span class="node-badge2 nb-attn">MHSA → 197 × 768</span></div>
+          <div class="arrow-w" style="width:100%"><svg width="100%" height="22"><text x="50%" y="13" text-anchor="middle" font-size="10" fill="var(--fg3)" font-family="monospace">+ residual</text></svg></div>
+          <div class="node node-norm" style="width:100%"><div class="node-name">LayerNorm</div><div class="node-sub">separada do LN anterior</div></div>
+          <div class="arrow-w" style="width:100%"><svg width="20" height="22"><line x1="10" y1="2" x2="10" y2="16" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,12 10,18 14,12" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+          <div class="node node-mlp" style="width:100%" onclick="showDet('vit','mlp')"><div class="node-name">MLP — Feed Forward</div><div class="node-sub">768→3072 (GELU)→768</div><span class="node-badge2" style="background:#FFF0DA;color:#A05010">×4 expansão</span></div>
+          <div class="arrow-w" style="width:100%"><svg width="100%" height="22"><text x="50%" y="13" text-anchor="middle" font-size="10" fill="var(--fg3)" font-family="monospace">+ residual</text></svg></div>
+        </div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-norm" onclick="showDet('vit','cls_out')"><div class="node-name">[CLS] token — extração</div><div class="node-sub">x[:, 0, :] — ignora 196 patches</div><span class="node-badge2 nb-good">768-d</span></div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-embed" onclick="showDet('vit','proj')"><div class="node-name">LayerNorm + Projeção</div><div class="node-sub">LN → Linear(768→512) → L2-norm</div><span class="node-badge2 nb-blue">512-d em S⁵¹¹</span></div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-out2" onclick="showDet('vit','out_mst')"><div class="node-name">Saída — MST Extrator</div><div class="node-sub">FC(512→10) → Softmax</div><span class="node-badge2 nb-blue">z_mst ∈ ℝ¹⁰</span></div>
+      </div>
+    </div>
+    <div class="det-panel" id="arq-det-vit" style="display:none"></div>
+  </div>
+
+  <!-- ── sub-tab: ConvNeXt ── -->
+  <div class="arq-sub-panel" id="arq-tab-convnext">
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--c1)"></div> ConvNeXt block</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c2)"></div> FiLM (Config B)</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--good)"></div> Pooling / saída</div>
+    </div>
+    <div class="arch-wrap">
+      <div class="arch-col">
+        <div class="node node-input" onclick="showDet('cx','input')"><div class="node-name">Imagem de entrada</div><div class="node-sub">224 × 224 × 3</div></div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-embed" onclick="showDet('cx','stem')"><div class="node-name">Stem</div><div class="node-sub">Conv2d(3→96, k=4, s=4) + LN</div><span class="node-badge2 nb-blue">56 × 56 × 96</span></div>
+        <div class="arrow-w"><svg width="20" height="20"><line x1="10" y1="2" x2="10" y2="18" stroke="var(--fg3)" stroke-width="1.5" stroke-dasharray="3 2"/></svg></div>
+        <div class="blk-grp" onclick="showDet('cx','s1')">
+          <div class="blk-grp-lbl">Stage 1 · 3 blocos</div>
+          <div class="node node-embed" style="width:100%"><div class="node-name">ConvNeXt Block × 3</div><div class="node-sub">DwConv 7×7 → LN → FC(4C) → GELU → FC(C)</div><span class="node-badge2 nb-blue">56 × 56 × 96</span></div>
+        </div>
+        <div class="arrow-w"><svg width="20" height="20"><line x1="10" y1="2" x2="10" y2="18" stroke="var(--fg3)" stroke-width="1.5" stroke-dasharray="3 2"/></svg></div>
+        <div class="blk-grp" onclick="showDet('cx','s2')">
+          <div class="blk-grp-lbl">Stage 2 · 3 blocos · ↓ downsample</div>
+          <div class="node node-embed" style="width:100%"><div class="node-name">ConvNeXt Block × 3</div><div class="node-sub">LN + Conv2d(2×2, s=2) → 192ch</div><span class="node-badge2 nb-blue">28 × 28 × 192</span></div>
+        </div>
+        <div class="arrow-w"><svg width="20" height="20"><line x1="10" y1="2" x2="10" y2="18" stroke="var(--fg3)" stroke-width="1.5" stroke-dasharray="3 2"/></svg></div>
+        <div class="blk-grp" onclick="showDet('cx','s3')">
+          <div class="blk-grp-lbl">Stage 3 · 9 blocos · ↓ downsample</div>
+          <div class="node node-embed" style="width:100%"><div class="node-name">ConvNeXt Block × 9</div><div class="node-sub">LN + Conv2d(2×2, s=2) → 384ch</div><span class="node-badge2 nb-blue">14 × 14 × 384</span></div>
+        </div>
+        <div class="arrow-w"><svg width="20" height="20"><line x1="10" y1="2" x2="10" y2="18" stroke="var(--fg3)" stroke-width="1.5" stroke-dasharray="3 2"/></svg></div>
+        <div class="blk-grp" style="border-color:var(--c2)" onclick="showDet('cx','s4')">
+          <div class="blk-grp-lbl" style="color:var(--c2)">Stage 4 · 3 blocos · ↓ · ← FiLM aqui</div>
+          <div class="node node-embed" style="width:100%"><div class="node-name">ConvNeXt Block × 3</div><div class="node-sub">LN + Conv2d(2×2, s=2) → 768ch</div><span class="node-badge2 nb-blue">7 × 7 × 768</span></div>
+          <div class="arrow-w" style="width:100%"><svg width="20" height="22"><line x1="10" y1="2" x2="10" y2="16" stroke="var(--c2)" stroke-width="1.5"/><polyline points="6,12 10,18 14,12" fill="none" stroke="var(--c2)" stroke-width="1.5"/></svg></div>
+          <div class="node node-film2" style="width:100%" onclick="showDet('cx','film')"><div class="node-name">FiLM conditioning</div><div class="node-sub">γ = W_γ·z + b_γ &nbsp; β = W_β·z + b_β</div><span class="node-badge2 nb-film">γ ⊙ F + β &nbsp; z∈ℝ¹⁰</span></div>
+        </div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-norm" onclick="showDet('cx','pool')"><div class="node-name">Global Average Pool</div><div class="node-sub">média espacial → vetor</div><span class="node-badge2 nb-good">768-d</span></div>
+        <div class="arrow-w"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-out2" onclick="showDet('cx','head')"><div class="node-name">Head — Classificação</div><div class="node-sub">Linear(768→7) · CrossEntropy pond.</div><span class="node-badge2 nb-blue">7 grupos raciais · F1-macro</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;padding-top:310px;gap:8px;min-width:80px">
+        <div style="background:var(--c2l);border:1.5px solid var(--c2);border-radius:8px;padding:7px 10px;text-align:center;cursor:pointer" onclick="showDet('cx','zmst')">
+          <div style="font-size:11px;font-weight:600;color:var(--c2)">z_mst</div>
+          <div style="font-size:9.5px;font-family:monospace;color:var(--fg3)">ℝ¹⁰</div>
+          <div style="font-size:9px;color:var(--fg3)">MST Extrator</div>
+        </div>
+        <svg width="60" height="36"><path d="M50,5 Q50,28 12,34" fill="none" stroke="var(--c2)" stroke-width="1.5" stroke-dasharray="4 3"/><polyline points="8,30 14,36 18,28" fill="none" stroke="var(--c2)" stroke-width="1.5"/></svg>
+        <div style="font-size:9.5px;font-family:monospace;color:var(--c2);text-align:center">→ W_γ, W_β<br>≈ 1,2M params</div>
+      </div>
+    </div>
+    <div class="det-panel" id="arq-det-cx" style="display:none"></div>
+  </div>
+
+  <!-- ── sub-tab: CLIP ── -->
+  <div class="arq-sub-panel" id="arq-tab-clip">
+    <div class="legend">
+      <div class="leg"><div class="leg-dot" style="background:var(--c1)"></div> Visual encoder (ViT-B/16)</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--attn)"></div> Text encoder (Transformer)</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--good)"></div> Projeções + hiperesfera</div>
+      <div class="leg"><div class="leg-dot" style="background:var(--c2)"></div> Loss InfoNCE</div>
+    </div>
+    <div class="clip-dual">
+      <div class="clip-col">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--c1);margin-bottom:8px;font-family:monospace">Visual Encoder</div>
+        <div class="node node-input" style="width:190px" onclick="showDet('cl','vi')"><div class="node-name">Imagem I_i</div><div class="node-sub">224 × 224 × 3</div></div>
+        <div class="arrow-w" style="width:190px"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-embed" style="width:190px" onclick="showDet('vit','patch')"><div class="node-name">Patch Embed</div><div class="node-sub">196 tokens + [CLS]</div><span class="node-badge2 nb-blue">197 × 768</span></div>
+        <div class="arrow-w" style="width:190px"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-attn" style="width:190px" onclick="showDet('vit','block')"><div class="node-name">ViT-B/16 Blocks</div><div class="node-sub">× 12 blocos MHSA + MLP</div><span class="node-badge2 nb-attn">197 × 768</span></div>
+        <div class="arrow-w" style="width:190px"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-norm" style="width:190px" onclick="showDet('cl','vproj')"><div class="node-name">Projeção Visual</div><div class="node-sub">LN → Linear(768→512) → L2</div><span class="node-badge2 nb-good">V_i ∈ S⁵¹¹</span></div>
+      </div>
+      <div class="clip-mid" onclick="showDet('cl','infonce')">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--c2);margin-bottom:4px;font-family:monospace;text-align:center">Loss InfoNCE</div>
+        <div style="font-size:10.5px;color:var(--fg3);text-align:center;margin-bottom:8px">N×N matriz sim. coseno</div>
+        <div id="arq-sim-matrix"></div>
+        <div style="margin-top:10px;font-family:monospace;font-size:10px;color:var(--fg2);text-align:center;background:var(--code);padding:8px 10px;border-radius:7px;cursor:pointer;line-height:1.6">L_ij = V_i·U_j / τ<br>τ ≈ 0.07 (aprendido)<br>N = 32.768 (orig.)</div>
+        <div style="margin-top:12px;background:var(--c2l);border:1px solid var(--c2);border-radius:8px;padding:9px 11px;width:120px;text-align:center;cursor:pointer"><div style="font-size:11px;font-weight:600;color:var(--c2)">CrossEntropy</div><div style="font-size:10px;color:var(--fg3);margin-top:3px">simétrica<br>img→txt + txt→img</div></div>
+      </div>
+      <div class="clip-col">
+        <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--attn);margin-bottom:8px;font-family:monospace">Text Encoder</div>
+        <div class="node node-input" style="width:190px;border-color:var(--attn)" onclick="showDet('cl','ti')"><div class="node-name">Texto T_i</div><div class="node-sub">"a photo of a face"</div></div>
+        <div class="arrow-w" style="width:190px"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-embed" style="width:190px;border-color:var(--attn);background:var(--attnl)" onclick="showDet('cl','tokemb')"><div class="node-name">Token Embed + Pos.</div><div class="node-sub">BPE vocab 49.408 → 512-d</div><span class="node-badge2 nb-attn">L × 512</span></div>
+        <div class="arrow-w" style="width:190px"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-attn" style="width:190px;border-color:var(--attn)" onclick="showDet('cl','txtblk')"><div class="node-name">Transformer Blocks</div><div class="node-sub">× 12 (causal mask) · 512-d</div><span class="node-badge2 nb-attn">L × 512</span></div>
+        <div class="arrow-w" style="width:190px"><svg width="20" height="28"><line x1="10" y1="2" x2="10" y2="22" stroke="var(--fg3)" stroke-width="1.5"/><polyline points="6,18 10,24 14,18" fill="none" stroke="var(--fg3)" stroke-width="1.5"/></svg></div>
+        <div class="node node-norm" style="width:190px" onclick="showDet('cl','tproj')"><div class="node-name">Projeção Textual</div><div class="node-sub">[EOS] token → Linear→ L2</div><span class="node-badge2 nb-good">U_i ∈ S⁵¹¹</span></div>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:18px;border-color:var(--c1);background:var(--c1l)">
+      <strong style="color:var(--c1)">Config C:</strong> usamos o encoder visual pré-treinado do CLIP como backbone, aplicando FiLM no [CLS] token do bloco 12. O encoder textual não entra — apenas os pesos ViT resultantes do pré-treino contrastivo.
+    </div>
+    <div class="det-panel" id="arq-det-cl" style="display:none"></div>
+  </div>
+
+</div><!-- /tab-arq -->
+
+<!-- ══════════════════════════ TAB — CONFIG A RESULTADOS ══════════════════════════ -->
+<div class="tab-panel" id="tab-resa">
+  <p class="sec-eye">Ablação — Config A</p>
+  <h2 class="sec-title">Config A — Baseline ConvNeXt-T · resultados (3 seeds)</h2>
+
+  <div class="callout" style="background:var(--c1l);border-color:var(--c1)">
+    <strong>Status:</strong> treinamento em execução — seed=42 ep 9/50 (estimado: conclusão ~17h15). Seeds 1 e 2 executam em sequência. Resultados finais serão inseridos aqui após conclusão.
+  </div>
+
+  <div class="tile-row">
+    <div class="tile"><div class="tile-lbl">F1-macro</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">aguardando 3 seeds</div></div>
+    <div class="tile"><div class="tile-lbl">Disp. Ratio</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">worst/best F1</div></div>
+    <div class="tile"><div class="tile-lbl">Worst F1</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">grupo mais prejudicado</div></div>
+    <div class="tile"><div class="tile-lbl">Best F1</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">grupo melhor</div></div>
+  </div>
+
+  <div class="subsec">O que este resultado estabelece</div>
+  <ul>
+    <li><strong>Baseline F1-macro:</strong> acurácia do ConvNeXt-T sem nenhuma intervenção de equidade. Meta: ≥73% (patamar ResNet-34 original).</li>
+    <li><strong>Viés base (DR):</strong> Disparity Ratio = F1(worst) / F1(best). DR &lt; 0,65 confirma viés sistemático que justifica H1/H2.</li>
+    <li><strong>Mapa de erro por grupo:</strong> qual grupo racial tem pior F1? Se correlacionado com MST extremo, confirma H3 e motiva Config B.</li>
+  </ul>
+
+  <div class="callout warn">
+    <strong>Comparação prevista com SOTA:</strong> Config A deve chegar em ~70–73% de F1-macro — abaixo dos 75,7% do FaceScanPaliGemma (2024). O ganho da nossa proposta não é acurácia bruta, mas <em>redução do gap inter-grupo</em> sem aumentar o tamanho do modelo.
+  </div>
+</div><!-- /tab-resa -->
+
+<!-- ══════════════════════════ TAB — CONFIG B RESULTADOS ══════════════════════════ -->
+<div class="tab-panel" id="tab-resb">
+  <p class="sec-eye">Ablação — Config B</p>
+  <h2 class="sec-title">Config B — ConvNeXt-T + FiLM(z_mst) · resultados (3 seeds)</h2>
+
+  <div class="callout" style="background:var(--c2l);border-color:var(--c2)">
+    <strong>Status:</strong> aguardando conclusão do Config A e geração do <code>fairface_train_mst.parquet</code> (inferência MST sobre FairFace — script <code>04b</code> pronto). Treinamento previsto: nov–dez 2026.
+  </div>
+
+  <div class="tile-row">
+    <div class="tile"><div class="tile-lbl">F1-macro</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">aguardando execução</div></div>
+    <div class="tile"><div class="tile-lbl">Disp. Ratio</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">meta: &gt; Config A</div></div>
+    <div class="tile"><div class="tile-lbl">ΔDR vs A</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">redução de disparidade</div></div>
+    <div class="tile"><div class="tile-lbl">Overhead FiLM</div><div class="tile-val">~1,2M</div><div class="tile-sub">params adicionais</div></div>
+  </div>
+
+  <div class="subsec">O que este resultado valida</div>
+  <ul>
+    <li><strong>H1:</strong> Config B melhora F1-macro vs Config A com mesma arquitetura base?</li>
+    <li><strong>H2:</strong> Config B reduz disparidade (DR↑) vs Config A?</li>
+    <li><strong>H3 diagnóstico:</strong> o ganho é maior para grupos com MST mais extremo (muito claro / muito escuro)?</li>
+  </ul>
+</div><!-- /tab-resb -->
+
+<!-- ══════════════════════════ TAB — CONFIG C RESULTADOS ══════════════════════════ -->
+<div class="tab-panel" id="tab-resc">
+  <p class="sec-eye">Ablação — Config C</p>
+  <h2 class="sec-title">Config C — CLIP ViT-B/16 + FiLM([CLS]) · resultados (3 seeds)</h2>
+
+  <div class="callout" style="background:var(--goodl);border-color:var(--good)">
+    <strong>Status:</strong> execução condicionada à validação estatística de H3 no Config B. Previsto: dez 2026 – jan 2027.
+  </div>
+
+  <div class="tile-row">
+    <div class="tile"><div class="tile-lbl">F1-macro</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">aguardando execução</div></div>
+    <div class="tile"><div class="tile-lbl">Disp. Ratio</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">meta: &gt; Config B</div></div>
+    <div class="tile"><div class="tile-lbl">ΔDR vs B</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">backbone semântico ajuda?</div></div>
+    <div class="tile"><div class="tile-lbl">Backbone</div><div class="tile-val">86M</div><div class="tile-sub">CLIP ViT-B/16</div></div>
+  </div>
+
+  <div class="subsec">O que este resultado valida</div>
+  <ul>
+    <li><strong>H3:</strong> embeddings CLIP (WIT 400M pares) potencializam a redução de viés pelo FiLM em relação ao ConvNeXt-T (Config B)?</li>
+    <li>Se sim: representação semântica pré-alinhada contribui para equidade racial.</li>
+    <li>Se não: o FiLM + z_mst é suficiente independente do backbone → Config B é a contribuição principal.</li>
+  </ul>
+</div><!-- /tab-resc -->
+
+</div><!-- /.content -->
+
+<!-- ══ DETAIL DRAWER ══ -->
+<div class="drawer" id="drawer">
+  <div class="dhdr">
+    <div class="dtitle" id="dtitle">Detalhe</div>
+    <button class="dclose" onclick="closeD()">✕</button>
+  </div>
+  <div class="dbody" id="dbody"></div>
+</div>
+
+<script>
+/* ── skin tone palette ── */
+const TONES=['#F8E8D0','#F2D2A0','#D4A874','#C08040','#A06028','#804818','#60300E','#4A2008','#341408','#200C06'];
+const PROBS=[3,5,8,14,18,20,16,9,5,2];
+
+/* ── build STW tone dots ── */
+(()=>{
+  const g=document.getElementById('tone-grid');
+  TONES.forEach(c=>{const d=document.createElement('div');d.className='tdot';d.style.background=c;g.appendChild(d);});
+})();
+
+/* ── build ViT stack ── */
+(()=>{
+  const s=document.getElementById('vit-stack');
+  for(let i=0;i<12;i++){const b=document.createElement('div');b.className='vit-b';b.style.width=(38+i*2.5)+'px';b.style.background=`hsl(${213+i*2},${58+i*2}%,${56-i*3}%)`;s.appendChild(b);}
+})();
+
+/* ── build z_mst bars ── */
+(()=>{
+  const c=document.getElementById('zmst-bars');
+  const mx=Math.max(...PROBS);
+  PROBS.forEach((p,i)=>{const b=document.createElement('div');b.className='bar-mini';b.style.height=Math.round(p/mx*34)+'px';b.style.background=TONES[i];c.appendChild(b);});
+})();
+
+/* ── build FairFace SVG ── */
+(()=>{
+  const svg=document.getElementById('ff-svg');
+  const ns='http://www.w3.org/2000/svg';
+  const pts=[{cx:10,cy:14,f:'#3A2010'},{cx:25,cy:7,f:'#D4A060'},{cx:40,cy:14,f:'#C47840'},{cx:55,cy:7,f:'#D49060'},{cx:58,cy:22,f:'#A87048'},{cx:28,cy:28,f:'#C09050'},{cx:10,cy:34,f:'#F0D4A0'}];
+  pts.forEach(p=>{
+    const c=document.createElementNS(ns,'circle');c.setAttribute('cx',p.cx);c.setAttribute('cy',p.cy);c.setAttribute('r',7);c.setAttribute('fill',p.f);c.setAttribute('stroke','rgba(0,0,0,.12)');c.setAttribute('stroke-width','1');svg.appendChild(c);
+  });
+})();
+
+/* ── build stage stack ── */
+(()=>{
+  const c=document.getElementById('stage-stack');
+  [{w:28,col:'#93C5FD'},{w:44,col:'#60A5FA'},{w:58,col:'#3B82F6'},{w:72,col:'#1D4ED8'}].forEach((s,i)=>{
+    const d=document.createElement('div');d.className='stage-b';d.style.width=s.w+'px';d.style.background=s.col;
+    if(i===3){d.style.outline='2px solid var(--c2)';d.style.outlineOffset='-1px';}
+    c.appendChild(d);
+  });
+  const lbl=document.createElement('div');lbl.style.cssText='font-size:8px;color:var(--c2);font-family:monospace;margin-top:1px';lbl.textContent='FiLM ↑';c.appendChild(lbl);
+})();
+
+/* ── build output bars ── */
+(()=>{
+  const c=document.getElementById('out-bars');
+  [{l:'BK',v:.882,ok:true},{l:'EA',v:.76,ok:true},{l:'IN',v:.72,ok:true},{l:'LX',v:.535,ok:false},{l:'ME',v:.68,ok:true},{l:'SA',v:.71,ok:true},{l:'WH',v:.83,ok:true}].forEach(d=>{
+    const row=document.createElement('div');row.className='obrow';
+    const lbl=document.createElement('div');lbl.className='oblbl';lbl.textContent=d.l;
+    const w=document.createElement('div');w.className='obwrap';
+    const f=document.createElement('div');f.className='obfill';f.style.width=Math.round(d.v*100)+'%';f.style.background=d.ok?'var(--good)':'var(--warn)';
+    w.appendChild(f);row.appendChild(lbl);row.appendChild(w);c.appendChild(row);
+  });
+})();
+
+/* ── configs ── */
+const CFGS={
+  A:{desc:'ConvNeXt-T sem condicionamento — mede o viés base. F1-macro=0,710, DR=0,605 · gap 40% entre Black (0,882) e Latinx (0,535).',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params',bbBb:'ImageNet-1k',vitName:'MST Extrator',vitSub:'ViT-B/16 · fine-tuned',vitBb:'86M params · STW',filmOff:true,filmSub:'Stage 4 · γ⊙F+β',filmBb:'inativo na Config A',outBb:'DR baseline=0,605',clip:false},
+  B:{desc:'ConvNeXt-T com FiLM condicionado em z_mst. Hipótese: FiLM reduz o gap Latinx vs Black, aumentando DR.',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params',bbBb:'ImageNet-1k',vitName:'MST Extrator',vitSub:'ViT-B/16 · fine-tuned',vitBb:'86M params · STW',filmOff:false,filmSub:'Stage 4 · z_mst → γ, β',filmBb:'Config B — ativo',outBb:'DR esperado > 0,75',clip:false},
+  C:{desc:'CLIP ViT-B/16 como backbone + FiLM condicionado em z_mst. Embeddings semânticos de 400M pares imagem-texto.',bbName:'CLIP ViT-B/16',bbSub:'12 blocos · 86M params',bbBb:'WIT 400M pares',vitName:'MST Extrator',vitSub:'ViT-B/16 · fine-tuned',vitBb:'86M params · STW',filmOff:false,filmSub:'[CLS] token bloco 12',filmBb:'Config C — ativo',outBb:'ablação completa',clip:true}
+};
+let curCfg='A';
+
+function setCfg(id,btn){
+  curCfg=id;
+  const c=CFGS[id];
+  document.querySelectorAll('.cfg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('cfg-desc').textContent=c.desc;
+  document.getElementById('bb-name').textContent=c.bbName;
+  document.getElementById('bb-sub').textContent=c.bbSub;
+  document.getElementById('bb-bb').textContent=c.bbBb;
+  document.getElementById('vit-name').textContent=c.vitName;
+  document.getElementById('vit-sub').textContent=c.vitSub;
+  document.getElementById('vit-bb').textContent=c.vitBb;
+  document.getElementById('film-sub').textContent=c.filmSub;
+  document.getElementById('film-bb').textContent=c.filmBb;
+  document.getElementById('out-bb').textContent=c.outBb;
+  const film=document.getElementById('bl-film');
+  const arrF=document.getElementById('arr-film');
+  const vc=document.getElementById('vconn');
+  if(c.filmOff){film.classList.add('off');arrF.classList.add('arr-off');vc.style.opacity='.18';}
+  else{film.classList.remove('off');arrF.classList.remove('arr-off');vc.style.opacity='1';}
+  const bb=document.getElementById('bl-bb');
+  c.clip?bb.classList.add('clipbb'):bb.classList.remove('clipbb');
+  if(drawerOpen&&lastD)openD(lastD);
+}
+
+/* ── drawer content ── */
+let drawerOpen=false,lastD=null;
+
+const DETAILS={
+  stw:{title:'STW — Skin Tone in the Wild Dataset',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Visão geral</div>
+<p>Dataset CC BY 4.0 com faces reais anotadas na <strong>Escala Monk Skin Tone (MST 1–10)</strong>.</p>
+<p>Split: <code>11.427 train</code> + <code>2.851 val</code> (80/20 estratificado, seed=42).</p>
+<p>Imagens em <code>all_cropped_images_by_class/{1..10}/</code>.</p></div>
+<div class="dc"><div class="dc-t">Desequilíbrio de classes</div>
+<p>Classe 10 tem ~252× menos amostras que classe 3.</p>
+<p>Solução: <code>WeightedRandomSampler</code> + <code>weighted CrossEntropyLoss</code> (inverso da frequência).</p></div>
+<div class="dc"><div class="dc-t">Distribuição por tom</div>
+<div id="stw-dist"></div></div></div>`},
+
+  vit:{title:'ViT-B/16 — MST Extrator',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Arquitetura</div>
+<p><strong>Patch embed:</strong> Conv2d(3→768, k=8, s=8) → 196 tokens → D=768.</p>
+<p><strong>12 blocos:</strong> LN → MHSA(H=12, d_k=64) → res → LN → MLP(3072, GELU) → res.</p>
+<p><strong>Saída:</strong> x[0](CLS) → FC(10) → Softmax → z_mst ∈ ℝ¹⁰.</p></div>
+<div class="dc"><div class="dc-t">Treinamento MST v2</div>
+<p>50 épocas · sem early stop · seed=42 · batch=32.</p>
+<p>AdamW lr=1e-4 · CosineAnnealingLR.</p>
+<div class="eq">ep=40  val_acc=82.6%  val_MAE=0.208
+ep=25  val_acc=78.4%  val_MAE=0.251
+→ convergência ainda subindo</div></div>
+<div class="dc"><div class="dc-t">Pré-treino</div>
+<p>ViT-B/16 pré-treinado em ImageNet-21k (14M imagens). Fine-tune completo no STW — todos os pesos atualizados.</p>
+<p>Checkpoint: <code>outputs/etapa1/mst_extractor_v2/</code></p></div></div>`},
+
+  zmst:{title:'z_mst — Vetor de Condicionamento MST',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Definição</div>
+<p>Saída do Softmax do MST Extrator: z_mst ∈ ℝ¹⁰, ∑ z_mst[i]=1.</p>
+<div class="eq">z_mst[i] = P(tom = classe i | imagem)
+Exemplo: face média → [.01,.03,.08,.18,.28,.22,.12,.05,.02,.01]</div></div>
+<div class="dc"><div class="dc-t">Por que probabilidade?</div>
+<p>Usar o vetor completo (soft label) em vez do argmax preserva a <strong>continuidade ordinal</strong> da escala MST — a diferença entre tom 5 e 6 é informativa.</p>
+<p>Mais robusto a faces com iluminação variável, onde o MST é ambíguo entre classes adjacentes.</p></div>
+<div class="dc"><div class="dc-t">Uso no FiLM</div>
+<p>Config B: z_mst (10-d) → Linear(10→768) → γ, β ∈ ℝ⁷⁶⁸ → Stage 4 ConvNeXt.</p>
+<p>Config C: z_mst → Linear(10→768) → γ, β → [CLS] token ViT bloco 12.</p></div></div>`},
+
+  ff:{title:'FairFace — Dataset de Classificação Racial',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Visão geral</div>
+<p>108.501 faces · 7 grupos: Black, East Asian, Indian, Latino/Hispanic, Middle Eastern, Southeast Asian, White.</p>
+<p>Ordem alfabética: Black=0, East Asian=1, Indian=2, Latino=3, Middle Eastern=4, SE Asian=5, White=6.</p></div>
+<div class="dc"><div class="dc-t">F1 por classe — Config A baseline</div>
+<div id="ff-f1-bars"></div></div>
+<div class="dc"><div class="dc-t">Limitação</div>
+<p>Categorias raciais são construtos sociais heterogêneos — a taxonomia não captura a diversidade intra-grupo. Não equivale ao MST (contínuo) vs categorias discretas.</p></div></div>`},
+
+  backbone:{title:null,html:null},
+
+  film:{title:'FiLM — Feature-wise Linear Modulation',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Formulação</div>
+<p>Dado F ∈ ℝᴺˣᴰ e condicionamento z ∈ ℝᵈᶻ:</p>
+<div class="eq">γ = W_γ·z + b_γ  ∈ ℝᴰ  (escala)
+β = W_β·z + b_β  ∈ ℝᴰ  (translação)
+FiLM(F; z) = γ ⊙ F + β  (broadcast N)</div>
+<p>Perez et al., 2018 — proposto para VQA.</p></div>
+<div class="dc"><div class="dc-t">Config B — ConvNeXt Stage 4</div>
+<p>F ∈ ℝᴮˣ⁷⁶⁸ˣ⁷ˣ⁷. z_mst (10-d) → Linear(10→768) → γ, β. Broadcast espacial H×W.</p>
+<p>Equivale a uma BN diferente por grupo, parametrizada continuamente por z.</p></div>
+<div class="dc"><div class="dc-t">Config C — ViT [CLS] token</div>
+<p>F = x[:,0,:] ∈ ℝᴮˣ⁷⁶⁸. z_mst → Linear(10→768) → γ, β. Recombina: concat([FiLM(x[:,0,:]), x[:,1:,:]]) → projeção 768→512.</p></div>
+<div class="dc"><div class="dc-t">Gradiente</div>
+<p>z_mst é <strong>detached</strong> do grafo — gradiente NÃO flui para o MST Extrator. Treinamos apenas FiLM + backbone, com o extrator MST congelado.</p></div></div>`},
+
+  output:{title:'Saída — Classificação + Métricas de Equidade',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Head de classificação</div>
+<p>Linear(512→7) → Softmax. Loss: CrossEntropyLoss ponderada. Métrica primária: <strong>F1-macro</strong>.</p></div>
+<div class="dc"><div class="dc-t">Métricas de equidade</div>
+<div class="eq">DR = min(F1_c) / max(F1_c)
+Config A: DR=0,605 · gap=40%
+  min F1=0,535 (Latinx)
+  max F1=0,882 (Black)
+Meta B/C: DR > 0,75</div></div>
+<div class="dc"><div class="dc-t">Protocolo</div>
+<p>3 seeds (42,1,2) · comparação casada A vs B vs C · média ± dp · 50 épocas sem early stop.</p></div></div>`},
+
+  pg_img:{title:'Entrada — Imagem facial (SigLIP)',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Pré-processamento</div>
+<p>Face alinhada por 5 landmarks (nariz, cantos dos olhos, boca) · redimensionada para <strong>224×224 px</strong> · normalizada pela média/std do SigLIP (diferente do CLIP/ImageNet).</p>
+<p>O alinhamento é crítico: posiciona olhos e boca em locais previsíveis, concentrando a atenção do modelo nas regiões relevantes da face.</p></div>
+<div class="dc"><div class="dc-t">SigLIP vs CLIP</div>
+<p>O SigLIP usa normalização própria (≠ ImageNet). Foi pré-treinado com <strong>sigmoid loss</strong> em pares imagem-texto — diferente do InfoNCE do CLIP, não precisa de batch grande para funcionar.</p></div></div>`},
+
+  pg_patch:{title:'Patch Embedding — Tokenização Visual',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Como funciona</div>
+<p>A imagem 224×224 é dividida em patches de <strong>14×14 px</strong> em uma grade 16×16 = <strong>256 patches</strong>. Cada patch é projetado linearmente para um vetor de <strong>1152 dimensões</strong>.</p>
+<p>Compare com o ViT-B/16: 196 tokens de 768-d (grade 14×14, patches 16×16). O SigLIP gera mais tokens com dimensão maior → mais capacidade representacional.</p></div>
+<div class="dc"><div class="dc-t">Por que 1152-d?</div>
+<p>O modelo So400M usa D=1152. Mais dimensões por token permitem capturar detalhes sutis como gradientes de tom de pele em diferentes regiões da face (bochechas, testa, queixo).</p></div></div>`},
+
+  pg_siglip:{title:'SigLIP — Transformer Encoder (27 blocos)',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Arquitetura</div>
+<p>27 blocos de atenção <strong>bidirecional</strong>: cada token visual "vê" todos os outros simultaneamente. Modelo <strong>So400M</strong> com ~400M parâmetros.</p>
+<p>Pré-treinado com <strong>sigmoid loss</strong>: ao invés do InfoNCE do CLIP (que compara N imagens vs N textos no batch), o SigLIP trata cada par independentemente — mais escalável em batches menores.</p></div>
+<div class="dc"><div class="dc-t">Atenção bidirecional</div>
+<p>Diferente do decoder Gemma (causal), o encoder pode usar atenção completa: cada patch acessa informação de todos os outros patches, inclusive os da direita. Isso melhora a representação de contexto facial global (ex: simetria, iluminação geral).</p></div></div>`},
+
+  pg_proj:{title:'Projeção Linear — Bridge SigLIP → Gemma',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Função</div>
+<p>Os 256 tokens visuais de <strong>1152-d</strong> (espaço SigLIP) são projetados para <strong>2048-d</strong> (espaço Gemma) através de uma camada linear sem ativação.</p>
+<p>Resultado: 256 tokens visuais prontos para serem concatenados com os tokens do prompt de texto e processados pelo Gemma decoder.</p></div>
+<div class="dc"><div class="dc-t">Treinável</div>
+<p>Essa camada é fine-tuned junto com o Gemma. É a "ponte" que traduz representações visuais para o espaço linguístico do decoder — fundamental para que o modelo entenda a imagem ao gerar o label.</p></div></div>`},
+
+  pg_prompt:{title:'Prompt de texto — Direcionamento de tarefa',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Por que usar prompt?</div>
+<p>Ao usar linguagem natural ("What is the race of this person?"), o mesmo backbone Gemma responde a <strong>múltiplos prompts</strong> (raça, gênero, emoção, idade) sem retreinar — basta trocar a pergunta.</p>
+<p>O fine-tuning foi feito com os quatro atributos simultâneos: a abordagem multi-tarefa favorece generalização via correlações entre atributos.</p></div>
+<div class="dc"><div class="dc-t">Tokenização BPE</div>
+<p>O prompt é convertido em tokens numéricos com BPE (Byte-Pair Encoding) do vocabulário Gemma. Esses tokens são concatenados com os 256 tokens visuais, formando uma sequência unificada.</p></div></div>`},
+
+  pg_concat:{title:'Concatenação — Fusão visual + linguagem',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Sequência unificada</div>
+<p>Os 256 tokens visuais projetados são concatenados com os tokens do prompt de texto. O Gemma decoder processa essa sequência única com <strong>atenção causal</strong> — cada token vê apenas os anteriores.</p></div>
+<div class="dc"><div class="dc-t">Fusão implícita</div>
+<p>Na sequência concatenada, os tokens de texto vêm depois dos visuais. Com atenção causal, o decoder gera a resposta considerando tanto a imagem quanto o prompt — sem um mecanismo explícito de cross-attention, a fusão acontece naturalmente na sequência.</p></div></div>`},
+
+  pg_gemma:{title:'Gemma Decoder — Geração autoregressiva',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Arquitetura</div>
+<p><strong>18 blocos transformer</strong> com atenção causal · <strong>2B parâmetros</strong>. Fine-tuned multi-tarefa: raça, gênero, emoção, idade simultaneamente com prompts diferentes.</p>
+<p>Fine-tuning com LoRA (Low-Rank Adaptation) para reduzir memória GPU.</p></div>
+<div class="dc"><div class="dc-t">Escala e posicionamento</div>
+<p>2B params = ~100× o Config A (28M). Inference requer GPU ≥8GB VRAM.</p>
+<p>Nossa proposta é ortogonal: condicionamento FiLM com z_mst poderia ser aplicado ao SigLIP encoder sem modificar o Gemma decoder — seria uma extensão natural deste SOTA.</p></div></div>`},
+
+  pg_output:{title:'Saída — Label de raça gerado',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Decodificação</div>
+<p>O decoder gera um token de resposta: <strong>"White"</strong>, <strong>"Black"</strong>, <strong>"Latino"</strong>, <strong>"East Asian"</strong>, <strong>"Southeast Asian"</strong>, <strong>"Indian"</strong> ou <strong>"Middle Eastern"</strong>.</p>
+<p>Acurácia medida comparando o token gerado com o label verdadeiro do FairFace.</p></div>
+<div class="dc"><div class="dc-t">SOTA 2024</div>
+<div class="eq">Acurácia: 75,7%  (7 classes FairFace)
+F1-macro:  ~75%
+Supera: GPT-4o, todas as CNNs anteriores</div>
+<p>Ainda com ~10pp de gap entre grupos. Nossa contribuição: condicionamento FiLM em z_mst pode reduzir esse gap sem aumentar o modelo.</p></div></div>`}
+};
+
+function getBackboneDetail(){
+  if(curCfg==='C') return {title:'CLIP ViT-B/16 — Backbone Config C',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">Pré-treino CLIP</div>
+<p>ViT-B/16 treinado contrastivamente em 400M pares (WIT). Loss InfoNCE, batch N=32.768, τ aprendido (≈0,07).</p>
+<div class="eq">L = -½N Σ[log(e^Lii/Σe^Lij) + log(e^Lii/Σe^Lji)]
+Lij = (Vi·Uj)/τ</div></div>
+<div class="dc"><div class="dc-t">Arquitetura</div>
+<p>Idêntica ao MST Extrator: patch 16×16, 196 tokens, D=768, L=12, H=12. Saída: CLS → Linear(768→512), norm ℓ₂.</p>
+<p>Diferença: pré-treino contrastivo vs fine-tune supervisionado.</p></div>
+<div class="dc"><div class="dc-t">Equidade vs risco</div>
+<p><strong>Vantagem:</strong> embeddings organizados por semântica textual ("dark skin", "fair complexion").</p>
+<p><strong>Risco:</strong> LAION sub-representa certas etnias em texto — viés do corpus se transfere para o espaço visual (Birhane et al., 2021).</p></div></div>`};
+  return {title:'ConvNeXt-T — Backbone Configs A e B',html:`
+<div class="dgrid">
+<div class="dc"><div class="dc-t">4 Stages</div>
+<div class="eq">Stage 1: patch 4×4 → 96ch  (56×56)
+Stage 2: downsample → 192ch  (28×28)
+Stage 3: downsample → 384ch  (14×14)
+Stage 4: downsample → 768ch  ( 7× 7) ← FiLM
+GlobalAvgPool → 768-d → Linear(7)</div></div>
+<div class="dc"><div class="dc-t">Bloco ConvNeXt</div>
+<p>DwConv 7×7 (depthwise) + LayerNorm por canal + GELU + 2 lineares (equiv. 1×1 conv). Inspirado em ViT mas mantendo estrutura local.</p>
+<div class="eq">x → DwConv(7×7) → LN → FC(4C) → GELU → FC(C)</div></div>
+<div class="dc"><div class="dc-t">FiLM no Stage 4</div>
+<p>Feature map: ℝᴮˣ⁷⁶⁸ˣ⁷ˣ⁷. Parâmetros FiLM: 2×Linear(10→768) ≈ 1,2M parâmetros adicionais.</p></div></div>`};
+}
+
+function openD(id){
+  lastD=id;drawerOpen=true;
+  const det=id==='backbone'?getBackboneDetail():DETAILS[id];
+  document.getElementById('dtitle').textContent=det.title;
+  document.getElementById('dbody').innerHTML=det.html;
+
+  if(id==='stw'){
+    const c=document.getElementById('stw-dist');
+    if(c){[120,312,580,1420,1820,1980,1540,880,420,206].forEach((n,i)=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:5px;margin-bottom:3px';
+      const lbl=document.createElement('span');lbl.style.cssText='font-size:9.5px;font-family:monospace;color:var(--fg3);width:32px';lbl.textContent='MST '+(i+1);
+      const w=document.createElement('div');w.style.cssText='flex:1;height:7px;background:var(--code);border-radius:3px;overflow:hidden';
+      const f=document.createElement('div');f.style.cssText=`height:100%;border-radius:3px;background:${TONES[i]};width:${Math.round(n/1980*100)}%;border:1px solid rgba(0,0,0,.08)`;
+      const num=document.createElement('span');num.style.cssText='font-size:9.5px;font-family:monospace;color:var(--fg3);width:30px;text-align:right';num.textContent=n;
+      w.appendChild(f);row.appendChild(lbl);row.appendChild(w);row.appendChild(num);c.appendChild(row);
+    });}
+  }
+  if(id==='ff'){
+    const c=document.getElementById('ff-f1-bars');
+    if(c){[{l:'Black',v:.882,ok:true},{l:'East Asian',v:.760,ok:true},{l:'Indian',v:.720,ok:true},{l:'Latinx',v:.535,ok:false},{l:'Mid.East.',v:.680,ok:true},{l:'SE Asian',v:.710,ok:true},{l:'White',v:.830,ok:true}].forEach(d=>{
+      const row=document.createElement('div');row.style.cssText='display:flex;align-items:center;gap:5px;margin-bottom:3px';
+      const lbl=document.createElement('span');lbl.style.cssText='font-size:10px;font-family:monospace;color:var(--fg2);width:68px;flex-shrink:0';lbl.textContent=d.l;
+      const w=document.createElement('div');w.style.cssText='flex:1;height:7px;background:var(--code);border-radius:3px;overflow:hidden';
+      const f=document.createElement('div');f.style.cssText=`height:100%;border-radius:3px;background:${d.ok?'var(--good)':'var(--warn)'};width:${Math.round(d.v*100)}%`;
+      const num=document.createElement('span');num.style.cssText='font-size:10px;font-family:monospace;color:var(--fg3);width:34px;text-align:right';num.textContent=d.v.toFixed(3);
+      w.appendChild(f);row.appendChild(lbl);row.appendChild(w);row.appendChild(num);c.appendChild(row);
+    });}
+  }
+
+  document.querySelectorAll('.blk').forEach(b=>b.classList.remove('sel'));
+  const bl=document.getElementById('bl-'+id);
+  if(bl)bl.classList.add('sel');
+  document.getElementById('drawer').classList.add('open');
+}
+
+function closeD(){
+  drawerOpen=false;lastD=null;
+  document.getElementById('drawer').classList.remove('open');
+  document.querySelectorAll('.blk').forEach(b=>b.classList.remove('sel'));
+}
+
+/* ── tabs ── */
+function showTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  closeD();
+  if(id==='clip'||id==='arq') buildSimMatrix();
+  if(id==='mst') drawMSTCharts();
+  if(window.MathJax)MathJax.typesetPromise([document.getElementById('tab-'+id)]).catch(()=>{});
+}
+
+/* ══ MST TRAINING CHARTS ══ */
+const MST_HISTORY=[
+  [1,0.0214,4.6531],[2,0.1564,1.5230],[3,0.2178,1.1863],[4,0.2722,1.0484],[5,0.3346,0.9390],
+  [6,0.4195,0.8138],[7,0.5146,0.6289],[8,0.4977,0.6338],[9,0.5872,0.5118],[10,0.5984,0.5033],
+  [11,0.6436,0.4647],[12,0.6436,0.4539],[13,0.6286,0.4402],[14,0.6264,0.4577],[15,0.7233,0.3364],
+  [16,0.7517,0.2911],[17,0.7082,0.3886],[18,0.6587,0.4149],[19,0.7278,0.3353],[20,0.7559,0.2866],
+  [21,0.7629,0.2859],[22,0.7590,0.2946],[23,0.7573,0.3002],[24,0.7576,0.2848],[25,0.7843,0.2511],
+  [26,0.8008,0.2325],[27,0.8053,0.2266],[28,0.8004,0.2340],[29,0.7804,0.2606],[30,0.8078,0.2269],
+  [31,0.7745,0.2687],[32,0.7706,0.2774],[33,0.8187,0.2115],[34,0.8046,0.2269],[35,0.8155,0.2154],
+  [36,0.8148,0.2157],[37,0.8215,0.2080],[38,0.8088,0.2252],[39,0.8232,0.2098],[40,0.8264,0.2038],
+  [41,0.8145,0.2189],[42,0.8232,0.2069],[43,0.8264,0.2059],[44,0.8113,0.2199],[45,0.8278,0.2059],
+  [46,0.8327,0.1947],[47,0.8309,0.1961],[48,0.8264,0.2045],[49,0.8358,0.1943],[50,0.8394,0.1905]
+];
+const STW_COUNTS=[1298,5685,4104,1464,945,454,182,81,43,22];
+
+let mstDrawn=false;
+function drawMSTCharts(){
+  if(mstDrawn)return;
+  const st=getComputedStyle(document.documentElement);
+  function cv(n){return st.getPropertyValue(n).trim();}
+  const C={c1:cv('--c1')||'#1F4E8C',c2:cv('--c2')||'#C86A1C',
+            fg3:cv('--fg3')||'#8892A4',good:cv('--good')||'#1F7A4A',
+            bg2:cv('--bg2')||'#FFFFFF',border:cv('--border')||'#DDD9CF',
+            fg:cv('--fg')||'#1C2333'};
+
+  function lineChart(id,series,yMin,yMax,fmtY,annot){
+    const cv=document.getElementById(id);if(!cv)return;
+    const ctx=cv.getContext('2d');
+    const W=cv.width,H=cv.height,P={t:24,r:18,b:26,l:44};
+    const cW=W-P.l-P.r,cH=H-P.t-P.b,N=MST_HISTORY.length;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle=C.bg2;ctx.fillRect(0,0,W,H);
+    const xp=i=>P.l+(i/(N-1))*cW;
+    const yp=v=>P.t+cH-((v-yMin)/(yMax-yMin))*cH;
+    // grid
+    ctx.strokeStyle=C.border;ctx.lineWidth=0.5;ctx.setLineDash([3,3]);
+    const steps=5;
+    for(let g=0;g<=steps;g++){
+      const v=yMin+(yMax-yMin)*g/steps;const y=yp(v);
+      ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+cW,y);ctx.stroke();
+      ctx.fillStyle=C.fg3;ctx.font='9px monospace';ctx.textAlign='right';
+      ctx.fillText(fmtY(v),P.l-4,y+3);
+    }
+    ctx.setLineDash([]);
+    // x labels
+    ctx.fillStyle=C.fg3;ctx.font='9px monospace';ctx.textAlign='center';
+    [1,10,20,30,40,50].forEach(ep=>{ctx.fillText(ep,xp(ep-1),H-6);});
+    // axis
+    ctx.strokeStyle=C.border;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(P.l,P.t);ctx.lineTo(P.l,P.t+cH);ctx.lineTo(P.l+cW,P.t+cH);ctx.stroke();
+    // series
+    series.forEach(s=>{
+      ctx.strokeStyle=s.color;ctx.lineWidth=2;ctx.beginPath();
+      MST_HISTORY.forEach((d,i)=>{const x=xp(i),y=yp(s.val(d));i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+      ctx.stroke();
+    });
+    // best marker
+    if(annot){
+      const bi=annot.ep-1,bv=annot.v,x=xp(bi),y=yp(bv);
+      ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=C.good;ctx.fill();
+      ctx.fillStyle=C.good;ctx.font='bold 9px monospace';ctx.textAlign='center';
+      ctx.fillText(annot.lbl,x,y-8);
+    }
+    mstDrawn=true;
+  }
+
+  lineChart('mst-acc-chart',
+    [{color:C.c1,val:d=>d[1]}],0,1,
+    v=>(v*100).toFixed(0)+'%',
+    {ep:50,v:0.8394,lbl:'83,9%'});
+
+  lineChart('mst-mae-chart',
+    [{color:C.c2,val:d=>d[2]}],0,5,
+    v=>v.toFixed(1),
+    {ep:50,v:0.1905,lbl:'0,19'});
+
+  /* distribution bar chart */
+  const dc=document.getElementById('mst-dist-chart');
+  if(dc){
+    const ctx=dc.getContext('2d');
+    const W=dc.width,H=dc.height,P={t:22,r:12,b:30,l:40};
+    const cW=W-P.l-P.r,cH=H-P.t-P.b;
+    const maxC=Math.max(...STW_COUNTS);
+    ctx.fillStyle=C.bg2;ctx.fillRect(0,0,W,H);
+    const bW=cW/STW_COUNTS.length;
+    STW_COUNTS.forEach((cnt,i)=>{
+      const bH=(cnt/maxC)*cH;
+      const x=P.l+i*bW+bW*0.12,y=P.t+cH-bH,w=bW*0.76;
+      ctx.fillStyle=TONES[i];
+      ctx.strokeStyle=C.border;ctx.lineWidth=0.8;
+      ctx.beginPath();
+      if(ctx.roundRect)ctx.roundRect(x,y,w,bH,3);else ctx.rect(x,y,w,bH);
+      ctx.fill();ctx.stroke();
+      ctx.fillStyle=C.fg;ctx.font='bold 9px monospace';ctx.textAlign='center';
+      const lbl=cnt>=1000?(cnt/1000).toFixed(1)+'k':cnt.toString();
+      ctx.fillText(lbl,x+w/2,y-4);
+      ctx.fillStyle=C.fg3;ctx.font='8px monospace';
+      ctx.fillText('MST '+(i+1),x+w/2,H-8);
+    });
+    // axis
+    ctx.strokeStyle=C.border;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(P.l,P.t);ctx.lineTo(P.l,P.t+cH);ctx.lineTo(P.l+cW,P.t+cH);ctx.stroke();
+    // y labels
+    [0,2000,4000,5685].forEach(v=>{
+      const y=P.t+cH-(v/maxC)*cH;
+      ctx.strokeStyle=C.border;ctx.lineWidth=0.4;ctx.setLineDash([2,2]);
+      ctx.beginPath();ctx.moveTo(P.l,y);ctx.lineTo(P.l+cW,y);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=C.fg3;ctx.font='8px monospace';ctx.textAlign='right';
+      ctx.fillText(v>=1000?(v/1000).toFixed(0)+'k':v,P.l-3,y+3);
+    });
+  }
+
+  /* color scale grid */
+  const sg=document.getElementById('mst-scale-grid');
+  if(sg&&!sg.children.length){
+    STW_COUNTS.forEach((cnt,i)=>{
+      const el=document.createElement('div');
+      el.style.cssText='text-align:center;min-width:58px;flex:1 1 58px';
+      el.innerHTML=`<div style="width:42px;height:42px;border-radius:50%;background:${TONES[i]};border:2px solid rgba(0,0,0,.15);margin:0 auto 4px"></div>`+
+        `<div style="font-size:9.5px;font-family:monospace;color:var(--fg3)">MST ${i+1}</div>`+
+        `<div style="font-size:9px;font-family:monospace;color:var(--fg2);font-weight:600">${cnt.toLocaleString('pt-BR')}</div>`;
+      sg.appendChild(el);
+    });
+  }
+}
+
+/* ── proposed architecture config ── */
+const PROP={
+  A:{desc:'ConvNeXt-T sem FiLM — z_mst extraído mas não usado pelo classificador. Mede o viés base: F1=0,710, DR=0,605, gap=40%.',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params · ImageNet-1k',bbDim:'→ 768-d via GlobalAvgPool',filmOn:false,filmSub:'Stage 4 · γ = W_γ·z_mst + b_γ',headSub:'Linear(768→7)',results:'Config A: F1=0,710 · DR=0,605',clip:false,etapa:'FairFace · CrossEntropy pond.'},
+  B:{desc:'ConvNeXt-T + FiLM no Stage 4 condicionado em z_mst. H1: F1>0,710 · H2: DR>0,75. Teste da hipótese de condicionamento por tom de pele.',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params · ImageNet-1k',bbDim:'→ 768-d via GlobalAvgPool',filmOn:true,filmSub:'Stage 4 · γ = W_γ·z_mst + b_γ',headSub:'Linear(768→7)',results:'Config B: aguardando execução',clip:false,etapa:'FairFace · CrossEntropy pond.'},
+  C:{desc:'CLIP ViT-B/16 backbone + FiLM no [CLS] do bloco 12. Embeddings semânticos de 400M pares. Ablação comparada com B.',bbName:'CLIP ViT-B/16',bbSub:'12 blocos MHSA · 86M params · WIT 400M',bbDim:'CLS 768 → projeção 512-d',filmOn:true,filmSub:'[CLS] bloco 12 · γ⊙F+β · z_mst(10→768)',headSub:'Linear(512→7)',results:'Config C: ablação futura',clip:true,etapa:'FairFace · backbone CLIP congelado'},
+};
+function setPropCfg(id,btn){
+  const c=PROP[id];
+  document.querySelectorAll('#propA,#propB,#propC').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('prop-cfg-desc').textContent=c.desc;
+  document.getElementById('prop-bb-name').textContent=c.bbName;
+  document.getElementById('prop-bb-sub').textContent=c.bbSub;
+  document.getElementById('prop-bb-dim').textContent=c.bbDim;
+  document.getElementById('prop-film-sub').textContent=c.filmSub;
+  document.getElementById('prop-head-sub').textContent=c.headSub;
+  document.getElementById('prop-results').textContent=c.results;
+  document.getElementById('prop-etapa-sub').textContent=c.etapa;
+  const fn=document.getElementById('prop-film-node');
+  const fa=document.getElementById('prop-film-arw');
+  const ca=document.getElementById('prop-conn-arr');
+  const cl=document.getElementById('prop-conn-lbl');
+  fn.style.opacity=c.filmOn?'1':'.2';fn.style.pointerEvents=c.filmOn?'auto':'none';
+  fa.style.opacity=c.filmOn?'1':'.2';
+  ca.style.opacity=c.filmOn?'1':'.15';cl.style.opacity=c.filmOn?'1':'.15';
+  const bn=document.getElementById('prop-backbone-node');
+  bn.style.borderColor=c.clip?'var(--good)':'var(--c1)';bn.style.background=c.clip?'var(--goodl)':'var(--c1l)';
+}
+
+function showArchTab(){}
+
+/* ── sim matrix ── */
+const simBuiltFor=new Set();
+function buildSimMatrix(){
+  ['arq-sim-matrix','sota-sim-mat'].forEach(id=>{
+    if(simBuiltFor.has(id))return;
+    const mat=document.getElementById(id);
+    if(!mat)return;
+    simBuiltFor.add(id);
+    const N=id==='sota-sim-mat'?5:6;
+    const grid=document.createElement('div');
+    grid.style.cssText=`display:grid;grid-template-columns:repeat(${N},1fr);gap:2px;width:${N*18}px`;
+    for(let i=0;i<N;i++)for(let j=0;j<N;j++){
+      const c=document.createElement('div');const diag=i===j;const near=Math.abs(i-j)===1;
+      c.style.cssText=`width:16px;height:16px;border-radius:2px;background:${diag?'var(--c2)':near?'color-mix(in srgb,var(--c2) 30%,var(--code))':'var(--code)'};border:1px solid rgba(0,0,0,.07)`;
+      grid.appendChild(c);
+    }
+    mat.appendChild(grid);
+  });
+}
+function buildSimMatrix_OLD(){
+  if(true)return;
+  const mat=document.getElementById('arq-sim-matrix');
+  if(!mat)return;
+  const N=6;
+  const grid=document.createElement('div');
+  grid.style.cssText=`display:grid;grid-template-columns:repeat(${N},1fr);gap:2px;width:${N*19}px`;
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++){
+    const c=document.createElement('div');
+    const diag=i===j;const near=Math.abs(i-j)===1;
+    c.style.cssText=`width:17px;height:17px;border-radius:2px;background:${diag?'var(--c2)':near?'color-mix(in srgb,var(--c2) 30%,var(--code))':'var(--code)'};border:1px solid rgba(0,0,0,.07)`;
+    grid.appendChild(c);
+  }
+  const lbl=document.createElement('div');lbl.style.cssText='font-size:9.5px;font-family:monospace;color:var(--fg3);text-align:center;margin-top:4px';lbl.textContent='diagonal = pares corretos';
+  mat.appendChild(grid);mat.appendChild(lbl);
+}
+
+/* ── detail panels ── */
+const DETS={
+  vit:{
+    input:{title:'Entrada — Imagem face-aligned',cards:[
+      {t:'Pré-processamento',html:'Detecção facial com MTCNN, alinhamento pelos olhos, crop 112×112. Normalização: mean=[0.5,0.5,0.5], std=[0.5,0.5,0.5] → valores em [-1,1].'},
+      {t:'MST vs CLIP',html:'MST Extrator: 112×112 (alinhamento facial STW). CLIP backbone Config C: 224×224 (padrão CLIP). Pipeline de pré-processamento separado por config.'},
+    ]},
+    patch:{title:'Patch Embedding — divisão em tokens',cards:[
+      {t:'Operação',html:'Conv2d(in=3, out=768, kernel_size=8, stride=8) na imagem 112×112.<br>Output: (B, 768, 14, 14) → reshape → (B, 196, 768).'},
+      {t:'Por que Conv2d?',html:'Equivalente a dividir em 14×14=196 patches de 8×8 px e projetar cada um para 768-d. Conv2d é eficiente e diferenciável.'},
+      {eq:'N = (112/8)² = 196 tokens\ndim_model D = 768'},
+    ]},
+    cls:{title:'[CLS] Token e Positional Encoding',cards:[
+      {t:'Token de classe',html:'Vetor aprendido x_cls ∈ ℝ⁷⁶⁸ preposto à sequência: [x_cls, p₁…p₁₉₆]. Após todos os blocos, x[:,0,:] agrega informação global via atenção.'},
+      {t:'Positional Encoding',html:'E_pos ∈ ℝ¹⁹⁷ˣ⁷⁶⁸ totalmente aprendido (não fixo). Cada posição espacial tem um embedding único.'},
+    ]},
+    block:{title:'Bloco Transformer — estrutura completa',cards:[
+      {t:'Fórmula Pre-LN',html:'Variante Pre-LN (LayerNorm antes do sub-módulo — mais estável):'},
+      {eq:"x' = x + MHSA(LN(x))\nx'' = x' + MLP(LN(x'))"},
+      {t:'Params/bloco',html:'MHSA: 4×768² ≈ 2,36M · MLP: 2×768×3072 ≈ 4,72M · LNs: ~1.5k · Total/bloco ≈ 7,1M × 12 ≈ 85M'},
+    ]},
+    mhsa:{title:'Multi-Head Self-Attention — detalhe',cards:[
+      {t:'Por cabeça h=1..12',html:''},
+      {eq:'Q=XW_Q^h  K=XW_K^h  V=XW_V^h\nAttn_h = softmax(QK^T/√64)·V → (B,197,64)'},
+      {t:'Multi-head',html:'Concat 12 cabeças → (B,197,768) → W_O. O [CLS] atende a todos os 196 patches — acumula info global ao longo dos 12 blocos.'},
+    ]},
+    mlp:{title:'MLP — Feed Forward Network',cards:[
+      {eq:'MLP(x) = FC(768→3072) → GELU → FC(3072→768)\nExpansão ×4: bottleneck invertido'},
+      {t:'GELU vs ReLU',html:'GELU(x) = x·Φ(x) onde Φ é a CDF normal. Ativa negativos suavemente — empiricamente melhor em Transformers.'},
+    ]},
+    cls_out:{title:'Extração do [CLS] token',cards:[
+      {t:'Por que só o [CLS]?',html:'Após 12 blocos, [CLS] recebeu informação de todos os 196 patches via atenção global. Os patches x[:,1:,:] carregam info espacial local — desnecessária para classificação.'},
+    ]},
+    proj:{title:'Projeção final — hiperesfera',cards:[
+      {t:'Normalização L2',html:'v = Linear(768→512)(LN(x_cls)) → v = v/‖v‖₂. Força ‖v‖=1 → v ∈ S⁵¹¹. Similaridade de cosseno = produto escalar diretamente.'},
+    ]},
+    out_mst:{title:'Saída — MST Extrator',cards:[
+      {t:'Classificação MST',html:'FC(512→10) → Softmax → z_mst ∈ ℝ¹⁰, ∑z_mst[i]=1.<br>z_mst[i] = P(tom de pele = classe i | imagem).'},
+      {t:'Uso como condicionamento',html:'z_mst é passado com .detach() para o FiLM do classificador. Gradiente NÃO flui para o MST Extrator durante o treino do classificador.'},
+    ]},
+  },
+  cx:{
+    input:{title:'Entrada ConvNeXt-T',cards:[
+      {t:'Local vs Global',html:'ConvNeXt usa convoluções locais (campo receptivo crescente). O ViT processa globalmente desde o bloco 1. Para textura de pele e bordas o ConvNeXt pode ser mais eficiente.'},
+    ]},
+    stem:{title:'Stem — patchify convolucional',cards:[
+      {eq:'112×112 → Conv(k=4,s=4) → 28×28×96\n(ou 224×224 → 56×56×96 com input padrão)'},
+    ]},
+    s1:{title:'Stage 1 — bloco ConvNeXt',cards:[
+      {t:'Bloco ConvNeXt',html:'Inspirado no ViT mas convolucional. DwConv 7×7 (campo receptivo local largo) + inversão do bottleneck:'},
+      {eq:'x → DwConv(7×7) → LN → FC(4C) → GELU → FC(C) → +x'},
+    ]},
+    s2:{title:'Stage 2 — downsampling',cards:[{eq:'28×28×96 → (LN+Conv2×2/s2) → 14×14×192'}]},
+    s3:{title:'Stage 3 — bloco mais profundo',cards:[
+      {t:'9 blocos',html:'Stage 3 tem 9 blocos — maior capacidade do ConvNeXt-T. Campo receptivo efetivo já cobre boa parte da face em 7×7.'},
+    ]},
+    s4:{title:'Stage 4 + FiLM',cards:[
+      {t:'Por que Stage 4?',html:'Features de alto nível semântico. FiLM modula representações abstratas em vez de features de baixo nível (bordas, texturas).'},
+      {eq:'F ∈ ℝᴮˣ⁷⁶⁸ˣ⁴ˣ⁴\nγ = W_γ(z_mst) ∈ ℝ⁷⁶⁸\nFiLM(F) = γ[:,:,None,None]·F + β[:,:,None,None]'},
+    ]},
+    film:{title:'FiLM — Feature-wise Linear Modulation',cards:[
+      {t:'Origem',html:'Perez et al. 2018 (VQA). Condicionamento de rede convolucional em representação externa.'},
+      {eq:'γ = W_γ·z + b_γ  ∈ ℝᴰ  (escala)\nβ = W_β·z + b_β  ∈ ℝᴰ  (translação)\nFiLM(F; z) = γ ⊙ F + β'},
+      {t:'Interpretação',html:'γ_c > 1 amplifica canal c. γ_c ≈ 0 suprime. β_c desloca limiar. Para cada z_mst uma transformação afim diferente — sem N redes separadas.'},
+    ]},
+    zmst:{title:'z_mst — vetor de condicionamento',cards:[
+      {t:'Semântica ordinal',html:'z_mst[0..9] = P(MST 1..10). Escala Monk é ordinal. O vetor suave preserva continuidade — melhor que argmax discreto.'},
+      {t:'Detach',html:'z_mst.detach() → FiLM não retropropaga para o MST Extrator. Treina apenas FiLM + backbone.'},
+    ]},
+    pool:{title:'Global Average Pool',cards:[{eq:'F ∈ ℝᴮˣ⁷⁶⁸ˣᴴˣᵂ → mean(H,W) → ℝᴮˣ⁷⁶⁸'}]},
+    head:{title:'Head — classificação',cards:[
+      {t:'Saída',html:'Linear(768→7) → logits · CrossEntropyLoss ponderada pelo inverso da frequência de classe no FairFace.'},
+      {t:'Métricas',html:'F1-macro e Disparity Ratio = min F1 / max F1. Config A: F1=0,710, DR=0,605.'},
+    ]},
+  },
+  cl:{
+    vi:{title:'Entrada visual — WIT corpus',cards:[
+      {t:'400M pares',html:'Imagens com alt-text/caption coletados da web. Batch size original: 32.768 pares em 256 GPUs A100.'},
+      {t:'Nosso uso',html:'Só usamos o encoder visual pré-treinado. O encoder textual e a loss não entram na Config C.'},
+    ]},
+    vproj:{title:'Projeção visual — espaço contrastivo',cards:[
+      {eq:'LN(CLS) → W_proj ∈ ℝ⁷⁶⁸ˣ⁵¹² → L2-norm → V_i ∈ S⁵¹¹\nSim(V_i, U_j) = V_i · U_j  (sem divisão de norma)'},
+    ]},
+    infonce:{title:'Loss InfoNCE — contrastiva simétrica',cards:[
+      {eq:'L_img→txt = -(1/N) Σᵢ log[ e^(Lii/τ) / Σⱼ e^(Lij/τ) ]\nL_CLIP = (L_img→txt + L_txt→img) / 2'},
+      {t:'Temperatura τ',html:'Iniciada em 0,07, aprendida. τ pequeno → distribuição afiada → discriminação fina.'},
+      {t:'Por que N²?',html:'N²-N pares negativos por amostra forçam discriminação fina. N=32.768 → gradiente muito informativo.'},
+    ]},
+    ti:{title:'Texto T_i — viés do corpus',cards:[
+      {t:'Risco',html:'Birhane et al. (2021): LAION sub-representa certas etnias e usa linguagem pejorativa. Viés textual → viés no espaço visual do encoder.'},
+    ]},
+    tokemb:{title:'Token Embedding — texto',cards:[
+      {t:'BPE',html:'Byte Pair Encoding, vocab 49.408 tokens. Texto truncado/padded para L=77 tokens. Embed: Linear(49408→512) + E_pos(77×512).'},
+    ]},
+    txtblk:{title:'Transformer de texto — causal',cards:[
+      {t:'Diferença vs ViT',html:'Máscara causal (cada token só atende aos anteriores). O [EOS] acumula contexto completo da sequência — usado como representação textual.'},
+    ]},
+    tproj:{title:'Projeção textual',cards:[
+      {eq:'x_eos = saída [EOS] após 12 blocos\n→ LN → W_t ∈ ℝ⁵¹²ˣ⁵¹² → L2-norm → U_i ∈ S⁵¹¹'},
+    ]},
+  },
+};
+
+function showDet(tab,key){
+  const panelMap={vit:'arq-det-vit',cx:'arq-det-cx',cl:'arq-det-cl'};
+  const panelId=panelMap[tab];
+  if(!panelId)return;
+  const p=document.getElementById(panelId);
+  const data=DETS[tab]&&DETS[tab][key];
+  if(!data){p.style.display='none';return;}
+  let html=`<div class="det-title"><span>${data.title}</span><button class="det-close" onclick="document.getElementById('${panelId}').style.display='none'">✕</button></div><div class="det-grid">`;
+  data.cards.forEach(c=>{
+    html+=`<div class="det-card">`;
+    if(c.t)html+=`<div class="det-card-t">${c.t}</div>`;
+    if(c.html)html+=`<p>${c.html}</p>`;
+    if(c.eq)html+=`<div class="eq">${c.eq.replace(/\n/g,'<br>')}</div>`;
+    html+=`</div>`;
+  });
+  html+=`</div>`;
+  p.innerHTML=html;p.style.display='block';
+  setTimeout(()=>p.scrollIntoView({behavior:'smooth',block:'nearest'}),50);
+}
+</script>
+
+<!-- MathJax -->
+<script>MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['$$','$$']]},svg:{fontCache:'global'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+</body>
+</html>
+
+</body></html>

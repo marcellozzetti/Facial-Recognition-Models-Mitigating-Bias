@@ -1,12 +1,10 @@
 """Pipeline stage — Etapa 2: treinamento das 3 configurações A/B/C.
 
-Cap. 4 §4.7. Todas as configurações compartilham backbone (ConvNeXt-T),
-dataset (FairFace) e protocolo de treinamento — o que varia é apenas
-o sinal de condicionamento.
+Cap. 4 §4.7. Protocolo de ablação com 3 seeds (42, 1, 2) × 3 configs = 9 treinos.
 
-Config A: ConvNeXt-T puro (baseline)
-Config B: ConvNeXt-T + FiLM com sinal MST direto (10-dim)
-Config C: ConvNeXt-T + FiLM com sinal via CLIP-text (512-dim)
+Config A: ConvNeXt-T puro (baseline, sem FiLM)
+Config B: ConvNeXt-T + FiLM(z_mst, 10-dim) após Stage 4 — proposta principal
+Config C: CLIP ViT-B/16 + FiLM(z_mst, 10-dim) no [CLS] token — ablação do backbone
 
 Uso:
     python pipelines/05_train_ablation.py --config-id A --seed 42
@@ -47,6 +45,7 @@ if str(REPO_ROOT / "src") not in sys.path:
 
 from face_bias.conditioning import (  # noqa: E402
     CLIPPromptEnsembler,
+    CLIPViTWithFiLM,
     wrap_convnext_with_film,
 )
 from face_bias.fairness.disparity_ratio import disparity_ratio, per_class_f1  # noqa: E402
@@ -132,15 +131,16 @@ def _train_transform() -> transforms.Compose:
 # Model builder por configuração                                              #
 # --------------------------------------------------------------------------- #
 def build_model_for_config(config_id: str, num_classes: int = FAIRFACE_CLASSES) -> nn.Module:
-    """A: ConvNeXt-T puro. B: + FiLM 10-dim. C: + FiLM 512-dim (CLIP)."""
-    bb = convnext_tiny(weights=ConvNeXt_Tiny_Weights.DEFAULT)
+    """A: ConvNeXt-T puro. B: ConvNeXt-T + FiLM(z_mst). C: CLIP ViT-B/16 + FiLM(z_mst)."""
     if config_id == "A":
+        bb = convnext_tiny(weights=ConvNeXt_Tiny_Weights.DEFAULT)
         bb.classifier[-1] = nn.Linear(bb.classifier[-1].in_features, num_classes)
         return bb
     if config_id == "B":
+        bb = convnext_tiny(weights=ConvNeXt_Tiny_Weights.DEFAULT)
         return wrap_convnext_with_film(bb, cond_dim=10, num_classes=num_classes)
     if config_id == "C":
-        return wrap_convnext_with_film(bb, cond_dim=512, num_classes=num_classes)
+        return CLIPViTWithFiLM(cond_dim=10, num_classes=num_classes)
     raise ValueError(f"config_id inválido: {config_id!r}. Use A, B ou C.")
 
 
@@ -168,6 +168,7 @@ def train_one_config(
     lr_head: float,
     weight_decay: float,
     seed: int,
+    patience: int = EARLY_STOPPING_PATIENCE,
     clip_ensembler: Optional[CLIPPromptEnsembler] = None,
 ) -> dict:
     _set_seed(seed)
@@ -212,8 +213,7 @@ def train_one_config(
         if len(batch) == 3:
             x, y, z = batch
             z = z.to(device, non_blocking=True)
-            if config_id == "C" and clip_ensembler is not None:
-                z = clip_ensembler.encode(z)
+            # Config C: z é z_mst (10-dim) diretamente — sem projeção CLIP-text.
         else:
             x, y = batch
             z = None
@@ -293,10 +293,10 @@ def train_one_config(
             patience_counter = 0
         else:
             patience_counter += 1
-            if patience_counter >= EARLY_STOPPING_PATIENCE:
+            if patience_counter >= patience:
                 logger.info(
                     "Early stopping: cfg=%s seed=%d ep=%d (patience=%d)",
-                    config_id, seed, epoch, EARLY_STOPPING_PATIENCE,
+                    config_id, seed, epoch, patience,
                 )
                 break
 
@@ -319,6 +319,8 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                    help="Cache .npy do prompt bank CLIP (Config C).")
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--max-epochs", type=int, default=15)
+    p.add_argument("--patience", type=int, default=EARLY_STOPPING_PATIENCE,
+                   help="Paciência do early stopping. Use 999 para desativar.")
     p.add_argument("--batch-size", type=int, default=64)
     p.add_argument("--num-workers", type=int, default=4)
     p.add_argument("--lr-backbone", type=float, default=1e-4)
@@ -352,10 +354,7 @@ def main(argv: list[str] | None = None) -> int:
     val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False,
                             num_workers=args.num_workers, pin_memory=torch.cuda.is_available())
 
-    clip_ensembler = None
-    if args.config_id == "C":
-        clip_ensembler = CLIPPromptEnsembler(cache_path=args.clip_cache, device=str(device))
-        clip_ensembler.build_prompt_bank()
+    clip_ensembler = None  # Config C agora usa z_mst direto; CLIPPromptEnsembler não é mais necessário.
 
     args.output.mkdir(parents=True, exist_ok=True)
     t0 = time.time()
@@ -369,6 +368,7 @@ def main(argv: list[str] | None = None) -> int:
         lr_head=args.lr_head,
         weight_decay=args.weight_decay,
         seed=args.seed,
+        patience=args.patience,
         clip_ensembler=clip_ensembler,
     )
     elapsed = time.time() - t0
