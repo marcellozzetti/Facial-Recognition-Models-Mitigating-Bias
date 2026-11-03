@@ -285,7 +285,7 @@ li strong{color:var(--fg)}
     <button class="cfg-btn cb"     onclick="setCfg('B',this)">Config B — FiLM + MST</button>
     <button class="cfg-btn cc"     onclick="setCfg('C',this)">Config C — CLIP + FiLM</button>
   </div>
-  <div class="cfg-desc-box" id="cfg-desc">ConvNeXt-T sem condicionamento — mede o viés base. F1-macro=0,710, DR=0,605 · gap 40% entre Black (0,882) e Latinx (0,535).</div>
+  <div class="cfg-desc-box" id="cfg-desc">ConvNeXt-T sem condicionamento — mede o viés base. F1-macro=0,692, DR=0,595 · gap ~34pp entre melhor (0,844) e pior grupo (0,502) · seed=42.</div>
 
   <!-- Diagram -->
   <div class="diagram">
@@ -456,8 +456,8 @@ li strong{color:var(--fg)}
   <h2 class="sec-title">Cronograma até defesa</h2>
 
   <div class="roadmap">
-    <div class="rm-row"><div class="rm-dot rm-done"></div><div class="rm-date">out 2026</div><div class="rm-item"><strong>Config A concluída</strong> — baseline definido, viés documentado (DR=0,605)</div></div>
-    <div class="rm-row"><div class="rm-dot rm-now"></div><div class="rm-date">nov 2026</div><div class="rm-item"><strong>MST v2 + Config A 50ep</strong> — curvas completas de convergência · em execução agora</div></div>
+    <div class="rm-row"><div class="rm-dot rm-done"></div><div class="rm-date">out 2026</div><div class="rm-item"><strong>Config A concluída</strong> — baseline definido, viés documentado (DR=0,595)</div></div>
+    <div class="rm-row"><div class="rm-dot rm-now"></div><div class="rm-date">nov 2026</div><div class="rm-item"><strong>MST v2 + Config A 50ep</strong> — seed=42 concluída (F1=0,692 · DR=0,595) · seeds 1 e 2 em andamento</div></div>
     <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date">nov–dez 2026</div><div class="rm-item"><strong>Config B</strong> — ConvNeXt-T + FiLM com z_mst · 3 seeds · 50ep · comparação A vs B</div></div>
     <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date">dez 2026–jan 2027</div><div class="rm-item"><strong>Diagnóstico H3</strong> — matriz MST × classe racial · correlação tom de pele / erro</div></div>
     <div class="rm-row"><div class="rm-dot rm-next"></div><div class="rm-date" style="color:var(--c1);font-weight:600">31 jan 2027</div><div class="rm-item"><strong>Submissão IJCNN 2027</strong> — 6pp IEEE · Config A + MST + H3 · Cape Town jun/2027</div></div>
@@ -885,7 +885,7 @@ li strong{color:var(--fg)}
     <button class="cfg-btn cb" id="propB" onclick="setPropCfg('B',this)">Config B — FiLM + MST</button>
     <button class="cfg-btn cc" id="propC" onclick="setPropCfg('C',this)">Config C — CLIP + FiLM</button>
   </div>
-  <div class="cfg-desc-box" id="prop-cfg-desc">ConvNeXt-T sem FiLM — z_mst extraído mas não usado pelo classificador. Mede o viés base: F1=0,710, DR=0,605, gap=40%.</div>
+  <div class="cfg-desc-box" id="prop-cfg-desc">ConvNeXt-T sem FiLM — z_mst extraído mas não usado pelo classificador. Mede o viés base: F1=0,692, DR=0,595, gap~34pp · seed=42.</div>
 
   <!-- Two-stream diagram -->
   <div style="overflow-x:auto;margin:16px 0">
@@ -940,7 +940,7 @@ li strong{color:var(--fg)}
       <div class="node node-norm" style="width:220px;border-color:var(--good);border-width:2px">
         <div class="node-name">Saída — 7 grupos raciais</div>
         <div class="node-sub">F1-macro · DR = min F1 / max F1</div>
-        <span class="node-badge2 nb-good" id="prop-results">Config A: F1=0,710 · DR=0,605</span>
+        <span class="node-badge2 nb-good" id="prop-results">Config A: F1=0,692 · DR=0,595 · seed=42</span>
       </div>
     </div>
   </div>
@@ -953,8 +953,8 @@ li strong{color:var(--fg)}
     <table>
       <thead><tr><th>Config</th><th>Backbone</th><th>FiLM</th><th>F1-macro</th><th>DR</th><th>Status</th></tr></thead>
       <tbody>
-        <tr><td><strong>A</strong> Baseline</td><td>ConvNeXt-T · 28M</td><td>—</td><td class="mono" style="color:var(--good)">0,710 ±0,002</td><td class="mono">0,605 ±0,006</td><td><span class="badge ok">Concluída</span></td></tr>
-        <tr><td><strong>B</strong> FiLM+MST</td><td>ConvNeXt-T · 28M</td><td>Stage 4 · z_mst</td><td class="mono">H1: &gt; 0,710</td><td class="mono">H2: &gt; 0,75</td><td><span class="badge mid">Próxima</span></td></tr>
+        <tr><td><strong>A</strong> Baseline</td><td>ConvNeXt-T · 28M</td><td>—</td><td class="mono" style="color:var(--c1)">0,692 (seed=42)</td><td class="mono">0,595 (seed=42)</td><td><span class="badge mid">1/3 seeds</span></td></tr>
+        <tr><td><strong>B</strong> FiLM+MST</td><td>ConvNeXt-T · 28M</td><td>Stage 4 · z_mst</td><td class="mono">H1: &gt; 0,692</td><td class="mono">H2: &gt; 0,75</td><td><span class="badge mid">Próxima</span></td></tr>
         <tr><td><strong>C</strong> CLIP+FiLM</td><td>CLIP ViT-B/16 · 86M</td><td>[CLS] bloco 12</td><td class="mono">ablação</td><td class="mono">ablação</td><td><span class="badge grey">Futura</span></td></tr>
       </tbody>
     </table>
@@ -1103,15 +1103,15 @@ li strong{color:var(--fg)}
   <p class="sec-eye">Ablação — Config A</p>
   <h2 class="sec-title">Config A — Baseline ConvNeXt-T · resultados (3 seeds)</h2>
 
-  <div class="callout" style="background:var(--c1l);border-color:var(--c1)">
-    <strong>Status:</strong> treinamento em execução — seed=42 ep 9/50 (estimado: conclusão ~17h15). Seeds 1 e 2 executam em sequência. Resultados finais serão inseridos aqui após conclusão.
+  <div class="callout good">
+    <strong>Seed=42 concluída</strong> — best val F1-macro = 0,692 (ep=43 / 50ep · ~4h). Seeds 1 e 2 em andamento (sequencial). Valores finais com média±dp disponíveis após conclusão dos 3 seeds.
   </div>
 
   <div class="tile-row">
-    <div class="tile"><div class="tile-lbl">F1-macro</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">aguardando 3 seeds</div></div>
-    <div class="tile"><div class="tile-lbl">Disp. Ratio</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">worst/best F1</div></div>
-    <div class="tile"><div class="tile-lbl">Worst F1</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">grupo mais prejudicado</div></div>
-    <div class="tile"><div class="tile-lbl">Best F1</div><div class="tile-val" style="color:var(--fg3)">—</div><div class="tile-sub">grupo melhor</div></div>
+    <div class="tile"><div class="tile-lbl">F1-macro</div><div class="tile-val" style="color:var(--c1)">0,692</div><div class="tile-sub">seed=42 · ep=43 · 1/3 seeds</div></div>
+    <div class="tile"><div class="tile-lbl">Disp. Ratio</div><div class="tile-val warn">0,595</div><div class="tile-sub">worst/best F1 · gap~34pp</div></div>
+    <div class="tile"><div class="tile-lbl">Worst F1</div><div class="tile-val warn">0,502</div><div class="tile-sub">grupo mais prejudicado</div></div>
+    <div class="tile"><div class="tile-lbl">Best F1</div><div class="tile-val good">0,844</div><div class="tile-sub">grupo melhor</div></div>
   </div>
 
   <div class="subsec">O que este resultado estabelece</div>
@@ -1244,7 +1244,7 @@ const PROBS=[3,5,8,14,18,20,16,9,5,2];
 
 /* ── configs ── */
 const CFGS={
-  A:{desc:'ConvNeXt-T sem condicionamento — mede o viés base. F1-macro=0,710, DR=0,605 · gap 40% entre Black (0,882) e Latinx (0,535).',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params',bbBb:'ImageNet-1k',vitName:'MST Extrator',vitSub:'ViT-B/16 · fine-tuned',vitBb:'86M params · STW',filmOff:true,filmSub:'Stage 4 · γ⊙F+β',filmBb:'inativo na Config A',outBb:'DR baseline=0,605',clip:false},
+  A:{desc:'ConvNeXt-T sem condicionamento — mede o viés base. F1-macro=0,692, DR=0,595 · gap~34pp entre melhor (0,844) e pior grupo (0,502) · seed=42.',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params',bbBb:'ImageNet-1k',vitName:'MST Extrator',vitSub:'ViT-B/16 · fine-tuned',vitBb:'86M params · STW',filmOff:true,filmSub:'Stage 4 · γ⊙F+β',filmBb:'inativo na Config A',outBb:'DR baseline=0,595',clip:false},
   B:{desc:'ConvNeXt-T com FiLM condicionado em z_mst. Hipótese: FiLM reduz o gap Latinx vs Black, aumentando DR.',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params',bbBb:'ImageNet-1k',vitName:'MST Extrator',vitSub:'ViT-B/16 · fine-tuned',vitBb:'86M params · STW',filmOff:false,filmSub:'Stage 4 · z_mst → γ, β',filmBb:'Config B — ativo',outBb:'DR esperado > 0,75',clip:false},
   C:{desc:'CLIP ViT-B/16 como backbone + FiLM condicionado em z_mst. Embeddings semânticos de 400M pares imagem-texto.',bbName:'CLIP ViT-B/16',bbSub:'12 blocos · 86M params',bbBb:'WIT 400M pares',vitName:'MST Extrator',vitSub:'ViT-B/16 · fine-tuned',vitBb:'86M params · STW',filmOff:false,filmSub:'[CLS] token bloco 12',filmBb:'Config C — ativo',outBb:'ablação completa',clip:true}
 };
@@ -1354,8 +1354,8 @@ FiLM(F; z) = γ ⊙ F + β  (broadcast N)</div>
 <p>Linear(512→7) → Softmax. Loss: CrossEntropyLoss ponderada. Métrica primária: <strong>F1-macro</strong>.</p></div>
 <div class="dc"><div class="dc-t">Métricas de equidade</div>
 <div class="eq">DR = min(F1_c) / max(F1_c)
-Config A: DR=0,605 · gap=40%
-  min F1=0,535 (Latinx)
+Config A: DR=0,595 · gap~34pp
+  min F1=0,502 · max F1=0,844
   max F1=0,882 (Black)
 Meta B/C: DR > 0,75</div></div>
 <div class="dc"><div class="dc-t">Protocolo</div>
@@ -1639,7 +1639,7 @@ function drawMSTCharts(){
 
 /* ── proposed architecture config ── */
 const PROP={
-  A:{desc:'ConvNeXt-T sem FiLM — z_mst extraído mas não usado pelo classificador. Mede o viés base: F1=0,710, DR=0,605, gap=40%.',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params · ImageNet-1k',bbDim:'→ 768-d via GlobalAvgPool',filmOn:false,filmSub:'Stage 4 · γ = W_γ·z_mst + b_γ',headSub:'Linear(768→7)',results:'Config A: F1=0,710 · DR=0,605',clip:false,etapa:'FairFace · CrossEntropy pond.'},
+  A:{desc:'ConvNeXt-T sem FiLM — z_mst extraído mas não usado pelo classificador. Mede o viés base: F1=0,692, DR=0,595, gap~34pp · seed=42.',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params · ImageNet-1k',bbDim:'→ 768-d via GlobalAvgPool',filmOn:false,filmSub:'Stage 4 · γ = W_γ·z_mst + b_γ',headSub:'Linear(768→7)',results:'Config A: F1=0,692 · DR=0,595 · seed=42',clip:false,etapa:'FairFace · CrossEntropy pond.'},
   B:{desc:'ConvNeXt-T + FiLM no Stage 4 condicionado em z_mst. H1: F1>0,710 · H2: DR>0,75. Teste da hipótese de condicionamento por tom de pele.',bbName:'ConvNeXt-T',bbSub:'4 stages · 28M params · ImageNet-1k',bbDim:'→ 768-d via GlobalAvgPool',filmOn:true,filmSub:'Stage 4 · γ = W_γ·z_mst + b_γ',headSub:'Linear(768→7)',results:'Config B: aguardando execução',clip:false,etapa:'FairFace · CrossEntropy pond.'},
   C:{desc:'CLIP ViT-B/16 backbone + FiLM no [CLS] do bloco 12. Embeddings semânticos de 400M pares. Ablação comparada com B.',bbName:'CLIP ViT-B/16',bbSub:'12 blocos MHSA · 86M params · WIT 400M',bbDim:'CLS 768 → projeção 512-d',filmOn:true,filmSub:'[CLS] bloco 12 · γ⊙F+β · z_mst(10→768)',headSub:'Linear(512→7)',results:'Config C: ablação futura',clip:true,etapa:'FairFace · backbone CLIP congelado'},
 };
@@ -1776,7 +1776,7 @@ const DETS={
     pool:{title:'Global Average Pool',cards:[{eq:'F ∈ ℝᴮˣ⁷⁶⁸ˣᴴˣᵂ → mean(H,W) → ℝᴮˣ⁷⁶⁸'}]},
     head:{title:'Head — classificação',cards:[
       {t:'Saída',html:'Linear(768→7) → logits · CrossEntropyLoss ponderada pelo inverso da frequência de classe no FairFace.'},
-      {t:'Métricas',html:'F1-macro e Disparity Ratio = min F1 / max F1. Config A: F1=0,710, DR=0,605.'},
+      {t:'Métricas',html:'F1-macro e Disparity Ratio = min F1 / max F1. Config A: F1=0,692, DR=0,595 · seed=42 (1/3 seeds).'},
     ]},
   },
   cl:{
